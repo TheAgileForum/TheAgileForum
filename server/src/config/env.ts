@@ -6,6 +6,9 @@ const schema = z.object({
   DATABASE_URL: z.string().min(1),
   JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
   AUTH_COOKIE_NAME: z.string().default("access_token"),
+  REDIS_URL: z.string().url().default("redis://localhost:6379"),
+  WORKER_PORT: z.coerce.number().int().positive().default(3101),
+  SCHEDULER_PORT: z.coerce.number().int().positive().default(3102),
 });
 
 export type AppEnv = z.infer<typeof schema>;
