@@ -1,0 +1,706 @@
+<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>PRD - Agile Forum</title><style>body{font-family:Inter,Segoe UI,Arial,sans-serif;max-width:1080px;margin:0 auto;padding:32px;line-height:1.6;color:#1f2937;background:#f8fafc}h1,h2,h3{line-height:1.25;color:#0f172a}h1{font-size:2rem;margin-top:0}h2{font-size:1.45rem;margin-top:2rem;border-bottom:1px solid #e5e7eb;padding-bottom:.35rem}h3{font-size:1.15rem;margin-top:1.2rem}table{border-collapse:collapse;width:100%;margin:1rem 0;background:#fff}th,td{border:1px solid #d1d5db;padding:.55rem;vertical-align:top}th{background:#f1f5f9;text-align:left}code{background:#eef2ff;padding:.1rem .3rem;border-radius:4px}pre{background:#0b1020;color:#e2e8f0;padding:1rem;border-radius:8px;overflow:auto}blockquote{border-left:4px solid #cbd5e1;padding:.2rem .9rem;margin:1rem 0;color:#334155;background:#f8fafc}ul,ol{padding-left:1.4rem}.meta{color:#64748b;font-size:.9rem;margin-bottom:1rem}</style></head><body><div class='meta'>Generated from prd-agile-forum.md on 2026-05-25 15:09</div><hr />
+<h2 id="title-product-requirements-document-the-agile-forum-ai-native-career-transformation">title: "Product Requirements Document: The Agile Forum (AI-Native Career Transformation)"</h2>
+<p>status: draft
+created: "2026-05-25"
+updated: "2026-05-25"
+owner: "Dhirender"
+workflowType: "prd"
+inputDocuments:
+  - "c:/Users/dhire/OneDrive/Documents/mybmadproj/_bmad-output/planning-artifacts/product-brief-agile-forum.md"
+  - "c:/Users/dhire/OneDrive/Documents/mybmadproj/_bmad-output/planning-artifacts/product-brief-agile-forum-distillate.md"
+  - "c:/Users/dhire/OneDrive/Documents/mybmadproj/_bmad-output/planning-artifacts/must-have-priorities-agile-forum.md"
+  - "c:/Users/dhire/OneDrive/Documents/mybmadproj/_bmad-output/planning-artifacts/competitive-analysis-agile-forum.md"
+  - "c:/Users/dhire/OneDrive/Documents/mybmadproj/_bmad-output/planning-artifacts/current-state-analysis-theagileforum.md"
+  - "c:/Users/dhire/OneDrive/Documents/AgileForum/Requirement/The Agile Forum Product Requirements Document Prd.docx"</p>
+<h1 id="product-requirements-document-the-agile-forum">Product Requirements Document - The Agile Forum</h1>
+<p><strong>Author:</strong> Dhirender<br />
+<strong>Date:</strong> 2026-05-25</p>
+<h2 id="executive-summary">Executive Summary</h2>
+<p>The Agile Forum will evolve from a high-touch Wix-led training site into an AI-native career transformation platform for Agile and Product professionals. The MVP centers on a single conversion system: diagnose learner gaps fast, show progress in a learner dashboard, validate via timed micro-exams, and guide users to one best-fit paid offer with consistent pricing and trustworthy claims.</p>
+<p>This PRD defines a full-site replacement of current public surfaces while preserving acquisition strengths (content, SEO, founder trust) and introducing productized personalization, measurement, and commerce reliability.</p>
+<h2 id="problem-statement">Problem Statement</h2>
+<p>Current journey quality is constrained by manual counseling and long-form marketing pages. Visitors lack personalized confidence in what to buy next, and operations rely on fragmented flows between content, diagnostics, and purchase.</p>
+<p>Key issues:</p>
+<ul>
+<li>No productized resume-to-role diagnosis funnel</li>
+<li>No persistent learner account/dashboard for progress and return visits</li>
+<li>No scalable, time-bound skills check-ins</li>
+<li>Inconsistent pricing/trust signals across surfaces</li>
+<li>Technical hygiene risks (for example sitemap reliability) and weak cutover readiness for a full replacement</li>
+</ul>
+<h2 id="product-vision">Product Vision</h2>
+<p>Deliver a guided, data-informed career growth platform where every learner can answer:</p>
+<ol>
+<li>Where am I right now?</li>
+<li>What should I do next?</li>
+<li>Which paid path best matches my goal and constraints?</li>
+</ol>
+<h2 id="goals-and-non-goals">Goals and Non-Goals</h2>
+<h3 id="goals-mvp">Goals (MVP)</h3>
+<ul>
+<li>Increase diagnosis completion, checkout starts, and paid conversions</li>
+<li>Create a repeatable post-diagnosis engagement loop (dashboard + micro-exam)</li>
+<li>Build a trust-first purchase experience with pricing and claims consistency</li>
+<li>Replace legacy pages with continuity controls (SEO redirects, legal parity, rollback safety)</li>
+<li>Establish event instrumentation for funnel truth and iteration</li>
+<li>Increase organic discoverability across Google, Bing, and AI-answer engines through structured content and technical quality.</li>
+</ul>
+<h3 id="non-goals-mvp">Non-Goals (MVP)</h3>
+<ul>
+<li>Full LMS and course-authoring suite</li>
+<li>Community platform and webinar automation stack</li>
+<li>Heavy exam proctoring and anti-cheat infrastructure</li>
+<li>Enterprise SSO and multi-tenant enterprise controls</li>
+<li>Deep recruiter API ecosystem integrations</li>
+</ul>
+<h2 id="personas">Personas</h2>
+<ul>
+<li><strong>Career switcher:</strong> needs fast clarity and an actionable path into Agile/Product roles</li>
+<li><strong>Practicing Agile professional:</strong> needs role advancement and measurable skill growth</li>
+<li><strong>IT professional pivoting:</strong> needs confidence in certification and program fit</li>
+<li><strong>Entry-level learner:</strong> needs guided progression and interview-oriented outcomes</li>
+<li><strong>Internal ops/marketing:</strong> needs measurable funnels and fewer manual handoffs</li>
+</ul>
+<h2 id="project-classification">Project Classification</h2>
+<ul>
+<li><strong>Project Type:</strong> AI-enabled learning and career transformation platform (D2C first)</li>
+<li><strong>Domain:</strong> Agile, Scrum, SAFe, Product/Program transformation careers</li>
+<li><strong>Complexity:</strong> High (hybrid stack, AI integration, commerce, cutover)</li>
+<li><strong>Project Context:</strong> Brownfield replacement of existing public website and business flows</li>
+</ul>
+<h2 id="success-criteria">Success Criteria</h2>
+<h3 id="business-kpis">Business KPIs</h3>
+<ul>
+<li>Increase paid enrollment conversion rate from diagnosis entrants</li>
+<li>Improve checkout completion rate</li>
+<li>Improve lead quality (diagnosis completion + profile completeness)</li>
+</ul>
+<h3 id="product-kpis">Product KPIs</h3>
+<ul>
+<li>Diagnosis started/completed rate</li>
+<li>Resume upload rate</li>
+<li>Skills dashboard return usage</li>
+<li>Timed micro-exam completion rate</li>
+<li>Recommendation click-through rate</li>
+<li>Organic search impressions/clicks for priority intent pages</li>
+<li>AI-answer referral traffic and citation-attributed sessions</li>
+</ul>
+<h3 id="operational-kpis">Operational KPIs</h3>
+<ul>
+<li>Checkout reliability (error and abandonment reduction)</li>
+<li>Sitemap/SEO health (200 availability, crawl integrity)</li>
+<li>Post-cutover 404/5xx incident rate</li>
+<li>AI and automation observability coverage</li>
+<li>Search indexing health (coverage, crawl errors, and rich-result validity)</li>
+</ul>
+<h2 id="scope">Scope</h2>
+<h3 id="mvp-release-1">MVP (Release 1)</h3>
+<ol>
+<li>Identity and profile (email + OAuth, consent-aware onboarding)</li>
+<li>Productized diagnosis flow (goals, resume upload/paste, optional target role/JD)</li>
+<li>Skill-gap output and program recommendation mapping</li>
+<li>Learner dashboard with accessible progress views</li>
+<li>Time-based micro-exams tied to skill model</li>
+<li>Single guided purchase path and pricing consistency</li>
+<li>Commerce integration (Stripe and/or migration bridge from existing flows)</li>
+<li>Trust and quality layer (claims, copy, policy, pricing parity)</li>
+<li>AI chatbot across key surfaces (marketing, discovery, support, learner guidance)</li>
+<li>Community discovery and member-benefit layer (Meetup/WhatsApp/community links + perks)</li>
+<li>Free sessions and webinar discovery module (homepage + all customer-facing pages)</li>
+<li>Webinar registration and invite workflow for registered users (email confirmations/reminders)</li>
+<li>Core trust and support pages (About, Contact Us, FAQ) with structured inquiry forms</li>
+<li>Registered-user free discussion/discovery call booking with coach</li>
+<li>Webinar recording library + photo gallery with discovery surfaces for visitors and users</li>
+<li>Interview-questions content pages via Wix blogs and category hubs</li>
+<li>Funnel and event instrumentation</li>
+<li>Full replacement cutover requirements (redirects, legal, continuity, rollback)</li>
+<li>Resume intelligence suggestions funnel (skills + keyword optimization, registration-gated deep report, resume upgrade service offers)</li>
+<li>Admin command center baseline (journey monitoring, campaign controls, human-in-the-loop approvals)</li>
+<li>Search growth foundation (SEO + AI-engine discoverability) including schema, content structures, and indexing observability</li>
+<li>Role-specific AI enablement across all courses and services (personalized guidance, recommendations, and outcomes by target role)</li>
+</ol>
+<h3 id="post-mvp-release-2">Post-MVP (Release 2+)</h3>
+<ul>
+<li>Bounded AI copilot expansion (deeper contextual assistance and memory)</li>
+<li>WhatsApp transactional/nurture orchestration</li>
+<li>Structured social proof engine and partner campaign variants</li>
+<li>Advanced experimentation and recommendation tuning</li>
+<li>AI-native admin copilot and semi-autonomous operations (with policy guardrails and approvals)</li>
+<li>Advanced search optimization automation (programmatic SEO at scale, snippet testing, and AI-citation optimization workflows)</li>
+</ul>
+<h3 id="mvp-growth-and-trust-surfaces-mandatory">MVP Growth and Trust Surfaces (mandatory)</h3>
+<ul>
+<li>Multiple conversion-focused landing pages for:</li>
+<li>live project cohort mentorships</li>
+<li>certification programs</li>
+<li>skill assessments</li>
+<li>practice/mock certification exams (paid)</li>
+<li>Dedicated interview-questions content hub using Wix blogs (role/certification categorized)</li>
+<li>Prominent "next free sessions and webinars" surfaces on homepage and all high-intent customer pages</li>
+<li>Webinar recording links and event photo gallery discoverable from homepage, webinar pages, and relevant user surfaces</li>
+<li>Lightweight promo popups/lightboxes for offers and campaigns with clear dismiss controls</li>
+<li>Corporate credibility marquee (logo carousel of target/mentor employer brands with approval controls)</li>
+<li>Outcome-led success story system (mentee transitions, role upgrades, salary-growth narratives with compliant proof framing)</li>
+<li>Beginner activation campaigns (coupon/freebie programs, contest or reward mechanics for free online sessions and 1:1 resume reviews linked to skill assessments)</li>
+<li>Pricing/access policy: only skill assessment exams are free; certification practice/mock exams are paid offerings.</li>
+<li>Priority keyword-cluster coverage for role training and career-transition intents (Scrum Master, Product Owner, Product Manager, and RTE pathways).</li>
+</ul>
+<h3 id="explicitly-out-of-scope-for-mvp">Explicitly Out of Scope for MVP</h3>
+<ul>
+<li>Full LMS platform, community, webinar automation</li>
+<li>Heavy proctoring, enterprise SSO, enterprise multi-tenant architecture</li>
+</ul>
+<h2 id="mandatory-must-haves">Mandatory Must-Haves</h2>
+<h3 id="tier-a-must-have-for-first-revenue-ready-release">Tier A (must-have for first revenue-ready release)</h3>
+<ul>
+<li><strong>A1 Productized diagnosis:</strong> fast, low-friction flow producing personalized skill-gap and recommended offers</li>
+<li><strong>A2 Learner account + dashboard:</strong> persistent skills snapshot and progress with accessibility fallbacks</li>
+<li><strong>A3 Time-based micro-exams:</strong> short timed attempts to refresh skill profile and recommendations</li>
+<li><strong>A4 Single guided path to purchase:</strong> one primary CTA with transparent, consistent pricing (INR/USD governance)</li>
+<li><strong>A5 Trust and quality layer:</strong> terminology/copy hygiene, claims framework, testimonial-proof alignment</li>
+<li><strong>A6 Technical hygiene:</strong> sitemap, mobile performance baseline, stable checkout, consent clarity</li>
+</ul>
+<h3 id="tier-b-should-have-soon-after-tier-a">Tier B (should-have soon after Tier A)</h3>
+<ul>
+<li><strong>B1 Bounded AI assist:</strong> RAG-grounded chat for FAQ, fit explanations, and report interpretation</li>
+<li><strong>B2 Email + staged WhatsApp:</strong> consented nurture and transactional messaging with unsubscribe parity</li>
+<li><strong>B3 Structured social proof system:</strong> reusable outcomes surfaced in post-diagnosis moments</li>
+<li><strong>B4 Analytics truth layer:</strong> complete event instrumentation and operator reporting</li>
+</ul>
+<h2 id="full-site-replacement-requirements">Full Site Replacement Requirements</h2>
+<p>These are acceptance-critical requirements for replacing current pages and legacy journeys.</p>
+<h3 id="url-and-seo-continuity">URL and SEO Continuity</h3>
+<ul>
+<li>Maintain an approved redirect map for legacy URLs to new destinations</li>
+<li>Preserve indexability and canonical integrity</li>
+<li>Deliver reliable sitemap endpoints and monitor with Search Console</li>
+</ul>
+<h3 id="content-and-information-architecture-continuity">Content and Information Architecture Continuity</h3>
+<ul>
+<li>Classify each existing page as rewrite, merge, retain, or retire</li>
+<li>Ensure no high-intent page is dropped without mapped replacement</li>
+<li>Preserve core trust assets (founder authority, FAQs, outcomes narrative) with improved clarity</li>
+</ul>
+<h3 id="customer-continuity">Customer Continuity</h3>
+<ul>
+<li>Define explicit policy for existing learners/customers (account migration vs re-invite)</li>
+<li>Preserve access to relevant receipts, purchase records, and support handoff paths</li>
+<li>Publish support playbooks for transition-related user confusion</li>
+</ul>
+<h3 id="legal-and-policy-continuity">Legal and Policy Continuity</h3>
+<ul>
+<li>Publish updated privacy, terms, refund/cancellation, and contact/support paths before cutover</li>
+<li>Ensure consent and policy language aligns with new data practices (resume and diagnostics data)</li>
+</ul>
+<h3 id="cutover-and-rollback">Cutover and Rollback</h3>
+<ul>
+<li>Define launch checklist for DNS/domain cutover and verification</li>
+<li>Define rollback triggers and a tested rollback procedure</li>
+<li>Set alert thresholds for 404 spikes, 5xx spikes, and checkout degradation</li>
+</ul>
+<h2 id="user-journeys">User Journeys</h2>
+<h3 id="journey-orchestration-rules">Journey Orchestration Rules</h3>
+<ul>
+<li>Every journey must expose a clear <strong>next-best-action</strong> CTA to prevent dead ends.</li>
+<li>Anonymous visitors can discover value; registered users can book, save, and continue progress.</li>
+<li>AI chat, FAQ, and Contact support act as persistent fallback paths across all journeys.</li>
+<li>Community, webinars, and content are not side channels; they are connected re-entry points into diagnosis, offers, and coaching.</li>
+</ul>
+<h3 id="persona-alignment-matrix">Persona Alignment Matrix</h3>
+<table>
+<thead>
+<tr>
+<th>Persona</th>
+<th>Primary Journeys</th>
+<th>Secondary Journeys</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Career switcher</td>
+<td>J1-J11</td>
+<td>J12-J16</td>
+</tr>
+<tr>
+<td>Practicing Agile professional</td>
+<td>J1-J9, J11-J16</td>
+<td>J10</td>
+</tr>
+<tr>
+<td>IT professional pivoting</td>
+<td>J1-J11</td>
+<td>J12-J16</td>
+</tr>
+<tr>
+<td>Entry-level learner</td>
+<td>J1-J11</td>
+<td>J12-J16</td>
+</tr>
+<tr>
+<td>Internal ops/marketing</td>
+<td>J1-J8, J12-J17 (enablement + optimization)</td>
+<td>J9-J11</td>
+</tr>
+</tbody>
+</table>
+<h3 id="journey-1-awareness-journey-mvp">Journey 1: Awareness Journey (MVP)</h3>
+<ol>
+<li>User discovers Agile Forum through search, social, referral, or partner channels.</li>
+<li>User lands on role-aligned pages with trust signals (corporate marquee, success stories, founder credibility).</li>
+<li>User sees clear CTAs to discovery, webinars, or recordings.</li>
+</ol>
+<h3 id="journey-2-discovery-and-exploration-journey-mvp">Journey 2: Discovery and Exploration Journey (MVP)</h3>
+<ol>
+<li>User explores certifications, mentorships, free skill assessments, and paid mock/practice certification exam paths, all with role-specific AI context.</li>
+<li>User compares options with AI-chat and FAQ support.</li>
+<li>User moves to diagnosis, webinar registration, or discovery-call CTA.</li>
+</ol>
+<h3 id="journey-3-webinar-recordings-and-gallery-discovery-journey-mvp">Journey 3: Webinar Recordings and Gallery Discovery Journey (MVP)</h3>
+<ol>
+<li>New visitor or registered user discovers recordings/photo gallery from homepage, webinar hub, and content pages.</li>
+<li>User filters recordings by topic/role/certification.</li>
+<li>User moves to session registration, diagnosis, or call booking CTA.</li>
+</ol>
+<h3 id="journey-4-free-sessions-and-webinar-participation-journey-mvp">Journey 4: Free Sessions and Webinar Participation Journey (MVP)</h3>
+<ol>
+<li>User sees upcoming free sessions/webinars on homepage and key customer pages.</li>
+<li>User views session schedule and eligibility.</li>
+<li>Registered user books and receives email confirmation/reminder invites.</li>
+<li>After attendance, learner opens student dashboard self-service, enters webinar end-code, and marks attendance.</li>
+<li>Learner fills feedback survey and can indicate interest in a free certificate of attendance.</li>
+<li>System recommends next relevant sessions based on attendance topic, survey response, and user goals.</li>
+<li>Post-session follow-up routes user to diagnosis, mentorship, certification, assessment path, and certificate/download actions where eligible.</li>
+</ol>
+<h3 id="journey-5-skill-gap-analysis-journey-mvp">Journey 5: Skill Gap Analysis Journey (MVP)</h3>
+<ol>
+<li>User submits resume and optional target JD/role.</li>
+<li>System performs analysis and produces skill-gap + roadmap.</li>
+<li>System surfaces resume skill and keyword suggestions that improve role fit.</li>
+<li>Visitor is encouraged to register to unlock detailed report and saved recommendations.</li>
+<li>System routes user to best-fit training, assessment, and resume-upgrade service options.</li>
+</ol>
+<h3 id="journey-6-trust-and-evaluation-journey-mvp">Journey 6: Trust and Evaluation Journey (MVP)</h3>
+<ol>
+<li>User reviews outcomes proof, testimonials, FAQs, and coach credibility.</li>
+<li>User validates recommendation rationale and pricing confidence.</li>
+<li>User proceeds to purchase or books a discovery call.</li>
+</ol>
+<h3 id="journey-7-purchase-decision-journey-mvp">Journey 7: Purchase Decision Journey (MVP)</h3>
+<ol>
+<li>User sees one primary recommendation CTA with localized pricing.</li>
+<li>User applies eligible coupons/freebies and confirms selection.</li>
+<li>User moves to checkout.</li>
+</ol>
+<h3 id="journey-8-payment-and-order-journey-mvp">Journey 8: Payment and Order Journey (MVP)</h3>
+<ol>
+<li>User completes payment via reliable checkout.</li>
+<li>User receives order confirmation, invoice/receipt, and enrollment status.</li>
+<li>User is routed into onboarding.</li>
+</ol>
+<h3 id="journey-9-onboarding-journey-mvp-lite">Journey 9: Onboarding Journey (MVP-lite)</h3>
+<ol>
+<li>Newly enrolled learner reaches welcome dashboard.</li>
+<li>Learner completes profile enrichment and gets immediate next-best-action.</li>
+<li>Learner receives recommendations for sessions, assessments, and learning content.</li>
+</ol>
+<h3 id="journey-10-discovery-call-booking-journey-mvp">Journey 10: Discovery Call Booking Journey (MVP)</h3>
+<ol>
+<li>Registered user books a free discussion/discovery call with coach.</li>
+<li>User submits goals/questions and receives invite details by email.</li>
+<li>Post-call recommendations push the user to next paid or learning action.</li>
+</ol>
+<h3 id="journey-11-ai-guided-learning-journey-mvp-lite">Journey 11: AI Guided Learning Journey (MVP-lite)</h3>
+<ol>
+<li>Learner receives AI-guided next steps.</li>
+<li>Learner tracks progress and completes timed micro-exams.</li>
+<li>User is routed to advanced recommendations or support where needed.</li>
+</ol>
+<h3 id="journey-12-community-and-member-benefits-journey-mvp">Journey 12: Community and Member Benefits Journey (MVP)</h3>
+<ol>
+<li>User discovers Meetup/WhatsApp/community links from landing and dashboard surfaces.</li>
+<li>User joins official channels and unlocks member benefits.</li>
+<li>Community engagement drives re-entry into webinar, diagnosis, and conversion journeys.</li>
+</ol>
+<h3 id="journey-13-help-and-support-journey-mvp-lite">Journey 13: Help and Support Journey (MVP-lite)</h3>
+<ol>
+<li>User seeks help through AI support, FAQ, About, and Contact flows.</li>
+<li>User submits structured forms when needed; unresolved issues escalate to human support.</li>
+<li>Resolution flow returns user to active conversion or learning journey.</li>
+</ol>
+<h3 id="journey-14-re-engagement-and-smart-nudges-journey-mvp">Journey 14: Re-engagement and Smart Nudges Journey (MVP)</h3>
+<ol>
+<li>System detects inactivity in funnel or learning progress (including abandoned cart).</li>
+<li>User receives personalized reminders via consented channels with deep links to resume progress.</li>
+<li>If no action is taken for 3 days after key intent events, system can send a limited-time discount nudge (for example "valid today only") under campaign guardrails.</li>
+<li>User re-enters at the most relevant step (checkout, session, diagnosis, call, or offer).</li>
+</ol>
+<h3 id="journey-15-upsell-and-expansion-journey-post-mvp-release-2">Journey 15: Upsell and Expansion Journey (Post-MVP, Release 2)</h3>
+<ol>
+<li>Learner completes milestone/certification.</li>
+<li>System recommends next-level pathways and bundled offers.</li>
+<li>Learner converts to higher-value offerings.</li>
+</ol>
+<h3 id="journey-16-advocacy-and-referral-journey-post-mvp-release-2">Journey 16: Advocacy and Referral Journey (Post-MVP, Release 2+)</h3>
+<ol>
+<li>Learner records achievement and transition outcomes.</li>
+<li>User contributes testimonial/review/referral.</li>
+<li>Referred users re-enter Journey 1 or Journey 2.</li>
+</ol>
+<h3 id="journey-17-cutover-safe-legacy-user-experience-mvp">Journey 17: Cutover-Safe Legacy User Experience (MVP)</h3>
+<ol>
+<li>Legacy URL visits resolve via mapped redirects with no dead ends.</li>
+<li>Users retain access to trust, policy, support, and key conversion paths.</li>
+<li>Migration flow preserves continuity for existing users while routing them into current journeys.</li>
+</ol>
+<h3 id="admin-and-management-journeys-ai-native">Admin and Management Journeys (AI-Native)</h3>
+<h3 id="journey-18-admin-funnel-monitoring-and-health-journey-mvp">Journey 18: Admin Funnel Monitoring and Health Journey (MVP)</h3>
+<ol>
+<li>Ops/marketing admin views live funnel health and conversion checkpoints across key journeys.</li>
+<li>System highlights anomalies (drop in registrations, checkout failures, engagement decay) with AI-generated probable causes.</li>
+<li>Admin triggers remediation actions (campaign tweak, CTA update, support intervention, escalation).</li>
+</ol>
+<h3 id="journey-19-campaign-and-notification-orchestration-journey-mvp">Journey 19: Campaign and Notification Orchestration Journey (MVP)</h3>
+<ol>
+<li>Admin configures rules for abandoned cart, inactivity nudges, webinar reminders, and discount campaigns.</li>
+<li>AI suggests best timing, segment, and channel based on historical performance and consent constraints.</li>
+<li>Admin approves or edits suggested automation; system executes and reports outcomes.</li>
+</ol>
+<h3 id="journey-20-content-and-conversion-surface-governance-journey-mvp">Journey 20: Content and Conversion Surface Governance Journey (MVP)</h3>
+<ol>
+<li>Admin manages marquee logos, success stories, webinar schedule cards, recording links, and promo popups.</li>
+<li>AI flags stale, broken, or low-performing content and suggests replacements.</li>
+<li>Admin publishes updates and monitors conversion lift.</li>
+</ol>
+<h3 id="journey-21-coach-and-support-intervention-journey-mvp-lite">Journey 21: Coach and Support Intervention Journey (MVP-lite)</h3>
+<ol>
+<li>System identifies high-intent or at-risk users (for example multiple failed checkouts or repeated help requests).</li>
+<li>AI recommends priority queue for coach calls and support escalation.</li>
+<li>Admin/support team takes action and logs resolution outcomes.</li>
+</ol>
+<h3 id="journey-22-quality-trust-and-compliance-oversight-journey-mvp-lite">Journey 22: Quality, Trust, and Compliance Oversight Journey (MVP-lite)</h3>
+<ol>
+<li>AI continuously scans copy, claims, pricing consistency, and policy surfaces.</li>
+<li>System alerts admin on trust/compliance risks (claim mismatch, pricing mismatch, missing disclosures, expired offers).</li>
+<li>Admin resolves issues with approval logs and audit traceability.</li>
+</ol>
+<h3 id="journey-23-ai-operations-and-prompt-governance-journey-post-mvp-release-2">Journey 23: AI Operations and Prompt Governance Journey (Post-MVP, Release 2+)</h3>
+<ol>
+<li>Admin reviews AI performance (accuracy, hallucination signals, escalation rate, cost/latency).</li>
+<li>AI suggests prompt/policy updates, retrieval-source changes, and routing optimizations.</li>
+<li>Admin approves controlled rollout via experiment flags with rollback safety.</li>
+</ol>
+<h2 id="functional-requirements">Functional Requirements</h2>
+<h3 id="identity-consent-and-profile">Identity, Consent, and Profile</h3>
+<ul>
+<li>FR-1: Users can register/login with email and selected OAuth providers.</li>
+<li>FR-2: Users can create and update profile details needed for personalization.</li>
+<li>FR-3: Users must provide required consent acknowledgments before using diagnosis features.</li>
+</ul>
+<h3 id="diagnosis-and-skill-intelligence">Diagnosis and Skill Intelligence</h3>
+<ul>
+<li>FR-4: Users can submit goals and upload/paste resume content.</li>
+<li>FR-5: Users can provide optional target role or job description for comparison.</li>
+<li>FR-6: System can produce a structured skill-gap summary from available inputs.</li>
+<li>FR-7: System can map diagnosis outcomes to eligible programs/offers.</li>
+<li>FR-61: Platform can generate resume skill and keyword improvement suggestions based on target role/JD alignment.</li>
+<li>FR-62: Platform can provide a quick pre-registration resume scan preview and gate detailed insights behind registration.</li>
+<li>FR-63: Registered users can receive saved resume-improvement reports and recommended relevant skill-training pathways.</li>
+<li>FR-64: Platform can present resume-upgrade services (for example coached resume rewrite/new resume package) based on detected gaps and confidence signals.</li>
+</ul>
+<h3 id="learner-dashboard-and-assessments">Learner Dashboard and Assessments</h3>
+<ul>
+<li>FR-8: Authenticated learners can view persistent skills dashboard.</li>
+<li>FR-9: Dashboard can show skill/progress indicators with text/table alternatives for accessibility.</li>
+<li>FR-10: Learners can launch timed micro-exams by competency area as free skill-assessment exams.</li>
+<li>FR-11: Assessment outcomes can update displayed skill profile and recommendations.</li>
+</ul>
+<h3 id="offer-and-commerce-flow">Offer and Commerce Flow</h3>
+<ul>
+<li>FR-12: System can present one primary recommendation CTA after diagnosis.</li>
+<li>FR-13: Pricing for recommendations is consistent across diagnosis, catalog, and checkout surfaces.</li>
+<li>FR-14: Users can complete payment and receive confirmation and basic invoicing artifacts.</li>
+<li>FR-15: System can support currency handling relevant to target geographies.</li>
+<li>FR-16: Platform can detect user geography (with user override) and present localized currency/pricing defaults consistently across landing pages, offers, cart, and checkout.</li>
+<li>FR-85: Platform can enforce exam monetization rules where skill-assessment exams are free and certification mock/practice exams are paid.</li>
+<li>FR-86: Certification mock/practice exams must require paid enrollment/checkout before access.</li>
+<li>FR-87: Exam listing and detail pages must clearly label access type ("Free Skill Assessment" vs "Paid Certification Mock Exam") before CTA click.</li>
+</ul>
+<h3 id="trust-quality-and-content-governance">Trust, Quality, and Content Governance</h3>
+<ul>
+<li>FR-17: Editorial workflow can enforce approved terminology and copy quality.</li>
+<li>FR-18: Claims displayed on public pages can be tied to evidence or compliant disclaimers.</li>
+<li>FR-19: Testimonials and proof assets can be managed and reused in key conversion contexts.</li>
+</ul>
+<h3 id="ai-chat-and-guidance">AI Chat and Guidance</h3>
+<ul>
+<li>FR-20: Users can access an AI chatbot on key surfaces (landing, discovery, diagnosis, support entry points, dashboard).</li>
+<li>FR-21: AI chatbot can answer FAQs, explain program fit, and guide next best action using approved content boundaries.</li>
+<li>FR-22: AI chatbot responses must include safe fallback/escalation path to human support when confidence is low.</li>
+<li>FR-88: AI chatbot can proactively recommend paid professional services (mentorship, resume services, mock interviews, certification pathways) when user context indicates time-to-outcome needs.</li>
+<li>FR-89: Conversion-oriented AI prompts must emphasize value framing (save time, structured quality outcomes, coach support) while avoiding absolute guarantees.</li>
+<li>FR-90: When discussing salary outcomes (including "2x growth" narratives), AI chatbot must use compliant wording tied to evidence/testimonials and include non-guarantee disclaimers.</li>
+<li>FR-91: AI chatbot can personalize paid-service recommendations using profile, diagnosis, and engagement signals and provide clear CTA handoff to checkout or discovery call.</li>
+</ul>
+<h3 id="role-specific-ai-enablement-across-services-and-courses">Role-Specific AI Enablement Across Services and Courses</h3>
+<ul>
+<li>FR-108: Every service/course page and purchaseable offering must include role-specific AI enablement metadata (target role, prerequisite level, skill outcomes, and recommended sequence).</li>
+<li>FR-109: Platform can generate role-specific learning guidance for all offerings (for example Scrum Master, Product Owner, Product Manager, and RTE pathways) instead of generic recommendations.</li>
+<li>FR-110: AI recommendations and next-best-actions must adapt per target role across diagnosis, dashboard, webinars, assessments, and paid services.</li>
+<li>FR-111: Admin users can manage and validate role-to-offering mappings so all newly published services/courses remain AI-enabled by role.</li>
+</ul>
+<h3 id="community-rewards-and-conversion-surfaces">Community, Rewards, and Conversion Surfaces</h3>
+<ul>
+<li>FR-23: Users can discover and access official Meetup and WhatsApp community links from high-intent pages.</li>
+<li>FR-24: Platform can present community-member benefit badges/offers and eligibility conditions.</li>
+<li>FR-25: Platform can run beginner reward campaigns (coupon/freebie) tied to defined triggers, including skill-assessment participation.</li>
+<li>FR-26: Platform can offer prize-style benefits such as free online sessions and 1:1 resume reviews with coaches, with terms and quota controls.</li>
+<li>FR-27: Marketing system can render corporate credibility marquee with content governance controls.</li>
+<li>FR-28: Marketing system can publish and rotate success stories focused on role transition, salary growth, and career outcomes with claims-compliance checks.</li>
+<li>FR-29: Platform can host multiple SEO-oriented landing page templates for cohorts, certifications, skill assessments, and practice/mock exam offerings.</li>
+<li>FR-30: Platform can display upcoming free sessions/webinars on homepage and all designated customer-facing pages.</li>
+<li>FR-31: Platform can maintain a curated schedule feed (title, topic, date/time, host, seat availability, registration CTA) for free sessions/webinars.</li>
+<li>FR-32: Registered users can book webinar/free-session slots and receive transactional email confirmation and reminder invites.</li>
+<li>FR-33: Platform can trigger post-session follow-up emails with relevant next-step offers (diagnosis, assessments, cohorts, certifications).</li>
+<li>FR-34: Platform can support promotional popups/lightboxes with campaign targeting, frequency caps, and clear close/dismiss behavior on mobile and desktop.</li>
+</ul>
+<h3 id="webinar-feedback-recommendations-and-attendance-certificates">Webinar Feedback, Recommendations, and Attendance Certificates</h3>
+<ul>
+<li>FR-79: Webinar attendees can submit a post-session feedback survey (rating, usefulness, topic interest, and open comments).</li>
+<li>FR-80: Platform can recommend next webinar sessions to attendees based on attended topic, learner profile, and survey responses.</li>
+<li>FR-81: Registered webinar attendees can use student dashboard self-service to mark attendance using a code provided at webinar end.</li>
+<li>FR-82: Webinar attendees can express interest in receiving a free certificate of attendance through the post-session dashboard flow.</li>
+<li>FR-83: Platform can generate and deliver/download a certificate of attendance for eligible attendees after attendance-code verification, with basic validation controls.</li>
+<li>FR-84: Student dashboard can show certificate status (eligible, pending verification, issued) and provide download access/history for issued webinar certificates.</li>
+</ul>
+<h3 id="smart-automation-monitoring-tracking-and-notifications">Smart Automation, Monitoring, Tracking, and Notifications</h3>
+<ul>
+<li>FR-52: Users can submit any job link (or pasted job description text) to recheck required skills against their profile and goals.</li>
+<li>FR-53: Platform can parse submitted job links/JD content and generate a required-skills gap summary with recommended next actions.</li>
+<li>FR-54: Platform can trigger abandoned-cart reminders with checkout deep links at configurable intervals.</li>
+<li>FR-55: Platform can trigger inactivity nudges and time-bound offers (for example after 3 days of no action) with configurable campaign rules.</li>
+<li>FR-56: Users can manage communication preferences for email/notification categories, including opt-out controls where required.</li>
+<li>FR-57: Automation engine can orchestrate triggers from key events (diagnosis complete, cart abandon, no-show, inactivity, job-link recheck completed).</li>
+<li>FR-58: Ops/marketing can view automation performance metrics (deliveries, opens, clicks, conversions, failures) by campaign and segment.</li>
+<li>FR-59: System can alert operators on automation failures or abnormal engagement drops.</li>
+<li>FR-60: Campaign execution supports frequency caps, quiet hours, and timezone-aware scheduling to reduce notification fatigue.</li>
+</ul>
+<h3 id="ai-native-admin-management-and-control-plane">AI-Native Admin Management and Control Plane</h3>
+<ul>
+<li>FR-65: Admin users can access a unified command center for funnel status, journey health, and campaign outcomes.</li>
+<li>FR-66: System can provide AI-generated anomaly detection and probable-cause insights for conversion or engagement regressions.</li>
+<li>FR-67: Admin users can configure and approve automation policies with role-based permissions and change logs.</li>
+<li>FR-68: AI can recommend campaign adjustments (timing, segment, channel, message variant) with confidence indicators before execution.</li>
+<li>FR-69: Admin users can manage lifecycle assets (webinars, recordings, galleries, stories, marquee, popups) through governed workflows.</li>
+<li>FR-70: System can enforce human-in-the-loop approval for high-impact actions (discount blast, pricing changes, broad notification sends).</li>
+<li>FR-71: AI can identify at-risk/high-intent users and suggest prioritized coach/support interventions.</li>
+<li>FR-72: Admin users can track intervention outcomes (booked call, resumed checkout, conversion, churn risk drop).</li>
+<li>FR-73: System can run trust/compliance checks for claims, price consistency, expired offers, and mandatory disclosures.</li>
+<li>FR-74: Admin users can view AI quality dashboards (answer quality signals, escalation rates, cost, latency, and safety incidents).</li>
+<li>FR-75: Admin users can manage prompt/policy versions and retrieval-source configurations with approval workflow.</li>
+<li>FR-76: Platform supports experiment flags and rollback controls for AI behavior and engagement automations.</li>
+<li>FR-77: System retains audit logs for admin actions, AI recommendations, approvals, and overrides.</li>
+<li>FR-78: Platform supports multi-role admin access patterns (marketing ops, support ops, content editor, coach manager, and super-admin).</li>
+<li>FR-92: Platform can maintain a flexible AI-native knowledge base that supports frequent updates from new learnings, market research, and validated user feedback.</li>
+<li>FR-93: AI can propose knowledge-base updates (new entries, edits, deprecations, confidence notes) and route them through mandatory human validation/approval before publishing.</li>
+<li>FR-94: Knowledge-base changes are versioned with provenance metadata (source, author/reviewer, rationale, timestamp) and rollback support.</li>
+<li>FR-95: Admin users can schedule periodic knowledge reviews and approve AI-suggested refreshes to keep recommendations and chat responses market-current.</li>
+</ul>
+<h3 id="search-visibility-and-ai-engine-discoverability-seo-geo">Search Visibility and AI-Engine Discoverability (SEO + GEO)</h3>
+<ul>
+<li>FR-96: Platform can maintain a search command center for indexing coverage, crawl errors, sitemap health, and priority query tracking.</li>
+<li>FR-97: Platform can generate and maintain structured data (FAQ, Course, Event, Article, Review, Organization, Person) by page template with validation checks.</li>
+<li>FR-98: Platform can support AI-citable answer blocks (concise Q&amp;A, definitions, and summary snippets) on priority pages.</li>
+<li>FR-99: Platform can manage pillar-cluster topical architecture with internal-link recommendations and orphan-page detection.</li>
+<li>FR-100: Platform can support programmatic landing-page templates for high-intent variations with canonical and duplication controls.</li>
+<li>FR-101: Platform can enforce metadata governance (titles, descriptions, canonicals, robots directives) and highlight missing/invalid fields.</li>
+<li>FR-102: Platform can track search-performance metrics per page cluster (impressions, clicks, CTR, average position) and link them to conversion outcomes.</li>
+<li>FR-103: Platform can ingest and surface search-engine diagnostics from webmaster tools for actionable operations.</li>
+<li>FR-104: Platform can support content freshness workflows (staleness alerts, scheduled refreshes, and update approvals).</li>
+<li>FR-105: Platform can run snippet/SEO content experiments with measurable impact tracking on traffic and conversion.</li>
+<li>FR-106: Platform can map search intents to journey CTAs (diagnosis, webinar, call booking, paid services) and monitor intent-to-conversion effectiveness.</li>
+<li>FR-107: Platform must maintain and operationalize priority keyword clusters, including at minimum: "scrum master training", "product owner training", "product manager training", "transition to scrum master", "transition to product manager", "transition to product owner", and "transition to RTE (release train engineer)" via dedicated pages/content blocks with mapped CTAs.</li>
+</ul>
+<h4 id="priority-keyword-to-page-mapping-mvp">Priority Keyword-to-Page Mapping (MVP)</h4>
+<table>
+<thead>
+<tr>
+<th>Keyword / Intent</th>
+<th>Target Page Type</th>
+<th>Primary CTA</th>
+<th>Secondary CTA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>scrum master training</td>
+<td>Certification + mentorship landing page</td>
+<td>Enroll in paid training/cohort</td>
+<td>Book free discovery call</td>
+</tr>
+<tr>
+<td>product owner training</td>
+<td>Product Owner training landing page</td>
+<td>Enroll in paid training/cohort</td>
+<td>Take free skill assessment</td>
+</tr>
+<tr>
+<td>product manager training</td>
+<td>Product Manager transition landing page</td>
+<td>Enroll in paid training/cohort</td>
+<td>Upload resume for gap analysis</td>
+</tr>
+<tr>
+<td>transition to scrum master</td>
+<td>Career transition pathway page</td>
+<td>Start diagnosis (resume + goals)</td>
+<td>Book free discovery call</td>
+</tr>
+<tr>
+<td>transition to product manager</td>
+<td>Career transition pathway page</td>
+<td>Start diagnosis (resume + goals)</td>
+<td>View webinar + register</td>
+</tr>
+<tr>
+<td>transition to product owner</td>
+<td>Career transition pathway page</td>
+<td>Start diagnosis (resume + goals)</td>
+<td>Take free skill assessment</td>
+</tr>
+<tr>
+<td>transition to RTE (release train engineer)</td>
+<td>RTE transition + certification pathway page</td>
+<td>Start diagnosis + recommended path</td>
+<td>Book discovery call</td>
+</tr>
+<tr>
+<td>release train engineer training</td>
+<td>RTE training/certification landing page</td>
+<td>Enroll in paid training/cohort</td>
+<td>Join free webinar</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Execution note:</strong> Each mapped page must include AI-citable Q&amp;A blocks, structured data, and explicit CTA instrumentation for intent-to-conversion tracking.</p>
+<h3 id="core-pages-forms-and-discovery-call-booking">Core Pages, Forms, and Discovery Call Booking</h3>
+<ul>
+<li>FR-35: Platform can provide a dedicated About page presenting brand story, coach/mentor credibility, and delivery model.</li>
+<li>FR-36: Platform can provide a Contact Us page with structured inquiry forms for user questions and support intent routing.</li>
+<li>FR-37: Platform can provide a dedicated FAQ page with searchable categories and AI-assisted answer discovery.</li>
+<li>FR-38: Platform can support multiple form templates (general inquiry, coaching query, partnership interest, webinar question) with submission tracking.</li>
+<li>FR-39: Registered users can book free discussion/discovery calls with coaches using a slot-based workflow with confirmation emails.</li>
+<li>FR-40: Platform can publish and maintain interview-question pages through Wix blogs, organized by role, certification, and difficulty tags.</li>
+<li>FR-41: Platform can connect inquiry-form and discovery-call submissions to downstream follow-up workflows and conversion attribution.</li>
+</ul>
+<h3 id="webinar-recordings-and-gallery">Webinar Recordings and Gallery</h3>
+<ul>
+<li>FR-49: Platform can publish and maintain a webinar recordings library with links, titles, topics, and speaker metadata.</li>
+<li>FR-50: Platform can publish and maintain an event photo gallery with captions/tags and lightweight moderation controls.</li>
+<li>FR-51: Homepage and key conversion pages can surface recording/gallery modules so new visitors and registered users can discover past sessions easily.</li>
+</ul>
+<h3 id="replacement-and-continuity">Replacement and Continuity</h3>
+<ul>
+<li>FR-42: Legacy URLs can be redirected to mapped new URLs with no broken high-intent paths.</li>
+<li>FR-43: Core legacy content entities are tracked through rewrite/merge/retire decisions.</li>
+<li>FR-44: Transition support paths are available for existing customers.</li>
+<li>FR-45: Legal/policy pages are available and linked in all required user journeys.</li>
+</ul>
+<h3 id="analytics-and-observability">Analytics and Observability</h3>
+<ul>
+<li>FR-46: System emits events for diagnosis start/complete, assessment complete, checkout start/complete, recommendation click-through, chatbot engagement, community-link click, reward redemption, webinar impressions/registrations/attendance markers, attendance-code verification events, webinar feedback submissions, next-session recommendation clicks, certificate-interest submissions, certificate-issued/download events, recording/gallery impressions and clicks, form submissions, discovery-call booking outcomes, localized pricing display, popup interactions (shown, closed, converted), job-link recheck events, resume-scan preview/full-report unlock events, resume-service CTA clicks, paid-service recommendation impressions/clicks/conversions, disclaimer-shown events for outcome claims, exam-type impression/click events (free skill assessment vs paid mock exam), cart-abandon reminder events, inactivity-nudge outcomes, admin intervention actions, AI recommendation acceptance/rejection, campaign-optimization outcomes, knowledge-base update proposal/approval/publish events, search-intent page impressions/clicks, keyword-cluster ranking trends for priority terms, and AI-answer referral events.</li>
+<li>FR-47: Operators can access funnel-level reports for conversion diagnostics.</li>
+<li>FR-48: System exposes operational alerts relevant to cutover and checkout stability.</li>
+</ul>
+<h2 id="non-functional-requirements">Non-Functional Requirements</h2>
+<h3 id="performance">Performance</h3>
+<ul>
+<li>NFR-P1: Landing and diagnosis surfaces are optimized for mobile-first performance.</li>
+<li>NFR-P2: Diagnosis result generation is responsive enough to preserve session continuity expectations.</li>
+<li>NFR-P3: Dashboard updates after assessment completion occur within acceptable interactive latency.</li>
+<li>NFR-P4: All core pages and conversion surfaces are fully responsive across mobile, tablet, and desktop breakpoints, including forms, checkout, and popups/lightboxes.</li>
+<li>NFR-P5: Priority landing pages must meet defined Core Web Vitals thresholds suitable for mobile-first search performance.</li>
+</ul>
+<h3 id="reliability">Reliability</h3>
+<ul>
+<li>NFR-R1: Checkout flow provides graceful failure handling and retry-safe behavior.</li>
+<li>NFR-R2: Critical public endpoints (including sitemap) maintain high availability targets.</li>
+<li>NFR-R3: Cutover monitoring can detect and alert on abnormal error spikes quickly.</li>
+<li>NFR-R4: Notification and automation workflows are retry-safe and observable, with delivery status tracking and dead-letter handling for failed dispatches.</li>
+<li>NFR-R5: Admin control-plane actions support rollback for high-impact changes and preserve system stability during configuration updates.</li>
+<li>NFR-R6: Search-critical assets (sitemaps, robots directives, canonical mappings, schema generation jobs) must be monitored with alerting and recovery procedures.</li>
+</ul>
+<h3 id="security-and-privacy">Security and Privacy</h3>
+<ul>
+<li>NFR-S1: Resume and profile data are protected in transit and at rest.</li>
+<li>NFR-S2: Access controls prevent unauthorized access to learner-specific data.</li>
+<li>NFR-S3: Data handling and retention are defined for uploaded resumes and derived artifacts.</li>
+</ul>
+<h3 id="compliance-and-accessibility">Compliance and Accessibility</h3>
+<ul>
+<li>NFR-C1: Consent and policy controls meet baseline legal and regional expectations.</li>
+<li>NFR-C2: Core journeys meet accessibility expectations with non-visual alternatives for charts.</li>
+<li>NFR-C3: Promo popups/lightboxes must be accessible (keyboard dismiss, focus handling, readable contrast, and no blocked primary navigation on small screens).</li>
+<li>NFR-C4: Engagement notifications and offers comply with consent/unsubscribe requirements and respect configured communication preferences.</li>
+</ul>
+<h3 id="ai-safety-and-cost-governance">AI Safety and Cost Governance</h3>
+<ul>
+<li>NFR-A1: AI responses are constrained by approved content grounding and guardrails.</li>
+<li>NFR-A2: Career/salary guidance includes cautionary framing where certainty is limited.</li>
+<li>NFR-A3: AI usage is observable for quality, safety, and cost management.</li>
+<li>NFR-A4: High-impact AI-admin decisions require human approval or staged rollout before full execution.</li>
+<li>NFR-A5: AI models and prompts used for admin automation are versioned, testable, and auditable.</li>
+<li>NFR-A6: AI sales-oriented messaging must enforce compliant claim templates, mandatory disclaimer insertion for outcome claims, and block disallowed guarantee language.</li>
+<li>NFR-A7: AI knowledge-base refresh workflows must enforce human validation gates, source traceability, and rollback-safe publishing.</li>
+</ul>
+<h2 id="dependencies-and-integrations">Dependencies and Integrations</h2>
+<ul>
+<li>Wix Studio and CMS for top-of-funnel content and acquisition surfaces</li>
+<li>Custom backend services for identity, diagnosis, recommendation, and analytics</li>
+<li>Payment provider integration (Stripe primary target)</li>
+<li>AI provider abstraction (OpenRouter + retrieval strategy)</li>
+<li>Knowledge-base management layer for source ingestion, review workflow, versioning, and retrieval indexing</li>
+<li>Search/webmaster integrations for indexing diagnostics and performance telemetry</li>
+<li>Event analytics stack for funnel truth and operator visibility</li>
+</ul>
+<h2 id="risks-and-mitigations">Risks and Mitigations</h2>
+<ul>
+<li><strong>Scope sprawl:</strong> enforce Tier A cut line and freeze release scope.</li>
+<li><strong>Trust regression:</strong> apply copy and claims governance before launch.</li>
+<li><strong>SEO loss during replacement:</strong> execute URL mapping and Search Console monitoring.</li>
+<li><strong>Migration confusion for existing customers:</strong> publish continuity policy and support scripts.</li>
+<li><strong>AI quality variance:</strong> use grounding, review loops, and bounded surface areas first.</li>
+</ul>
+<h2 id="release-plan-high-level">Release Plan (High-Level)</h2>
+<h3 id="release-1-tier-a-cutover">Release 1 (Tier A + Cutover)</h3>
+<ul>
+<li>Diagnosis + learner account + dashboard + timed micro-exams</li>
+<li>Guided purchase flow and pricing harmonization</li>
+<li>Trust/quality baseline and full continuity checklist</li>
+<li>Core funnel and reliability instrumentation</li>
+</ul>
+<h3 id="release-2-tier-b">Release 2 (Tier B)</h3>
+<ul>
+<li>Bounded AI assistant expansion</li>
+<li>WhatsApp and lifecycle messaging orchestration</li>
+<li>Structured social proof and deeper optimization loops</li>
+</ul>
+<h3 id="later-releases">Later Releases</h3>
+<ul>
+<li>LMS/community/enterprise capabilities after D2C conversion loop is validated</li>
+</ul>
+<h2 id="open-decisions">Open Decisions</h2>
+<ol>
+<li>Existing customer continuity policy: migrate accounts or re-invite workflow?</li>
+<li>Day-1 commerce model: full Stripe replacement vs temporary bridge with legacy checkout?</li>
+<li>Canonical source of truth for catalog/pricing during transition period?</li>
+<li>Required legal review depth for claim language before launch?</li>
+<li>Geographic rollout order and currency policy for launch markets?</li>
+</ol>
+<h2 id="acceptance-gate-for-prd-sign-off">Acceptance Gate for PRD Sign-Off</h2>
+<p>This PRD is ready for implementation planning when:</p>
+<ul>
+<li>Tier A requirements are accepted by product, engineering, and business owners</li>
+<li>Continuity and cutover requirements have named owners</li>
+<li>Open decisions above are resolved or explicitly deferred with risk acceptance</li>
+<li>KPI definitions and instrumentation ownership are approved</li>
+</ul></body></html>

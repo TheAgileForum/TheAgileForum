@@ -1,0 +1,515 @@
+<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Epics - Agile Forum MVP</title><style>
+    :root{
+      --bg:#f6f8fc;
+      --card:#ffffff;
+      --ink:#1f2937;
+      --muted:#64748b;
+      --h1:#0f172a;
+      --h2:#1d4ed8;
+      --h3:#7c3aed;
+      --accent:#0ea5e9;
+      --accent-soft:#e0f2fe;
+      --border:#dbe2f0;
+      --table-head:#eef2ff;
+      --table-stripe:#f8fafc;
+      --code-bg:#111827;
+      --code-ink:#e5e7eb;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--ink);
+      font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;
+      line-height:1.65;
+      padding:30px;
+    }
+    .page{
+      max-width:1180px;
+      margin:0 auto;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:32px 40px;
+      box-shadow:0 10px 26px rgba(15,23,42,.06);
+    }
+    .meta{
+      color:var(--muted);
+      font-size:.92rem;
+      margin-bottom:16px;
+      padding:10px 12px;
+      background:#f8fafc;
+      border:1px solid var(--border);
+      border-radius:8px;
+    }
+    h1,h2,h3{line-height:1.25;margin-top:1.4em}
+    h1{
+      color:var(--h1);
+      font-size:2.05rem;
+      margin-top:0;
+      border-bottom:3px solid var(--accent);
+      padding-bottom:10px;
+    }
+    h2{
+      color:var(--h2);
+      font-size:1.45rem;
+      border-left:5px solid var(--accent);
+      padding-left:10px;
+      margin-top:2.1rem;
+    }
+    h3{
+      color:var(--h3);
+      font-size:1.1rem;
+      margin-top:1.35rem;
+    }
+    strong{
+      color:#111827;
+      font-weight:700;
+    }
+    p code, li code{
+      background:var(--accent-soft);
+      color:#0c4a6e;
+      border:1px solid #bae6fd;
+      border-radius:6px;
+      padding:2px 6px;
+      font-weight:600;
+    }
+    pre{
+      background:var(--code-bg);
+      color:var(--code-ink);
+      border-radius:10px;
+      padding:14px 16px;
+      overflow:auto;
+      border:1px solid #1f2937;
+    }
+    pre code{
+      background:none;
+      border:none;
+      color:inherit;
+      padding:0;
+      font-weight:500;
+    }
+    ul,ol{padding-left:1.3rem}
+    li{margin:.35rem 0}
+    hr{
+      border:none;
+      border-top:1px solid var(--border);
+      margin:1.7rem 0;
+    }
+    blockquote{
+      margin:1rem 0;
+      border-left:4px solid var(--accent);
+      background:#f8fdff;
+      padding:8px 14px;
+      color:#0f172a;
+      border-radius:6px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin:1rem 0 1.25rem;
+      border:1px solid var(--border);
+      font-size:.96rem;
+    }
+    thead th{
+      background:var(--table-head);
+      color:#1e3a8a;
+      text-align:left;
+      border:1px solid var(--border);
+      padding:10px 12px;
+      font-weight:700;
+    }
+    tbody td{
+      border:1px solid var(--border);
+      padding:9px 12px;
+      vertical-align:top;
+    }
+    tbody tr:nth-child(even){background:var(--table-stripe)}
+    </style></head><body><main class='page'><div class='meta'>Generated from epics-agile-forum.md on 2026-05-25 16:38</div><hr />
+<p>stepsCompleted:
+  - requirements-extracted
+  - epics-designed
+  - stories-defined
+inputDocuments:
+  - "c:/Users/dhire/OneDrive/Documents/mybmadproj/_bmad-output/planning-artifacts/prd-agile-forum.md"</p>
+<hr />
+<h1 id="mybmadproj-epic-breakdown-agile-forum-mvp">mybmadproj - Epic Breakdown (Agile Forum MVP)</h1>
+<h2 id="overview">Overview</h2>
+<p>This document translates <code>prd-agile-forum.md</code> into implementable MVP epics and stories with testable acceptance criteria.</p>
+<h2 id="requirements-inventory">Requirements Inventory</h2>
+<h3 id="functional-requirements">Functional Requirements</h3>
+<ul>
+<li>Source of truth: <code>FR-1</code> to <code>FR-160</code> in <code>prd-agile-forum.md</code>.</li>
+<li>Key clusters included in MVP plan:</li>
+<li>Identity/profile and diagnosis</li>
+<li>Role X -&gt; Role Y planner and roadmap</li>
+<li>Learner dashboard, assessments, bookmarks</li>
+<li>AI chat, feedback, and quality loop</li>
+<li>Commerce and checkout variants</li>
+<li>Course/service catalog detail completeness</li>
+<li>Webinars, certificates, recordings/gallery</li>
+<li>Community/social trust and engagement</li>
+<li>Automation/notifications (including scholarships)</li>
+<li>Admin command center and AI-native operations</li>
+<li>Search visibility (SEO + AI-answer engines)</li>
+<li>Tracking, observability, governance, cutover continuity</li>
+</ul>
+<h3 id="non-functional-requirements">Non-Functional Requirements</h3>
+<ul>
+<li>Source of truth: <code>NFR-P1..P5</code>, <code>NFR-R1..R6</code>, <code>NFR-S1..S3</code>, <code>NFR-C1..C4</code>, <code>NFR-A1..A8</code>.</li>
+<li>MVP quality bars:</li>
+<li>Mobile-first responsive UX</li>
+<li>Reliable checkout/notification flows</li>
+<li>Security/consent/compliance controls</li>
+<li>AI safety guardrails and auditable quality improvements</li>
+<li>Search-critical reliability (sitemap/canonical/schema jobs)</li>
+</ul>
+<h3 id="additional-requirements">Additional Requirements</h3>
+<ul>
+<li>Role-specific AI enablement across all courses/services.</li>
+<li>Exam monetization policy: free skill assessments, paid mock certification exams.</li>
+<li>Schedule-bound offerings require schedule selection before cart add.</li>
+<li>Organization payment/reimbursement checkout path for eligible SAFe offerings.</li>
+</ul>
+<h3 id="ux-design-requirements">UX Design Requirements</h3>
+<ul>
+<li>Current-state dashboard with bar/radar options, out-of-10 scoring, and accessible non-visual views.</li>
+<li>Trust surfaces and conversion CTAs across journey stages.</li>
+<li>Footer completeness for legal/policy/affiliate/partnership/contact/social.</li>
+</ul>
+<h3 id="fr-coverage-map">FR Coverage Map</h3>
+<table>
+<thead>
+<tr>
+<th>Epic</th>
+<th>FR Coverage (primary)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Epic 1</td>
+<td>FR-1..3, FR-151</td>
+</tr>
+<tr>
+<td>Epic 2</td>
+<td>FR-4..7, FR-61..64, FR-158..160</td>
+</tr>
+<tr>
+<td>Epic 3</td>
+<td>FR-8..11, FR-131, FR-132</td>
+</tr>
+<tr>
+<td>Epic 4</td>
+<td>FR-12..16, FR-85..87, FR-157</td>
+</tr>
+<tr>
+<td>Epic 5</td>
+<td>FR-20..22, FR-88..91, FR-126..130</td>
+</tr>
+<tr>
+<td>Epic 6</td>
+<td>FR-112..116, FR-140..143, FR-136..139</td>
+</tr>
+<tr>
+<td>Epic 7</td>
+<td>FR-30..34, FR-79..84, FR-49..51</td>
+</tr>
+<tr>
+<td>Epic 8</td>
+<td>FR-23..29, FR-121..125, FR-144..146</td>
+</tr>
+<tr>
+<td>Epic 9</td>
+<td>FR-52..60, FR-133..135, FR-147..150, FR-154..156</td>
+</tr>
+<tr>
+<td>Epic 10</td>
+<td>FR-65..78, FR-92..95</td>
+</tr>
+<tr>
+<td>Epic 11</td>
+<td>FR-96..107</td>
+</tr>
+<tr>
+<td>Epic 12</td>
+<td>FR-42..45, FR-46..48, NFR clusters</td>
+</tr>
+</tbody>
+</table>
+<h2 id="epic-list">Epic List</h2>
+<ol>
+<li>Identity and Access Foundation</li>
+<li>Diagnosis and Transition Planner</li>
+<li>Learner Dashboard and Assessments</li>
+<li>Commerce and Checkout Flows</li>
+<li>AI Chat, Guidance, and Quality Feedback</li>
+<li>Role-Based Offerings and Course Detail Experience</li>
+<li>Webinar Lifecycle and Attendance Artifacts</li>
+<li>Community, Social Trust, and Public Site Framework</li>
+<li>Automation, Notifications, and Re-engagement</li>
+<li>Admin Command Center and AI-Native Operations</li>
+<li>Search Growth Platform (SEO + GEO)</li>
+<li>Cutover, Reliability, and Compliance Hardening</li>
+</ol>
+<hr />
+<h2 id="epic-1-identity-and-access-foundation">Epic 1: Identity and Access Foundation</h2>
+<p>Establish secure onboarding, authentication, and checkout-gating identity patterns.</p>
+<h3 id="story-11-email-and-oauth-authentication">Story 1.1: Email and OAuth Authentication</h3>
+<p>As a visitor, I want to sign up/login with email, Google, or LinkedIn so that I can access personalized flows.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given a new visitor, when they choose signup, then they can complete email registration with verification.
+- Given a returning user, when they choose OAuth login, then session is created successfully.</p>
+<h3 id="story-12-consent-and-session-governance">Story 1.2: Consent and Session Governance</h3>
+<p>As a platform operator, I want consent capture and active session control so that security/compliance requirements are met.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given a user onboarding flow, when consent is presented, then acceptance is stored with timestamp.
+- Given an authenticated session, when token expires, then secure re-authentication is required.</p>
+<h3 id="story-13-checkout-authentication-gate">Story 1.3: Checkout Authentication Gate</h3>
+<p>As a non-logged-in visitor, I want to be prompted to sign in before checkout so that my order is correctly tied to my profile.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given a guest at checkout, when they proceed, then login/signup gate appears.
+- Given successful auth, when checkout resumes, then cart context is preserved.</p>
+<hr />
+<h2 id="epic-2-diagnosis-and-transition-planner">Epic 2: Diagnosis and Transition Planner</h2>
+<p>Deliver resume/JD intelligence and Role X -&gt; Role Y planning with actionable 4-8 week roadmaps.</p>
+<h3 id="story-21-resume-jd-skill-gap-engine">Story 2.1: Resume + JD Skill Gap Engine</h3>
+<p>As a learner, I want resume/JD comparison so that I can see my role-gap clearly.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given resume and optional JD input, when analysis runs, then system outputs skill-gap summary.
+- Given output is generated, then recommendation-ready fields are persisted.</p>
+<h3 id="story-22-resume-keyword-and-skill-suggestions">Story 2.2: Resume Keyword and Skill Suggestions</h3>
+<p>As a learner, I want keyword/skill suggestions so that I can improve role-fit quickly.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given a target role, when analysis completes, then missing keywords and skills are suggested.
+- Given user is not registered, when preview is shown, then detailed report is registration-gated.</p>
+<h3 id="story-23-role-x-role-y-planner">Story 2.3: Role X -&gt; Role Y Planner</h3>
+<p>As a transition-focused learner, I want predefined role-path options so that I can choose a clear direction.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given selected current and target role, when planner loads, then predefined pathway options are shown.
+- Given selected pathway, when plan renders, then training/exams/certs and todo tasks are sequenced.</p>
+<h3 id="story-24-4-8-week-roadmap-and-progress-tracking">Story 2.4: 4-8 Week Roadmap and Progress Tracking</h3>
+<p>As a registered learner, I want a 4-8 week plan with task tracking so that I can execute consistently.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given a confirmed pathway, when roadmap is generated, then 4-8 week timeline is visible.
+- Given user actions, when tasks are updated, then progress status persists over time.</p>
+<hr />
+<h2 id="epic-3-learner-dashboard-and-assessments">Epic 3: Learner Dashboard and Assessments</h2>
+<p>Create role-aware learner cockpit for current state, progress, and saved decisions.</p>
+<h3 id="story-31-current-state-dashboard-visuals">Story 3.1: Current-State Dashboard Visuals</h3>
+<p>As a learner, I want current-state skill views so that I can understand readiness at a glance.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given learner profile data, when dashboard loads, then out-of-10 ratings are shown.
+- Given visualization preference, when toggled, then bar/radar mode updates with accessible equivalents.</p>
+<h3 id="story-32-free-skill-assessment-micro-exams">Story 3.2: Free Skill Assessment Micro-Exams</h3>
+<p>As a learner, I want free skill assessment exams so that I can validate progress.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given skill-assessment catalog, when learner starts exam, then no payment is required.
+- Given exam completion, when scored, then profile and recommendations update.</p>
+<h3 id="story-33-bookmarking-courses-and-services">Story 3.3: Bookmarking Courses and Services</h3>
+<p>As a learner, I want to bookmark offerings so that I can revisit options later.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given listing/dashboard cards, when bookmark is clicked, then item appears in saved list.
+- Given saved list entry, when removed, then bookmark state updates everywhere.</p>
+<hr />
+<h2 id="epic-4-commerce-and-checkout-flows">Epic 4: Commerce and Checkout Flows</h2>
+<p>Implement conversion-focused cart/checkout behaviors with policy-compliant variants.</p>
+<h3 id="story-41-core-cart-and-payment-flow">Story 4.1: Core Cart and Payment Flow</h3>
+<p>As a learner, I want a consistent cart/checkout so that I can purchase confidently.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given an eligible paid offering, when added to cart, then localized pricing is shown consistently.
+- Given successful payment, when confirmed, then invoice and enrollment artifacts are generated.</p>
+<h3 id="story-42-schedule-bound-cart-enforcement">Story 4.2: Schedule-Bound Cart Enforcement</h3>
+<p>As a learner, I want to attach schedule before cart add for schedule-bound services.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given schedule-bound offering, when add-to-cart is attempted without schedule, then action is blocked.
+- Given selected schedule, when add-to-cart completes, then schedule reference is stored in cart payload.</p>
+<h3 id="story-43-exam-access-policy-enforcement">Story 4.3: Exam Access Policy Enforcement</h3>
+<p>As a product owner, I want free-vs-paid exam rules enforced so that pricing policy is clear and correct.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given skill assessment exam, when user accesses, then it is free.
+- Given mock certification exam, when user accesses, then paid checkout is required first.</p>
+<h3 id="story-44-organization-payment-checkout-variant">Story 4.4: Organization Payment Checkout Variant</h3>
+<p>As a SAFe buyer, I want organization reimbursement checkout option so that enterprise-funded purchases are supported.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given eligible SAFe item in cart, when checkout loads, then org-payment option is visible.
+- Given org-payment flow selected, when form submitted, then company/billing/reference details are captured and routed to ops.</p>
+<hr />
+<h2 id="epic-5-ai-chat-guidance-and-quality-feedback">Epic 5: AI Chat, Guidance, and Quality Feedback</h2>
+<p>Ship conversion-capable AI assistant with guardrails and closed-loop quality improvement.</p>
+<h3 id="story-51-ai-assistant-across-key-surfaces">Story 5.1: AI Assistant Across Key Surfaces</h3>
+<p>As a visitor/learner, I want contextual AI help wherever I need it.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given landing/discovery/dashboard/support pages, when opened, then AI assistant is available.
+- Given low-confidence answer case, when detected, then escalation path is offered.</p>
+<h3 id="story-52-conversion-oriented-ai-with-compliance-guardrails">Story 5.2: Conversion-Oriented AI with Compliance Guardrails</h3>
+<p>As a business owner, I want AI to recommend paid services responsibly.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given high-intent context, when AI responds, then paid service recommendations are role-relevant.
+- Given outcome claims, when mentioned, then compliant non-guarantee framing is enforced.</p>
+<h3 id="story-53-end-user-answer-quality-feedback">Story 5.3: End-User Answer Quality Feedback</h3>
+<p>As a user, I want to mark answers as correct/helpful or not so that chatbot quality improves.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given any assistant response, when feedback is submitted, then signal is captured with optional comments.
+- Given negative feedback, when submitted, then clarification + escalation options are offered.</p>
+<h3 id="story-54-ai-quality-intelligence-dashboard">Story 5.4: AI Quality Intelligence Dashboard</h3>
+<p>As an admin, I want topic/role-level AI quality metrics so that I can prioritize improvements.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given collected feedback, when dashboard viewed, then helpfulness/unresolved metrics are segmented.
+- Given low-performing response clusters, when reviewed, then corrective actions can be approved.</p>
+<hr />
+<h2 id="epic-6-role-based-offerings-and-course-detail-experience">Epic 6: Role-Based Offerings and Course Detail Experience</h2>
+<p>Ensure every offering is role-aware, complete, and decision-ready.</p>
+<h3 id="story-61-role-specific-offer-metadata-and-mapping">Story 6.1: Role-Specific Offer Metadata and Mapping</h3>
+<p>As an admin, I want role-to-offering mappings managed centrally so recommendations stay accurate.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given a course/service, when configured, then target role metadata is required.
+- Given new/updated offerings, when published, then mapping validation passes.</p>
+<h3 id="story-62-role-specific-mock-interview-services">Story 6.2: Role-Specific Mock Interview Services</h3>
+<p>As a learner, I want role-wise mock interviews so that prep is specific to my target role.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given target roles (SM/PO/PM/RTE), when catalog viewed, then role-specific mock interview services are available.
+- Given booking completion, when tracked, then role-wise funnel metrics update.</p>
+<h3 id="story-63-complete-course-details-package">Story 6.3: Complete Course Details Package</h3>
+<p>As a buyer, I want brochure, schedule, fees, and details for each course.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given any course page, when opened, then downloadable brochure is available.
+- Given schedule-bound courses, when viewed, then upcoming schedule + timezone + mode details are shown.
+- Given pricing section, when viewed, then fees/inclusions/payment details are transparent.</p>
+<h3 id="story-64-popularity-and-best-seller-signals">Story 6.4: Popularity and Best Seller Signals</h3>
+<p>As a visitor, I want uptake counts and bestseller tags so that trust improves.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given offering cards, when rendered, then learner uptake counts are displayed from verified analytics.
+- Given ranking rules met, when evaluated, then bestseller tags appear with governance controls.</p>
+<hr />
+<h2 id="epic-7-webinar-lifecycle-and-attendance-artifacts">Epic 7: Webinar Lifecycle and Attendance Artifacts</h2>
+<p>Manage webinar discovery, participation, post-session feedback, and artifacts.</p>
+<h3 id="story-71-webinar-discovery-and-registration">Story 7.1: Webinar Discovery and Registration</h3>
+<p>As a user, I want to discover/register webinars easily from key surfaces.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given homepage and key pages, when loaded, then upcoming webinar module is visible.
+- Given registration action, when completed, then confirmation/reminder notifications are sent.</p>
+<h3 id="story-72-attendance-code-and-certificate-self-service">Story 7.2: Attendance Code and Certificate Self-Service</h3>
+<p>As an attendee, I want to mark attendance and receive certificates in dashboard.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given webinar completion, when user enters end-code in dashboard, then attendance is verified.
+- Given eligibility met, when certificate requested, then status and downloadable certificate are available.</p>
+<h3 id="story-73-feedback-and-next-session-recommendations">Story 7.3: Feedback and Next-Session Recommendations</h3>
+<p>As an attendee, I want to give feedback and get next-session recommendations.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given post-session flow, when survey submitted, then rating/comments are stored.
+- Given survey + profile context, when processed, then recommended next sessions are shown.</p>
+<h3 id="story-74-recording-library-and-photo-gallery">Story 7.4: Recording Library and Photo Gallery</h3>
+<p>As a prospect/learner, I want to browse webinar recordings and event galleries.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given webinar hub/homepage surfaces, when viewed, then recording and gallery modules are discoverable.
+- Given content interactions, when tracked, then conversion attribution to downstream journeys is available.</p>
+<hr />
+<h2 id="epic-8-community-social-trust-and-public-site-framework">Epic 8: Community, Social Trust, and Public Site Framework</h2>
+<p>Strengthen trust and discovery through community and social channels.</p>
+<h3 id="story-81-community-discovery-and-benefits">Story 8.1: Community Discovery and Benefits</h3>
+<p>As a learner, I want to join official communities and receive member benefits.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given high-intent surfaces, when viewed, then official community links are visible.
+- Given membership join, when completed, then benefit visibility and re-entry CTAs are shown.</p>
+<h3 id="story-82-social-trust-modules-and-routing">Story 8.2: Social Trust Modules and Routing</h3>
+<p>As a visitor, I want to verify active social presence before buying.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given trust pages, when loaded, then official social profiles and curated proof modules are displayed.
+- Given social CTA click, when user returns, then conversion path resumes with attribution.</p>
+<h3 id="story-83-footer-and-public-information-completeness">Story 8.3: Footer and Public Information Completeness</h3>
+<p>As a visitor, I want complete legal/policy/contact/footer links so trust is clear.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given any public page, when footer loads, then policy/T&amp;C/affiliate/partnership/contact/social links are present.
+- Given footer links, when clicked, then destinations are valid and trackable.</p>
+<hr />
+<h2 id="epic-9-automation-notifications-and-re-engagement">Epic 9: Automation, Notifications, and Re-engagement</h2>
+<p>Build always-on personalized engagement and operational messaging.</p>
+<h3 id="story-91-interest-based-always-on-campaigns">Story 9.1: Interest-Based Always-On Campaigns</h3>
+<p>As a user, I want relevant notifications based on selected interests.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given user interests/preferences, when campaigns run, then content/channel/frequency align with preferences.
+- Given preference updates, when saved, then downstream campaigns adapt.</p>
+<h3 id="story-92-re-engagement-and-cart-recovery">Story 9.2: Re-engagement and Cart Recovery</h3>
+<p>As a non-converting learner, I want relevant nudges to return and complete action.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given abandoned cart or inactivity, when trigger rules match, then reminders are sent with deep links.
+- Given 3-day no-action window, when configured, then limited-time offer nudges can be sent.</p>
+<h3 id="story-93-scholarship-and-financial-aid-campaigns">Story 9.3: Scholarship and Financial Aid Campaigns</h3>
+<p>As an eligible non-buyer, I want scholarship/aid outreach options.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given eligible segment rules, when campaign runs, then scholarship/aid email is sent.
+- Given aid email CTA, when clicked, then intake flow starts and conversion is tracked.</p>
+<h3 id="story-94-enrollment-notifications-to-ops-email-telegram">Story 9.4: Enrollment Notifications to Ops (Email + Telegram)</h3>
+<p>As an ops/admin team, I want immediate enrollment alerts with payment details.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given successful enrollment, when event occurs, then notifications go to configured admin emails and Telegram.
+- Given delivery failures, when detected, then retry/status visibility is available.</p>
+<h3 id="story-95-student-order-confirmation-with-resources">Story 9.5: Student Order Confirmation with Resources</h3>
+<p>As a learner, I want post-order resources and group links.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given successful order, when confirmation is sent, then curated resources and official group join links are included.
+- Given offering type, when assembling content, then resources are context-relevant.</p>
+<hr />
+<h2 id="epic-10-admin-command-center-and-ai-native-operations">Epic 10: Admin Command Center and AI-Native Operations</h2>
+<p>Give operations teams governed AI-assisted control of growth, quality, and content.</p>
+<h3 id="story-101-unified-admin-command-center">Story 10.1: Unified Admin Command Center</h3>
+<p>As an admin, I want one place to monitor journeys, campaigns, and funnel health.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given admin dashboard, when opened, then key health/conversion metrics are visible.
+- Given anomalies, when detected, then probable-cause insights are surfaced.</p>
+<h3 id="story-102-campaign-governance-and-human-in-the-loop-controls">Story 10.2: Campaign Governance and Human-in-the-Loop Controls</h3>
+<p>As an admin, I want controlled automation approvals for high-impact actions.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given high-impact campaign, when configured, then approval workflow is required before execution.
+- Given approved changes, when deployed, then audit trail is recorded.</p>
+<h3 id="story-103-knowledge-base-evolution-and-validation">Story 10.3: Knowledge Base Evolution and Validation</h3>
+<p>As an admin, I want AI-suggested KB updates with human validation.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given new learnings/research signals, when AI proposes updates, then proposals require review/approval.
+- Given approved update, when published, then provenance/version metadata is stored and rollback is possible.</p>
+<h3 id="story-104-promptpolicy-and-experiment-governance">Story 10.4: Prompt/Policy and Experiment Governance</h3>
+<p>As an AI operator, I want versioned prompt/policy management and safe experiments.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given prompt/policy changes, when submitted, then versioning + review workflow applies.
+- Given experiment rollout, when enabled, then flags and rollback controls are available.</p>
+<hr />
+<h2 id="epic-11-search-growth-platform-seo-geo">Epic 11: Search Growth Platform (SEO + GEO)</h2>
+<p>Operationalize organic discoverability across search and AI-answer engines.</p>
+<h3 id="story-111-search-command-center-and-diagnostics">Story 11.1: Search Command Center and Diagnostics</h3>
+<p>As a growth operator, I want indexing/diagnostic visibility.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given search integrations, when data syncs, then crawl/index/schema issues are visible.
+- Given critical issue detection, when triggered, then alerting workflow activates.</p>
+<h3 id="story-112-structured-data-and-ai-citable-content">Story 11.2: Structured Data and AI-Citable Content</h3>
+<p>As a content team, I want schema + answer blocks to improve visibility.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given page templates, when rendered, then required schema is generated and validated.
+- Given priority pages, when authored, then concise Q&amp;A/summary blocks are present.</p>
+<h3 id="story-113-keyword-to-page-intent-mapping">Story 11.3: Keyword-to-Page Intent Mapping</h3>
+<p>As an SEO owner, I want priority keyword cluster coverage with CTA mapping.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given target keyword clusters, when mapped, then each keyword has target page + CTA + fallback CTA.
+- Given reporting interval, when measured, then rankings/CTR/conversion are available per cluster.</p>
+<h3 id="story-114-programmatic-landing-and-optimization-loop">Story 11.4: Programmatic Landing and Optimization Loop</h3>
+<p>As a growth team, I want scalable landing pages and snippet experiments.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given high-intent variants, when generated, then canonical/duplication rules are enforced.
+- Given experiments, when run, then impact on traffic and conversion is measurable.</p>
+<hr />
+<h2 id="epic-12-cutover-reliability-and-compliance-hardening">Epic 12: Cutover, Reliability, and Compliance Hardening</h2>
+<p>Ensure safe launch, operational resilience, and policy compliance.</p>
+<h3 id="story-121-url-seo-and-migration-continuity">Story 12.1: URL, SEO, and Migration Continuity</h3>
+<p>As a migration lead, I want redirect/canonical continuity so traffic and trust are preserved.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given legacy URLs, when accessed, then mapped redirects resolve with no dead ends.
+- Given migration period, when monitored, then 404/5xx spikes trigger alerting and response.</p>
+<h3 id="story-122-reliability-and-notification-resilience">Story 12.2: Reliability and Notification Resilience</h3>
+<p>As an operator, I want retry-safe notification/automation and monitored critical assets.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given notification failures, when encountered, then retries and dead-letter handling are applied.
+- Given search-critical assets and checkout endpoints, when unhealthy, then alerts and recovery runbooks execute.</p>
+<h3 id="story-123-compliance-accessibility-and-ai-guardrails">Story 12.3: Compliance, Accessibility, and AI Guardrails</h3>
+<p>As a governance owner, I want legal/consent/accessibility and AI safety controls enforced.</p>
+<p><strong>Acceptance Criteria</strong>
+- Given user interactions, when communications occur, then consent/unsubscribe and preference controls are respected.
+- Given AI messaging, when outcome claims are generated, then disallowed guarantee language is blocked and disclaimers are enforced.</p></main></body></html>

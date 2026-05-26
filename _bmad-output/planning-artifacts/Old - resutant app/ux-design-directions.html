@@ -1,0 +1,1235 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>mybmadproj — UX Design Directions</title>
+    <style>
+      :root {
+        --bg: #0b1220;
+        --panel: rgba(255, 255, 255, 0.06);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.68);
+        --border: rgba(255, 255, 255, 0.12);
+        --accent: #5eead4;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
+          "Segoe UI Emoji";
+        background: radial-gradient(1200px 800px at 20% 0%, #12213a 0%, var(--bg) 55%, #070a12 100%);
+        color: var(--text);
+        line-height: 1.35;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 28px 18px 80px;
+      }
+
+      header {
+        display: grid;
+        gap: 10px;
+        padding: 18px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+        margin-bottom: 18px;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: 0.2px;
+      }
+
+      header p {
+        margin: 0;
+        color: var(--muted);
+        max-width: 95ch;
+      }
+
+      .toc {
+        position: sticky;
+        top: 10px;
+        z-index: 5;
+        padding: 12px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: rgba(7, 10, 18, 0.72);
+        backdrop-filter: blur(10px);
+        margin: 14px 0 18px;
+      }
+
+      .toc strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .toc a {
+        display: inline-block;
+        margin: 4px 10px 4px 0;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        text-decoration: none;
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.04);
+        font-size: 13px;
+      }
+
+      .toc a:hover {
+        border-color: rgba(94, 234, 212, 0.55);
+      }
+
+      .grid {
+        display: grid;
+        gap: 14px;
+      }
+
+      @media (min-width: 980px) {
+        .grid {
+          grid-template-columns: 1fr 1fr;
+          align-items: start;
+        }
+      }
+
+      section.mock {
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .mock > .hd {
+        padding: 14px 14px 12px;
+        border-bottom: 1px solid var(--border);
+        display: grid;
+        gap: 6px;
+      }
+
+      .mock > .hd h2 {
+        margin: 0;
+        font-size: 15px;
+      }
+
+      .mock > .hd .meta {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .mock > .bd {
+        padding: 14px;
+      }
+
+      .frames {
+        display: grid;
+        gap: 12px;
+      }
+
+      @media (min-width: 980px) {
+        .frames {
+          grid-template-columns: 360px 1fr;
+          align-items: start;
+        }
+      }
+
+      .phone {
+        width: 100%;
+        max-width: 360px;
+        border-radius: 18px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        overflow: hidden;
+        background: var(--app-bg);
+        color: var(--app-fg);
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+      }
+
+      .desk {
+        border-radius: 14px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        overflow: hidden;
+        background: var(--app-bg);
+        color: var(--app-fg);
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+        min-height: 360px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--line);
+        background: var(--top);
+      }
+
+      .brand {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        font-weight: 650;
+        letter-spacing: 0.2px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--primary);
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+      }
+
+      .pill {
+        font-size: 12px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--chip-bg);
+        color: var(--chip-fg);
+      }
+
+      .content {
+        padding: 12px;
+      }
+
+      .h {
+        font-size: 14px;
+        margin: 0 0 8px;
+        font-weight: 700;
+      }
+
+      .sub {
+        margin: 0 0 12px;
+        color: var(--muted2);
+        font-size: 12.5px;
+      }
+
+      .item {
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--card);
+        margin-bottom: 10px;
+      }
+
+      .item .t {
+        display: grid;
+        gap: 4px;
+      }
+
+      .item .name {
+        font-weight: 650;
+        font-size: 13px;
+      }
+
+      .item .meta2 {
+        color: var(--muted2);
+        font-size: 12px;
+      }
+
+      .price {
+        font-weight: 750;
+        font-size: 13px;
+        color: var(--primary);
+      }
+
+      .cta-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .btn {
+        flex: 1;
+        border: 0;
+        border-radius: 12px;
+        padding: 10px 10px;
+        font-weight: 750;
+        cursor: default;
+      }
+
+      .btn.primary {
+        background: var(--primary);
+        color: var(--on-primary);
+      }
+
+      .btn.ghost {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--app-fg);
+      }
+
+      .sheet {
+        margin-top: 10px;
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+
+      .sheet .title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .sheet .title strong {
+        font-size: 13px;
+      }
+
+      .badge {
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(0, 0, 0, 0.03);
+        color: var(--muted2);
+        white-space: nowrap;
+      }
+
+      .compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        font-size: 12px;
+      }
+
+      .box {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 8px;
+        background: rgba(0, 0, 0, 0.02);
+      }
+
+      .box .k {
+        color: var(--muted2);
+        font-size: 11px;
+        margin-bottom: 4px;
+      }
+
+      .desk-layout {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        min-height: 330px;
+      }
+
+      .nav {
+        border-right: 1px solid var(--line);
+        background: var(--nav);
+        padding: 10px;
+      }
+
+      .nav .n {
+        padding: 8px 10px;
+        border-radius: 10px;
+        margin-bottom: 6px;
+        color: var(--muted2);
+        font-size: 12px;
+      }
+
+      .nav .n.active {
+        background: rgba(0, 0, 0, 0.05);
+        color: var(--app-fg);
+        font-weight: 750;
+      }
+
+      .main {
+        padding: 10px;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 8px 10px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--card);
+        margin-bottom: 10px;
+      }
+
+      .toolbar .left {
+        display: grid;
+        gap: 2px;
+      }
+
+      .toolbar .left .big {
+        font-weight: 800;
+        font-size: 13px;
+      }
+
+      .toolbar .left .sm {
+        color: var(--muted2);
+        font-size: 12px;
+      }
+
+      .table {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--card);
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1.2fr 0.6fr 0.7fr 0.7fr;
+        gap: 8px;
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--line);
+        font-size: 12px;
+      }
+
+      .row.head {
+        background: rgba(0, 0, 0, 0.03);
+        font-weight: 800;
+        color: var(--muted2);
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        width: fit-content;
+        font-size: 11px;
+        color: var(--muted2);
+      }
+
+      .chip.warn {
+        border-color: rgba(245, 158, 11, 0.35);
+        background: rgba(245, 158, 11, 0.12);
+        color: rgba(120, 53, 15, 0.95);
+      }
+
+      .chip.ok {
+        border-color: rgba(16, 185, 129, 0.35);
+        background: rgba(16, 185, 129, 0.12);
+        color: rgba(6, 78, 59, 0.95);
+      }
+
+      /* Directions */
+      #d1 {
+        --app-bg: #fbfaf7;
+        --app-fg: #0f172a;
+        --muted2: rgba(15, 23, 42, 0.62);
+        --line: rgba(15, 23, 42, 0.12);
+        --top: rgba(255, 255, 255, 0.86);
+        --nav: #f3f4f6;
+        --card: #ffffff;
+        --chip-bg: rgba(15, 23, 42, 0.04);
+        --chip-fg: rgba(15, 23, 42, 0.78);
+        --primary: #0f766e;
+        --on-primary: #ffffff;
+      }
+
+      #d2 {
+        --app-bg: #0b1220;
+        --app-fg: rgba(255, 255, 255, 0.92);
+        --muted2: rgba(255, 255, 255, 0.62);
+        --line: rgba(255, 255, 255, 0.12);
+        --top: rgba(255, 255, 255, 0.06);
+        --nav: rgba(255, 255, 255, 0.04);
+        --card: rgba(255, 255, 255, 0.06);
+        --chip-bg: rgba(255, 255, 255, 0.06);
+        --chip-fg: rgba(255, 255, 255, 0.78);
+        --primary: #5eead4;
+        --on-primary: #042f2e;
+      }
+
+      #d3 {
+        --app-bg: #fff7ed;
+        --app-fg: #1f2937;
+        --muted2: rgba(31, 41, 55, 0.62);
+        --line: rgba(31, 41, 55, 0.12);
+        --top: rgba(255, 255, 255, 0.75);
+        --nav: #ffedd5;
+        --card: #ffffff;
+        --chip-bg: rgba(234, 88, 12, 0.08);
+        --chip-fg: rgba(124, 45, 18, 0.9);
+        --primary: #ea580c;
+        --on-primary: #ffffff;
+      }
+
+      #d4 {
+        --app-bg: #f8fafc;
+        --app-fg: #0f172a;
+        --muted2: rgba(15, 23, 42, 0.62);
+        --line: rgba(15, 23, 42, 0.12);
+        --top: #ffffff;
+        --nav: #eef2ff;
+        --card: #ffffff;
+        --chip-bg: rgba(79, 70, 229, 0.08);
+        --chip-fg: rgba(55, 48, 163, 0.95);
+        --primary: #4f46e5;
+        --on-primary: #ffffff;
+      }
+
+      #d5 {
+        --app-bg: #ffffff;
+        --app-fg: #111827;
+        --muted2: rgba(17, 24, 39, 0.62);
+        --line: rgba(17, 24, 39, 0.12);
+        --top: #ffffff;
+        --nav: #f9fafb;
+        --card: #ffffff;
+        --chip-bg: rgba(17, 24, 39, 0.04);
+        --chip-fg: rgba(17, 24, 39, 0.72);
+        --primary: #111827;
+        --on-primary: #ffffff;
+      }
+
+      #d6 {
+        --app-bg: #0b1020;
+        --app-fg: rgba(255, 255, 255, 0.92);
+        --muted2: rgba(255, 255, 255, 0.62);
+        --line: rgba(255, 255, 255, 0.12);
+        --top: rgba(255, 255, 255, 0.06);
+        --nav: rgba(255, 255, 255, 0.04);
+        --card: rgba(255, 255, 255, 0.06);
+        --chip-bg: rgba(255, 255, 255, 0.06);
+        --chip-fg: rgba(255, 255, 255, 0.78);
+        --primary: #a78bfa;
+        --on-primary: #1e1036;
+      }
+
+      #d7 {
+        --app-bg: #f0fdf4;
+        --app-fg: #052e16;
+        --muted2: rgba(5, 46, 22, 0.62);
+        --line: rgba(5, 46, 22, 0.12);
+        --top: rgba(255, 255, 255, 0.82);
+        --nav: #dcfce7;
+        --card: #ffffff;
+        --chip-bg: rgba(22, 163, 74, 0.1);
+        --chip-fg: rgba(20, 83, 45, 0.95);
+        --primary: #16a34a;
+        --on-primary: #ffffff;
+      }
+
+      #d8 {
+        --app-bg: #0f172a;
+        --app-fg: rgba(255, 255, 255, 0.92);
+        --muted2: rgba(255, 255, 255, 0.62);
+        --line: rgba(255, 255, 255, 0.12);
+        --top: rgba(255, 255, 255, 0.06);
+        --nav: rgba(255, 255, 255, 0.04);
+        --card: rgba(255, 255, 255, 0.06);
+        --chip-bg: rgba(255, 255, 255, 0.06);
+        --chip-fg: rgba(255, 255, 255, 0.78);
+        --primary: #38bdf8;
+        --on-primary: #0b1220;
+      }
+
+      footer {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 12px;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.03);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>UX Design Directions — mybmadproj</h1>
+        <p>
+          This page compares multiple visual directions using the same core UX moment: <strong>checkout recovery</strong> (inventory disruption) plus a compact
+          <strong>ops incident</strong> preview. Use it to pick a visual language, density, and hierarchy style before we lock tokens in MUI.
+        </p>
+      </header>
+
+      <nav class="toc" aria-label="Table of contents">
+        <strong>Jump to direction</strong>
+        <a href="#d1">D1 Calm consumer / warm neutral</a>
+        <a href="#d2">D2 Ops-first dark console</a>
+        <a href="#d3">D3 Warm marketplace (orange)</a>
+        <a href="#d4">D4 Enterprise indigo (SaaS)</a>
+        <a href="#d5">D5 Monochrome editorial</a>
+        <a href="#d6">D6 Dark premium violet</a>
+        <a href="#d7">D7 Restaurant tablet cockpit</a>
+        <a href="#d8">D8 Cyan signal dark ops</a>
+      </nav>
+
+      <div class="grid">
+        <section class="mock" id="d1">
+          <div class="hd">
+            <h2>Direction 1 — Calm consumer + credible neutrals (recommended default)</h2>
+            <div class="meta">Best for: trust-first customer demo + readable ops without going “gaming dark.”</div>
+          </div>
+          <div class="bd">
+            <div class="frames">
+              <div class="phone" aria-label="Customer phone mock">
+                <div class="topbar">
+                  <div class="brand"><span class="dot" aria-hidden="true"></span> FreshRoute</div>
+                  <div class="pill">Cart · 2</div>
+                </div>
+                <div class="content">
+                  <p class="h">Checkout</p>
+                  <p class="sub">We re-check inventory before confirming your order.</p>
+                  <div class="item">
+                    <div class="t">
+                      <div class="name">Paneer Tikka Bowl</div>
+                      <div class="meta2">Spice Kitchen · Prep ~18m</div>
+                    </div>
+                    <div class="price">$12</div>
+                  </div>
+                  <div class="sheet">
+                    <div class="title">
+                      <strong>Item unavailable</strong>
+                      <span class="badge">Proposed fix · 4s</span>
+                    </div>
+                    <div class="compare">
+                      <div class="box">
+                        <div class="k">Before</div>
+                        <div>Paneer Tikka Bowl · ETA 6:18pm</div>
+                      </div>
+                      <div class="box">
+                        <div class="k">After</div>
+                        <div>Chicken Tikka Bowl · ETA 6:24pm</div>
+                      </div>
+                    </div>
+                    <div class="cta-row">
+                      <button class="btn ghost" type="button">Edit cart</button>
+                      <button class="btn primary" type="button">Accept change</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="desk" aria-label="Ops desktop mock">
+                <div class="topbar">
+                  <div class="brand"><span class="dot" aria-hidden="true"></span> Ops Console</div>
+                  <div class="pill">Tenant: North City Group</div>
+                </div>
+                <div class="desk-layout">
+                  <aside class="nav" aria-label="Sidebar">
+                    <div class="n active">Incidents</div>
+                    <div class="n">Orders</div>
+                    <div class="n">Policies</div>
+                    <div class="n">Audit</div>
+                  </aside>
+                  <main class="main">
+                    <div class="toolbar">
+                      <div class="left">
+                        <div class="big">INC-2041 · Inventory mismatch</div>
+                        <div class="sm">Impacted orders: 3 · Recommended: approve substitution policy</div>
+                      </div>
+                      <span class="chip warn">Needs review</span>
+                    </div>
+                    <div class="table" role="table" aria-label="Impacted orders">
+                      <div class="row head" role="row">
+                        <div role="columnheader">Order</div>
+                        <div role="columnheader">State</div>
+                        <div role="columnheader">Proposal</div>
+                        <div role="columnheader">SLA</div>
+                      </div>
+                      <div class="row" role="row">
+                        <div>#4821</div>
+                        <div><span class="chip warn">Checkout blocked</span></div>
+                        <div>Substitute bowl</div>
+                        <div>2m</div>
+                      </div>
+                      <div class="row" role="row">
+                        <div>#4822</div>
+                        <div><span class="chip ok">Recovered</span></div>
+                        <div>Reroute</div>
+                        <div>—</div>
+                      </div>
+                    </div>
+                  </main>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="mock" id="d2">
+          <div class="hd">
+            <h2>Direction 2 — Ops-first dark console (high density)</h2>
+            <div class="meta">Best for: “serious platform” demos where ops credibility is the headline.</div>
+          </div>
+          <div class="bd">
+            <div class="frames">
+              <div class="phone">
+                <div class="topbar">
+                  <div class="brand"><span class="dot" aria-hidden="true"></span> FreshRoute</div>
+                  <div class="pill">Cart · 2</div>
+                </div>
+                <div class="content">
+                  <p class="h">Checkout</p>
+                  <p class="sub">Inventory check complete.</p>
+                  <div class="sheet">
+                    <div class="title">
+                      <strong>Change required</strong>
+                      <span class="badge">Auto</span>
+                    </div>
+                    <div class="compare">
+                      <div class="box">
+                        <div class="k">You had</div>
+                        <div>Paneer bowl · 6:18pm</div>
+                      </div>
+                      <div class="box">
+                        <div class="k">We can do</div>
+                        <div>Chicken bowl · 6:24pm</div>
+                      </div>
+                    </div>
+                    <div class="cta-row">
+                      <button class="btn ghost" type="button">Back</button>
+                      <button class="btn primary" type="button">Continue</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="desk">
+                <div class="topbar">
+                  <div class="brand"><span class="dot" aria-hidden="true"></span> Ops Console</div>
+                  <div class="pill">Live</div>
+                </div>
+                <div class="desk-layout">
+                  <aside class="nav">
+                    <div class="n active">Incidents</div>
+                    <div class="n">Orders</div>
+                    <div class="n">Policies</div>
+                    <div class="n">Audit</div>
+                  </aside>
+                  <main class="main">
+                    <div class="toolbar">
+                      <div class="left">
+                        <div class="big">INC-2041 · STOCKOUT_CLUSTER</div>
+                        <div class="sm">Detector: pre_confirm_validation · Confidence: medium</div>
+                      </div>
+                      <span class="chip warn">Active</span>
+                    </div>
+                    <div class="table">
+                      <div class="row head">
+                        <div>Order</div>
+                        <div>Severity</div>
+                        <div>Next action</div>
+                        <div>Owner</div>
+                      </div>
+                      <div class="row">
+                        <div>#4821</div>
+                        <div>P1</div>
+                        <div>Approve substitution</div>
+                        <div>Ops</div>
+                      </div>
+                      <div class="row">
+                        <div>#4810</div>
+                        <div>P3</div>
+                        <div>Monitor</div>
+                        <div>—</div>
+                      </div>
+                    </div>
+                  </main>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="mock" id="d3">
+          <div class="hd">
+            <h2>Direction 3 — Warm marketplace (high energy)</h2>
+            <div class="meta">Best for: consumer delight-forward demos; ops still readable but warmer.</div>
+          </div>
+          <div class="bd">
+            <div class="frames">
+              <div class="phone">
+                <div class="topbar">
+                  <div class="brand"><span class="dot" aria-hidden="true"></span> FreshRoute</div>
+                  <div class="pill">Deals</div>
+                </div>
+                <div class="content">
+                  <p class="h">Almost there</p>
+                  <p class="sub">We found a swap that keeps your order moving.</p>
+                  <div class="sheet">
+                    <div class="title">
+                      <strong>Swap suggested</strong>
+                      <span class="badge">Save $1</span>
+                    </div>
+                    <div class="compare">
+                      <div class="box">
+                        <div class="k">Item</div>
+                        <div>Paneer bowl</div>
+                      </div>
+                      <div class="box">
+                        <div class="k">Swap</div>
+                        <div>Chicken bowl</div>
+                      </div>
+                    </div>
+                    <div class="cta-row">
+                      <button class="btn ghost" type="button">Choose different</button>
+                      <button class="btn primary" type="button">Use swap</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="desk">
+                <div class="topbar">
+                  <div class="brand"><span class="dot" aria-hidden="true"></span> Ops Console</div>
+                  <div class="pill">Warm UI</div>
+                </div>
+                <div class="desk-layout">
+                  <aside class="nav">
+                    <div class="n active">Queue</div>
+                    <div class="n">Restaurants</div>
+                    <div class="n">Rules</div>
+                  </aside>
+                  <main class="main">
+                    <div class="toolbar">
+                      <div class="left">
+                        <div class="big">Fallback spike · 11:40am</div>
+                        <div class="sm">Likely cause: inventory drift</div>
+                      </div>
+                      <span class="chip warn">Review</span>
+                    </div>
+                    <div class="table">
+                      <div class="row head">
+                        <div>Signal</div>
+                        <div>Rate</div>
+                        <div>Action</div>
+                        <div>Status</div>
+                      </div>
+                      <div class="row">
+                        <div>Substitution offers</div>
+                        <div>+18%</div>
+                        <div>Tighten policy</div>
+                        <div>Open</div>
+                      </div>
+                    </div>
+                  </main>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="mock" id="d4">
+          <div class="hd">
+            <h2>Direction 4 — Enterprise indigo (classic SaaS)</h2>
+            <div class="meta">Best for: B2B storytelling; very “platform procurement friendly.”</div>
+          </div>
+          <div class="bd">
+            <div class="frames">
+              <div class="phone">
+                <div class="topbar">
+                  <div class="brand"><span class="dot" aria-hidden="true"></span> FreshRoute</div>
+                  <div class="pill">Help</div>
+                </div>
+                <div class="content">
+                  <p class="h">Confirm changes</p>
+                  <p class="sub">Your order changes before confirmation.</p>
+                  <div class="sheet">
+                    <div class="title">
+                      <strong>Summary</strong>
+                      <span class="badge">Review</span>
+                    </div>
+                    <div class="compare">
+                      <div class="box">
+                        <div class="k">Item</div>
+                        <div>Paneer bowl</div>
+                      </div>
+                      <div class="box">
+                        <div class="k">Replacement</div>
+                        <div>Chicken bowl</div>
+                      </div>
+                    </div>
+                    <div class="cta-row">
+                      <button class="btn ghost" type="button">Cancel</button>
+                      <button class="btn primary" type="button">Confirm</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="desk">
+                <div class="topbar">
+                  <div class="brand"><span class="dot" aria-hidden="true"></span> Admin</div>
+                  <div class="pill">Policies</div>
+                </div>
+                <div class="desk-layout">
+                  <aside class="nav">
+                    <div class="n active">Incidents</div>
+                    <div class="n">Orders</div>
+                    <div class="n">Tenants</div>
+                  </aside>
+                  <main class="main">
+                    <div class="toolbar">
+                      <div class="left">
+                        <div class="big">Policy change impact</div>
+                        <div class="sm">Simulated: stricter substitution thresholds</div>
+                      </div>
+                      <span class="chip ok">Safe</span>
+                    </div>
+                    <div class="table">
+                      <div class="row head">
+                        <div>Metric</div>
+                        <div>Before</div>
+                        <div>After</div>
+                        <div>Risk</div>
+                      </div>
+                      <div class="row">
+                        <div>Failed checkouts</div>
+                        <div>6.2%</div>
+                        <div>4.1%</div>
+                        <div>Low</div>
+                      </div>
+                    </div>
+                  </main>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="mock" id="d5">
+          <div class="hd">
+            <h2>Direction 5 — Monochrome editorial (minimal brand)</h2>
+            <div class="meta">Best for: fastest “clean UI” demo; relies on typography and spacing.</div>
+          </div>
+          <div class="bd">
+            <div class="frames">
+              <div class="phone">
+                <div class="topbar">
+                  <div class="brand"><span class="dot" aria-hidden="true"></span> FreshRoute</div>
+                  <div class="pill">···</div>
+                </div>
+                <div class="content">
+                  <p class="h">Order update</p>
+                  <p class="sub">One item needs a change before confirmation.</p>
+                  <div class="sheet">
+                    <div class="title">
+                      <strong>Details</strong>
+                      <span class="badge">Required</span>
+                    </div>
+                    <div class="compare">
+                      <div class="box">
+                        <div class="k">Remove</div>
+                        <div>Paneer bowl</div>
+                      </div>
+                      <div class="box">
+                        <div class="k">Add</div>
+                        <div>Chicken bowl</div>
+                      </div>
+                    </div>
+                    <div class="cta-row">
+                      <button class="btn ghost" type="button">Edit</button>
+                      <button class="btn primary" type="button">Apply</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="desk">
+                <div class="topbar">
+                  <div class="brand"><span class="dot" aria-hidden="true"></span> Console</div>
+                  <div class="pill">Audit on</div>
+                </div>
+                <div class="desk-layout">
+                  <aside class="nav">
+                    <div class="n active">Overview</div>
+                    <div class="n">Orders</div>
+                    <div class="n">Rules</div>
+                  </aside>
+                  <main class="main">
+                    <div class="toolbar">
+                      <div class="left">
+                        <div class="big">Incident overview</div>
+                        <div class="sm">Monochrome emphasis on hierarchy, not color</div>
+                      </div>
+                      <span class="chip">Neutral</span>
+                    </div>
+                    <div class="table">
+                      <div class="row head">
+                        <div>ID</div>
+                        <div>Type</div>
+                        <div>Impact</div>
+                        <div>Next</div>
+                      </div>
+                      <div class="row">
+                        <div>INC-2041</div>
+                        <div>Stockout</div>
+                        <div>3 orders</div>
+                        <div>Review proposal</div>
+                      </div>
+                    </div>
+                  </main>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="mock" id="d6">
+          <div class="hd">
+            <h2>Direction 6 — Dark premium violet (product-led aesthetic)</h2>
+            <div class="meta">Best for: standout visual identity; use carefully for trust-critical flows.</div>
+          </div>
+          <div class="bd">
+            <div class="frames">
+              <div class="phone">
+                <div class="topbar">
+                  <div class="brand"><span class="dot" aria-hidden="true"></span> FreshRoute</div>
+                  <div class="pill">Pro</div>
+                </div>
+                <div class="content">
+                  <p class="h">Smart fix</p>
+                  <p class="sub">We can keep your meal on track with one confirmation.</p>
+                  <div class="sheet">
+                    <div class="title">
+                      <strong>Proposed update</strong>
+                      <span class="badge">AI assist</span>
+                    </div>
+                    <div class="compare">
+                      <div class="box">
+                        <div class="k">From</div>
+                        <div>Paneer bowl</div>
+                      </div>
+                      <div class="box">
+                        <div class="k">To</div>
+                        <div>Chicken bowl</div>
+                      </div>
+                    </div>
+                    <div class="cta-row">
+                      <button class="btn ghost" type="button">Not now</button>
+                      <button class="btn primary" type="button">Confirm</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="desk">
+                <div class="topbar">
+                  <div class="brand"><span class="dot" aria-hidden="true"></span> Ops</div>
+                  <div class="pill">Insights</div>
+                </div>
+                <div class="desk-layout">
+                  <aside class="nav">
+                    <div class="n active">Live</div>
+                    <div class="n">Orders</div>
+                    <div class="n">Policies</div>
+                  </aside>
+                  <main class="main">
+                    <div class="toolbar">
+                      <div class="left">
+                        <div class="big">Anomaly: substitution acceptance</div>
+                        <div class="sm">Spike detected · last 20 minutes</div>
+                      </div>
+                      <span class="chip warn">Investigate</span>
+                    </div>
+                    <div class="table">
+                      <div class="row head">
+                        <div>Window</div>
+                        <div>Accept rate</div>
+                        <div>Reject</div>
+                        <div>Note</div>
+                      </div>
+                      <div class="row">
+                        <div>11:20–11:40</div>
+                        <div>72%</div>
+                        <div>8%</div>
+                        <div>Menu drift</div>
+                      </div>
+                    </div>
+                  </main>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="mock" id="d7">
+          <div class="hd">
+            <h2>Direction 7 — Restaurant tablet cockpit (operations-forward green)</h2>
+            <div class="meta">Best for: restaurant manager workflows: inventory + order queue in one glanceable screen.</div>
+          </div>
+          <div class="bd">
+            <div class="frames">
+              <div class="phone">
+                <div class="topbar">
+                  <div class="brand"><span class="dot" aria-hidden="true"></span> Kitchen Console</div>
+                  <div class="pill">Spice Kitchen</div>
+                </div>
+                <div class="content">
+                  <p class="h">Today</p>
+                  <p class="sub">Inventory + incoming orders in one place.</p>
+                  <div class="item">
+                    <div class="t">
+                      <div class="name">Stock risk: Paneer</div>
+                      <div class="meta2">Low · last updated 6m ago</div>
+                    </div>
+                    <div class="price" style="color: var(--primary)">Fix</div>
+                  </div>
+                  <div class="item">
+                    <div class="t">
+                      <div class="name">Order #4821</div>
+                      <div class="meta2">Rerouted · needs accept</div>
+                    </div>
+                    <div class="price" style="color: var(--primary)">Open</div>
+                  </div>
+                  <div class="cta-row">
+                    <button class="btn ghost" type="button">Inventory</button>
+                    <button class="btn primary" type="button">Orders</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="desk">
+                <div class="topbar">
+                  <div class="brand"><span class="dot" aria-hidden="true"></span> Restaurant Dashboard</div>
+                  <div class="pill">Tablet layout</div>
+                </div>
+                <div class="desk-layout">
+                  <aside class="nav">
+                    <div class="n active">Queue</div>
+                    <div class="n">Inventory</div>
+                    <div class="n">Fallback</div>
+                  </aside>
+                  <main class="main">
+                    <div class="toolbar">
+                      <div class="left">
+                        <div class="big">Incoming · 6 orders</div>
+                        <div class="sm">2 require decision · SLA tight</div>
+                      </div>
+                      <span class="chip warn">Action</span>
+                    </div>
+                    <div class="table">
+                      <div class="row head">
+                        <div>Order</div>
+                        <div>Type</div>
+                        <div>Due</div>
+                        <div>Status</div>
+                      </div>
+                      <div class="row">
+                        <div>#4821</div>
+                        <div>Reroute</div>
+                        <div>6m</div>
+                        <div><span class="chip warn">Accept</span></div>
+                      </div>
+                      <div class="row">
+                        <div>#4810</div>
+                        <div>Normal</div>
+                        <div>14m</div>
+                        <div><span class="chip ok">OK</span></div>
+                      </div>
+                    </div>
+                  </main>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="mock" id="d8">
+          <div class="hd">
+            <h2>Direction 8 — Cyan “signal” dark ops (high contrast alerts)</h2>
+            <div class="meta">Best for: alert readability + incident triage; pairs with a lighter customer UI.</div>
+          </div>
+          <div class="bd">
+            <div class="frames">
+              <div class="phone">
+                <div class="topbar">
+                  <div class="brand"><span class="dot" aria-hidden="true"></span> FreshRoute</div>
+                  <div class="pill">Track</div>
+                </div>
+                <div class="content">
+                  <p class="h">Stay on track</p>
+                  <p class="sub">Your order changed slightly—confirm to continue.</p>
+                  <div class="sheet">
+                    <div class="title">
+                      <strong>Review changes</strong>
+                      <span class="badge">Required</span>
+                    </div>
+                    <div class="compare">
+                      <div class="box">
+                        <div class="k">Item</div>
+                        <div>Paneer bowl</div>
+                      </div>
+                      <div class="box">
+                        <div class="k">Replacement</div>
+                        <div>Chicken bowl</div>
+                      </div>
+                    </div>
+                    <div class="cta-row">
+                      <button class="btn ghost" type="button">Cancel</button>
+                      <button class="btn primary" type="button">Confirm</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="desk">
+                <div class="topbar">
+                  <div class="brand"><span class="dot" aria-hidden="true"></span> Ops</div>
+                  <div class="pill">Signals</div>
+                </div>
+                <div class="desk-layout">
+                  <aside class="nav">
+                    <div class="n active">Alerts</div>
+                    <div class="n">Orders</div>
+                    <div class="n">Policies</div>
+                  </aside>
+                  <main class="main">
+                    <div class="toolbar">
+                      <div class="left">
+                        <div class="big">P1 · Pre-confirm failures</div>
+                        <div class="sm">3 open · oldest 6m</div>
+                      </div>
+                      <span class="chip warn">Triage</span>
+                    </div>
+                    <div class="table">
+                      <div class="row head">
+                        <div>Incident</div>
+                        <div>Signal</div>
+                        <div>Proposal</div>
+                        <div>Owner</div>
+                      </div>
+                      <div class="row">
+                        <div>INC-910</div>
+                        <div>Stockout</div>
+                        <div>Substitute</div>
+                        <div>Ops</div>
+                      </div>
+                      <div class="row">
+                        <div>INC-911</div>
+                        <div>Delay</div>
+                        <div>Reroute</div>
+                        <div>Auto</div>
+                      </div>
+                    </div>
+                  </main>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <footer>
+        Tip: pick a <strong>customer direction</strong> and an <strong>ops direction</strong> independently if you want (common combo: <strong>D1 customer + D2 ops</strong>).
+      </footer>
+    </div>
+  </body>
+</html>

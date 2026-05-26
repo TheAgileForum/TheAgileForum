@@ -1,0 +1,93 @@
+import { Navigate, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import { CartProvider } from "./contexts/CartContext";
+import { CustomerLayout } from "./layouts/CustomerLayout";
+import { CustomerShell } from "./layouts/CustomerShell";
+import { DeliveryLayout } from "./layouts/DeliveryLayout";
+import { OpsLayout } from "./layouts/OpsLayout";
+import { RestaurantLayout } from "./layouts/RestaurantLayout";
+import { SupportLayout } from "./layouts/SupportLayout";
+import { CartPage } from "./pages/customer/CartPage";
+import { CheckoutPage } from "./pages/customer/CheckoutPage";
+import { CheckoutSuccessPage } from "./pages/customer/CheckoutSuccessPage";
+import { ConsentPage } from "./pages/customer/ConsentPage";
+import { HomePage } from "./pages/customer/HomePage";
+import { LoginPage } from "./pages/customer/LoginPage";
+import { MenuPage } from "./pages/customer/MenuPage";
+import { OrderTrackPage } from "./pages/customer/OrderTrackPage";
+import { RecoveryPage } from "./pages/customer/RecoveryPage";
+import { DeliveryDetailPage } from "./pages/delivery/DeliveryDetailPage";
+import { DeliveryListPage } from "./pages/delivery/DeliveryListPage";
+import { DecisionsPage } from "./pages/ops/DecisionsPage";
+import { OpsHome } from "./pages/ops/OpsHome";
+import { OpsOrderPage } from "./pages/ops/OpsOrderPage";
+import { PoliciesPage } from "./pages/ops/PoliciesPage";
+import { InventoryPage } from "./pages/restaurant/InventoryPage";
+import { OrderDetailPage } from "./pages/restaurant/OrderDetailPage";
+import { OrdersQueuePage } from "./pages/restaurant/OrdersQueuePage";
+import { RestaurantHome } from "./pages/restaurant/RestaurantHome";
+import { IncidentDetailPage } from "./pages/support/IncidentDetailPage";
+import { SupportInbox } from "./pages/support/SupportInbox";
+
+function App() {
+  return (
+    <AuthProvider>
+      <CartProvider>
+        <Routes>
+          <Route
+            path="/login"
+            element={
+              <CustomerShell>
+                <LoginPage />
+              </CustomerShell>
+            }
+          />
+          <Route
+            element={
+              <CustomerShell>
+                <CustomerLayout />
+              </CustomerShell>
+            }
+          >
+            <Route index element={<HomePage />} />
+            <Route path="menu" element={<MenuPage />} />
+            <Route path="cart" element={<CartPage />} />
+            <Route path="checkout" element={<CheckoutPage />} />
+            <Route path="checkout/success" element={<CheckoutSuccessPage />} />
+            <Route path="recovery" element={<RecoveryPage />} />
+            <Route path="orders/:orderId" element={<OrderTrackPage />} />
+            <Route path="consent" element={<ConsentPage />} />
+          </Route>
+
+          <Route path="/restaurant" element={<RestaurantLayout />}>
+            <Route index element={<RestaurantHome />} />
+            <Route path="orders" element={<OrdersQueuePage />} />
+            <Route path="orders/:id" element={<OrderDetailPage />} />
+            <Route path="inventory" element={<InventoryPage />} />
+          </Route>
+
+          <Route path="/ops" element={<OpsLayout />}>
+            <Route index element={<OpsHome />} />
+            <Route path="policies" element={<PoliciesPage />} />
+            <Route path="decisions" element={<DecisionsPage />} />
+            <Route path="orders/:id" element={<OpsOrderPage />} />
+          </Route>
+
+          <Route path="/support" element={<SupportLayout />}>
+            <Route index element={<SupportInbox />} />
+            <Route path="incidents/:id" element={<IncidentDetailPage />} />
+          </Route>
+
+          <Route path="/delivery" element={<DeliveryLayout />}>
+            <Route index element={<DeliveryListPage />} />
+            <Route path=":id" element={<DeliveryDetailPage />} />
+          </Route>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </CartProvider>
+    </AuthProvider>
+  );
+}
+
+export default App;
