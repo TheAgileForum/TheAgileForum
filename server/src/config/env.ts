@@ -12,15 +12,26 @@ export type AppEnv = z.infer<typeof schema>;
 
 let cached: AppEnv | null = null;
 
+function formatEnvError(error: z.ZodError): string {
+  const issues = error.issues.map((issue) => {
+    const key = issue.path.join(".") || "unknown";
+    return `- ${key}: ${issue.message}`;
+  });
+  return ["Invalid environment configuration.", ...issues].join("\n");
+}
+
 export function getEnv(): AppEnv {
   if (cached) return cached;
   const parsed = schema.safeParse(process.env);
   if (!parsed.success) {
-    const msg = parsed.error.flatten().fieldErrors;
-    throw new Error(`Invalid environment: ${JSON.stringify(msg)}`);
+    throw new Error(formatEnvError(parsed.error));
   }
   cached = parsed.data;
   return cached;
+}
+
+export function validateEnvOrThrow(): AppEnv {
+  return getEnv();
 }
 
 export function resetEnvCache(): void {

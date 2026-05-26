@@ -78,8 +78,13 @@ Expected: `200` and body `{"status":"ok"}`.
 
 ## Environment
 
-- **`server/.env.example`** — `PORT`, future `DATABASE_URL` placeholder.
-- **`client/.env.example`** — optional `VITE_API_URL` when not using the dev proxy.
+- **`server/.env.example`** — required backend runtime variables.
+- **`client/.env.example`** — optional frontend overrides.
+- Validate backend environment before startup:
+  - `cd server && npm run env:check`
+- Detailed setup docs:
+  - `docs/environment-bootstrap.md`
+  - `docs/secrets-policy.md`
 
 Do not commit `.env` files with secrets.
 

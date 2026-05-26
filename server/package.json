@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
+    "env:check": "tsx src/config/validate-env.ts",
     "build": "prisma generate && tsc",
     "start": "node dist/index.js",
     "test": "vitest run --config vitest.config.ts",
