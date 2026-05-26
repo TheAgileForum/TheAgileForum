@@ -101,4 +101,47 @@ describe.skipIf(!hasDb)("auth integration", () => {
       "00000000-0000-4000-8000-000000000001",
     );
   });
+
+  it("stores consent event for authenticated user", async () => {
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email: "customer@demo.local", password: "password123" })
+      .expect(200);
+
+    const res = await agent.post("/api/v1/auth/consent").send({
+      policyVersion: "v1",
+      accepted: true,
+      source: "integration-test",
+    });
+
+    expect(res.status).toBe(201);
+    expect(res.body.consent.policyVersion).toBe("v1");
+    expect(res.body.consent.accepted).toBe(true);
+    expect(res.body.consent.source).toBe("integration-test");
+  });
+
+  it("blocks CUSTOMER from admin-check route", async () => {
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email: "customer@demo.local", password: "password123" })
+      .expect(200);
+
+    const res = await agent.get("/api/v1/auth/admin-check");
+    expect(res.status).toBe(403);
+    expect(res.body.error.code).toBe("FORBIDDEN");
+  });
+
+  it("allows OPS_ADMIN to access admin-check route", async () => {
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email: "ops@demo.local", password: "password123" })
+      .expect(200);
+
+    const res = await agent.get("/api/v1/auth/admin-check");
+    expect(res.status).toBe(200);
+    expect(res.body.ok).toBe(true);
+  });
 });

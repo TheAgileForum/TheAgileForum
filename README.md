@@ -94,6 +94,8 @@ Expected: `200` and body `{"status":"ok"}`.
 - Detailed setup docs:
   - `docs/environment-bootstrap.md`
   - `docs/secrets-policy.md`
+  - `docs/data-baseline-s0-4.md`
+  - `docs/auth-rbac-consent-contracts-s0-5.md`
 
 Do not commit `.env` files with secrets.
 
