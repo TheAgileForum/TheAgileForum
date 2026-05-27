@@ -9,6 +9,10 @@ const schema = z.object({
   REDIS_URL: z.string().url().default("redis://localhost:6379"),
   WORKER_PORT: z.coerce.number().int().positive().default(3101),
   SCHEDULER_PORT: z.coerce.number().int().positive().default(3102),
+  INTEGRATION_PROVIDER_MODE: z.enum(["stub", "live"]).default("stub"),
+  STRIPE_WEBHOOK_SECRET: z.string().default("whsec_stub"),
+  INTEGRATION_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),
+  INTEGRATION_MAX_RETRIES: z.coerce.number().int().min(0).default(2),
 });
 
 export type AppEnv = z.infer<typeof schema>;
