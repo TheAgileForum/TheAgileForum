@@ -3,6 +3,7 @@ import { createIntegrationAdapters } from "../integrations/factory.js";
 import { publishEvent } from "../events/publisher.js";
 import { logError, logInfo } from "../runtime/logger.js";
 import { IntegrationError } from "../integrations/errors.js";
+import { captureProductEvent } from "../observability/posthog.js";
 
 export const stripeWebhookRouter = Router();
 
@@ -37,6 +38,14 @@ stripeWebhookRouter.post("/webhook", async (req, res) => {
       eventId: parsed.id,
       eventType: parsed.type,
       queue: published.queue,
+    });
+    await captureProductEvent({
+      distinctId: parsed.id,
+      event: "stripe_webhook_accepted",
+      properties: {
+        eventType: parsed.type,
+        queue: published.queue,
+      },
     });
 
     return res.status(202).json({

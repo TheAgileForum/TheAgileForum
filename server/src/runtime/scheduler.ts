@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { getEnv } from "../config/env.js";
+import { initObservability } from "../observability/bootstrap.js";
 import { startRuntimeHealthServer } from "./health-server.js";
 import { logInfo } from "./logger.js";
 import { wireGracefulShutdown } from "./signals.js";
@@ -7,6 +8,7 @@ import { wireGracefulShutdown } from "./signals.js";
 const env = getEnv();
 const role = "scheduler";
 const heartbeatMs = 20000;
+initObservability(role);
 
 logInfo("Scheduler booting", {
   role,

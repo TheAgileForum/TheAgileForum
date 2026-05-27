@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+const optionalString = z.preprocess((value) => {
+  if (typeof value === "string" && value.trim() === "") {
+    return undefined;
+  }
+  return value;
+}, z.string().optional());
+
 const schema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(3001),
@@ -13,6 +20,13 @@ const schema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().default("whsec_stub"),
   INTEGRATION_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),
   INTEGRATION_MAX_RETRIES: z.coerce.number().int().min(0).default(2),
+  SENTRY_DSN: optionalString,
+  SENTRY_TRACES_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(0.1),
+  POSTHOG_API_KEY: optionalString,
+  POSTHOG_HOST: z.string().url().default("https://us.i.posthog.com"),
+  OBSERVABILITY_RELEASE: z.string().default("local-dev"),
+  ALERT_WEBHOOK_URL: optionalString,
+  CLARITY_PROJECT_ID: optionalString,
 });
 
 export type AppEnv = z.infer<typeof schema>;
