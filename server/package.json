@@ -21,7 +21,8 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "db:reset": "prisma migrate reset",
-    "observability:synthetic": "tsx scripts/observability-synthetic-failure.ts"
+    "observability:synthetic": "tsx scripts/observability-synthetic-failure.ts",
+    "readiness:gate": "tsx scripts/sprint-1-readiness-gate.ts"
   },
   "dependencies": {
     "@sentry/node": "^10.22.0",
