@@ -4,24 +4,34 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "npm run dev:api",
+    "dev:api": "tsx watch src/index.ts",
+    "dev:worker": "tsx watch src/runtime/worker.ts",
+    "dev:scheduler": "tsx watch src/runtime/scheduler.ts",
+    "dev:runtime": "tsx src/runtime/dev-orchestrator.ts",
+    "env:check": "tsx src/config/validate-env.ts",
     "build": "prisma generate && tsc",
     "start": "node dist/index.js",
+    "start:worker": "node dist/runtime/worker.js",
+    "start:scheduler": "node dist/runtime/scheduler.js",
     "test": "vitest run --config vitest.config.ts",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
-    "db:reset": "prisma migrate reset"
+    "db:reset": "prisma migrate reset",
+    "observability:synthetic": "tsx scripts/observability-synthetic-failure.ts"
   },
   "dependencies": {
+    "@sentry/node": "^10.22.0",
     "@prisma/client": "^6.19.0",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jose": "^5.9.6",
+    "posthog-node": "^5.13.2",
     "zod": "^3.24.1"
   },
   "devDependencies": {

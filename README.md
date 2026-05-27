@@ -17,6 +17,10 @@ Auth uses **PostgreSQL** + **Prisma**. From repo root:
 docker compose up -d
 ```
 
+This starts local dependencies:
+- PostgreSQL on `5432`
+- Redis on `6379` (runtime skeleton dependency for worker/scheduler)
+
 Create `server/.env` from `server/.env.example` — set **`DATABASE_URL`** and a long **`JWT_SECRET`** (32+ chars). Then:
 
 ```bash
@@ -61,8 +65,13 @@ Expected: `200` and body `{"status":"ok"}`.
 | Location | Command        | Description        |
 |----------|----------------|--------------------|
 | `server` | `npm run dev`  | API with hot reload (`tsx watch`) |
+| `server` | `npm run dev:worker` | Worker runtime skeleton with heartbeat + health endpoint |
+| `server` | `npm run dev:scheduler` | Scheduler runtime skeleton with heartbeat + health endpoint |
+| `server` | `npm run dev:runtime` | Local orchestrator that starts API + worker + scheduler |
 | `server` | `npm run build`| Compile to `dist/` |
 | `server` | `npm start`    | Run compiled `dist/index.js` |
+| `server` | `npm run start:worker` | Run compiled worker runtime |
+| `server` | `npm run start:scheduler` | Run compiled scheduler runtime |
 | `server` | `npm test`     | Vitest unit (`/health`, no DB) |
 | `server` | `npm run test:integration` | Auth tests — needs Postgres + `server/.env.test` |
 | `client` | `npm run dev`  | Vite dev + HMR |
@@ -78,10 +87,23 @@ Expected: `200` and body `{"status":"ok"}`.
 
 ## Environment
 
-- **`server/.env.example`** — `PORT`, future `DATABASE_URL` placeholder.
-- **`client/.env.example`** — optional `VITE_API_URL` when not using the dev proxy.
+- **`server/.env.example`** — required backend runtime variables.
+- **`client/.env.example`** — optional frontend overrides.
+- Validate backend environment before startup:
+  - `cd server && npm run env:check`
+- Detailed setup docs:
+  - `docs/environment-bootstrap.md`
+  - `docs/secrets-policy.md`
+  - `docs/data-baseline-s0-4.md`
+  - `docs/auth-rbac-consent-contracts-s0-5.md`
 
 Do not commit `.env` files with secrets.
+
+### Runtime skeleton health endpoints (S0.3)
+
+- API: `http://localhost:3001/api/v1/health`
+- Worker: `http://localhost:3101/health`
+- Scheduler: `http://localhost:3102/health`
 
 ## Project layout
 

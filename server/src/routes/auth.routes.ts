@@ -2,7 +2,7 @@ import { Router, type RequestHandler } from "express";
 import { z } from "zod";
 import { prisma } from "../db/client.js";
 import { getEnv } from "../config/env.js";
-import { requireAuth } from "../middleware/auth.js";
+import { requireAuth, requireRoles } from "../middleware/auth.js";
 import {
   authenticateUser,
   getCookieOptions,
@@ -14,7 +14,22 @@ const loginBody = z.object({
   password: z.string().min(1),
 });
 
+const consentBody = z.object({
+  policyVersion: z.string().min(1),
+  accepted: z.boolean(),
+  source: z.string().min(1).default("web"),
+});
+
 export const authRouter = Router();
+
+authRouter.post("/register", (_req, res) => {
+  return res.status(501).json({
+    error: {
+      code: "NOT_IMPLEMENTED",
+      message: "Registration contract reserved for Sprint 1 implementation",
+    },
+  });
+});
 
 authRouter.post("/login", async (req, res) => {
   const parsed = loginBody.safeParse(req.body);
@@ -86,6 +101,51 @@ authRouter.get("/me", requireAuth, async (req, res) => {
   });
 });
 
+authRouter.post("/consent", requireAuth, async (req, res) => {
+  const parsed = consentBody.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({
+      error: {
+        code: "VALIDATION_ERROR",
+        message: "Invalid request body",
+        details: parsed.error.flatten(),
+      },
+    });
+  }
+
+  const payload = parsed.data;
+  const row = await prisma.consentEvent.upsert({
+    where: {
+      userId_policyVersion_source: {
+        userId: req.auth!.userId,
+        policyVersion: payload.policyVersion,
+        source: payload.source,
+      },
+    },
+    update: {
+      accepted: payload.accepted,
+      tenantId: req.auth!.tenantId,
+    },
+    create: {
+      userId: req.auth!.userId,
+      tenantId: req.auth!.tenantId,
+      policyVersion: payload.policyVersion,
+      accepted: payload.accepted,
+      source: payload.source,
+    },
+  });
+
+  return res.status(201).json({
+    consent: {
+      id: row.id,
+      policyVersion: row.policyVersion,
+      accepted: row.accepted,
+      source: row.source,
+      createdAt: row.createdAt,
+    },
+  });
+});
+
 const contextCheckHandler: RequestHandler = (req, res) => {
   const spoofQuery = req.query.tenantId;
   const body = req.body as { tenantId?: string } | undefined;
@@ -104,3 +164,12 @@ const contextCheckHandler: RequestHandler = (req, res) => {
 
 authRouter.get("/context-check", requireAuth, contextCheckHandler);
 authRouter.post("/context-check", requireAuth, contextCheckHandler);
+
+authRouter.get(
+  "/admin-check",
+  requireAuth,
+  requireRoles(["OPS_ADMIN"]),
+  (_req, res) => {
+    return res.status(200).json({ ok: true });
+  },
+);

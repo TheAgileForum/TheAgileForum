@@ -16,18 +16,24 @@ enum Role {
 }
 
 model Tenant {
-  id           String              @id @default(uuid())
-  name         String
-  memberships  TenantMembership[]
+  id            String              @id @default(uuid())
+  name          String
+  memberships   TenantMembership[]
+  consentEvents ConsentEvent[]
+  carts         Cart[]
+  orders        Order[]
 
   @@map("tenants")
 }
 
 model User {
-  id           String              @id @default(uuid())
-  email        String              @unique
-  passwordHash String              @map("password_hash")
-  memberships  TenantMembership[]
+  id            String              @id @default(uuid())
+  email         String              @unique
+  passwordHash  String              @map("password_hash")
+  memberships   TenantMembership[]
+  consentEvents ConsentEvent[]
+  carts         Cart[]
+  orders        Order[]
 
   @@map("users")
 }
@@ -42,4 +48,157 @@ model TenantMembership {
 
   @@unique([userId, tenantId])
   @@map("tenant_memberships")
+}
+
+model RoleDefinition {
+  id          String           @id @default(uuid())
+  key         String           @unique
+  displayName String           @map("display_name")
+  isSystem    Boolean          @default(true) @map("is_system")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+  permissions RolePermission[]
+
+  @@map("role_definitions")
+}
+
+model Permission {
+  id          String           @id @default(uuid())
+  key         String           @unique
+  description String?
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+  roles       RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  id               String         @id @default(uuid())
+  roleDefinitionId String         @map("role_definition_id")
+  permissionId     String         @map("permission_id")
+  createdAt        DateTime       @default(now()) @map("created_at")
+  roleDefinition   RoleDefinition @relation(fields: [roleDefinitionId], references: [id], onDelete: Cascade)
+  permission       Permission     @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleDefinitionId, permissionId])
+  @@map("role_permissions")
+}
+
+model ConsentEvent {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  tenantId      String?   @map("tenant_id")
+  policyVersion String    @map("policy_version")
+  accepted      Boolean
+  source        String
+  createdAt     DateTime  @default(now()) @map("created_at")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant        Tenant?   @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([tenantId])
+  @@unique([userId, policyVersion, source])
+  @@map("consent_events")
+}
+
+model EventLog {
+  id             String   @id @default(uuid())
+  eventName      String   @map("event_name")
+  payload        Json
+  source         String
+  idempotencyKey String   @unique @map("idempotency_key")
+  status         String   @default("pending")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@index([eventName, createdAt])
+  @@index([status, createdAt])
+  @@map("events")
+}
+
+model JobRun {
+  id         String   @id @default(uuid())
+  jobType    String   @map("job_type")
+  queue      String
+  runAt      DateTime @map("run_at")
+  attempts   Int      @default(0)
+  status     String   @default("queued")
+  error      String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([queue, status, runAt])
+  @@map("jobs")
+}
+
+model Cart {
+  id         String     @id @default(uuid())
+  userId     String     @map("user_id")
+  tenantId   String?    @map("tenant_id")
+  status     String     @default("active")
+  currency   String
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant     Tenant?    @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  items      CartItem[]
+  orders     Order[]
+
+  @@index([userId, status])
+  @@index([tenantId])
+  @@map("carts")
+}
+
+model CartItem {
+  id           String   @id @default(uuid())
+  cartId       String   @map("cart_id")
+  offeringCode String   @map("offering_code")
+  scheduleRef  String?  @map("schedule_ref")
+  quantity     Int      @default(1)
+  unitPrice    Decimal  @db.Decimal(10, 2) @map("unit_price")
+  currency     String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  cart         Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  @@index([cartId])
+  @@map("cart_items")
+}
+
+model Order {
+  id           String      @id @default(uuid())
+  orderNumber  String      @unique @map("order_number")
+  userId       String      @map("user_id")
+  tenantId     String?     @map("tenant_id")
+  cartId       String?     @map("cart_id")
+  status       String      @default("created")
+  currency     String
+  totalAmount  Decimal     @db.Decimal(10, 2) @map("total_amount")
+  paymentRef   String?     @map("payment_ref")
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant       Tenant?     @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  cart         Cart?       @relation(fields: [cartId], references: [id], onDelete: SetNull)
+  items        OrderItem[]
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id           String   @id @default(uuid())
+  orderId      String   @map("order_id")
+  offeringCode String   @map("offering_code")
+  quantity     Int      @default(1)
+  unitPrice    Decimal  @db.Decimal(10, 2) @map("unit_price")
+  currency     String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("order_items")
 }
