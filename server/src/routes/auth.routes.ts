@@ -3,6 +3,9 @@ import { z } from "zod";
 import { prisma } from "../db/client.js";
 import { getEnv } from "../config/env.js";
 import { requireAuth, requireRoles } from "../middleware/auth.js";
+import { createRateLimitMiddleware } from "../middleware/rate-limit.js";
+import { withBodyValidation } from "../middleware/validation.js";
+import { logPrivilegedAction } from "../security/audit.js";
 import {
   authenticateUser,
   getCookieOptions,
@@ -20,7 +23,13 @@ const consentBody = z.object({
   source: z.string().min(1).default("web"),
 });
 
+const unsubscribeBody = z.object({
+  channel: z.enum(["email", "telegram"]),
+  reason: z.string().max(500).optional(),
+});
+
 export const authRouter = Router();
+const sensitiveLimiter = createRateLimitMiddleware("auth-sensitive");
 
 authRouter.post("/register", (_req, res) => {
   return res.status(501).json({
@@ -31,19 +40,8 @@ authRouter.post("/register", (_req, res) => {
   });
 });
 
-authRouter.post("/login", async (req, res) => {
-  const parsed = loginBody.safeParse(req.body);
-  if (!parsed.success) {
-    return res.status(400).json({
-      error: {
-        code: "VALIDATION_ERROR",
-        message: "Invalid request body",
-        details: parsed.error.flatten(),
-      },
-    });
-  }
-
-  const { email, password } = parsed.data;
+authRouter.post("/login", sensitiveLimiter, withBodyValidation(loginBody), async (req, res) => {
+  const { email, password } = req.body as z.infer<typeof loginBody>;
   const session = await authenticateUser(email, password);
   if (!session) {
     return res.status(401).json({
@@ -101,50 +99,84 @@ authRouter.get("/me", requireAuth, async (req, res) => {
   });
 });
 
-authRouter.post("/consent", requireAuth, async (req, res) => {
-  const parsed = consentBody.safeParse(req.body);
-  if (!parsed.success) {
-    return res.status(400).json({
-      error: {
-        code: "VALIDATION_ERROR",
-        message: "Invalid request body",
-        details: parsed.error.flatten(),
+authRouter.post(
+  "/consent",
+  requireAuth,
+  sensitiveLimiter,
+  withBodyValidation(consentBody),
+  async (req, res) => {
+    const payload = req.body as z.infer<typeof consentBody>;
+    const row = await prisma.consentEvent.upsert({
+      where: {
+        userId_policyVersion_source: {
+          userId: req.auth!.userId,
+          policyVersion: payload.policyVersion,
+          source: payload.source,
+        },
       },
-    });
-  }
-
-  const payload = parsed.data;
-  const row = await prisma.consentEvent.upsert({
-    where: {
-      userId_policyVersion_source: {
+      update: {
+        accepted: payload.accepted,
+        tenantId: req.auth!.tenantId,
+      },
+      create: {
         userId: req.auth!.userId,
+        tenantId: req.auth!.tenantId,
         policyVersion: payload.policyVersion,
+        accepted: payload.accepted,
         source: payload.source,
       },
-    },
-    update: {
-      accepted: payload.accepted,
-      tenantId: req.auth!.tenantId,
-    },
-    create: {
-      userId: req.auth!.userId,
-      tenantId: req.auth!.tenantId,
-      policyVersion: payload.policyVersion,
-      accepted: payload.accepted,
-      source: payload.source,
-    },
-  });
+    });
 
-  return res.status(201).json({
-    consent: {
-      id: row.id,
-      policyVersion: row.policyVersion,
-      accepted: row.accepted,
-      source: row.source,
-      createdAt: row.createdAt,
-    },
-  });
-});
+    return res.status(201).json({
+      consent: {
+        id: row.id,
+        policyVersion: row.policyVersion,
+        accepted: row.accepted,
+        source: row.source,
+        createdAt: row.createdAt,
+      },
+    });
+  },
+);
+
+authRouter.post(
+  "/unsubscribe",
+  requireAuth,
+  sensitiveLimiter,
+  withBodyValidation(unsubscribeBody),
+  async (req, res) => {
+    const payload = req.body as z.infer<typeof unsubscribeBody>;
+    const source = `unsubscribe:${payload.channel}`;
+    await prisma.consentEvent.upsert({
+      where: {
+        userId_policyVersion_source: {
+          userId: req.auth!.userId,
+          policyVersion: "marketing-v1",
+          source,
+        },
+      },
+      update: {
+        accepted: false,
+        tenantId: req.auth!.tenantId,
+      },
+      create: {
+        userId: req.auth!.userId,
+        tenantId: req.auth!.tenantId,
+        policyVersion: "marketing-v1",
+        accepted: false,
+        source,
+      },
+    });
+
+    return res.status(202).json({
+      unsubscribe: {
+        accepted: true,
+        channel: payload.channel,
+        status: "scheduled",
+      },
+    });
+  },
+);
 
 const contextCheckHandler: RequestHandler = (req, res) => {
   const spoofQuery = req.query.tenantId;
@@ -169,7 +201,14 @@ authRouter.get(
   "/admin-check",
   requireAuth,
   requireRoles(["OPS_ADMIN"]),
-  (_req, res) => {
+  (req, res) => {
+    logPrivilegedAction({
+      action: "admin_check_access",
+      actorUserId: req.auth!.userId,
+      actorRole: req.auth!.role,
+      tenantId: req.auth!.tenantId,
+      requestId: req.requestId ?? null,
+    });
     return res.status(200).json({ ok: true });
   },
 );

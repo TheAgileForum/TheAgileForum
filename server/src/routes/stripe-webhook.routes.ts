@@ -1,13 +1,15 @@
 import { Router } from "express";
 import { createIntegrationAdapters } from "../integrations/factory.js";
 import { publishEvent } from "../events/publisher.js";
+import { createRateLimitMiddleware } from "../middleware/rate-limit.js";
 import { logError, logInfo } from "../runtime/logger.js";
 import { IntegrationError } from "../integrations/errors.js";
 import { captureProductEvent } from "../observability/posthog.js";
 
 export const stripeWebhookRouter = Router();
+const stripeWebhookLimiter = createRateLimitMiddleware("stripe-webhook");
 
-stripeWebhookRouter.post("/webhook", async (req, res) => {
+stripeWebhookRouter.post("/webhook", stripeWebhookLimiter, async (req, res) => {
   try {
     const adapters = createIntegrationAdapters();
     const signature = req.get("stripe-signature") ?? undefined;

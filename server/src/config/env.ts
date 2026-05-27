@@ -27,6 +27,10 @@ const schema = z.object({
   OBSERVABILITY_RELEASE: z.string().default("local-dev"),
   ALERT_WEBHOOK_URL: optionalString,
   CLARITY_PROJECT_ID: optionalString,
+  CORS_ALLOWED_ORIGINS: z.string().default("http://localhost:5173"),
+  RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60000),
+  RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(30),
+  RESUME_UPLOAD_MAX_MB: z.coerce.number().positive().default(5),
 });
 
 export type AppEnv = z.infer<typeof schema>;
