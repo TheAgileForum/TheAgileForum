@@ -1,7 +1,8 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { resetRateLimitBuckets } from "../middleware/rate-limit.js";
 import request from "supertest";
 import { createApp } from "../app.js";
 import { prisma } from "../db/client.js";
@@ -13,16 +14,15 @@ describe.skipIf(!hasDb)("commerce integration (Sprint 1)", () => {
   const app = createApp();
 
   beforeAll(() => {
-    execSync("npx prisma migrate deploy", {
-      cwd: serverRoot,
-      stdio: "inherit",
-      env: process.env,
-    });
     execSync("npx tsx prisma/seed.ts", {
       cwd: serverRoot,
       stdio: "inherit",
       env: process.env,
     });
+  });
+
+  beforeEach(() => {
+    resetRateLimitBuckets();
   });
 
   const loginCustomer = async () => {

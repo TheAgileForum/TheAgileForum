@@ -4,7 +4,20 @@ import { execSync } from "node:child_process";
 import { beforeAll, describe, expect, it } from "vitest";
 import request from "supertest";
 import { createApp } from "./app.js";
+import { resetEnvCache } from "./config/env.js";
 import { resetRateLimitBuckets } from "./middleware/rate-limit.js";
+
+function withStrictAuthRateLimit<T>(run: () => Promise<T>): Promise<T> {
+  const previous = process.env.RATE_LIMIT_MAX_REQUESTS;
+  process.env.RATE_LIMIT_MAX_REQUESTS = "2";
+  resetEnvCache();
+  resetRateLimitBuckets();
+  return run().finally(() => {
+    process.env.RATE_LIMIT_MAX_REQUESTS = previous ?? "30";
+    resetEnvCache();
+    resetRateLimitBuckets();
+  });
+}
 
 const hasDb = Boolean(process.env.DATABASE_URL);
 const serverRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -238,8 +251,9 @@ describe.skipIf(!hasDb)("auth integration", () => {
   });
 
   it("rate-limits repeated sensitive consent submissions", async () => {
-    resetRateLimitBuckets();
+    await withStrictAuthRateLimit(async () => {
     const agent = await loginCustomer();
+    resetRateLimitBuckets();
 
     const first = await agent.post("/api/v1/auth/consent").send({
       policyVersion: "rate-limit-consent",
@@ -262,11 +276,13 @@ describe.skipIf(!hasDb)("auth integration", () => {
     expect(third.status).toBe(429);
     expect(third.body.error.code).toBe("RATE_LIMIT_EXCEEDED");
     expect(Number(third.headers["retry-after"])).toBeGreaterThan(0);
+    });
   });
 
   it("rate-limits repeated unsubscribe submissions", async () => {
-    resetRateLimitBuckets();
+    await withStrictAuthRateLimit(async () => {
     const agent = await loginCustomer();
+    resetRateLimitBuckets();
 
     const first = await agent.post("/api/v1/auth/unsubscribe").send({
       channel: "email",
@@ -283,6 +299,7 @@ describe.skipIf(!hasDb)("auth integration", () => {
     expect(third.status).toBe(429);
     expect(third.body.error.code).toBe("RATE_LIMIT_EXCEEDED");
     expect(Number(third.headers["retry-after"])).toBeGreaterThan(0);
+    });
   });
 
   it("blocks CUSTOMER from admin-check route", async () => {
