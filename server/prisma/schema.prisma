@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
@@ -27,13 +28,14 @@ model Tenant {
 }
 
 model User {
-  id            String              @id @default(uuid())
-  email         String              @unique
-  passwordHash  String              @map("password_hash")
-  memberships   TenantMembership[]
-  consentEvents ConsentEvent[]
-  carts         Cart[]
-  orders        Order[]
+  id                String              @id @default(uuid())
+  email             String              @unique
+  passwordHash      String              @map("password_hash")
+  memberships       TenantMembership[]
+  consentEvents     ConsentEvent[]
+  carts             Cart[]
+  orders            Order[]
+  diagnosisSessions DiagnosisSession[]
 
   @@map("users")
 }
@@ -201,4 +203,159 @@ model OrderItem {
 
   @@index([orderId])
   @@map("order_items")
+}
+
+enum DiagnosisSessionStatus {
+  DRAFT
+  INTENT_SAVED
+  INPUT_READY
+  ANALYZING
+  COMPLETED
+}
+
+enum DiagnosisStep {
+  STEP_1
+  STEP_2
+  STEP_3
+  STEP_4
+}
+
+enum ResumeAssetStatus {
+  PENDING
+  VALIDATED
+  FAILED
+}
+
+enum AnalysisRunStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+  TIMEOUT
+}
+
+enum AnalysisStage {
+  PARSING
+  MAPPING
+  INSIGHTS
+}
+
+enum JourneySubjectType {
+  SESSION
+  USER
+}
+
+model DiagnosisSession {
+  id             String                 @id @default(uuid())
+  userId         String?                @map("user_id")
+  status         DiagnosisSessionStatus @default(DRAFT)
+  currentStep    DiagnosisStep          @default(STEP_1) @map("current_step")
+  roleIntent     String?                @map("role_intent")
+  targetRole     String?                @map("target_role")
+  timeline       String?
+  currentStatus  String?                @map("current_status")
+  consentAck     Boolean                @default(false) @map("consent_ack")
+  consentAt      DateTime?              @map("consent_at")
+  policyVersion  String?                @map("policy_version")
+  campaignId     String?                @map("campaign_id")
+  createdAt      DateTime               @default(now()) @map("created_at")
+  updatedAt      DateTime               @updatedAt @map("updated_at")
+  user           User?                  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  resumeAssets   ResumeAsset[]
+  jdInput        JdInput?
+  analysisRuns   AnalysisRun[]
+  journeyStates  JourneyState[]
+
+  @@index([userId, updatedAt])
+  @@map("diagnosis_sessions")
+}
+
+model ResumeAsset {
+  id          String            @id @default(uuid())
+  sessionId   String            @map("session_id")
+  fileName    String            @map("file_name")
+  mimeType    String            @map("mime_type")
+  sizeBytes   Int               @map("size_bytes")
+  checksum    String?
+  storagePath String            @map("storage_path")
+  status      ResumeAssetStatus @default(PENDING)
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+  session     DiagnosisSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@map("resume_assets")
+}
+
+model JdInput {
+  id         String           @id @default(uuid())
+  sessionId  String           @unique @map("session_id")
+  jdText     String?          @map("jd_text")
+  jdUrl      String?          @map("jd_url")
+  targetRole String?          @map("target_role")
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt @map("updated_at")
+  session    DiagnosisSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("jd_inputs")
+}
+
+model AnalysisRun {
+  id           String            @id @default(uuid())
+  sessionId    String            @map("session_id")
+  status       AnalysisRunStatus @default(QUEUED)
+  stage        AnalysisStage?
+  progressPct  Int               @default(0) @map("progress_pct")
+  errorMessage String?           @map("error_message")
+  startedAt    DateTime?         @map("started_at")
+  completedAt  DateTime?         @map("completed_at")
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+  session      DiagnosisSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  gapInsight   GapInsight?
+  recommendation Recommendation?
+
+  @@index([sessionId, createdAt])
+  @@map("analysis_runs")
+}
+
+model GapInsight {
+  id              String      @id @default(uuid())
+  analysisRunId   String      @unique @map("analysis_run_id")
+  readinessScore  Int         @map("readiness_score")
+  strengths       Json
+  gaps            Json
+  confidence      Float
+  createdAt       DateTime    @default(now()) @map("created_at")
+  analysisRun     AnalysisRun @relation(fields: [analysisRunId], references: [id], onDelete: Cascade)
+
+  @@map("gap_insights")
+}
+
+model Recommendation {
+  id            String      @id @default(uuid())
+  analysisRunId String      @unique @map("analysis_run_id")
+  primaryAction Json        @map("primary_action")
+  rationale     Json
+  createdAt     DateTime    @default(now()) @map("created_at")
+  analysisRun   AnalysisRun @relation(fields: [analysisRunId], references: [id], onDelete: Cascade)
+
+  @@map("recommendations")
+}
+
+model JourneyState {
+  id             String             @id @default(uuid())
+  subjectType    JourneySubjectType @map("subject_type")
+  subjectId      String             @map("subject_id")
+  sessionId      String?            @map("session_id")
+  currentFlow    String             @map("current_flow")
+  currentStep    String             @map("current_step")
+  resumePayload  Json               @map("resume_payload")
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @updatedAt @map("updated_at")
+  session        DiagnosisSession?  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([subjectType, subjectId])
+  @@index([sessionId])
+  @@map("journey_states")
 }

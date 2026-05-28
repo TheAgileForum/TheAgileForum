@@ -4,6 +4,7 @@ import { execSync } from "node:child_process";
 import { beforeAll, describe, expect, it } from "vitest";
 import request from "supertest";
 import { createApp } from "./app.js";
+import { resetRateLimitBuckets } from "./middleware/rate-limit.js";
 
 const hasDb = Boolean(process.env.DATABASE_URL);
 const serverRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -11,12 +12,45 @@ const serverRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "..")
 describe.skipIf(!hasDb)("auth integration", () => {
   const app = createApp();
 
+  const loginCustomer = async () => {
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email: "customer@demo.local", password: "password123" })
+      .expect(200);
+    return agent;
+  };
+
   beforeAll(() => {
     execSync("npx tsx prisma/seed.ts", {
       cwd: serverRoot,
       stdio: "inherit",
       env: process.env,
     });
+  });
+
+  it("registers a new user and sets session cookie", async () => {
+    const email = `register-${Date.now()}@demo.local`;
+    const res = await request(app).post("/api/v1/auth/register").send({
+      email,
+      password: "password123",
+      policyVersion: "v1",
+      acceptTerms: true,
+    });
+    expect(res.status).toBe(201);
+    expect(res.body.user.role).toBe("CUSTOMER");
+    expect(res.headers["set-cookie"]).toBeDefined();
+  });
+
+  it("returns 409 when registering duplicate email", async () => {
+    const res = await request(app).post("/api/v1/auth/register").send({
+      email: "customer@demo.local",
+      password: "password123",
+      policyVersion: "v1",
+      acceptTerms: true,
+    });
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe("EMAIL_ALREADY_REGISTERED");
   });
 
   it("logs in with valid credentials and sets cookie", async () => {
@@ -119,6 +153,136 @@ describe.skipIf(!hasDb)("auth integration", () => {
     expect(res.body.consent.policyVersion).toBe("v1");
     expect(res.body.consent.accepted).toBe(true);
     expect(res.body.consent.source).toBe("integration-test");
+  });
+
+  it("applies default consent source and updates existing consent via upsert", async () => {
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email: "customer@demo.local", password: "password123" })
+      .expect(200);
+
+    const first = await agent.post("/api/v1/auth/consent").send({
+      policyVersion: "policy-upsert",
+      accepted: true,
+    });
+    expect(first.status).toBe(201);
+    expect(first.body.consent.source).toBe("web");
+    expect(first.body.consent.accepted).toBe(true);
+
+    const second = await agent.post("/api/v1/auth/consent").send({
+      policyVersion: "policy-upsert",
+      accepted: false,
+      source: "web",
+    });
+    expect(second.status).toBe(201);
+    expect(second.body.consent.id).toBe(first.body.consent.id);
+    expect(second.body.consent.accepted).toBe(false);
+  });
+
+  it("returns 400 for invalid consent body for authenticated users", async () => {
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email: "customer@demo.local", password: "password123" })
+      .expect(200);
+
+    const res = await agent.post("/api/v1/auth/consent").send({
+      policyVersion: "",
+      accepted: "yes",
+    });
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe("VALIDATION_ERROR");
+  });
+
+  it("creates unsubscribe consent event for authenticated user", async () => {
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email: "customer@demo.local", password: "password123" })
+      .expect(200);
+
+    const res = await agent.post("/api/v1/auth/unsubscribe").send({
+      channel: "email",
+      reason: "No longer needed",
+    });
+    expect(res.status).toBe(202);
+    expect(res.body.unsubscribe.accepted).toBe(true);
+    expect(res.body.unsubscribe.channel).toBe("email");
+    expect(res.body.unsubscribe.status).toBe("scheduled");
+  });
+
+  it("returns 400 for invalid unsubscribe channel", async () => {
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email: "customer@demo.local", password: "password123" })
+      .expect(200);
+
+    const res = await agent.post("/api/v1/auth/unsubscribe").send({
+      channel: "sms",
+    });
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe("VALIDATION_ERROR");
+  });
+
+  it("returns 400 when unsubscribe reason exceeds max length", async () => {
+    resetRateLimitBuckets();
+    const agent = await loginCustomer();
+    const res = await agent.post("/api/v1/auth/unsubscribe").send({
+      channel: "telegram",
+      reason: "x".repeat(501),
+    });
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe("VALIDATION_ERROR");
+  });
+
+  it("rate-limits repeated sensitive consent submissions", async () => {
+    resetRateLimitBuckets();
+    const agent = await loginCustomer();
+
+    const first = await agent.post("/api/v1/auth/consent").send({
+      policyVersion: "rate-limit-consent",
+      accepted: true,
+      source: "web",
+    });
+    const second = await agent.post("/api/v1/auth/consent").send({
+      policyVersion: "rate-limit-consent",
+      accepted: false,
+      source: "web",
+    });
+    const third = await agent.post("/api/v1/auth/consent").send({
+      policyVersion: "rate-limit-consent",
+      accepted: true,
+      source: "web",
+    });
+
+    expect(first.status).toBe(201);
+    expect(second.status).toBe(201);
+    expect(third.status).toBe(429);
+    expect(third.body.error.code).toBe("RATE_LIMIT_EXCEEDED");
+    expect(Number(third.headers["retry-after"])).toBeGreaterThan(0);
+  });
+
+  it("rate-limits repeated unsubscribe submissions", async () => {
+    resetRateLimitBuckets();
+    const agent = await loginCustomer();
+
+    const first = await agent.post("/api/v1/auth/unsubscribe").send({
+      channel: "email",
+    });
+    const second = await agent.post("/api/v1/auth/unsubscribe").send({
+      channel: "telegram",
+    });
+    const third = await agent.post("/api/v1/auth/unsubscribe").send({
+      channel: "email",
+    });
+
+    expect(first.status).toBe(202);
+    expect(second.status).toBe(202);
+    expect(third.status).toBe(429);
+    expect(third.body.error.code).toBe("RATE_LIMIT_EXCEEDED");
+    expect(Number(third.headers["retry-after"])).toBeGreaterThan(0);
   });
 
   it("blocks CUSTOMER from admin-check route", async () => {

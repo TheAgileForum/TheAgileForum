@@ -11,10 +11,18 @@ import {
   getCookieOptions,
   signSessionToken,
 } from "../services/auth-service.js";
+import { registerUser } from "../services/registration-service.js";
 
 const loginBody = z.object({
   email: z.string().email(),
   password: z.string().min(1),
+});
+
+const registerBody = z.object({
+  email: z.string().email(),
+  password: z.string().min(8).max(128),
+  policyVersion: z.string().min(1),
+  acceptTerms: z.literal(true),
 });
 
 const consentBody = z.object({
@@ -31,11 +39,55 @@ const unsubscribeBody = z.object({
 export const authRouter = Router();
 const sensitiveLimiter = createRateLimitMiddleware("auth-sensitive");
 
-authRouter.post("/register", (_req, res) => {
+authRouter.post(
+  "/register",
+  sensitiveLimiter,
+  withBodyValidation(registerBody),
+  async (req, res) => {
+    const body = req.body as z.infer<typeof registerBody>;
+    const result = await registerUser(body);
+    if (!result.ok) {
+      const status = result.code === "EMAIL_ALREADY_REGISTERED" ? 409 : 400;
+      return res.status(status).json({
+        error: { code: result.code, message: result.message },
+      });
+    }
+
+    const token = await signSessionToken(result.session);
+    const env = getEnv();
+    res.cookie(env.AUTH_COOKIE_NAME, token, getCookieOptions());
+
+    const user = await prisma.user.findUnique({
+      where: { id: result.userId },
+      select: { id: true, email: true },
+    });
+
+    return res.status(201).json({
+      user: {
+        id: user!.id,
+        email: user!.email,
+        role: result.session.role,
+        tenantId: result.session.tenantId,
+        tenantIds: result.session.tenantIds,
+      },
+    });
+  },
+);
+
+const oauthProviders = ["google", "linkedin"] as const;
+
+authRouter.get("/oauth/:provider/start", (req, res) => {
+  const provider = req.params.provider;
+  if (!oauthProviders.includes(provider as (typeof oauthProviders)[number])) {
+    return res.status(400).json({
+      error: { code: "UNKNOWN_OAUTH_PROVIDER", message: "Unsupported OAuth provider" },
+    });
+  }
   return res.status(501).json({
     error: {
-      code: "NOT_IMPLEMENTED",
-      message: "Registration contract reserved for Sprint 1 implementation",
+      code: "OAUTH_NOT_CONFIGURED",
+      message: `${provider} OAuth will be enabled when provider credentials are configured`,
+      details: { provider },
     },
   });
 });

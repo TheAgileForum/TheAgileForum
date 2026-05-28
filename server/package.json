@@ -21,11 +21,12 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "db:reset": "prisma migrate reset",
-    "observability:synthetic": "tsx scripts/observability-synthetic-failure.ts"
+    "observability:synthetic": "tsx scripts/observability-synthetic-failure.ts",
+    "readiness:gate": "tsx scripts/sprint-1-readiness-gate.ts"
   },
   "dependencies": {
-    "@sentry/node": "^10.22.0",
     "@prisma/client": "^6.19.0",
+    "@sentry/node": "^10.22.0",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.7",
