@@ -18,7 +18,7 @@ export function CheckoutPage() {
       <Stack spacing={2}>
         <Typography variant="h5">Checkout</Typography>
         <Typography color="text.secondary">Add items before checkout.</Typography>
-        <Button component={RouterLink} to="/menu" variant="contained">
+        <Button component={RouterLink} to="/demo/menu" variant="contained">
           Menu
         </Button>
       </Stack>

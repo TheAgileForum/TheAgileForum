@@ -13,6 +13,17 @@ export type OfferingMeta = {
 };
 
 export const OFFERING_CATALOG: Record<string, OfferingMeta> = {
+  "agile-readiness": {
+    code: "agile-readiness",
+    title: "Agile Readiness Program",
+    kind: "course",
+    scheduleBound: true,
+    examAccess: "preview_only",
+    safeOrgPaymentEligible: false,
+    defaultUnitPrice: "299.00",
+    currency: "USD",
+    roleTags: ["learner", "scrum_master", "product_owner"],
+  },
   "course-agile-fundamentals": {
     code: "course-agile-fundamentals",
     title: "Agile Fundamentals (Cohort)",

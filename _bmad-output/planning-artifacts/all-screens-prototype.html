@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Agile Forum - All Screens Prototype</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #111a2e;
+      --panel-2: #17223b;
+      --line: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --primary: #1e3a8a;
+      --secondary: #0f766e;
+      --accent: #f59e0b;
+      --ok: #16a34a;
+      --danger: #dc2626;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: linear-gradient(180deg, #060b16, #0b1220);
+      color: var(--text);
+    }
+    .app {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      min-height: 100vh;
+    }
+    .sidebar {
+      border-right: 1px solid var(--line);
+      background: rgba(10, 16, 30, 0.95);
+      padding: 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+    }
+    .brand {
+      margin-bottom: 12px;
+      font-weight: 700;
+      font-size: 18px;
+    }
+    .sub {
+      margin-bottom: 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .nav {
+      display: grid;
+      gap: 8px;
+    }
+    .nav button {
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #0f172a;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .nav button.active {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-color: transparent;
+    }
+    .main {
+      padding: 18px;
+    }
+    .topbar {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .chips span {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      margin-left: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .screen {
+      display: none;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--panel);
+    }
+    .screen.active { display: block; }
+    .head {
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(23, 34, 59, 0.7);
+      font-weight: 600;
+    }
+    .content { padding: 14px; }
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      background: #0f172a;
+    }
+    .hero {
+      border-radius: 12px;
+      border: 1px solid #1d4ed8;
+      background: linear-gradient(135deg, #1e3a8a, #0f766e);
+      padding: 14px;
+      font-weight: 600;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .btn {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+    .btn.p { background: var(--primary); color: #fff; }
+    .btn.s { background: #1f2937; color: var(--text); border-color: var(--line); }
+    .muted { color: var(--muted); font-size: 13px; }
+    .bar {
+      height: 10px;
+      border-radius: 6px;
+      background: #1e293b;
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+    .bar > span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--secondary), var(--primary));
+      width: 68%;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .table th, .table td {
+      border: 1px solid var(--line);
+      padding: 8px;
+    }
+    .footer {
+      margin-top: 12px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+    @media (max-width: 980px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      .grid.two { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">The Agile Forum</div>
+      <div class="sub">Clickable low-fidelity HTML prototype pack</div>
+      <div class="nav" id="nav"></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div><strong>All Screens Preview</strong> <span class="muted">Validate flow + layout before dev build</span></div>
+        <div class="chips"><span>Mobile-first</span><span>MUI-aligned</span><span>WCAG AA intent</span></div>
+      </div>
+
+      <section class="screen active" data-id="home">
+        <div class="head">1. Home (Outcome-Led Landing)</div>
+        <div class="content grid">
+          <div class="hero">Find your fastest path to becoming a high-performing Scrum Master, PO, PM, or Agile leader.</div>
+          <div class="row"><button class="btn p">Start Diagnosis</button><button class="btn s">Book Paid Mentor Call</button></div>
+          <div class="grid two">
+            <div class="card"><strong>Proof Strip</strong><div class="muted">Outcomes, testimonials, trust badges, social proof.</div></div>
+            <div class="card"><strong>Role Pathways</strong><div class="muted">SM | PO | PM | RTE cards with prefiltered entry.</div></div>
+          </div>
+          <div class="card"><strong>Upcoming Webinars</strong><div class="muted">Topic, date, host, seats, register CTA.</div></div>
+        </div>
+      </section>
+
+      <section class="screen" data-id="diagnosis1">
+        <div class="head">2. Diagnosis Step 1 (Intent + Consent)</div>
+        <div class="content grid">
+          <div class="card"><strong>Progress:</strong> Step 1 of 4</div>
+          <div class="card"><strong>Target Role</strong><div class="muted">SM / PO / PM / RTE / Agile Coach / Leadership</div></div>
+          <div class="card"><strong>Timeline + Current Status</strong><div class="muted">Transition horizon and current profile.</div></div>
+          <div class="card"><input type="checkbox"> I consent to resume/JD analysis terms</div>
+          <div class="row"><button class="btn s">Back</button><button class="btn p">Continue</button></div>
+        </div>
+      </section>
+
+      <section class="screen" data-id="diagnosis2">
+        <div class="head">3. Diagnosis Step 2 (Resume + Optional JD)</div>
+        <div class="content grid">
+          <div class="card"><strong>Progress:</strong> Step 2 of 4</div>
+          <div class="grid two">
+            <div class="card"><strong>Resume Input</strong><div class="muted">Upload / Paste tabs + drag/drop state.</div></div>
+            <div class="card"><strong>Target Role + Optional JD</strong><div class="muted">Role selector + JD text/URL.</div></div>
+          </div>
+          <div class="card"><strong>Helper Tips</strong><div class="muted">Explain better input quality and expected results.</div></div>
+          <div class="row"><button class="btn s">Back</button><button class="btn p">Run Analysis</button></div>
+        </div>
+      </section>
+
+      <section class="screen" data-id="diagnosis3">
+        <div class="head">4. Diagnosis Step 3 (Analysis In Progress)</div>
+        <div class="content grid">
+          <div class="card"><strong>Status:</strong> Mapping skills to target role</div>
+          <div class="bar"><span></span></div>
+          <div class="card"><strong>Context Recap</strong><div class="muted">Role: PO | Resume: uploaded_resume.pdf | JD: provided</div></div>
+          <div class="row"><button class="btn s">Ask AI Coach</button></div>
+        </div>
+      </section>
+
+      <section class="screen" data-id="diagnosis4">
+        <div class="head">5. Diagnosis Step 4 (Results + Next Action)</div>
+        <div class="content grid">
+          <div class="card"><strong>Readiness:</strong> 6.8/10 | Confidence: High</div>
+          <div class="grid two">
+            <div class="card"><strong>Strengths</strong><div class="muted">Stakeholder communication, Agile fundamentals.</div></div>
+            <div class="card"><strong>Gaps</strong><div class="muted">Prioritization, product metrics, discovery depth.</div></div>
+          </div>
+          <div class="card"><strong>Recommendation Rationale</strong><div class="muted">Why this path fits and expected outcomes.</div></div>
+          <div class="card"><strong>Roadmap Preview</strong><div class="muted">Week 1 -> Week 2 -> Week 3 milestones.</div></div>
+          <div class="row">
+            <button class="btn p">Start Recommended Path</button>
+            <button class="btn s">Take Micro-Exam</button>
+            <button class="btn s">Join Webinar</button>
+            <button class="btn s">Book Paid Mentor Call</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-id="dashboard">
+        <div class="head">6. Learner Dashboard</div>
+        <div class="content grid">
+          <div class="card"><strong>Continue where you left off:</strong> Resume Week 2 task</div>
+          <div class="grid two">
+            <div class="card"><strong>Skill Snapshot</strong><div class="muted">Out-of-10 cards + chart/table toggle.</div></div>
+            <div class="card"><strong>Recommendation Refresh</strong><div class="muted">Updated next-best-action block.</div></div>
+          </div>
+          <div class="card"><strong>Roadmap Tasks</strong><div class="muted">Task status with completion controls.</div></div>
+          <div class="card"><strong>Saved Items</strong><div class="muted">Bookmarked courses and services.</div></div>
+          <div class="row"><button class="btn p">Take Timed Micro-Exam</button></div>
+        </div>
+      </section>
+
+      <section class="screen" data-id="exam-start">
+        <div class="head">7. Micro-Exam Start</div>
+        <div class="content grid">
+          <div class="card"><strong>Competency:</strong> Product Prioritization</div>
+          <div class="card"><strong>Duration:</strong> 15 min | Questions: 12 | Difficulty: Intermediate</div>
+          <div class="card"><strong>Instructions</strong><div class="muted">One-question focus, timer visible, submit guardrails.</div></div>
+          <div class="row"><button class="btn s">Back</button><button class="btn p">Start Exam</button></div>
+        </div>
+      </section>
+
+      <section class="screen" data-id="exam-attempt">
+        <div class="head">8. Micro-Exam Attempt</div>
+        <div class="content grid">
+          <div class="card"><strong>Q 3/12</strong> <span class="muted">11:42 left</span></div>
+          <div class="card">
+            <strong>Which signal best indicates product-market fit?</strong>
+            <div class="row">
+              <button class="btn s">Option A</button><button class="btn s">Option B</button><button class="btn s">Option C</button><button class="btn s">Option D</button>
+            </div>
+          </div>
+          <div class="row"><button class="btn s">Previous</button><button class="btn s">Skip</button><button class="btn p">Next</button></div>
+        </div>
+      </section>
+
+      <section class="screen" data-id="exam-result">
+        <div class="head">9. Micro-Exam Result</div>
+        <div class="content grid">
+          <div class="card"><strong>Result:</strong> 8/12 (67%)</div>
+          <div class="grid two">
+            <div class="card"><strong>Strength:</strong> stakeholder communication</div>
+            <div class="card"><strong>Gap:</strong> hypothesis validation</div>
+          </div>
+          <div class="card"><strong>Recommendation Impact:</strong> Pathway updated based on score</div>
+          <div class="row"><button class="btn p">Continue Updated Roadmap</button><button class="btn s">Review Answers</button><button class="btn s">Book Paid Mentor Call</button></div>
+        </div>
+      </section>
+
+      <section class="screen" data-id="offer">
+        <div class="head">10. Recommendation Detail / Offer Decision</div>
+        <div class="content grid">
+          <div class="card"><strong>Product Owner Transition Program</strong><div class="muted">Outcome-led summary and audience fit.</div></div>
+          <div class="card"><strong>Why this fits you</strong><div class="muted">Skill fit | timeline fit | goal alignment chips.</div></div>
+          <div class="grid two">
+            <div class="card"><strong>Schedule</strong><div class="muted">Required selector for schedule-bound offerings.</div></div>
+            <div class="card"><strong>Pricing</strong><div class="muted">INR 24,999 + inclusions + policy links.</div></div>
+          </div>
+          <div class="card"><strong>Trust Block</strong><div class="muted">Proof + disclaimer + compliance notes.</div></div>
+          <div class="row"><button class="btn p">Proceed to Checkout</button><button class="btn s">Compare Options</button><button class="btn s">Ask AI Coach</button></div>
+        </div>
+      </section>
+
+      <section class="screen" data-id="checkout">
+        <div class="head">11. Checkout (Standard + Org Branch)</div>
+        <div class="content grid two">
+          <div class="card">
+            <strong>Order Summary</strong>
+            <div class="muted">PO Program | Batch 12 Jul | INR 24,999</div>
+          </div>
+          <div class="card">
+            <strong>Billing & Payment</strong>
+            <div class="muted">Name, email, payment method, optional org reimbursement branch.</div>
+          </div>
+          <div class="card" style="grid-column:1/-1">
+            <strong>Organization Reimbursement (Eligible carts)</strong>
+            <div class="muted">Company, billing contact, reference details.</div>
+          </div>
+          <div class="row" style="grid-column:1/-1"><button class="btn s">Back</button><button class="btn p">Pay Now</button></div>
+        </div>
+      </section>
+
+      <section class="screen" data-id="checkout-success">
+        <div class="head">12. Checkout Success</div>
+        <div class="content grid">
+          <div class="card" style="border-color: #166534; background:#052e16;">
+            <strong style="color:#86efac">Payment Successful</strong>
+            <div class="muted">Enrollment confirmed + receipt sent + onboarding route available.</div>
+          </div>
+          <div class="row"><button class="btn p">Go to Dashboard</button><button class="btn s">Join Community</button><button class="btn s">View Resources</button></div>
+        </div>
+      </section>
+
+      <section class="screen" data-id="webinars">
+        <div class="head">13. Webinar Hub + Booking</div>
+        <div class="content grid">
+          <div class="card"><strong>Filters</strong> <span class="muted">Role | Topic | Date</span></div>
+          <div class="grid two">
+            <div class="card"><strong>PO Backlog Mastery</strong><div class="muted">30 May | Seats: 24</div><div class="row"><button class="btn s">Details</button><button class="btn p">Register</button></div></div>
+            <div class="card"><strong>Scrum Master Interview Prep</strong><div class="muted">02 Jun | Seats: 11</div><div class="row"><button class="btn s">Details</button><button class="btn p">Register</button></div></div>
+          </div>
+          <div class="card"><strong>Post-attendance tools</strong><div class="muted">Attendance code entry, feedback, certificate status/download.</div></div>
+        </div>
+      </section>
+
+      <section class="screen" data-id="mentor">
+        <div class="head">14. Paid Mentor Call Booking</div>
+        <div class="content grid">
+          <div class="card"><strong>Select Slot</strong><div class="muted">Calendar + available time blocks.</div></div>
+          <div class="card"><strong>Pricing</strong><div class="muted">USA: $9 | India: INR 49 | Auto-detect with manual override.</div></div>
+          <div class="card"><strong>Goal Intake</strong><div class="muted">Session objective and preferred support focus.</div></div>
+          <div class="card"><strong>Payment + Confirmation Summary</strong><div class="muted">Booking details, price confirmation, and follow-up recommendation.</div></div>
+          <div class="row"><button class="btn s">Cancel</button><button class="btn p">Pay & Confirm</button></div>
+        </div>
+      </section>
+
+      <section class="screen" data-id="coach">
+        <div class="head">15. AI Coach</div>
+        <div class="content grid">
+          <div class="card"><strong>Context:</strong> Diagnosis Results</div>
+          <div class="card"><strong>Suggested Prompts</strong><div class="row"><button class="btn s">What gap matters most?</button><button class="btn s">Explain this score</button><button class="btn s">What should I do this week?</button></div></div>
+          <div class="card"><strong>Conversation</strong><div class="muted">Context-aware response + rationale + action recommendation + escalation option.</div></div>
+          <div class="row"><button class="btn s">Need human help?</button><button class="btn p">Send</button></div>
+        </div>
+      </section>
+
+      <section class="screen" data-id="profile">
+        <div class="head">16. Profile + Preferences</div>
+        <div class="content grid">
+          <div class="grid two">
+            <div class="card"><strong>Role Goal</strong><div class="muted">Product Owner</div></div>
+            <div class="card"><strong>Experience</strong><div class="muted">5 years</div></div>
+          </div>
+          <div class="card"><strong>Interests</strong><div class="muted">PO | Agile Metrics | SAFe</div></div>
+          <div class="card"><strong>Notifications & Consent</strong><div class="muted">Email updates, reminders, promo preferences, data controls.</div></div>
+          <div class="row"><button class="btn s">Cancel</button><button class="btn p">Save</button></div>
+        </div>
+      </section>
+
+      <section class="screen" data-id="states">
+        <div class="head">17. Shared States (Empty / Loading / Error / Success)</div>
+        <div class="content grid two">
+          <div class="card"><strong>Empty State</strong><div class="muted">No saved items yet. Start by exploring recommendations.</div><div class="row"><button class="btn p">Explore Recommendations</button></div></div>
+          <div class="card"><strong>Loading State</strong><div class="bar"><span style="width:45%"></span></div><div class="muted">Loading your insights...</div></div>
+          <div class="card"><strong>Error State</strong><div class="muted" style="color:#fecaca">We could not process your resume.</div><div class="row"><button class="btn s">View Requirements</button><button class="btn p">Try Again</button></div></div>
+          <div class="card"><strong>Success State</strong><div class="muted" style="color:#bbf7d0">Saved successfully. Continue your roadmap.</div><div class="row"><button class="btn p">Continue</button></div></div>
+        </div>
+      </section>
+
+      <div class="footer muted">Prototype only. Visuals are intentionally low-fidelity but flow-accurate for pre-dev validation.</div>
+    </main>
+  </div>
+
+  <script>
+    const screens = [
+      ["home", "1. Home"],
+      ["diagnosis1", "2. Diagnosis Step 1"],
+      ["diagnosis2", "3. Diagnosis Step 2"],
+      ["diagnosis3", "4. Diagnosis Processing"],
+      ["diagnosis4", "5. Diagnosis Results"],
+      ["dashboard", "6. Dashboard"],
+      ["exam-start", "7. Micro-Exam Start"],
+      ["exam-attempt", "8. Micro-Exam Attempt"],
+      ["exam-result", "9. Micro-Exam Result"],
+      ["offer", "10. Offer Decision"],
+      ["checkout", "11. Checkout"],
+      ["checkout-success", "12. Checkout Success"],
+      ["webinars", "13. Webinar Hub"],
+      ["mentor", "14. Mentor Booking"],
+      ["coach", "15. AI Coach"],
+      ["profile", "16. Profile"],
+      ["states", "17. Shared States"]
+    ];
+    const nav = document.getElementById("nav");
+    const sections = Array.from(document.querySelectorAll(".screen"));
+    function activate(id) {
+      sections.forEach(s => s.classList.toggle("active", s.dataset.id === id));
+      Array.from(nav.querySelectorAll("button")).forEach(b => b.classList.toggle("active", b.dataset.id === id));
+      history.replaceState(null, "", "#" + id);
+    }
+    screens.forEach(([id, label]) => {
+      const btn = document.createElement("button");
+      btn.dataset.id = id;
+      btn.textContent = label;
+      btn.addEventListener("click", () => activate(id));
+      nav.appendChild(btn);
+    });
+    const fromHash = location.hash.replace("#", "");
+    const defaultId = screens.some(([id]) => id === fromHash) ? fromHash : "home";
+    activate(defaultId);
+  </script>
+</body>
+</html>

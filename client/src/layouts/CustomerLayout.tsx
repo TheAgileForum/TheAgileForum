@@ -21,7 +21,7 @@ export function CustomerLayout() {
           <Typography
             variant="h6"
             component={RouterLink}
-            to="/"
+            to="/demo"
             sx={{ flexGrow: 1, textDecoration: "none", color: "inherit", fontWeight: 700 }}
           >
             Bistro Demo
@@ -36,10 +36,10 @@ export function CustomerLayout() {
               {user.email}
             </Typography>
           ) : null}
-          <Button component={RouterLink} to="/menu" color="inherit" size="small">
+          <Button component={RouterLink} to="/demo/menu" color="inherit" size="small">
             Menu
           </Button>
-          <IconButton component={RouterLink} to="/cart" color="inherit" aria-label="cart">
+          <IconButton component={RouterLink} to="/demo/cart" color="inherit" aria-label="cart">
             <Badge badgeContent={itemCount} color="secondary">
               <ShoppingCartIcon />
             </Badge>

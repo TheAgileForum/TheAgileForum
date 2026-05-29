@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Agile Forum - Color Theme Visualizer</title>
+  <style>
+    body { font-family: Inter, Arial, sans-serif; margin: 0; background: #0b1220; color: #e2e8f0; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    h1 { margin: 0 0 8px; }
+    p { color: #94a3b8; margin: 0 0 20px; }
+    .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+    .theme { border: 1px solid #334155; border-radius: 12px; overflow: hidden; background: #111827; }
+    .head { padding: 12px 14px; font-weight: 600; border-bottom: 1px solid #334155; }
+    .swatches { display: grid; grid-template-columns: repeat(5, 1fr); }
+    .sw { height: 64px; position: relative; }
+    .sw span { position: absolute; left: 6px; bottom: 6px; font-size: 11px; background: rgba(0,0,0,0.35); padding: 2px 5px; border-radius: 4px; }
+    .meta { padding: 10px 14px 14px; font-size: 13px; color: #cbd5e1; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>The Agile Forum - Color Theme Visualizer</h1>
+    <p>Palette candidates aligned to the UX strategy (trust-first, mentor-like, confident, non-salesy).</p>
+    <div class="grid">
+      <section class="theme">
+        <div class="head">Theme A - Balanced Mentor (Recommended)</div>
+        <div class="swatches">
+          <div class="sw" style="background:#1E3A8A"><span>#1E3A8A</span></div>
+          <div class="sw" style="background:#0F766E"><span>#0F766E</span></div>
+          <div class="sw" style="background:#F59E0B"><span>#F59E0B</span></div>
+          <div class="sw" style="background:#0F172A"><span>#0F172A</span></div>
+          <div class="sw" style="background:#F8FAFC;color:#0f172a"><span>#F8FAFC</span></div>
+        </div>
+        <div class="meta">Trust-focused with calm momentum accents for conversion moments.</div>
+      </section>
+      <section class="theme">
+        <div class="head">Theme B - Data Confidence</div>
+        <div class="swatches">
+          <div class="sw" style="background:#1D4ED8"><span>#1D4ED8</span></div>
+          <div class="sw" style="background:#2563EB"><span>#2563EB</span></div>
+          <div class="sw" style="background:#0EA5E9"><span>#0EA5E9</span></div>
+          <div class="sw" style="background:#0B1020"><span>#0B1020</span></div>
+          <div class="sw" style="background:#E2E8F0;color:#0f172a"><span>#E2E8F0</span></div>
+        </div>
+        <div class="meta">Analytical and precise, strong fit for dashboard-heavy contexts.</div>
+      </section>
+      <section class="theme">
+        <div class="head">Theme C - Growth Lab</div>
+        <div class="swatches">
+          <div class="sw" style="background:#065F46"><span>#065F46</span></div>
+          <div class="sw" style="background:#0D9488"><span>#0D9488</span></div>
+          <div class="sw" style="background:#14B8A6"><span>#14B8A6</span></div>
+          <div class="sw" style="background:#082F2B"><span>#082F2B</span></div>
+          <div class="sw" style="background:#ECFEFF;color:#0f172a"><span>#ECFEFF</span></div>
+        </div>
+        <div class="meta">Coaching and transformation tone, best for guidance-heavy surfaces.</div>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

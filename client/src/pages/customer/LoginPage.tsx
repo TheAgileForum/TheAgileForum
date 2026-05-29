@@ -8,7 +8,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState, type FormEvent } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
 export function LoginPage() {
@@ -17,6 +17,8 @@ export function LoginPage() {
   const [password, setPassword] = useState("password123");
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = (location.state as { returnTo?: string } | null)?.returnTo ?? "/";
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -30,9 +32,9 @@ export function LoginPage() {
 
   useEffect(() => {
     if (!loading && user) {
-      navigate("/menu", { replace: true });
+      navigate(returnTo, { replace: true });
     }
-  }, [loading, user, navigate]);
+  }, [loading, user, navigate, returnTo]);
 
   return (
     <Box sx={{ maxWidth: 400, mx: "auto", mt: 4 }}>
@@ -73,7 +75,7 @@ export function LoginPage() {
         sx={{ mt: 2 }}
         onClick={() => {
           enterDemoBrowse();
-          navigate("/menu");
+          navigate("/demo/menu");
         }}
       >
         Continue without signing in (demo browse)
