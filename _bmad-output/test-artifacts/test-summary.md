@@ -2,15 +2,24 @@
 
 **Location:** `_bmad-output/test-artifacts/`  
 **Branch:** `sprint/s1-foundation-revenue-slice`  
-**Last run:** 2026-06-04
+**Last run:** 2026-06-05
 
 ## Latest Run Status
 
 | Suite | Result |
 |-------|--------|
-| `npm run test` (unit/contract) | **67 passed** (24 files, ~33s) |
-| `npm run test:integration` (commerce slice) | **7 passed** (`commerce.integration.test.ts`, ~57s) |
-| `npm run test:integration` (full) | Run full suite and record total |
+| `npm run test` (unit/contract) | **67 passed** (24 files, ~33s) — 2026-06-04 |
+| `npm run test:integration` (full) | **33 passed** (3 files, ~58s) — 2026-06-05 |
+
+### Integration breakdown (2026-06-05)
+
+| File | Tests |
+|------|-------|
+| `auth.integration.test.ts` | 21 |
+| `diagnosis.integration.test.ts` | 5 |
+| `commerce.integration.test.ts` | 7 |
+
+**Combined automated count (unit + integration):** **100 passed**
 
 ## Test Inventory
 
@@ -56,7 +65,7 @@
 
 ## Next Steps
 
-1. Run `npm run test:integration` and record count in this file.
+1. ~~Run `npm run test:integration` and record count in this file.~~ Done (33 passed).
 2. Manual E2E per `docs/sprint-1-e2e-smoke.md`.
 3. Stripe test-mode CI secret for webhook integration (tracker §5).
 4. CI required check: `cd server && npm run test`.

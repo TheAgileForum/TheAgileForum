@@ -14,7 +14,7 @@
 
 ### P1 — Verification
 - [x] Commerce integration slice: **7 passed**
-- [ ] Run full `npm run test:integration` and update `test-summary.md` with total counts
+- [x] Full integration: **33 passed** — recorded in `test-summary.md` (2026-06-05)
 - [ ] Archive run log under `docs/reports/` if needed for S0.10 sign-off
 
 ### P2 — Sprint 1 tracker (see `implementation-artifacts/sprint-1-remaining-work-tracker.md`)
