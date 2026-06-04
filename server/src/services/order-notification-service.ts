@@ -1,4 +1,5 @@
 import { publishEvent } from "../events/publisher.js";
+import { deliverEnrollmentNotifications } from "../notifications/enrollment-notifier.js";
 
 export type EnrollmentLine = {
   offeringCode: string;
@@ -39,5 +40,12 @@ export async function publishEnrollmentNotifications(input: {
       channels: ["email"],
       template: "enrollment_welcome_v1",
     },
+  });
+
+  await deliverEnrollmentNotifications({
+    orderId: input.orderId,
+    orderNumber: input.orderNumber,
+    userId: input.userId,
+    items: input.items,
   });
 }

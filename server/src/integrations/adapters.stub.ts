@@ -18,11 +18,29 @@ export class StubStripeAdapter implements StripeAdapter {
 
   async parseWebhookEvent(payload: Buffer): Promise<StripeWebhookEvent> {
     const raw = payload.toString("utf8");
-    return {
-      id: `stub_evt_${Date.now()}`,
-      type: "checkout.session.completed",
-      rawPayload: raw,
-    };
+    let id = `stub_evt_${Date.now()}`;
+    let type = "checkout.session.completed";
+    let orderId: string | undefined;
+    let sessionId: string | undefined;
+    try {
+      const json = JSON.parse(raw) as {
+        id?: string;
+        type?: string;
+        data?: { object?: Record<string, unknown> };
+      };
+      if (json.id) id = String(json.id);
+      if (json.type) type = String(json.type);
+      const obj = (json.data?.object ?? json) as {
+        id?: string;
+        client_reference_id?: string;
+        metadata?: { order_id?: string };
+      };
+      orderId = obj.metadata?.order_id ?? obj.client_reference_id;
+      sessionId = obj.id;
+    } catch {
+      // keep stub defaults for minimal payloads
+    }
+    return { id, type, rawPayload: raw, orderId, sessionId };
   }
 }
 

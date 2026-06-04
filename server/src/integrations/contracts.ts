@@ -9,6 +9,8 @@ export type StripeWebhookEvent = {
   id: string;
   type: string;
   rawPayload: string;
+  orderId?: string;
+  sessionId?: string;
 };
 
 export interface StripeAdapter {

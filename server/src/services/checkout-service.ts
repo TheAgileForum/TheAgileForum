@@ -9,6 +9,7 @@ import {
 import { publishEnrollmentNotifications } from "./order-notification-service.js";
 import type { SessionClaims } from "./auth-service.js";
 import { getOrCreateActiveCart, serializeCart } from "./cart-service.js";
+import { createCheckoutSession } from "./stripe-checkout-service.js";
 
 export type CheckoutVariant = "standard" | "org_reimbursement";
 
@@ -98,6 +99,22 @@ export async function startCheckout(
     return created;
   });
 
+  let stripeCheckoutUrl: string | null = null;
+  if (variant === "standard") {
+    const user = await prisma.user.findUnique({
+      where: { id: auth.userId },
+      select: { email: true },
+    });
+    const stripeSession = await createCheckoutSession({
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      amount: order.totalAmount.toString(),
+      currency: order.currency,
+      customerEmail: user?.email,
+    });
+    stripeCheckoutUrl = stripeSession?.checkoutUrl ?? null;
+  }
+
   return {
     ok: true as const,
     checkout: {
@@ -110,6 +127,93 @@ export async function startCheckout(
       cart: serializeCart(cart),
       orgReimbursement:
         variant === "org_reimbursement" ? input.orgReimbursement : undefined,
+      stripeCheckoutUrl,
+    },
+  };
+}
+
+async function markOrderPaid(
+  order: { id: string; orderNumber: string; cartId: string | null; status: string },
+  paymentRef: string,
+) {
+  return prisma.$transaction(async (tx) => {
+    const row = await tx.order.update({
+      where: { id: order.id },
+      data: { status: "paid", paymentRef },
+      include: { items: true },
+    });
+
+    if (order.cartId) {
+      await tx.cart.update({
+        where: { id: order.cartId },
+        data: { status: "completed" },
+      });
+    }
+
+    return row;
+  });
+}
+
+async function deliverPaidOrderNotifications(
+  order: Awaited<ReturnType<typeof markOrderPaid>>,
+) {
+  await publishEnrollmentNotifications({
+    orderId: order.id,
+    orderNumber: order.orderNumber,
+    userId: order.userId,
+    tenantId: order.tenantId,
+    items: order.items.map((item) => ({
+      offeringCode: item.offeringCode,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice.toString(),
+      currency: item.currency,
+      title: getOffering(item.offeringCode)?.title ?? item.offeringCode,
+    })),
+  });
+}
+
+export async function completeOrderFromStripeWebhook(input: {
+  orderId: string;
+  stripeSessionId: string;
+  stripeEventId: string;
+}) {
+  const order = await prisma.order.findUnique({
+    where: { id: input.orderId },
+    include: { items: true },
+  });
+
+  if (!order) {
+    return {
+      ok: false as const,
+      error: { code: "ORDER_NOT_FOUND", message: "Order not found" },
+    };
+  }
+
+  if (order.status === "paid") {
+    return {
+      ok: true as const,
+      order: {
+        id: order.id,
+        orderNumber: order.orderNumber,
+        status: order.status,
+        paymentRef: order.paymentRef,
+        alreadyCompleted: true,
+      },
+    };
+  }
+
+  const paymentRef = `stripe:${input.stripeSessionId}:${input.stripeEventId}`;
+  const updated = await markOrderPaid(order, paymentRef);
+  await deliverPaidOrderNotifications(updated);
+
+  return {
+    ok: true as const,
+    order: {
+      id: updated.id,
+      orderNumber: updated.orderNumber,
+      status: updated.status,
+      paymentRef: updated.paymentRef,
+      alreadyCompleted: false,
     },
   };
 }
@@ -143,39 +247,11 @@ export async function completeCheckout(
     };
   }
 
-  const updated = await prisma.$transaction(async (tx) => {
-    const row = await tx.order.update({
-      where: { id: order.id },
-      data: {
-        status: "paid",
-        paymentRef: paymentRef ?? `stub-${order.orderNumber}`,
-      },
-      include: { items: true },
-    });
-
-    if (order.cartId) {
-      await tx.cart.update({
-        where: { id: order.cartId },
-        data: { status: "completed" },
-      });
-    }
-
-    return row;
-  });
-
-  await publishEnrollmentNotifications({
-    orderId: updated.id,
-    orderNumber: updated.orderNumber,
-    userId: updated.userId,
-    tenantId: updated.tenantId,
-    items: updated.items.map((item) => ({
-      offeringCode: item.offeringCode,
-      quantity: item.quantity,
-      unitPrice: item.unitPrice.toString(),
-      currency: item.currency,
-      title: getOffering(item.offeringCode)?.title ?? item.offeringCode,
-    })),
-  });
+  const updated = await markOrderPaid(
+    order,
+    paymentRef ?? `stub-${order.orderNumber}`,
+  );
+  await deliverPaidOrderNotifications(updated);
 
   return {
     ok: true as const,

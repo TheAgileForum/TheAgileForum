@@ -35,3 +35,7 @@ export function captureException(error: unknown, context: Record<string, unknown
     extra: context,
   });
 }
+
+export function resetSentryForTests(): void {
+  sentryInitialized = false;
+}

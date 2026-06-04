@@ -56,3 +56,7 @@ export async function captureProductEvent(input: PosthogEventInput): Promise<boo
   await posthog.flush();
   return true;
 }
+
+export function resetPosthogClientForTests(): void {
+  client = null;
+}

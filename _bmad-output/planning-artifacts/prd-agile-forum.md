@@ -135,7 +135,7 @@ Deliver a guided, data-informed career growth platform where every learner can a
 11. Free sessions and webinar discovery module (homepage + all customer-facing pages)
 12. Webinar registration and invite workflow for registered users (email confirmations/reminders)
 13. Core trust and support pages (About, Contact Us, FAQ) with structured inquiry forms
-14. Registered-user free discussion/discovery call booking with coach
+14. Registered-user paid discussion/discovery call booking with coach (geo-priced: `$9` USA, `INR 49` India)
 15. Webinar recording library + photo gallery with discovery surfaces for visitors and users
 16. Interview-questions content pages via Wix blogs and category hubs
 17. Funnel and event instrumentation
@@ -322,7 +322,7 @@ These are acceptance-critical requirements for replacing current pages and legac
 
 ### Journey 10: Discovery Call Booking Journey (MVP)
 
-1. Registered user books a free discussion/discovery call with coach.
+1. Registered user books a paid discussion/discovery call with coach, with geo-priced fee display (`$9` USA, `INR 49` India).
 2. User submits goals/questions and receives invite details by email.
 3. Post-call recommendations push the user to next paid or learning action.
 
@@ -585,10 +585,10 @@ These are acceptance-critical requirements for replacing current pages and legac
 
 | Keyword / Intent                           | Target Page Type                            | Primary CTA                        | Secondary CTA                  |
 | ------------------------------------------ | ------------------------------------------- | ---------------------------------- | ------------------------------ |
-| scrum master training                      | Certification + mentorship landing page     | Enroll in paid training/cohort     | Book free discovery call       |
+| scrum master training                      | Certification + mentorship landing page     | Enroll in paid training/cohort     | Book paid discovery call       |
 | product owner training                     | Product Owner training landing page         | Enroll in paid training/cohort     | Take free skill assessment     |
 | product manager training                   | Product Manager transition landing page     | Enroll in paid training/cohort     | Upload resume for gap analysis |
-| transition to scrum master                 | Career transition pathway page              | Start diagnosis (resume + goals)   | Book free discovery call       |
+| transition to scrum master                 | Career transition pathway page              | Start diagnosis (resume + goals)   | Book paid discovery call       |
 | transition to product manager              | Career transition pathway page              | Start diagnosis (resume + goals)   | View webinar + register        |
 | transition to product owner                | Career transition pathway page              | Start diagnosis (resume + goals)   | Take free skill assessment     |
 | transition to RTE (release train engineer) | RTE transition + certification pathway page | Start diagnosis + recommended path | Book discovery call            |
@@ -603,7 +603,7 @@ These are acceptance-critical requirements for replacing current pages and legac
 - FR-36: Platform can provide a Contact Us page with structured inquiry forms for user questions and support intent routing.
 - FR-37: Platform can provide a dedicated FAQ page with searchable categories and AI-assisted answer discovery.
 - FR-38: Platform can support multiple form templates (general inquiry, coaching query, partnership interest, webinar question) with submission tracking.
-- FR-39: Registered users can book free discussion/discovery calls with coaches using a slot-based workflow with confirmation emails.
+- FR-39: Registered users can book paid discussion/discovery calls with coaches using a slot-based workflow with geo-priced fees (`$9` for USA, `INR 49` for India) and confirmation emails.
 - FR-40: Platform can publish and maintain interview-question pages through Wix blogs, organized by role, certification, and difficulty tags.
 - FR-41: Platform can connect inquiry-form and discovery-call submissions to downstream follow-up workflows and conversion attribution.
 - FR-144: Global footer must include all relevant navigation and trust links, including core pages, policies, Terms and Conditions, and legal disclosures.

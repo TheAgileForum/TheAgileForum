@@ -112,9 +112,47 @@ export type Offering = {
   title: string;
   kind: string;
   scheduleBound: boolean;
+  safeOrgPaymentEligible: boolean;
   defaultUnitPrice: string;
   currency: string;
 };
+
+export type CartSummary = {
+  id: string;
+  status: string;
+  currency: string;
+  subtotal: string;
+  items: Array<{
+    id: string;
+    offeringCode: string;
+    scheduleRef: string | null;
+    quantity: number;
+    unitPrice: string;
+    currency: string;
+  }>;
+};
+
+export type OrgReimbursementInput = {
+  organizationName: string;
+  purchaseOrderNumber: string;
+  billingContactEmail: string;
+};
+
+export type CheckoutStartResult = {
+  orderId: string;
+  orderNumber: string;
+  variant: "standard" | "org_reimbursement";
+  status: string;
+  totalAmount: string;
+  currency: string;
+  cart: CartSummary;
+  stripeCheckoutUrl?: string | null;
+};
+
+export async function getCart() {
+  const res = await apiFetch<{ cart: CartSummary }>("/api/v1/commerce/cart");
+  return res.cart;
+}
 
 export async function listOfferings() {
   const res = await apiFetch<{ offerings: Offering[] }>("/api/v1/catalog/offerings");
@@ -131,18 +169,18 @@ export async function addToCart(offeringCode: string, scheduleRef?: string) {
   );
 }
 
-export async function startCheckout(variant: "standard" | "org_reimbursement" = "standard") {
-  const res = await apiFetch<{
-    checkout: { orderId: string; orderNumber: string; status: string; totalAmount: string };
-  }>("/api/v1/commerce/checkout/start", {
+export async function startCheckout(
+  variant: "standard" | "org_reimbursement" = "standard",
+  orgReimbursement?: OrgReimbursementInput,
+) {
+  return apiFetch<CheckoutStartResult>("/api/v1/commerce/checkout/start", {
     method: "POST",
-    body: JSON.stringify({ variant }),
+    body: JSON.stringify({ variant, orgReimbursement }),
   });
-  return res.checkout;
 }
 
 export async function completeCheckout(orderId: string, paymentRef?: string) {
-  return apiFetch<{ order: { id: string; orderNumber: string; status: string } }>(
+  return apiFetch<{ order: { id: string; orderNumber: string; status: string; paymentRef?: string } }>(
     "/api/v1/commerce/checkout/complete",
     {
       method: "POST",

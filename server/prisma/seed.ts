@@ -70,10 +70,16 @@ async function main() {
 
   const customer = await prisma.user.upsert({
     where: { email: "customer@demo.local" },
-    update: { passwordHash },
+    update: {
+      passwordHash,
+      emailVerifiedAt: new Date(),
+      authProvider: "local",
+    },
     create: {
       email: "customer@demo.local",
       passwordHash,
+      emailVerifiedAt: new Date(),
+      authProvider: "local",
     },
   });
 
@@ -91,10 +97,16 @@ async function main() {
 
   const ops = await prisma.user.upsert({
     where: { email: "ops@demo.local" },
-    update: { passwordHash },
+    update: {
+      passwordHash,
+      emailVerifiedAt: new Date(),
+      authProvider: "local",
+    },
     create: {
       email: "ops@demo.local",
       passwordHash,
+      emailVerifiedAt: new Date(),
+      authProvider: "local",
     },
   });
 

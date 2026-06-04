@@ -3,16 +3,19 @@ import { Role } from "@prisma/client";
 import { prisma } from "../db/client.js";
 import { DEFAULT_REGISTRATION_TENANT_ID } from "../constants/platform.js";
 import type { SessionClaims } from "./auth-service.js";
+import { issueEmailVerification } from "./email-verification-service.js";
 
 export type RegisterInput = {
   email: string;
   password: string;
   policyVersion: string;
   acceptTerms: boolean;
+  authProvider?: "local" | "google" | "linkedin";
+  emailVerified?: boolean;
 };
 
 export type RegisterResult =
-  | { ok: true; session: SessionClaims; userId: string }
+  | { ok: true; session: SessionClaims; userId: string; emailVerified: boolean }
   | { ok: false; code: string; message: string };
 
 export async function registerUser(input: RegisterInput): Promise<RegisterResult> {
@@ -46,10 +49,13 @@ export async function registerUser(input: RegisterInput): Promise<RegisterResult
   }
 
   const passwordHash = await bcrypt.hash(input.password, 10);
+  const verifiedNow = input.emailVerified === true;
   const user = await prisma.user.create({
     data: {
       email,
       passwordHash,
+      authProvider: input.authProvider ?? "local",
+      emailVerifiedAt: verifiedNow ? new Date() : null,
       memberships: {
         create: {
           tenantId: tenant.id,
@@ -69,9 +75,15 @@ export async function registerUser(input: RegisterInput): Promise<RegisterResult
   });
 
   const membership = user.memberships[0]!;
+
+  if (!verifiedNow) {
+    await issueEmailVerification(user.id, email);
+  }
+
   return {
     ok: true,
     userId: user.id,
+    emailVerified: verifiedNow,
     session: {
       userId: user.id,
       role: membership.role,

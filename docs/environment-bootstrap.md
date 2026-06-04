@@ -15,6 +15,7 @@ Provide a repeatable setup sequence for local/dev/stage environment configuratio
 
 - `server/.env` (required)
 - `client/.env` (optional unless overriding API URL)
+- `server/.env.test` (integration tests; recommended separate DB/project)
 
 ## Local Setup Steps
 
@@ -24,7 +25,8 @@ Provide a repeatable setup sequence for local/dev/stage environment configuratio
 2. Set required values in `server/.env`:
    - `NODE_ENV`
    - `PORT`
-   - `DATABASE_URL`
+   - `DATABASE_URL` (runtime/pool URL)
+   - `DIRECT_URL` (direct DB URL for migrations)
    - `JWT_SECRET` (minimum 32 chars)
    - `REDIS_URL`
 3. Validate backend environment:
@@ -41,6 +43,11 @@ Provide a repeatable setup sequence for local/dev/stage environment configuratio
 - Use platform-managed secrets for stage/prod variables.
 - Never copy local `.env` files into shared environments.
 - Keep `NODE_ENV=production` in production-like deployments.
+- Recommended split:
+  - `DATABASE_URL` = pooler/runtime URL
+  - `DIRECT_URL` = direct DB URL for Prisma migrations
+- For integration tests, prefer a separate Supabase test project and set
+  `server/.env.test` (`DATABASE_URL` + `DIRECT_URL`) to that test database.
 
 ## Troubleshooting
 

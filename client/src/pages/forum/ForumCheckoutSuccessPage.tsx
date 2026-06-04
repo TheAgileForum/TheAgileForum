@@ -13,7 +13,10 @@ export function ForumCheckoutSuccessPage() {
         Payment confirmed
       </Typography>
       <Typography color="text.secondary">
-        Order {state?.orderNumber ?? state?.orderId ?? "—"} is confirmed. Welcome to your program.
+        Order {state?.orderNumber ?? state?.orderId ?? "—"} is confirmed.
+        {(state as { variant?: string } | null)?.variant === "org_reimbursement"
+          ? " Your organization reimbursement request was submitted to ops."
+          : " Welcome to your program."}
       </Typography>
       <Button variant="contained" component={RouterLink} to="/">
         Back to home

@@ -32,14 +32,11 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
   const [sessionId, setSessionId] = useState<string | null>(() => getStoredSessionId());
   const [runId, setRunId] = useState<string | null>(null);
   const [resumeStep, setResumeStep] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => Boolean(getStoredSessionId()));
 
   useEffect(() => {
     const stored = getStoredSessionId();
-    if (!stored) {
-      setLoading(false);
-      return;
-    }
+    if (!stored) return;
     void getJourneyState(stored)
       .then((state) => {
         setSessionId(stored);

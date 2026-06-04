@@ -10,6 +10,7 @@ const queueRoutingRules: Array<{ pattern: RegExp; queue: QueueName }> = [
   { pattern: /^report\./, queue: "q_reporting" },
   { pattern: /^ai\./, queue: "q_ai_processing" },
   { pattern: /^resume\./, queue: "q_ai_processing" },
+  { pattern: /^diagnosis\./, queue: "q_ai_processing" },
 ];
 
 export function resolveQueueForEvent(eventName: string): QueueName {

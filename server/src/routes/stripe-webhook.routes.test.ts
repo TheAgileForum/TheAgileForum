@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import { resetEnvCache } from "../config/env.js";
 import { createApp } from "../app.js";
+import { IntegrationError } from "../integrations/errors.js";
 
 const {
   mockVerifyWebhookSignature,
@@ -111,5 +112,25 @@ describe("stripe webhook route", () => {
 
     expect(res.status).toBe(500);
     expect(res.body.error.code).toBe("WEBHOOK_PROCESSING_FAILED");
+  });
+
+  it("returns provider integration error code when adapter raises IntegrationError", async () => {
+    mockVerifyWebhookSignature.mockResolvedValue(true);
+    mockParseWebhookEvent.mockRejectedValue(
+      new IntegrationError("INTEGRATION_TIMEOUT", "provider timeout", "stripe"),
+    );
+
+    const app = createApp();
+    const payload = Buffer.from(JSON.stringify({ id: "evt_timeout" }));
+
+    const res = await request(app)
+      .post("/api/v1/integrations/stripe/webhook")
+      .set("content-type", "application/json")
+      .set("stripe-signature", "stub-valid-signature")
+      .send(payload);
+
+    expect(res.status).toBe(500);
+    expect(res.body.error.code).toBe("INTEGRATION_TIMEOUT");
+    expect(res.body.error.message).toBe("Could not process webhook");
   });
 });

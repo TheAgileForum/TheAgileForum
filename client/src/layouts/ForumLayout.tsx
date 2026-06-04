@@ -5,6 +5,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { Outlet, Link as RouterLink } from "react-router-dom";
 import { TrustFooter } from "../components/forum/TrustFooter";
+import { EmailVerificationBanner } from "../components/EmailVerificationBanner";
 import { useAuth } from "../contexts/AuthContext";
 
 export function ForumLayout() {
@@ -45,6 +46,7 @@ export function ForumLayout() {
         component="main"
         sx={{ flex: 1, p: { xs: 2, sm: 3 }, maxWidth: 800, mx: "auto", width: "100%", boxSizing: "border-box" }}
       >
+        <EmailVerificationBanner />
         <Outlet />
       </Box>
       <TrustFooter />

@@ -28,14 +28,18 @@ model Tenant {
 }
 
 model User {
-  id                String              @id @default(uuid())
-  email             String              @unique
-  passwordHash      String              @map("password_hash")
-  memberships       TenantMembership[]
-  consentEvents     ConsentEvent[]
-  carts             Cart[]
-  orders            Order[]
-  diagnosisSessions DiagnosisSession[]
+  id                          String              @id @default(uuid())
+  email                       String              @unique
+  passwordHash                String              @map("password_hash")
+  emailVerifiedAt             DateTime?           @map("email_verified_at")
+  emailVerificationToken      String?             @unique @map("email_verification_token")
+  emailVerificationExpiresAt  DateTime?           @map("email_verification_expires_at")
+  authProvider                String?             @map("auth_provider")
+  memberships                 TenantMembership[]
+  consentEvents               ConsentEvent[]
+  carts                       Cart[]
+  orders                      Order[]
+  diagnosisSessions           DiagnosisSession[]
 
   @@map("users")
 }

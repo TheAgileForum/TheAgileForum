@@ -52,6 +52,8 @@ describe.skipIf(!hasDb)("auth integration", () => {
     });
     expect(res.status).toBe(201);
     expect(res.body.user.role).toBe("CUSTOMER");
+    expect(res.body.user.emailVerified).toBe(false);
+    expect(res.body.emailVerificationSent).toBe(true);
     expect(res.headers["set-cookie"]).toBeDefined();
   });
 
@@ -110,6 +112,7 @@ describe.skipIf(!hasDb)("auth integration", () => {
     const res = await agent.get("/api/v1/auth/me");
     expect(res.status).toBe(200);
     expect(res.body.user.email).toBe("customer@demo.local");
+    expect(res.body.user.emailVerified).toBe(true);
   });
 
   it("context-check ignores spoof tenantId in query and body", async () => {
@@ -324,5 +327,43 @@ describe.skipIf(!hasDb)("auth integration", () => {
     const res = await agent.get("/api/v1/auth/admin-check");
     expect(res.status).toBe(200);
     expect(res.body.ok).toBe(true);
+  });
+
+  it("completes google OAuth stub callback and sets session cookie", async () => {
+    const start = await request(app)
+      .get("/api/v1/auth/oauth/google/start")
+      .redirects(0);
+    expect(start.status).toBe(302);
+    const location = start.headers.location as string;
+    const parsed = new URL(location, "http://localhost");
+    const callback = await request(app).get(`${parsed.pathname}${parsed.search}`);
+    expect(callback.status).toBe(302);
+    const setCookie = callback.headers["set-cookie"];
+    const cookies = Array.isArray(setCookie) ? setCookie : setCookie ? [setCookie] : [];
+    expect(cookies.some((c) => c.startsWith("access_token="))).toBe(true);
+  });
+
+  it("verifies email via token link", async () => {
+    const email = `verify-${Date.now()}@demo.local`;
+    const register = await request(app).post("/api/v1/auth/register").send({
+      email,
+      password: "password123",
+      policyVersion: "v1",
+      acceptTerms: true,
+    });
+    expect(register.status).toBe(201);
+
+    const { prisma } = await import("./db/client.js");
+    const user = await prisma.user.findUnique({ where: { email } });
+    expect(user?.emailVerificationToken).toBeTruthy();
+
+    const verify = await request(app).get(
+      `/api/v1/auth/verify-email?token=${encodeURIComponent(user!.emailVerificationToken!)}`,
+    );
+    expect(verify.status).toBe(302);
+    expect(String(verify.headers.location)).toContain("verified=1");
+
+    const updated = await prisma.user.findUnique({ where: { email } });
+    expect(updated?.emailVerifiedAt).toBeTruthy();
   });
 });

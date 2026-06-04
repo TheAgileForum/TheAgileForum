@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { requireAuth } from "../middleware/auth.js";
+import { requireVerifiedEmail } from "../middleware/email-verification.js";
 import { withBodyValidation } from "../middleware/validation.js";
 import { getOffering } from "../catalog/offerings.js";
 import { validateExamAccess } from "../commerce/checkout-policy.js";
@@ -112,6 +113,7 @@ async function hasCompletedPaidOrder(
 commerceRouter.post(
   "/checkout/start",
   requireAuth,
+  requireVerifiedEmail,
   withBodyValidation(checkoutStartBody),
   async (req, res) => {
     const body = req.body as z.infer<typeof checkoutStartBody>;
@@ -128,6 +130,7 @@ commerceRouter.post(
 commerceRouter.post(
   "/checkout/complete",
   requireAuth,
+  requireVerifiedEmail,
   withBodyValidation(checkoutCompleteBody),
   async (req, res) => {
     const body = req.body as z.infer<typeof checkoutCompleteBody>;
