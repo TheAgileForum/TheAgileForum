@@ -11,6 +11,7 @@ import { requestIdMiddleware } from "./middleware/request-id.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { corsMiddleware, securityHeadersMiddleware } from "./middleware/security.js";
 import { stripeWebhookRouter } from "./routes/stripe-webhook.routes.js";
+import { razorpayWebhookRouter } from "./routes/razorpay-webhook.routes.js";
 import { paymentsRouter } from "./routes/payments.routes.js";
 import { pricingRouter } from "./routes/pricing.routes.js";
 import { recommendationsRouter } from "./routes/recommendations.routes.js";
@@ -25,6 +26,11 @@ export function createApp() {
     express.raw({ type: "application/json", limit: "1mb" }),
   );
   app.use("/api/v1/integrations/stripe", stripeWebhookRouter);
+  app.use(
+    "/api/v1/integrations/razorpay",
+    express.raw({ type: "application/json", limit: "1mb" }),
+  );
+  app.use("/api/v1/integrations/razorpay", razorpayWebhookRouter);
   app.use(express.json());
   app.use(cookieParser());
   app.use("/api/v1", healthRouter);

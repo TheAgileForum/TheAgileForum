@@ -28,6 +28,7 @@ import { DiagnosisStep3Page } from "./pages/forum/diagnosis/DiagnosisStep3Page";
 import { DiagnosisStep4Page } from "./pages/forum/diagnosis/DiagnosisStep4Page";
 import { ForumCheckoutPage } from "./pages/forum/ForumCheckoutPage";
 import { ForumCheckoutSuccessPage } from "./pages/forum/ForumCheckoutSuccessPage";
+import { ForumRazorpayCheckoutPage } from "./pages/forum/ForumRazorpayCheckoutPage";
 import { ForumRazorpayStubPage } from "./pages/forum/ForumRazorpayStubPage";
 import { ForumHomePage } from "./pages/forum/ForumHomePage";
 import { CatalogListingPage } from "./pages/forum/catalog/CatalogListingPage";
@@ -81,6 +82,7 @@ function App() {
               <Route path="diagnosis/step-4" element={<DiagnosisStep4Page />} />
               <Route path="offers/:code" element={<OfferPage />} />
               <Route path="checkout" element={<ForumCheckoutPage />} />
+              <Route path="checkout/razorpay" element={<ForumRazorpayCheckoutPage />} />
               <Route path="checkout/razorpay/stub" element={<ForumRazorpayStubPage />} />
               <Route path="checkout/success" element={<ForumCheckoutSuccessPage />} />
             </Route>

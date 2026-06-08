@@ -321,6 +321,14 @@ export type PaymentModesResponse = {
 
 export type PaymentProvider = "stripe" | "razorpay";
 
+export type RazorpayCheckoutConfig = {
+  mode: "stub" | "live";
+  keyId?: string;
+  amountMinor?: number;
+  currency: string;
+  providerOrderId: string;
+};
+
 export type CheckoutStartResult = {
   orderId: string;
   orderNumber: string;
@@ -332,6 +340,12 @@ export type CheckoutStartResult = {
   stripeCheckoutUrl?: string | null;
   razorpayCheckoutUrl?: string | null;
   razorpayPaymentRef?: string | null;
+  razorpayCheckout?: RazorpayCheckoutConfig;
+  razorpayEmiPlans?: Array<{
+    provider: string;
+    monthlyAmount: string;
+    currency: string;
+  }>;
   paymentProvider?: PaymentProvider | null;
   paymentMode?: PaymentMode;
   installmentProvider?: InstallmentProvider | null;
@@ -537,6 +551,29 @@ export async function startCheckout(
         installmentProvider: options?.installmentProvider,
         commerceJourneyOrigin: options?.commerceJourneyOrigin,
       }),
+    },
+  );
+}
+
+export async function getRazorpayCheckoutConfig(orderId: string) {
+  const res = await apiFetch<{
+    config: RazorpayCheckoutConfig & { orderNumber: string };
+  }>(`/api/v1/commerce/razorpay/checkout-config/${orderId}`);
+  return res.config;
+}
+
+export async function confirmRazorpayCheckout(input: {
+  orderId: string;
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  razorpaySignature: string;
+  paymentMode?: PaymentMode;
+}) {
+  return apiFetch<{ order: { id: string; orderNumber: string; status: string; paymentRef?: string } }>(
+    "/api/v1/commerce/checkout/razorpay/confirm",
+    {
+      method: "POST",
+      body: JSON.stringify(input),
     },
   );
 }

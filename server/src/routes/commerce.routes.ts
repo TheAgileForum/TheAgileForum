@@ -27,7 +27,12 @@ import {
   updateGuestCartItemQuantity,
 } from "../services/guest-cart-service.js";
 import { commerceJourneyOriginSchema } from "../commerce/journey-origin.js";
-import { completeCheckout, startCheckout } from "../services/checkout-service.js";
+import {
+  completeCheckout,
+  completeOrderFromRazorpayPayment,
+  getRazorpayCheckoutConfig,
+  startCheckout,
+} from "../services/checkout-service.js";
 import {
   trackCartUpdated,
   trackGlobalCartViewed,
@@ -320,6 +325,55 @@ async function hasCompletedPaidOrder(
   });
   return order !== null;
 }
+
+const razorpayConfirmBody = z.object({
+  orderId: z.string().uuid(),
+  razorpayOrderId: z.string().min(1),
+  razorpayPaymentId: z.string().min(1),
+  razorpaySignature: z.string().min(1),
+  paymentMode: paymentModeSchema.optional(),
+});
+
+commerceRouter.get(
+  "/razorpay/checkout-config/:orderId",
+  requireAuth,
+  async (req, res) => {
+    const result = await getRazorpayCheckoutConfig(req.auth!, req.params.orderId);
+    if (!result.ok) {
+      const status = result.error.code === "ORDER_NOT_FOUND" ? 404 : 400;
+      return res.status(status).json({ error: result.error });
+    }
+    return res.json({ config: result.config });
+  },
+);
+
+commerceRouter.post(
+  "/checkout/razorpay/confirm",
+  requireAuth,
+  requireVerifiedEmail,
+  withBodyValidation(razorpayConfirmBody),
+  async (req, res) => {
+    const body = req.body as z.infer<typeof razorpayConfirmBody>;
+    const result = await completeOrderFromRazorpayPayment({
+      auth: req.auth!,
+      orderId: body.orderId,
+      razorpayOrderId: body.razorpayOrderId,
+      razorpayPaymentId: body.razorpayPaymentId,
+      razorpaySignature: body.razorpaySignature,
+      paymentMode: body.paymentMode,
+    });
+    if (!result.ok) {
+      const status =
+        result.error.code === "ORDER_NOT_FOUND"
+          ? 404
+          : result.error.code === "RAZORPAY_SIGNATURE_INVALID"
+            ? 400
+            : 400;
+      return res.status(status).json({ error: result.error });
+    }
+    return res.json({ order: result.order });
+  },
+);
 
 commerceRouter.post(
   "/checkout/start",

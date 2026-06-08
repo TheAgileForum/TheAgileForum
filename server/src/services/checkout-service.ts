@@ -23,7 +23,12 @@ import {
   type PaymentMode,
 } from "../commerce/payment-mode.js";
 import { createCheckoutSession } from "./stripe-checkout-service.js";
-import { createRazorpayCheckoutSession } from "./razorpay-checkout-service.js";
+import {
+  createRazorpayCheckoutSession,
+  getRazorpayKeySecret,
+  type RazorpayCheckoutSession,
+} from "./razorpay-checkout-service.js";
+import { verifyPaymentSignature } from "../integrations/razorpay-api.js";
 import {
   trackCheckoutConfirmed,
   trackCheckoutStarted,
@@ -173,7 +178,20 @@ export async function startCheckout(
   let razorpayEmiPlans:
     | Array<{ provider: string; monthlyAmount: string; currency: string }>
     | undefined;
+  let razorpayCheckout: RazorpayCheckoutSession | null = null;
   let paymentProvider: "stripe" | "razorpay" | null = null;
+
+  async function bindRazorpaySession(session: RazorpayCheckoutSession) {
+    razorpayCheckout = session;
+    razorpayCheckoutUrl = session.checkoutUrl;
+    razorpayPaymentRef = session.paymentRef;
+    if (session.paymentRef) {
+      await prisma.order.update({
+        where: { id: order.id },
+        data: { paymentRef: session.paymentRef },
+      });
+    }
+  }
 
   if (
     variant === "standard" &&
@@ -187,27 +205,29 @@ export async function startCheckout(
       priced.currency,
       context.geoDetected,
     );
-    const stubSession = await createRazorpayCheckoutSession({
-      orderId: order.id,
-      orderNumber: order.orderNumber,
-      amount: order.totalAmount.toString(),
-      currency: order.currency,
-    });
-    razorpayCheckoutUrl = stubSession.checkoutUrl;
-    razorpayPaymentRef = stubSession.paymentRef;
+    await bindRazorpaySession(
+      await createRazorpayCheckoutSession({
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        amount: order.totalAmount.toString(),
+        currency: order.currency,
+        paymentMode: "installment",
+      }),
+    );
   } else if (variant === "standard" && paymentSelection.paymentMode === "full_pay") {
     const paymentModes = resolvePaymentModes(context.geoDetected);
     paymentProvider = paymentModes.fullPayProvider;
 
     if (paymentModes.fullPayProvider === "razorpay") {
-      const razorpaySession = await createRazorpayCheckoutSession({
-        orderId: order.id,
-        orderNumber: order.orderNumber,
-        amount: order.totalAmount.toString(),
-        currency: order.currency,
-      });
-      razorpayCheckoutUrl = razorpaySession.checkoutUrl;
-      razorpayPaymentRef = razorpaySession.paymentRef;
+      await bindRazorpaySession(
+        await createRazorpayCheckoutSession({
+          orderId: order.id,
+          orderNumber: order.orderNumber,
+          amount: order.totalAmount.toString(),
+          currency: order.currency,
+          paymentMode: "full_pay",
+        }),
+      );
     } else {
       const user = await prisma.user.findUnique({
         where: { id: auth.userId },
@@ -262,6 +282,15 @@ export async function startCheckout(
       stripeCheckoutUrl,
       razorpayCheckoutUrl,
       razorpayPaymentRef,
+      razorpayCheckout: razorpayCheckout
+        ? {
+            mode: razorpayCheckout.mode,
+            keyId: razorpayCheckout.keyId,
+            amountMinor: razorpayCheckout.amountMinor,
+            currency: razorpayCheckout.currency,
+            providerOrderId: razorpayCheckout.providerOrderId,
+          }
+        : undefined,
       razorpayEmiPlans,
       commerceJourneyOrigin: input.commerceJourneyOrigin ?? null,
       paymentMode: paymentSelection.paymentMode,
@@ -313,6 +342,196 @@ async function deliverPaidOrderNotifications(
       }),
     ),
   });
+}
+
+export async function getRazorpayCheckoutConfig(auth: SessionClaims, orderId: string) {
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, userId: auth.userId },
+  });
+  if (!order) {
+    return {
+      ok: false as const,
+      error: { code: "ORDER_NOT_FOUND", message: "Order not found" },
+    };
+  }
+  const pendingRef = order.paymentRef ?? "";
+  const match = pendingRef.match(/^razorpay:pending:(.+)$/);
+  if (!match) {
+    return {
+      ok: false as const,
+      error: {
+        code: "RAZORPAY_SESSION_NOT_FOUND",
+        message: "No active Razorpay checkout session for this order",
+      },
+    };
+  }
+
+  const keyId = process.env.RAZORPAY_KEY_ID?.trim();
+  if (!keyId) {
+    return {
+      ok: false as const,
+      error: {
+        code: "RAZORPAY_NOT_CONFIGURED",
+        message: "Razorpay sandbox keys are not configured",
+      },
+    };
+  }
+
+  const amountMinor = Math.round(Number(order.totalAmount) * 100);
+
+  return {
+    ok: true as const,
+    config: {
+      mode: "live" as const,
+      keyId,
+      amountMinor,
+      currency: order.currency,
+      providerOrderId: match[1],
+      orderNumber: order.orderNumber,
+    },
+  };
+}
+
+export async function completeOrderFromRazorpayPayment(input: {
+  auth: SessionClaims;
+  orderId: string;
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  razorpaySignature: string;
+  paymentMode?: PaymentMode;
+}) {
+  const secret = getRazorpayKeySecret();
+  if (!secret) {
+    return {
+      ok: false as const,
+      error: {
+        code: "RAZORPAY_NOT_CONFIGURED",
+        message: "Razorpay is not configured",
+      },
+    };
+  }
+
+  const valid = verifyPaymentSignature({
+    orderId: input.razorpayOrderId,
+    paymentId: input.razorpayPaymentId,
+    signature: input.razorpaySignature,
+    secret,
+  });
+  if (!valid) {
+    return {
+      ok: false as const,
+      error: {
+        code: "RAZORPAY_SIGNATURE_INVALID",
+        message: "Payment signature verification failed",
+      },
+    };
+  }
+
+  const order = await prisma.order.findFirst({
+    where: { id: input.orderId, userId: input.auth.userId },
+    include: { items: true },
+  });
+  if (!order) {
+    return {
+      ok: false as const,
+      error: { code: "ORDER_NOT_FOUND", message: "Order not found" },
+    };
+  }
+
+  if (order.status === "paid") {
+    return {
+      ok: true as const,
+      order: {
+        id: order.id,
+        orderNumber: order.orderNumber,
+        status: order.status,
+        paymentRef: order.paymentRef,
+        alreadyCompleted: true,
+      },
+    };
+  }
+
+  const paymentRef = `razorpay:${input.razorpayOrderId}:${input.razorpayPaymentId}`;
+  const updated = await markOrderPaid(order, paymentRef);
+  await deliverPaidOrderNotifications(updated);
+
+  const mode = input.paymentMode ?? "full_pay";
+  void trackCheckoutConfirmed({
+    distinctId: input.auth.userId,
+    orderId: updated.id,
+    orderNumber: updated.orderNumber,
+    currency: updated.currency,
+    paymentMode: mode,
+  });
+  if (mode === "installment") {
+    void trackNamedProductEvent("installment_checkout_completed", input.auth.userId, {
+      order_id: updated.id,
+      provider: "razorpay_emi",
+      currency: updated.currency,
+    });
+  }
+
+  return {
+    ok: true as const,
+    order: {
+      id: updated.id,
+      orderNumber: updated.orderNumber,
+      status: updated.status,
+      paymentRef: updated.paymentRef,
+      alreadyCompleted: false,
+    },
+  };
+}
+
+export async function completeOrderFromRazorpayWebhook(input: {
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  internalOrderId?: string;
+}) {
+  const order = input.internalOrderId
+    ? await prisma.order.findUnique({
+        where: { id: input.internalOrderId },
+        include: { items: true },
+      })
+    : await prisma.order.findFirst({
+        where: { paymentRef: `razorpay:pending:${input.razorpayOrderId}` },
+        include: { items: true },
+      });
+
+  if (!order) {
+    return {
+      ok: false as const,
+      error: { code: "ORDER_NOT_FOUND", message: "Order not found" },
+    };
+  }
+
+  if (order.status === "paid") {
+    return {
+      ok: true as const,
+      order: {
+        id: order.id,
+        orderNumber: order.orderNumber,
+        status: order.status,
+        paymentRef: order.paymentRef,
+        alreadyCompleted: true,
+      },
+    };
+  }
+
+  const paymentRef = `razorpay:${input.razorpayOrderId}:${input.razorpayPaymentId}`;
+  const updated = await markOrderPaid(order, paymentRef);
+  await deliverPaidOrderNotifications(updated);
+
+  return {
+    ok: true as const,
+    order: {
+      id: updated.id,
+      orderNumber: updated.orderNumber,
+      status: updated.status,
+      paymentRef: updated.paymentRef,
+      alreadyCompleted: false,
+    },
+  };
 }
 
 export async function completeOrderFromStripeWebhook(input: {

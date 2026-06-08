@@ -6,6 +6,7 @@ export type CheckoutRedirectState = {
   orderNumber: string;
   paymentMode?: CheckoutStartResult["paymentMode"];
   installmentProvider?: CheckoutStartResult["installmentProvider"];
+  razorpayCheckout?: CheckoutStartResult["razorpayCheckout"];
 };
 
 /** Route in-app payment stubs internally; send external gateways to full redirect. */
@@ -18,6 +19,7 @@ export function redirectAfterCheckoutStart(
     orderNumber: started.orderNumber,
     paymentMode: started.paymentMode,
     installmentProvider: started.installmentProvider,
+    razorpayCheckout: started.razorpayCheckout,
   };
 
   if (started.stripeCheckoutUrl) {
