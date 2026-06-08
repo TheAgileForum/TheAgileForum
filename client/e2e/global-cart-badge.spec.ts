@@ -33,8 +33,31 @@ function mockGuestApis(page: import("@playwright/test").Page, cartState: { curre
         body: JSON.stringify({ error: { code: "UNAUTHENTICATED", message: "Not signed in" } }),
       });
     }),
-    page.route("**/api/v1/commerce/cart/guest", async (route) => {
-      if (route.request().method() === "GET") {
+    page.route(/\/api\/v1\/pricing\/currency-context/, async (route) => {
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({
+          currency: "USD",
+          geoDetected: "US",
+          source: "geo",
+        }),
+      });
+    }),
+    page.route(/\/api\/v1\/payments\/installment-plans/, async (route) => {
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({
+          offerId: "exam-practice-free",
+          amount: "0.00",
+          currency: "USD",
+          geo: "US",
+          disclaimerRef: "gateway",
+        }),
+      });
+    }),
+    page.route(/\/api\/v1\/commerce\/cart\/guest(?:\/items)?/, async (route) => {
+      const url = route.request().url();
+      if (route.request().method() === "GET" && url.includes("/cart/guest") && !url.includes("/items")) {
         await route.fulfill({
           contentType: "application/json",
           body: JSON.stringify({ cart: cartState.current }),
@@ -43,7 +66,7 @@ function mockGuestApis(page: import("@playwright/test").Page, cartState: { curre
       }
       await route.continue();
     }),
-    page.route("**/api/v1/commerce/cart/merge", async (route) => {
+    page.route(/\/api\/v1\/commerce\/cart\/merge/, async (route) => {
       await route.fulfill({
         contentType: "application/json",
         body: JSON.stringify({ merged: false, cart: cartState.current }),
@@ -79,7 +102,7 @@ test.describe("Global cart badge (FR-177)", () => {
 
     await mockGuestApis(page, cartState);
 
-    await page.route("**/api/v1/catalog/certifications**", async (route) => {
+    await page.route(/\/api\/v1\/catalog\/certifications/, async (route) => {
       await route.fulfill({
         contentType: "application/json",
         body: JSON.stringify({
@@ -91,7 +114,7 @@ test.describe("Global cart badge (FR-177)", () => {
       });
     });
 
-    await page.route("**/api/v1/commerce/cart/guest/items", async (route) => {
+    await page.route(/\/api\/v1\/commerce\/cart\/guest\/items/, async (route) => {
       cartState.current = {
         ...emptyCart,
         subtotal: "0.00",
