@@ -9,6 +9,7 @@ import { publishEvent } from "../events/publisher.js";
 import { validateResumeUpload } from "../security/upload-policy.js";
 import { scheduleAnalysisRun } from "./analysis-runner.js";
 import { upsertSessionJourney } from "./journey-state-service.js";
+import { enrichAnalysisPayload } from "./result-enrichment.js";
 
 function nextStepForStatus(status: DiagnosisSessionStatus): string {
   switch (status) {
@@ -333,18 +334,21 @@ export async function getAnalysisResult(runId: string) {
 
   const strengths = run.gapInsight.strengths as string[];
   const gaps = run.gapInsight.gaps as string[];
-
-  return {
-    readinessScore: run.gapInsight.readinessScore,
-    insights: {
-      strengths,
-      gaps,
-      confidence: run.gapInsight.confidence,
-    },
-    recommendation: {
-      primaryAction: run.recommendation.primaryAction,
-    },
-    rationale: run.recommendation.rationale,
-    primaryAction: run.recommendation.primaryAction,
+  const primaryAction = run.recommendation.primaryAction as {
+    type: string;
+    label: string;
+    href: string;
+    offeringCode?: string;
   };
+  const rationale = run.recommendation.rationale as Array<{ label: string; detail: string }>;
+
+  return enrichAnalysisPayload({
+    targetRole: run.session.targetRole,
+    readinessScore: run.gapInsight.readinessScore,
+    confidence: run.gapInsight.confidence,
+    strengths,
+    gaps,
+    primaryAction,
+    rationale,
+  });
 }

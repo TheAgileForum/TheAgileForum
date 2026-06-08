@@ -2,6 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import healthRouter from "./routes/health.js";
 import { authRouter } from "./routes/auth.routes.js";
+import { adminCatalogRouter } from "./routes/admin-catalog.routes.js";
 import { catalogRouter } from "./routes/catalog.routes.js";
 import { commerceRouter } from "./routes/commerce.routes.js";
 import { diagnosisRouter } from "./routes/diagnosis.routes.js";
@@ -10,6 +11,8 @@ import { requestIdMiddleware } from "./middleware/request-id.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { corsMiddleware, securityHeadersMiddleware } from "./middleware/security.js";
 import { stripeWebhookRouter } from "./routes/stripe-webhook.routes.js";
+import { pricingRouter } from "./routes/pricing.routes.js";
+import { recommendationsRouter } from "./routes/recommendations.routes.js";
 
 export function createApp() {
   const app = express();
@@ -26,9 +29,12 @@ export function createApp() {
   app.use("/api/v1", healthRouter);
   app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/catalog", catalogRouter);
+  app.use("/api/v1/admin/catalog", adminCatalogRouter);
   app.use("/api/v1/commerce", commerceRouter);
   app.use("/api/v1/diagnosis", diagnosisRouter);
   app.use("/api/v1/journey-state", journeyStateRouter);
+  app.use("/api/v1/pricing", pricingRouter);
+  app.use("/api/v1/recommendations", recommendationsRouter);
   app.use(errorHandler);
   return app;
 }

@@ -172,6 +172,35 @@ model CartItem {
   @@map("cart_items")
 }
 
+model GuestCart {
+  id           String          @id @default(uuid())
+  sessionToken String          @unique @map("session_token")
+  status       String          @default("active")
+  currency     String          @default("USD")
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+  items        GuestCartItem[]
+
+  @@index([sessionToken, status])
+  @@map("guest_carts")
+}
+
+model GuestCartItem {
+  id           String    @id @default(uuid())
+  guestCartId  String    @map("guest_cart_id")
+  offeringCode String    @map("offering_code")
+  scheduleRef  String?   @map("schedule_ref")
+  quantity     Int       @default(1)
+  unitPrice    Decimal   @db.Decimal(10, 2) @map("unit_price")
+  currency     String
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  guestCart    GuestCart @relation(fields: [guestCartId], references: [id], onDelete: Cascade)
+
+  @@index([guestCartId])
+  @@map("guest_cart_items")
+}
+
 model Order {
   id           String      @id @default(uuid())
   orderNumber  String      @unique @map("order_number")
@@ -247,6 +276,72 @@ enum AnalysisStage {
 enum JourneySubjectType {
   SESSION
   USER
+}
+
+enum OfferingKind {
+  course
+  exam
+  certification_mock
+  service
+}
+
+enum OfferingCategory {
+  training
+  certification
+  service
+}
+
+enum ExamAccessPolicy {
+  free
+  paid
+  preview_only
+}
+
+enum DeliveryMode {
+  live
+  self_paced
+}
+
+model Offering {
+  id                     String             @id @default(uuid())
+  code                   String             @unique
+  title                  String
+  kind                   OfferingKind
+  category               OfferingCategory
+  scheduleBound          Boolean            @map("schedule_bound")
+  examAccess             ExamAccessPolicy   @map("exam_access")
+  safeOrgPaymentEligible Boolean            @default(false) @map("safe_org_payment_eligible")
+  defaultUnitPrice       Decimal            @db.Decimal(10, 2) @map("default_unit_price")
+  currency               String             @default("USD")
+  roleTags               Json               @map("role_tags")
+  certBody               String?            @map("cert_body")
+  deliveryMode           DeliveryMode       @map("delivery_mode")
+  enabled                Boolean            @default(true)
+  deletedAt              DateTime?          @map("deleted_at")
+  createdAt              DateTime           @default(now()) @map("created_at")
+  updatedAt              DateTime           @updatedAt @map("updated_at")
+  schedules              OfferingSchedule[]
+
+  @@index([category, enabled])
+  @@index([enabled, deletedAt])
+  @@map("offerings")
+}
+
+model OfferingSchedule {
+  id         String    @id @default(uuid())
+  offeringId String    @map("offering_id")
+  refCode    String    @map("ref_code")
+  label      String?
+  startsAt   DateTime? @map("starts_at")
+  enabled    Boolean   @default(true)
+  deletedAt  DateTime? @map("deleted_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  offering   Offering  @relation(fields: [offeringId], references: [id], onDelete: Cascade)
+
+  @@unique([offeringId, refCode])
+  @@index([offeringId, enabled])
+  @@map("offering_schedules")
 }
 
 model DiagnosisSession {

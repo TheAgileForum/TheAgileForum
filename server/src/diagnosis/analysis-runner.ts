@@ -18,11 +18,14 @@ function buildStubRecommendation(targetRole: string | null): {
   confidence: number;
 } {
   const role = targetRole ?? "Agile professional";
+  const isPoTransition = /product owner/i.test(role);
   return {
-    readinessScore: 62,
+    readinessScore: isPoTransition ? 68 : 62,
     strengths: ["Stakeholder communication", "Delivery rhythm"],
-    gaps: ["SAFe PI planning depth", "Metrics storytelling"],
-    confidence: 0.78,
+    gaps: isPoTransition
+      ? ["Prioritization frameworks", "Product discovery"]
+      : ["SAFe PI planning depth", "Metrics storytelling"],
+    confidence: isPoTransition ? 0.55 : 0.78,
     primaryAction: {
       type: "offer",
       label: `Start ${role} readiness program`,

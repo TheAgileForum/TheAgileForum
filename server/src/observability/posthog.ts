@@ -2,6 +2,7 @@ import { PostHog } from "posthog-node";
 import { z } from "zod";
 import { getEnv } from "../config/env.js";
 import { logInfo, logWarn } from "../runtime/logger.js";
+import { validateProductEventProperties } from "./product-events.js";
 
 const posthogEventSchema = z.object({
   distinctId: z.string().min(1),
@@ -38,6 +39,20 @@ export async function captureProductEvent(input: PosthogEventInput): Promise<boo
       component: "observability",
       event: "posthog_schema_reject",
       issues: parsed.error.issues.map((issue) => `${issue.path.join(".")}:${issue.message}`),
+    });
+    return false;
+  }
+
+  const contract = validateProductEventProperties(
+    parsed.data.event,
+    parsed.data.properties as Record<string, unknown>,
+  );
+  if (!contract.ok) {
+    logWarn("PostHog event rejected by product contract", {
+      component: "observability",
+      event: "posthog_contract_reject",
+      posthogEvent: parsed.data.event,
+      issues: contract.issues,
     });
     return false;
   }

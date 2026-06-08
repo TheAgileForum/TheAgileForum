@@ -14,8 +14,9 @@ export type CheckoutPolicyError = {
 
 export function validateAddToCartLine(
   line: CartLineInput,
+  offeringOverride?: OfferingMeta,
 ): CheckoutPolicyError | null {
-  const offering = getOffering(line.offeringCode);
+  const offering = offeringOverride ?? getOffering(line.offeringCode);
   if (!offering) {
     return {
       code: "UNKNOWN_OFFERING",

@@ -12,6 +12,7 @@ import {
   signSessionToken,
 } from "../services/auth-service.js";
 import { registerUser } from "../services/registration-service.js";
+import { mergeGuestCartAfterAuth } from "../services/guest-cart-service.js";
 import {
   buildVerificationFailureRedirect,
   buildVerificationSuccessRedirect,
@@ -78,6 +79,7 @@ authRouter.post(
     const token = await signSessionToken(result.session);
     const env = getEnv();
     res.cookie(env.AUTH_COOKIE_NAME, token, getCookieOptions());
+    await mergeGuestCartAfterAuth(req, res, result.session);
 
     const user = await prisma.user.findUnique({
       where: { id: result.userId },
@@ -170,6 +172,7 @@ authRouter.post("/login", sensitiveLimiter, withBodyValidation(loginBody), async
   const token = await signSessionToken(session);
   const env = getEnv();
   res.cookie(env.AUTH_COOKIE_NAME, token, getCookieOptions());
+  await mergeGuestCartAfterAuth(req, res, session);
 
   const user = await prisma.user.findUnique({
     where: { id: session.userId },

@@ -329,6 +329,44 @@ describe.skipIf(!hasDb)("auth integration", () => {
     expect(res.body.ok).toBe(true);
   });
 
+  it("blocks CUSTOMER from admin catalog routes (FR-180)", async () => {
+    const agent = await loginCustomer();
+    const res = await agent.post("/api/v1/admin/catalog/offerings").send({
+      code: "blocked-offering",
+      title: "Blocked",
+      kind: "course",
+      category: "training",
+      scheduleBound: false,
+      examAccess: "preview_only",
+      defaultUnitPrice: "100.00",
+      roleTags: ["learner"],
+      deliveryMode: "live",
+    });
+    expect(res.status).toBe(403);
+    expect(res.body.error.code).toBe("FORBIDDEN");
+  });
+
+  it("validates admin catalog publish metadata (FR-182)", async () => {
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email: "ops@demo.local", password: "password123" })
+      .expect(200);
+
+    const bad = await agent.post("/api/v1/admin/catalog/offerings").send({
+      code: "invalid",
+      title: "Invalid",
+      kind: "course",
+      category: "training",
+      scheduleBound: true,
+      examAccess: "preview_only",
+      roleTags: [],
+      defaultUnitPrice: "100.00",
+      deliveryMode: "live",
+    });
+    expect(bad.status).toBe(400);
+  });
+
   it("completes google OAuth stub callback and sets session cookie", async () => {
     const start = await request(app)
       .get("/api/v1/auth/oauth/google/start")

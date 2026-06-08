@@ -68,6 +68,10 @@ describe.skipIf(!hasDb)("diagnosis integration (IT-01 subset)", () => {
     expect(resultRes.body.readinessScore).toBeGreaterThan(0);
     expect(resultRes.body.primaryAction).toBeDefined();
     expect(resultRes.body.primaryAction.label).toBeTruthy();
+    expect(resultRes.body.roadmapPreview).toHaveLength(3);
+    expect(resultRes.body.confidenceTier).toBe("low");
+    expect(resultRes.body.escalation).toMatchObject({ title: expect.any(String) });
+    expect(resultRes.body.secondaryActions.length).toBeGreaterThanOrEqual(3);
 
     const journeyRes = await request(app).get(`/api/v1/journey-state/${sessionId}`);
     expect(journeyRes.status).toBe(200);

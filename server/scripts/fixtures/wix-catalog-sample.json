@@ -1,0 +1,69 @@
+{
+  "offerings": [
+    {
+      "code": "wix-agile-fundamentals",
+      "title": "Agile Fundamentals (Wix Import)",
+      "kind": "course",
+      "category": "training",
+      "scheduleBound": true,
+      "examAccess": "preview_only",
+      "safeOrgPaymentEligible": false,
+      "defaultUnitPrice": "24900.00",
+      "currency": "INR",
+      "roleTags": ["learner", "scrum_master"],
+      "deliveryMode": "live",
+      "enabled": false,
+      "schedules": [
+        {
+          "refCode": "cohort-wix-2026-q3",
+          "label": "Q3 2026 Cohort",
+          "startsAt": "2026-09-01T09:00:00.000Z",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "code": "wix-safe-practitioner",
+      "title": "SAFe Practitioner (Wix Import)",
+      "kind": "course",
+      "category": "certification",
+      "scheduleBound": true,
+      "examAccess": "paid",
+      "safeOrgPaymentEligible": true,
+      "defaultUnitPrice": "899.00",
+      "currency": "USD",
+      "roleTags": ["scrum_master"],
+      "certBody": "scaled agile",
+      "deliveryMode": "live",
+      "enabled": false,
+      "schedules": [
+        {
+          "refCode": "safe-wix-jun-2026",
+          "label": "June 2026",
+          "startsAt": "2026-06-15T14:00:00.000Z",
+          "enabled": true
+        },
+        {
+          "refCode": "safe-wix-aug-2026",
+          "label": "August 2026",
+          "startsAt": "2026-08-10T14:00:00.000Z",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "code": "wix-mock-interview",
+      "title": "Mock Interview Pack (Wix Import)",
+      "kind": "service",
+      "category": "service",
+      "scheduleBound": false,
+      "examAccess": "preview_only",
+      "safeOrgPaymentEligible": false,
+      "defaultUnitPrice": "149.00",
+      "currency": "USD",
+      "roleTags": ["learner"],
+      "deliveryMode": "self_paced",
+      "enabled": true
+    }
+  ]
+}

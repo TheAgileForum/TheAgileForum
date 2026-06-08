@@ -84,3 +84,23 @@ export class StubWebinarAdapter implements WebinarAdapter {
     };
   }
 }
+
+export class StubRazorpayCheckoutAdapter {
+  provider: "stub" = "stub";
+
+  async createCheckoutSession(input: {
+    orderId: string;
+    orderNumber: string;
+    amount: string;
+    currency: string;
+  }): Promise<{ checkoutUrl: string; paymentRef: string; providerOrderId: string }> {
+    const providerOrderId = `order_stub_${input.orderNumber.toLowerCase()}`;
+    const paymentRef = `razorpay:${providerOrderId}:stub_${Date.now()}`;
+    const appUrl = process.env.APP_PUBLIC_URL?.trim() || "http://localhost:5173";
+    return {
+      providerOrderId,
+      paymentRef,
+      checkoutUrl: `${appUrl}/checkout/razorpay/stub?order=${encodeURIComponent(input.orderNumber)}&ref=${encodeURIComponent(paymentRef)}`,
+    };
+  }
+}

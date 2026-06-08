@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaClient, Role } from "@prisma/client";
 import bcrypt from "bcrypt";
+import { seedCatalogOfferingsIfEmpty } from "../src/catalog/catalog-repository.js";
 
 const prisma = new PrismaClient();
 
@@ -144,6 +145,11 @@ async function main() {
   });
 
   console.log("Seed complete:", { tenantId: tenant.id });
+
+  const catalogSeeded = await seedCatalogOfferingsIfEmpty();
+  if (catalogSeeded > 0) {
+    console.log(`Catalog seed complete: ${catalogSeeded} offerings`);
+  }
 }
 
 main()
