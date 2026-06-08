@@ -45,6 +45,9 @@ const GEO_DEFAULT_CURRENCY: Record<string, string> = {
   FR: "EUR",
 };
 
+/** Installment term shared across catalog, checkout, and payments APIs (FR-174). */
+export const INSTALLMENT_TERM_MONTHS = 6;
+
 const USD_CONVERSION_RATES: Record<string, number> = {
   USD: 1,
   INR: 83,
@@ -151,6 +154,28 @@ function amountUsdFromOffering(offering: Pick<OfferingMeta, "defaultUnitPrice">)
   return Number.parseFloat(offering.defaultUnitPrice);
 }
 
+export function buildInstallmentPlans(
+  amount: string,
+  currency: string,
+  geo: string,
+): PriceQuote["installmentPlans"] {
+  const paymentModes = resolvePaymentModes(geo);
+  const amountNum = Number.parseFloat(amount);
+  if (
+    paymentModes.installmentProviders.length === 0 ||
+    !Number.isFinite(amountNum) ||
+    amountNum <= 0
+  ) {
+    return undefined;
+  }
+  const monthly = (amountNum / INSTALLMENT_TERM_MONTHS).toFixed(2);
+  return paymentModes.installmentProviders.map((provider) => ({
+    provider,
+    monthlyAmount: monthly,
+    currency,
+  }));
+}
+
 export function quoteOfferingPrice(
   offering: Pick<OfferingMeta, "code" | "defaultUnitPrice">,
   context: CurrencyContext,
@@ -164,14 +189,11 @@ export function quoteOfferingPrice(
     currency: context.currency,
   };
 
-  if (paymentModes.installmentProviders.length > 0 && amountUsd > 0) {
-    const monthly = (Number.parseFloat(amount) / 6).toFixed(2);
-    quote.installmentPlans = paymentModes.installmentProviders.map((provider) => ({
-      provider,
-      monthlyAmount: monthly,
-      currency: context.currency,
-    }));
-  }
+  quote.installmentPlans = buildInstallmentPlans(
+    amount,
+    context.currency,
+    context.geoDetected,
+  );
 
   return quote;
 }

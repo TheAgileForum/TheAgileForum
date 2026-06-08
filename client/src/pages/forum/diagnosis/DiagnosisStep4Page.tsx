@@ -2,25 +2,29 @@ import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { DiagnosisActionModule } from "../../../components/forum/DiagnosisActionModule";
+import { DiagnosisReadinessSummary } from "../../../components/forum/DiagnosisReadinessSummary";
 import { DiagnosisStepper } from "../../../components/forum/DiagnosisStepper";
+import { RecommendationRationaleCard } from "../../../components/forum/RecommendationRationaleCard";
+import { RoadmapPreview } from "../../../components/forum/RoadmapPreview";
+import { RoleBasedUpsellRail } from "../../../components/forum/RoleBasedUpsellRail";
+import { SkillGapPanel } from "../../../components/forum/SkillGapPanel";
 import { useDiagnosis } from "../../../contexts/DiagnosisContext";
-import { getAnalysisResult, type PrimaryAction } from "../../../lib/forum-api";
+import { useForumCart } from "../../../contexts/ForumCartContext";
+import { trackEvent } from "../../../lib/analytics";
+import { getAnalysisResult, storeDiagnosisPersonalization, type AnalysisResult } from "../../../lib/forum-api";
 
 export function DiagnosisStep4Page() {
   const navigate = useNavigate();
   const { runId, sessionId } = useDiagnosis();
+  const { addItem } = useForumCart();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [readinessScore, setReadinessScore] = useState(0);
-  const [strengths, setStrengths] = useState<string[]>([]);
-  const [gaps, setGaps] = useState<string[]>([]);
-  const [primaryAction, setPrimaryAction] = useState<PrimaryAction | null>(null);
-  const [rationale, setRationale] = useState<Array<{ label: string; detail: string }>>([]);
+  const [result, setResult] = useState<AnalysisResult | null>(null);
 
   useEffect(() => {
     if (!runId) return;
@@ -29,11 +33,12 @@ export function DiagnosisStep4Page() {
       try {
         const res = await getAnalysisResult(runId);
         if (cancelled) return;
-        setReadinessScore(res.readinessScore);
-        setStrengths(res.insights.strengths);
-        setGaps(res.insights.gaps);
-        setPrimaryAction(res.primaryAction);
-        setRationale(res.rationale);
+        setResult(res);
+        storeDiagnosisPersonalization(res.targetRole, res.insights.gaps);
+        trackEvent("diagnosis_results_viewed", {
+          tier: res.confidenceTier,
+          score: res.readinessScore,
+        });
       } catch {
         if (!cancelled) setError("Results not ready yet.");
       } finally {
@@ -57,67 +62,52 @@ export function DiagnosisStep4Page() {
     );
   }
 
-  const offerCode = primaryAction?.offeringCode ?? "agile-readiness";
+  const offerCode = result?.primaryAction.offeringCode ?? "agile-readiness";
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2.5}>
       <DiagnosisStepper activeStep={3} />
-      <Typography variant="h5" sx={{ fontWeight: 600 }}>
-        Your readiness snapshot
+      <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
+        Your diagnosis results
       </Typography>
+
       {loading ? (
         <Typography color="text.secondary">Loading results…</Typography>
-      ) : error ? (
-        <Alert severity="error">{error}</Alert>
+      ) : error || !result ? (
+        <Alert severity="error">{error ?? "Could not load results."}</Alert>
       ) : (
         <>
+          <DiagnosisReadinessSummary
+            targetRole={result.targetRole}
+            readinessScore={result.readinessScore}
+            summaryPlain={result.summaryPlain}
+            confidenceTier={result.confidenceTier}
+            confidenceScore={result.insights.confidence}
+          />
+
           <Card variant="outlined">
             <CardContent>
-              <Typography variant="overline" color="text.secondary">
-                Readiness score
-              </Typography>
-              <Typography variant="h3" sx={{ fontWeight: 700 }}>
-                {readinessScore}%
-              </Typography>
+              <SkillGapPanel strengths={result.insights.strengths} gaps={result.insights.gaps} />
             </CardContent>
           </Card>
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-            <Card variant="outlined" sx={{ flex: 1 }}>
-              <CardContent>
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                  Strengths
-                </Typography>
-                {strengths.map((s) => (
-                  <Chip key={s} label={s} size="small" sx={{ mr: 0.5, mb: 0.5 }} color="success" variant="outlined" />
-                ))}
-              </CardContent>
-            </Card>
-            <Card variant="outlined" sx={{ flex: 1 }}>
-              <CardContent>
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                  Gaps
-                </Typography>
-                {gaps.map((g) => (
-                  <Chip key={g} label={g} size="small" sx={{ mr: 0.5, mb: 0.5 }} color="warning" variant="outlined" />
-                ))}
-              </CardContent>
-            </Card>
-          </Stack>
-          {rationale.map((r) => (
-            <Typography key={r.label} variant="body2" color="text.secondary">
-              <strong>{r.label}:</strong> {r.detail}
-            </Typography>
-          ))}
-          {primaryAction ? (
-            <Button
-              variant="contained"
-              size="large"
-              component={RouterLink}
-              to={`/offers/${offerCode}`}
-            >
-              {primaryAction.label}
-            </Button>
-          ) : null}
+
+          <RoadmapPreview milestones={result.roadmapPreview} />
+
+          <RecommendationRationaleCard rationale={result.rationale} />
+
+          <DiagnosisActionModule
+            primaryAction={result.primaryAction}
+            secondaryActions={result.secondaryActions}
+            escalation={result.escalation}
+            offerCode={offerCode}
+          />
+
+          <RoleBasedUpsellRail
+            targetRole={result.targetRole}
+            context="diagnosis"
+            gapTags={result.insights.gaps}
+            onAddOffering={(code) => void addItem(code).catch(() => undefined)}
+          />
         </>
       )}
     </Stack>

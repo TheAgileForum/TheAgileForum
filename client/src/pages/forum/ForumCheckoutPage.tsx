@@ -10,23 +10,37 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useEffect, useMemo, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { CheckoutPaymentModeSelector } from "../../components/forum/CheckoutPaymentModeSelector";
 import { useAuth } from "../../contexts/AuthContext";
+import { usePricing } from "../../contexts/PricingContext";
 import { ApiRequestError } from "../../lib/api";
+import { trackEvent } from "../../lib/analytics";
+import {
+  redirectAfterCheckoutStart,
+  resolveStubPaymentRef,
+} from "../../lib/checkout-redirect";
+import { getCommerceJourneyOrigin } from "../../lib/commerce-journey";
+import { formatPrice } from "../../lib/format-price";
 import {
   completeCheckout,
   getCart,
   listOfferings,
   startCheckout,
   type CartSummary,
+  type InstallmentProvider,
   type OrgReimbursementInput,
+  type PaymentMode,
 } from "../../lib/forum-api";
 
 export function ForumCheckoutPage() {
   const { user, loading } = useAuth();
+  const { currency, geo } = usePricing();
   const navigate = useNavigate();
   const [cart, setCart] = useState<CartSummary | null>(null);
   const [orgEligible, setOrgEligible] = useState(false);
   const [variant, setVariant] = useState<"standard" | "org_reimbursement">("standard");
+  const [paymentMode, setPaymentMode] = useState<PaymentMode>("full_pay");
+  const [installmentProvider, setInstallmentProvider] = useState<InstallmentProvider | null>(null);
   const [org, setOrg] = useState<OrgReimbursementInput>({
     organizationName: "",
     purchaseOrderNumber: "",
@@ -40,7 +54,7 @@ export function ForumCheckoutPage() {
 
   useEffect(() => {
     if (!user) return;
-    void Promise.all([getCart(), listOfferings()])
+    void Promise.all([getCart({ geo, currency }), listOfferings()])
       .then(([cartRes, offerings]) => {
         setCart(cartRes);
         const eligibleCodes = new Set(
@@ -51,18 +65,31 @@ export function ForumCheckoutPage() {
       .catch((err: unknown) => {
         setLoadError(err instanceof ApiRequestError ? err.message : "Could not load cart.");
       });
-  }, [user]);
+  }, [user, geo, currency]);
 
   const lineSummary = useMemo(
     () =>
       cart?.items.map((i) => (
         <Typography key={i.id} variant="body2">
           {i.offeringCode}
-          {i.scheduleRef ? ` · ${i.scheduleRef}` : ""} — {i.currency} {i.unitPrice} × {i.quantity}
+          {i.scheduleRef ? ` · ${i.scheduleRef}` : ""} — {formatPrice(i.currency, i.unitPrice)} × {i.quantity}
         </Typography>
       )),
     [cart],
   );
+
+  const confirmLabel = useMemo(() => {
+    if (variant === "org_reimbursement") {
+      return "Submit org reimbursement request";
+    }
+    if (paymentMode === "installment" && installmentProvider) {
+      return "Continue to installment checkout";
+    }
+    if (currency === "INR" || geo === "IN") {
+      return "Continue to Razorpay";
+    }
+    return "Confirm payment";
+  }, [currency, geo, installmentProvider, paymentMode, variant]);
 
   if (loading) return <LinearProgress />;
   if (!user) {
@@ -82,22 +109,49 @@ export function ForumCheckoutPage() {
     setBusy(true);
     setError(null);
     try {
-      const started = await startCheckout(
+      if (variant === "org_reimbursement") {
+        trackEvent("checkout_org_submitted");
+      }
+      if (variant === "standard" && paymentMode === "installment" && installmentProvider) {
+        trackEvent("installment_checkout_started", {
+          provider: installmentProvider,
+          origin: getCommerceJourneyOrigin(),
+        });
+      }
+      trackEvent("checkout_started", {
+        origin: getCommerceJourneyOrigin(),
         variant,
-        variant === "org_reimbursement" ? org : undefined,
-      );
-      if (started.stripeCheckoutUrl) {
-        window.location.href = started.stripeCheckoutUrl;
+        paymentMode: variant === "standard" ? paymentMode : "full_pay",
+      });
+
+      const started = await startCheckout(variant, {
+        orgReimbursement: variant === "org_reimbursement" ? org : undefined,
+        paymentMode: variant === "standard" ? paymentMode : undefined,
+        installmentProvider:
+          variant === "standard" && paymentMode === "installment"
+            ? (installmentProvider ?? undefined)
+            : undefined,
+        pricing: { geo, currency },
+      });
+
+      if (variant === "standard" && redirectAfterCheckoutStart(started, navigate)) {
         return;
       }
+
       const paymentRef =
-        variant === "org_reimbursement" ? `org-po-${org.purchaseOrderNumber.trim()}` : undefined;
+        variant === "org_reimbursement"
+          ? `org-po-${org.purchaseOrderNumber.trim()}`
+          : resolveStubPaymentRef(started);
+
       const done = await completeCheckout(started.orderId, paymentRef);
       navigate("/checkout/success", {
         state: {
           orderNumber: done.order.orderNumber,
           orderId: done.order.id,
           variant: started.variant,
+          paymentMode: started.paymentMode ?? "full_pay",
+          installmentProvider: started.installmentProvider ?? null,
+          paymentProvider: started.paymentProvider ?? null,
         },
       });
     } catch (err) {
@@ -126,7 +180,7 @@ export function ForumCheckoutPage() {
           {lineSummary}
           {cart ? (
             <Typography sx={{ mt: 1, fontWeight: 600 }}>
-              Subtotal {cart.currency} {cart.subtotal}
+              Subtotal {formatPrice(cart.currency, cart.subtotal)}
             </Typography>
           ) : (
             <LinearProgress sx={{ mt: 1 }} />
@@ -139,7 +193,7 @@ export function ForumCheckoutPage() {
           value={variant}
           onChange={(e) => setVariant(e.target.value as "standard" | "org_reimbursement")}
         >
-          <FormControlLabel value="standard" control={<Radio />} label="Pay now (card or stub)" />
+          <FormControlLabel value="standard" control={<Radio />} label="Pay now (card or installment)" />
           <FormControlLabel
             value="org_reimbursement"
             control={<Radio />}
@@ -173,11 +227,30 @@ export function ForumCheckoutPage() {
             fullWidth
           />
         </Stack>
-      ) : (
-        <Typography variant="body2" color="text.secondary">
-          Standard checkout uses stub payment when Stripe is not configured.
-        </Typography>
-      )}
+      ) : cart ? (
+        <CheckoutPaymentModeSelector
+          cartSubtotal={cart.subtotal}
+          cartCurrency={cart.currency}
+          paymentMode={paymentMode}
+          installmentProvider={installmentProvider}
+          onPaymentModeChange={setPaymentMode}
+          onInstallmentProviderChange={setInstallmentProvider}
+        />
+      ) : null}
+
+      <Box
+        sx={{
+          border: 1,
+          borderStyle: "dashed",
+          borderColor: "divider",
+          borderRadius: 1,
+          p: 1.5,
+          fontSize: 13,
+          color: "text.secondary",
+        }}
+      >
+        Have a code? Coupon field collapsed here — not marketed on catalog (FR-179).
+      </Box>
 
       {busy ? <LinearProgress /> : null}
       {error ? <Alert severity="error">{error}</Alert> : null}
@@ -187,7 +260,7 @@ export function ForumCheckoutPage() {
         disabled={busy || emptyCart || !cart}
         onClick={() => void pay()}
       >
-        {variant === "org_reimbursement" ? "Submit org reimbursement request" : "Confirm payment"}
+        {confirmLabel}
       </Button>
     </Stack>
   );

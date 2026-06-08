@@ -11,6 +11,7 @@ import { requestIdMiddleware } from "./middleware/request-id.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { corsMiddleware, securityHeadersMiddleware } from "./middleware/security.js";
 import { stripeWebhookRouter } from "./routes/stripe-webhook.routes.js";
+import { paymentsRouter } from "./routes/payments.routes.js";
 import { pricingRouter } from "./routes/pricing.routes.js";
 import { recommendationsRouter } from "./routes/recommendations.routes.js";
 
@@ -34,6 +35,7 @@ export function createApp() {
   app.use("/api/v1/diagnosis", diagnosisRouter);
   app.use("/api/v1/journey-state", journeyStateRouter);
   app.use("/api/v1/pricing", pricingRouter);
+  app.use("/api/v1/payments", paymentsRouter);
   app.use("/api/v1/recommendations", recommendationsRouter);
   app.use(errorHandler);
   return app;

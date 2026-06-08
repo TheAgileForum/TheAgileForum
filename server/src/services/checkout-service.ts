@@ -12,6 +12,7 @@ import type { SessionClaims } from "./auth-service.js";
 import { getOrCreateActiveCart, serializeCart } from "./cart-service.js";
 import type { PricingHttpInput } from "../pricing/pricing-service.js";
 import {
+  buildInstallmentPlans,
   quoteOfferingPrice,
   resolveCartLineTotals,
   resolveCurrencyContext,
@@ -181,16 +182,11 @@ export async function startCheckout(
     resolvePaymentModes(context.geoDetected).installmentProviders.includes("razorpay_emi")
   ) {
     paymentProvider = "razorpay";
-    const subtotalAmount = Number.parseFloat(priced.subtotal);
-    if (subtotalAmount > 0) {
-      razorpayEmiPlans = [
-        {
-          provider: "razorpay_emi",
-          monthlyAmount: (subtotalAmount / 6).toFixed(2),
-          currency: priced.currency,
-        },
-      ];
-    }
+    razorpayEmiPlans = buildInstallmentPlans(
+      priced.subtotal,
+      priced.currency,
+      context.geoDetected,
+    );
     const stubSession = await createRazorpayCheckoutSession({
       orderId: order.id,
       orderNumber: order.orderNumber,
