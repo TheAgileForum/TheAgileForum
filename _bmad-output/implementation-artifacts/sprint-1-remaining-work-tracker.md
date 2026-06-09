@@ -2,7 +2,7 @@
 
 **Project:** The Agile Forum  
 **Branch:** `sprint/s1-foundation-revenue-slice`  
-**Last updated:** 2026-05-31  
+**Last updated:** 2026-06-08  
 **Purpose:** Single checklist for open gaps called out in delivery review. Keep this file updated as items close.
 
 ---
@@ -173,11 +173,16 @@
 
 Quick reference — detail in `s1-3-ux-implementation-epics-stories-tasks.md`:
 
-- [ ] UX-01.1: proof strip, sticky mobile CTA, journey resume API, PostHog events.
-- [ ] UX-01.3: real file upload, drag/drop, autosave, scan hook.
-- [ ] UX-01.4: timeout fallback + support link.
-- [ ] UX-02.1/02.2: roadmap preview, a11y alternatives, low-confidence escalation.
-- [ ] UX-03.1: offer trust block, policy links, pricing consistency with checkout.
+- [x] UX-01.1: proof strip, sticky mobile CTA, journey resume (journey-state API), Clarity analytics events. _(2026-06-08: ForumHomePage + analytics.ts.)_
+- [x] UX-01.3: drag/drop upload, draft autosave, metadata upload path. _(2026-06-08: ResumeDropZone + step-2 draft.)_ · [ ] real binary upload + virus-scan hook (BE).
+- [x] UX-01.4: timeout fallback + support link. _(2026-06-08: step-3 poll timeout ~60s.)_
+- [x] UX-02.1/02.2: roadmap preview (API-driven), chips/table a11y toggle, low-confidence escalation + mentor CTA, secondary actions. _(2026-06-08: result-enrichment BE + diagnosis results components.)_
+- [x] UX-03.1: offer trust block, policy links, pricing consistency with checkout. _(2026-06-08: OfferPage + formatPrice.)_
+- [x] UX-08.1/08.2 (partial): `/trainings`, `/certifications`, `/services` listings, URL-synced filters, secondary nav, guest cart + badge, session currency selector. _(2026-06-08.)_
+- [x] UX-08.3–08.5 (partial): cart remove/qty, upsell rail, catalog facets API, `commerce_journey_origin` on checkout. _(2026-06-08.)_
+- [x] UX-09.1 (partial): EMI preview module on catalog cards + offer + checkout note (geo-asymmetric stub). _(2026-06-08.)_
+- [ ] UX-09.2+: checkout EMI payment mode UI, gateway plan parity (FR-174).
+- [x] UX-10/11: full FR-178 price resolver BE, upsell personalization from diagnosis role. _(2026-06-08: PricingContext + resolver quotes on catalog/offer/cart; upsell API with gap ranking + session currency.)_
 
 ---
 
