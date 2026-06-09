@@ -10,7 +10,7 @@ Sprint 0 includes setup and enablers only. Avoid building full user-facing produ
 
 ## Story Set (Sprint 0)
 
-- `S0.1` Repo + Standards + CI Baseline
+- `pull`
 - `S0.2` Environment and Secrets Setup (Dev/Stage)
 - `S0.3` Backend Runtime Skeleton (API + Worker + Scheduler)
 - `S0.4` Supabase Data Baseline (Schema, Migrations, Seeds)

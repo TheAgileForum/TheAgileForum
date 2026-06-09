@@ -56,10 +56,13 @@ const checks: Check[] = [
 ];
 
 function runCheck(check: Check): CheckResult {
+  const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+  const serverRoot = path.join(scriptDir, "..");
   const result = spawnSync(check.command, {
     shell: true,
     encoding: "utf8",
     stdio: "pipe",
+    cwd: serverRoot,
     env: { ...process.env, NODE_ENV: process.env.NODE_ENV ?? "test" },
   });
 

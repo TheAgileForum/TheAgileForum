@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Agile Forum - UX Design Directions</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #111a2e;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --line: #334155;
+      --accent: #2563eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      background: linear-gradient(180deg, #08101d, #0b1220);
+      color: var(--text);
+    }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 24px; }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    p { margin: 0 0 16px; color: var(--muted); }
+    .grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    }
+    .card {
+      background: rgba(17, 26, 46, 0.9);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    .card h2 {
+      margin: 0;
+      padding: 14px 16px;
+      font-size: 18px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(15, 23, 42, 0.85);
+    }
+    .meta {
+      padding: 0 16px 10px;
+      color: #cbd5e1;
+      font-size: 13px;
+    }
+    .preview {
+      margin: 0 12px 12px;
+      border-radius: 12px;
+      border: 1px solid #1f2937;
+      background: #0f172a;
+      min-height: 280px;
+      overflow: hidden;
+      position: relative;
+    }
+    .topbar {
+      height: 38px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+    .body { padding: 12px; display: grid; gap: 10px; }
+    .hero { border-radius: 10px; padding: 12px; font-weight: 600; }
+    .line { height: 8px; border-radius: 6px; background: rgba(255,255,255,0.2); }
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .box { border-radius: 10px; padding: 10px; min-height: 72px; }
+    .chip { display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: 11px; margin-right: 6px; }
+    .legend { padding: 0 12px 14px; font-size: 12px; color: #cbd5e1; }
+    .d1 .hero { background: linear-gradient(135deg, #1e3a8a, #0f766e); }
+    .d1 .box { background: #12203f; border: 1px solid #1d4ed8; }
+    .d2 .hero { background: linear-gradient(135deg, #0f172a, #334155); }
+    .d2 .box { background: #1e293b; border: 1px solid #475569; }
+    .d3 .hero { background: linear-gradient(135deg, #065f46, #0f766e); }
+    .d3 .box { background: #052e2b; border: 1px solid #0d9488; }
+    .d4 .hero { background: linear-gradient(135deg, #1e3a8a, #1d4ed8); }
+    .d4 .box { background: #172554; border: 1px solid #3b82f6; }
+    .d5 .hero { background: linear-gradient(135deg, #7c2d12, #f59e0b); }
+    .d5 .box { background: #451a03; border: 1px solid #f59e0b; }
+    .d6 .hero { background: linear-gradient(135deg, #0f172a, #0b1020); }
+    .d6 .box { background: #111827; border: 1px solid #374151; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>The Agile Forum - Design Direction Showcase</h1>
+    <p>Six visual directions aligned to the same UX strategy. Compare layout intuitiveness, visual weight, trust tone, and CTA clarity.</p>
+
+    <div class="grid">
+      <article class="card d1">
+        <h2>Direction 1 - Balanced Mentor</h2>
+        <div class="meta">Blue + teal trust blend | medium density | strongest default candidate</div>
+        <div class="preview">
+          <div class="topbar"><span>Home</span><span>Diagnose · AI Coach · Profile</span></div>
+          <div class="body">
+            <div class="hero">Find your fastest role-transition path</div>
+            <div class="line" style="width:78%"></div>
+            <div class="cols"><div class="box">Skill Gap Snapshot</div><div class="box">Next Best Action</div></div>
+            <div><span class="chip" style="background:#1d4ed8">Start Diagnosis</span><span class="chip" style="background:#0d9488">Book Mentor Call</span></div>
+          </div>
+        </div>
+        <div class="legend">Great for confidence + momentum balance across discovery and dashboard.</div>
+      </article>
+
+      <article class="card d2">
+        <h2>Direction 2 - Minimal Professional</h2>
+        <div class="meta">Neutral-first, low saturation | calm authority | low distraction</div>
+        <div class="preview">
+          <div class="topbar"><span>Dashboard</span><span>Progress · Recommendations</span></div>
+          <div class="body">
+            <div class="hero">Your readiness index and pathway</div>
+            <div class="line" style="width:65%"></div>
+            <div class="cols"><div class="box">Role Fit</div><div class="box">Roadmap Week 1-8</div></div>
+            <div><span class="chip" style="background:#334155">Continue Plan</span></div>
+          </div>
+        </div>
+        <div class="legend">Best for serious, premium positioning with less promotional feeling.</div>
+      </article>
+
+      <article class="card d3">
+        <h2>Direction 3 - Growth Lab</h2>
+        <div class="meta">Teal-forward | progress cues | coaching and learning energy</div>
+        <div class="preview">
+          <div class="topbar"><span>Diagnose</span><span>Resume · Role · Gaps</span></div>
+          <div class="body">
+            <div class="hero">Translate your current profile into a growth plan</div>
+            <div class="line" style="width:82%"></div>
+            <div class="cols"><div class="box">Input Coach</div><div class="box">Gap Highlights</div></div>
+            <div><span class="chip" style="background:#0f766e">Run Analysis</span><span class="chip" style="background:#0891b2">AI Explain</span></div>
+          </div>
+        </div>
+        <div class="legend">Strong coaching tone; good if transformation is primary story.</div>
+      </article>
+
+      <article class="card d4">
+        <h2>Direction 4 - Data Confidence</h2>
+        <div class="meta">Blue-forward | metric-first layout | analytical clarity</div>
+        <div class="preview">
+          <div class="topbar"><span>Learner Cockpit</span><span>Metrics · Trends · Actions</span></div>
+          <div class="body">
+            <div class="hero">See where you stand and what to do next</div>
+            <div class="line" style="width:72%"></div>
+            <div class="cols"><div class="box">Skill Scores</div><div class="box">Recommended Offers</div></div>
+            <div><span class="chip" style="background:#2563eb">Take Micro-Exam</span></div>
+          </div>
+        </div>
+        <div class="legend">Excellent for dashboard-led engagement and trust through data.</div>
+      </article>
+
+      <article class="card d5">
+        <h2>Direction 5 - Momentum Accent</h2>
+        <div class="meta">Amber accent moments | strong CTA emphasis | urgency controls required</div>
+        <div class="preview">
+          <div class="topbar"><span>Offers</span><span>Recommended Pathways</span></div>
+          <div class="body">
+            <div class="hero">One best-fit path to accelerate your transition</div>
+            <div class="line" style="width:70%"></div>
+            <div class="cols"><div class="box">Pathway Card</div><div class="box">Pricing + Trust</div></div>
+            <div><span class="chip" style="background:#f59e0b;color:#111827">Enroll Now</span></div>
+          </div>
+        </div>
+        <div class="legend">Useful for conversion sections; should not dominate all pages.</div>
+      </article>
+
+      <article class="card d6">
+        <h2>Direction 6 - Enterprise Calm Dark</h2>
+        <div class="meta">Dark mode default | premium and focused | high contrast controls</div>
+        <div class="preview">
+          <div class="topbar"><span>AI Coach</span><span>Context-aware guidance</span></div>
+          <div class="body">
+            <div class="hero">Ask, validate, and act with confidence</div>
+            <div class="line" style="width:75%"></div>
+            <div class="cols"><div class="box">Conversation</div><div class="box">Action Suggestions</div></div>
+            <div><span class="chip" style="background:#4f46e5">Try AI Coach</span></div>
+          </div>
+        </div>
+        <div class="legend">Good optional theme or advanced user preference mode.</div>
+      </article>
+    </div>
+  </div>
+</body>
+</html>

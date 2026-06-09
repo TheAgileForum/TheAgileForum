@@ -20,7 +20,7 @@ export function CartPage() {
           Cart
         </Typography>
         <Typography color="text.secondary">Your cart is empty.</Typography>
-        <Button variant="contained" component={RouterLink} to="/menu">
+        <Button variant="contained" component={RouterLink} to="/demo/menu">
           Back to menu
         </Button>
       </Stack>
@@ -60,7 +60,7 @@ export function CartPage() {
         <Typography variant="h6">Total</Typography>
         <Typography variant="h6">${(totalCents / 100).toFixed(2)}</Typography>
       </Stack>
-      <Button variant="contained" size="large" component={RouterLink} to="/checkout">
+      <Button variant="contained" size="large" component={RouterLink} to="/demo/checkout">
         Proceed to checkout
       </Button>
     </Stack>

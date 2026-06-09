@@ -1,11 +1,12 @@
 ---
 
 ## stepsCompleted:
-  - requirements-extracted
-  - epics-designed
-  - stories-defined
+
+- requirements-extracted
+- epics-designed
+- stories-defined
 inputDocuments:
-  - "c:/Users/dhire/OneDrive/Documents/mybmadproj/_bmad-output/planning-artifacts/prd-agile-forum.md"
+- "c:/Users/dhire/OneDrive/Documents/mybmadproj/_bmad-output/planning-artifacts/prd-agile-forum.md"
 
 # mybmadproj - Epic Breakdown (Agile Forum MVP)
 
@@ -58,20 +59,21 @@ This document translates `prd-agile-forum.md` into implementable MVP epics and s
 ### FR Coverage Map
 
 
-| Epic    | FR Coverage (primary)                            |
-| ------- | ------------------------------------------------ |
-| Epic 1  | FR-1..3, FR-151                                  |
-| Epic 2  | FR-4..7, FR-61..64, FR-158..160                  |
-| Epic 3  | FR-8..11, FR-131, FR-132                         |
-| Epic 4  | FR-12..16, FR-85..87, FR-157                     |
-| Epic 5  | FR-20..22, FR-88..91, FR-126..130                |
-| Epic 6  | FR-108..116, FR-140..143, FR-136..139            |
-| Epic 7  | FR-30..34, FR-79..84, FR-49..51                  |
+| Epic    | FR Coverage (primary)                                     |
+| ------- | --------------------------------------------------------- |
+| Epic 1  | FR-1..3, FR-151                                           |
+| Epic 2  | FR-4..7, FR-61..64, FR-158..160                           |
+| Epic 3  | FR-8..11, FR-131, FR-132                                  |
+| Epic 4  | FR-12..16, FR-85..87, FR-157                              |
+| Epic 5  | FR-20..22, FR-88..91, FR-126..130                         |
+| Epic 6  | FR-108..116, FR-140..143, FR-136..139                     |
+| Epic 7  | FR-30..34, FR-79..84, FR-49..51                           |
 | Epic 8  | FR-17..19, FR-23..29, FR-35..41, FR-121..125, FR-144..146 |
-| Epic 9  | FR-52..60, FR-133..135, FR-147..150, FR-154..156 |
-| Epic 10 | FR-65..78, FR-92..95                             |
-| Epic 11 | FR-96..107                                       |
-| Epic 12 | FR-42..45, FR-46..48, NFR clusters               |
+| Epic 9  | FR-52..60, FR-133..135, FR-147..150, FR-154..156          |
+| Epic 10 | FR-65..78, FR-92..95                                      |
+| Epic 11 | FR-96..107                                                |
+| Epic 12 | FR-42..45, FR-46..48, NFR clusters                        |
+
 
 ### PRD Recheck Result (Coverage Status)
 
@@ -79,7 +81,6 @@ This document translates `prd-agile-forum.md` into implementable MVP epics and s
 - Previously under-traced areas were `FR-17..19`, `FR-35..41`, and explicit `FR-108..111` mapping.
 - This revised epic/story set now includes those gaps via Epic 6 and Epic 8 story expansions and technical tasks.
 - NFR coverage remains primarily enforced through Epics 10-12 technical layers.
-
 
 ## Epic List
 
@@ -428,11 +429,12 @@ As a visitor, I want complete About/Contact/FAQ and inquiry forms so that I can 
 
 ### Story 8.5: Discovery Call Booking and Interview-Question Hubs
 
-As a registered learner, I want free discovery call booking and role-tagged interview-question pages so that I can plan my next steps.
+As a registered learner, I want paid discovery/mentor call booking with geo-priced fees and role-tagged interview-question pages so that I can plan my next steps.
 
 **Acceptance Criteria**
 
-- Given an authenticated learner, when discovery-call booking is opened, then slot-based scheduling with confirmation notification is available.
+- Given an authenticated learner, when discovery-call booking is opened, then slot-based scheduling with geo-priced fee display is available (`$9` for USA, `INR 49` for India).
+- Given booking confirmation, when payment is submitted, then the system validates geo/currency and records a paid booking.
 - Given interview-question content, when published via blogs, then pages are organized by role/certification/difficulty and remain discoverable from conversion surfaces.
 
 ### Story 8.6: Editorial, Claims, and Proof Governance
@@ -622,12 +624,15 @@ This section adds non-functional delivery work that must run alongside product s
 ## Epic 1 Technical Layer (Identity and Access Foundation)
 
 ### Architecture Story A1.1: Auth Architecture Baseline
+
 As a solution architect, I want a standardized auth/session architecture so that all user journeys use one secure identity model.
 
 ### Enabler Story E1.1: Identity Integration Enabler
+
 As an engineering team, we need reusable auth middleware and guards so that features can enforce auth consistently.
 
 ### Technical Tasks
+
 - T1.1 Create auth service contract (signup/login/OAuth/session/refresh/logout).
 - T1.2 Implement JWT/session lifecycle policy with expiry and refresh semantics.
 - T1.3 Implement RBAC primitives (visitor, learner, admin, mentor, support, super-admin).
@@ -638,12 +643,15 @@ As an engineering team, we need reusable auth middleware and guards so that feat
 ## Epic 2 Technical Layer (Diagnosis and Transition Planner)
 
 ### Architecture Story A2.1: Career Intelligence Data Model
+
 As an architect, I want a normalized role/skill/pathway model so that planners and recommendations are explainable.
 
 ### Enabler Story E2.1: Transition Pathway Catalog Enabler
+
 As product+engineering, we need seedable Role X->Y pathway definitions so that roadmap generation is deterministic.
 
 ### Technical Tasks
+
 - T2.1 Define entities: roles, skills, pathway templates, tasks, certs, exams, trainings.
 - T2.2 Implement resume/JD ingestion pipeline interface and result storage.
 - T2.3 Build pathway selection API returning predefined options with metadata.
@@ -654,12 +662,15 @@ As product+engineering, we need seedable Role X->Y pathway definitions so that r
 ## Epic 3 Technical Layer (Learner Dashboard and Assessments)
 
 ### Architecture Story A3.1: Dashboard View-Model Service
+
 As an architect, I want a composable dashboard view-model API so UI can render charts/accessibility views consistently.
 
 ### Enabler Story E3.1: Visualization and Accessibility Enabler
+
 As frontend engineering, we need reusable chart + accessibility components for bar/radar + text/table fallbacks.
 
 ### Technical Tasks
+
 - T3.1 Implement dashboard aggregate endpoint (scores, trends, saved items, recommendations).
 - T3.2 Build chart adapter supporting bar/radar mode switches.
 - T3.3 Build accessible summary/table fallback component.
@@ -670,12 +681,15 @@ As frontend engineering, we need reusable chart + accessibility components for b
 ## Epic 4 Technical Layer (Commerce and Checkout Flows)
 
 ### Architecture Story A4.1: Commerce Workflow Architecture
+
 As an architect, I want clear checkout state transitions so standard and org-reimbursement flows are reliable.
 
 ### Enabler Story E4.1: Payments and Schedule Validation Enabler
+
 As engineering, we need reusable validators for schedule-bound add-to-cart and payment route branching.
 
 ### Technical Tasks
+
 - T4.1 Define cart schema including attached schedule reference.
 - T4.2 Implement schedule-required validation on add-to-cart.
 - T4.3 Implement paid/free exam gating middleware.
@@ -686,12 +700,15 @@ As engineering, we need reusable validators for schedule-bound add-to-cart and p
 ## Epic 5 Technical Layer (AI Chat, Guidance, Quality Feedback)
 
 ### Architecture Story A5.1: AI Orchestration and Safety Layer
+
 As an architect, I want a central AI orchestration layer so prompt policy, guardrails, and routing are controlled.
 
 ### Enabler Story E5.1: Feedback Intelligence Enabler
+
 As AI operations, we need a closed-loop feedback ingestion and triage workflow for response quality evolution.
 
 ### Technical Tasks
+
 - T5.1 Build chat orchestration API with context retrieval + response policy enforcement.
 - T5.2 Implement conversion-safe claim templates and disclaimer injection.
 - T5.3 Implement per-message helpful/correct feedback capture.
@@ -702,12 +719,15 @@ As AI operations, we need a closed-loop feedback ingestion and triage workflow f
 ## Epic 6 Technical Layer (Role-Based Offerings and Course Detail)
 
 ### Architecture Story A6.1: Offering Metadata and Catalog Model
+
 As an architect, I want a role-aware catalog schema so recommendations and page rendering remain consistent.
 
 ### Enabler Story E6.1: Course Detail Publishing Enabler
+
 As content ops, we need a standard course detail schema (brochure/schedule/fees/etc.) enforced by CMS workflows.
 
 ### Technical Tasks
+
 - T6.1 Define offering metadata schema (role tags, prerequisites, outcomes, sequence).
 - T6.2 Build role-mapping validation checks at publish time.
 - T6.3 Implement course detail schema validator (brochure/schedule/fees/details).
@@ -720,12 +740,15 @@ As content ops, we need a standard course detail schema (brochure/schedule/fees/
 ## Epic 7 Technical Layer (Webinar Lifecycle)
 
 ### Architecture Story A7.1: Webinar Event and Artifact Architecture
+
 As an architect, I want one webinar domain model for schedule, attendance, feedback, certificates, recordings.
 
 ### Enabler Story E7.1: Attendance Verification Enabler
+
 As operations, we need secure attendance-code verification in dashboard self-service.
 
 ### Technical Tasks
+
 - T7.1 Implement webinar schedule and registration services.
 - T7.2 Implement attendance code issue/verify pipeline.
 - T7.3 Implement certificate eligibility and generation job.
@@ -736,12 +759,15 @@ As operations, we need secure attendance-code verification in dashboard self-ser
 ## Epic 8 Technical Layer (Community and Social Trust)
 
 ### Architecture Story A8.1: Trust Surface Composition Architecture
+
 As an architect, I want composable trust widgets so social/community proof remains consistent sitewide.
 
 ### Enabler Story E8.1: Social Channel Governance Enabler
+
 As marketing ops, we need controlled management of official social links and embeds.
 
 ### Technical Tasks
+
 - T8.1 Implement global trust widget registry (social links, proofs, footer links).
 - T8.2 Implement social CTA tracking and return-attribution hooks.
 - T8.3 Implement footer link policy validator (legal/policy/T&C/affiliate/partnership/contact).
@@ -754,12 +780,15 @@ As marketing ops, we need controlled management of official social links and emb
 ## Epic 9 Technical Layer (Automation and Notifications)
 
 ### Architecture Story A9.1: Event-Driven Campaign Orchestration
+
 As an architect, I want an event-driven campaign engine so triggers are consistent and extensible.
 
 ### Enabler Story E9.1: Multi-Channel Delivery Enabler
+
 As platform engineering, we need unified delivery abstractions for email, Telegram, and future channels.
 
 ### Technical Tasks
+
 - T9.1 Define canonical campaign trigger events and payload contracts.
 - T9.2 Build orchestration rules engine (cart, inactivity, scholarship, interest, post-order).
 - T9.3 Implement notification preference center + enforcement.
@@ -770,12 +799,15 @@ As platform engineering, we need unified delivery abstractions for email, Telegr
 ## Epic 10 Technical Layer (Admin Command Center)
 
 ### Architecture Story A10.1: Admin Control Plane Architecture
+
 As an architect, I want modular admin domains (campaigns, AI quality, content, alerts) with auditability.
 
 ### Enabler Story E10.1: Ops Workbench Enabler
+
 As ops teams, we need triage queues and decision tooling for interventions/approvals.
 
 ### Technical Tasks
+
 - T10.1 Build admin command center backend aggregation APIs.
 - T10.2 Build anomaly detection and probable-cause scoring pipeline.
 - T10.3 Build approval workflow service (high-impact actions).
@@ -786,12 +818,15 @@ As ops teams, we need triage queues and decision tooling for interventions/appro
 ## Epic 11 Technical Layer (Search Growth Platform)
 
 ### Architecture Story A11.1: Search Operations Architecture
+
 As an architect, I want search diagnostics, schema generation, and content optimization in one system.
 
 ### Enabler Story E11.1: SEO/GEO Workflow Enabler
+
 As growth/content teams, we need keyword mapping and refresh workflows with operational checks.
 
 ### Technical Tasks
+
 - T11.1 Integrate search diagnostics ingestion (GSC/Bing/webmaster sources).
 - T11.2 Implement schema generation/validation jobs by template.
 - T11.3 Implement keyword-to-page/CTA mapping repository.
@@ -802,12 +837,15 @@ As growth/content teams, we need keyword mapping and refresh workflows with oper
 ## Epic 12 Technical Layer (Cutover, Reliability, Compliance)
 
 ### Architecture Story A12.1: Launch and Reliability Guardrail Architecture
+
 As an architect, I want explicit cutover and rollback control planes for safe migration.
 
 ### Enabler Story E12.1: Compliance and Observability Enabler
+
 As platform governance, we need proactive compliance checks and full-stack observability.
 
 ### Technical Tasks
+
 - T12.1 Build redirect map validation tool and pre-launch checker.
 - T12.2 Implement sitemap/canonical/robots health monitors.
 - T12.3 Implement alerting playbooks for 404/5xx/checkout regressions.

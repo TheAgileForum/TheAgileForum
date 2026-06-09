@@ -11,10 +11,41 @@ import {
   getCookieOptions,
   signSessionToken,
 } from "../services/auth-service.js";
+import { registerUser } from "../services/registration-service.js";
+import { mergeGuestCartAfterAuth } from "../services/guest-cart-service.js";
+import {
+  buildVerificationFailureRedirect,
+  buildVerificationSuccessRedirect,
+  isEmailVerified,
+  issueEmailVerification,
+  requireEmailVerificationEnabled,
+  verifyEmailByToken,
+} from "../services/email-verification-service.js";
+
+function serializeAuthUser(
+  user: { id: string; email: string; emailVerifiedAt: Date | null },
+  session: { role: string; tenantId: string | null; tenantIds: string[] },
+) {
+  return {
+    id: user.id,
+    email: user.email,
+    role: session.role,
+    tenantId: session.tenantId,
+    tenantIds: session.tenantIds,
+    emailVerified: isEmailVerified(user),
+  };
+}
 
 const loginBody = z.object({
   email: z.string().email(),
   password: z.string().min(1),
+});
+
+const registerBody = z.object({
+  email: z.string().email(),
+  password: z.string().min(8).max(128),
+  policyVersion: z.string().min(1),
+  acceptTerms: z.literal(true),
 });
 
 const consentBody = z.object({
@@ -31,13 +62,101 @@ const unsubscribeBody = z.object({
 export const authRouter = Router();
 const sensitiveLimiter = createRateLimitMiddleware("auth-sensitive");
 
-authRouter.post("/register", (_req, res) => {
-  return res.status(501).json({
-    error: {
-      code: "NOT_IMPLEMENTED",
-      message: "Registration contract reserved for Sprint 1 implementation",
-    },
-  });
+authRouter.post(
+  "/register",
+  sensitiveLimiter,
+  withBodyValidation(registerBody),
+  async (req, res) => {
+    const body = req.body as z.infer<typeof registerBody>;
+    const result = await registerUser(body);
+    if (!result.ok) {
+      const status = result.code === "EMAIL_ALREADY_REGISTERED" ? 409 : 400;
+      return res.status(status).json({
+        error: { code: result.code, message: result.message },
+      });
+    }
+
+    const token = await signSessionToken(result.session);
+    const env = getEnv();
+    res.cookie(env.AUTH_COOKIE_NAME, token, getCookieOptions());
+    await mergeGuestCartAfterAuth(req, res, result.session);
+
+    const user = await prisma.user.findUnique({
+      where: { id: result.userId },
+      select: { id: true, email: true, emailVerifiedAt: true },
+    });
+
+    return res.status(201).json({
+      user: serializeAuthUser(user!, result.session),
+      emailVerificationSent: !result.emailVerified,
+    });
+  },
+);
+
+const oauthProviders = ["google", "linkedin"] as const;
+
+authRouter.get("/oauth/:provider/start", async (req, res, next) => {
+  try {
+    const provider = req.params.provider;
+    if (!oauthProviders.includes(provider as (typeof oauthProviders)[number])) {
+      return res.status(400).json({
+        error: { code: "UNKNOWN_OAUTH_PROVIDER", message: "Unsupported OAuth provider" },
+      });
+    }
+    const { buildOAuthStartUrl, isOAuthProviderSupported } = await import(
+      "../services/oauth-service.js"
+    );
+    if (!isOAuthProviderSupported(provider)) {
+      return res.status(400).json({
+        error: { code: "UNKNOWN_OAUTH_PROVIDER", message: "Unsupported OAuth provider" },
+      });
+    }
+    const oauthProvider = provider as (typeof oauthProviders)[number];
+    const url = await buildOAuthStartUrl(oauthProvider);
+    return res.redirect(url);
+  } catch (error) {
+    if (error instanceof Error && error.message === "OAUTH_NOT_CONFIGURED") {
+      return res.status(501).json({
+        error: {
+          code: "OAUTH_NOT_CONFIGURED",
+          message: "OAuth provider credentials are not configured",
+        },
+      });
+    }
+    return next(error);
+  }
+});
+
+authRouter.get("/oauth/:provider/callback", async (req, res, next) => {
+  try {
+    const provider = req.params.provider;
+    if (!oauthProviders.includes(provider as (typeof oauthProviders)[number])) {
+      return res.status(400).json({
+        error: { code: "UNKNOWN_OAUTH_PROVIDER", message: "Unsupported OAuth provider" },
+      });
+    }
+    const code = typeof req.query.code === "string" ? req.query.code : "";
+    const state = typeof req.query.state === "string" ? req.query.state : "";
+    if (!code || !state) {
+      return res.status(400).json({
+        error: { code: "OAUTH_CALLBACK_INVALID", message: "Missing code or state" },
+      });
+    }
+    const { completeOAuthLogin } = await import("../services/oauth-service.js");
+    const oauthProvider = provider as (typeof oauthProviders)[number];
+    const result = await completeOAuthLogin(oauthProvider, code, state);
+    const env = getEnv();
+    res.cookie(env.AUTH_COOKIE_NAME, result.token, getCookieOptions());
+    return res.redirect(result.returnUrl);
+  } catch (error) {
+    const appUrl = process.env.APP_PUBLIC_URL?.trim() || "http://localhost:5173";
+    const fail = new URL("/login", appUrl);
+    fail.searchParams.set("oauth", "error");
+    if (error instanceof Error) {
+      fail.searchParams.set("reason", error.message);
+    }
+    return res.redirect(fail.toString());
+  }
 });
 
 authRouter.post("/login", sensitiveLimiter, withBodyValidation(loginBody), async (req, res) => {
@@ -55,21 +174,42 @@ authRouter.post("/login", sensitiveLimiter, withBodyValidation(loginBody), async
   const token = await signSessionToken(session);
   const env = getEnv();
   res.cookie(env.AUTH_COOKIE_NAME, token, getCookieOptions());
+  await mergeGuestCartAfterAuth(req, res, session);
 
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
-    select: { id: true, email: true },
+    select: { id: true, email: true, emailVerifiedAt: true },
   });
 
   return res.json({
-    user: {
-      id: user!.id,
-      email: user!.email,
-      role: session.role,
-      tenantId: session.tenantId,
-      tenantIds: session.tenantIds,
-    },
+    user: serializeAuthUser(user!, session),
   });
+});
+
+authRouter.get("/verify-email", async (req, res) => {
+  const token = typeof req.query.token === "string" ? req.query.token : "";
+  const result = await verifyEmailByToken(token);
+  if (!result.ok) {
+    return res.redirect(buildVerificationFailureRedirect(result.code));
+  }
+  return res.redirect(buildVerificationSuccessRedirect());
+});
+
+authRouter.post("/verify-email/resend", requireAuth, sensitiveLimiter, async (req, res) => {
+  const user = await prisma.user.findUnique({
+    where: { id: req.auth!.userId },
+    select: { id: true, email: true, emailVerifiedAt: true },
+  });
+  if (!user) {
+    return res.status(404).json({
+      error: { code: "USER_NOT_FOUND", message: "User not found" },
+    });
+  }
+  if (isEmailVerified(user)) {
+    return res.status(200).json({ ok: true, alreadyVerified: true });
+  }
+  await issueEmailVerification(user.id, user.email);
+  return res.status(202).json({ ok: true, alreadyVerified: false });
 });
 
 authRouter.post("/logout", (_req, res) => {
@@ -86,16 +226,11 @@ authRouter.post("/logout", (_req, res) => {
 authRouter.get("/me", requireAuth, async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: req.auth!.userId },
-    select: { id: true, email: true },
+    select: { id: true, email: true, emailVerifiedAt: true },
   });
   return res.json({
-    user: {
-      id: user!.id,
-      email: user!.email,
-      role: req.auth!.role,
-      tenantId: req.auth!.tenantId,
-      tenantIds: req.auth!.tenantIds,
-    },
+    user: serializeAuthUser(user!, req.auth!),
+    requireEmailVerification: requireEmailVerificationEnabled(),
   });
 });
 

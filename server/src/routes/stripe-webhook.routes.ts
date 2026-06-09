@@ -5,6 +5,7 @@ import { createRateLimitMiddleware } from "../middleware/rate-limit.js";
 import { logError, logInfo } from "../runtime/logger.js";
 import { IntegrationError } from "../integrations/errors.js";
 import { captureProductEvent } from "../observability/posthog.js";
+import { completeOrderFromStripeWebhook } from "../services/checkout-service.js";
 
 export const stripeWebhookRouter = Router();
 const stripeWebhookLimiter = createRateLimitMiddleware("stripe-webhook");
@@ -24,6 +25,27 @@ stripeWebhookRouter.post("/webhook", stripeWebhookLimiter, async (req, res) => {
     }
 
     const parsed = await adapters.stripe.parseWebhookEvent(rawBody);
+
+    if (parsed.type === "checkout.session.completed" && parsed.orderId) {
+      const paid = await completeOrderFromStripeWebhook({
+        orderId: parsed.orderId,
+        stripeSessionId: parsed.sessionId ?? parsed.id,
+        stripeEventId: parsed.id,
+      });
+      if (!paid.ok) {
+        throw new IntegrationError(
+          "INTEGRATION_PROVIDER_FAILURE",
+          paid.error.message,
+          "stripe",
+        );
+      }
+      logInfo("Stripe checkout completed order", {
+        route: "stripe-webhook",
+        orderId: parsed.orderId,
+        alreadyCompleted: paid.order.alreadyCompleted,
+      });
+    }
+
     const published = await publishEvent({
       eventName: `stripe.${parsed.type}`,
       source: "stripe-webhook",

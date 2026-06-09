@@ -13,7 +13,7 @@ export function HomePage() {
         Demo customer journey: browse an honest menu, cart, checkout, recovery, and live-style tracking. Internal workspaces are linked in the footer.
       </Typography>
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ width: "100%" }}>
-        <Button variant="contained" size="large" component={RouterLink} to="/menu">
+        <Button variant="contained" size="large" component={RouterLink} to="/demo/menu">
           Browse menu
         </Button>
         <Button variant="outlined" component={RouterLink} to="/consent">

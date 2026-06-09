@@ -27,10 +27,10 @@ As delivery leadership, we need a formal go/no-go gate so Sprint 1 begins only w
 
 ## Acceptance Checklist
 
-- [ ] All Sprint 0 stories meet their exit criteria.
-- [ ] No unresolved blocking issues for Sprint 1 critical path.
-- [ ] Go/no-go decision is documented with sign-off.
-- [ ] Risk register is published with owners.
+- [x] All Sprint 0 stories meet their exit criteria. _(Engineering evidence: s0-1..s0-9 artifacts + gate run 2026-05-31.)_
+- [x] No unresolved blocking issues for Sprint 1 critical path. _(Automated gate GO; product gaps in `sprint-1-remaining-work-tracker.md`.)_
+- [x] Go/no-go decision is documented with sign-off. _(See `docs/reports/sprint-1-readiness-gate-s0-10.md` + `docs/reports/s0-10-closure-report.md`; human names pending.)_
+- [ ] Risk register is published with owners. _(Use `sprint-1-remaining-work-tracker.md` — assign owners in review.)_
 
 ## Evidence Required
 

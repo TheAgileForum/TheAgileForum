@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaClient, Role } from "@prisma/client";
 import bcrypt from "bcrypt";
+import { seedCatalogOfferingsIfEmpty } from "../src/catalog/catalog-repository.js";
 
 const prisma = new PrismaClient();
 
@@ -70,10 +71,16 @@ async function main() {
 
   const customer = await prisma.user.upsert({
     where: { email: "customer@demo.local" },
-    update: { passwordHash },
+    update: {
+      passwordHash,
+      emailVerifiedAt: new Date(),
+      authProvider: "local",
+    },
     create: {
       email: "customer@demo.local",
       passwordHash,
+      emailVerifiedAt: new Date(),
+      authProvider: "local",
     },
   });
 
@@ -91,10 +98,16 @@ async function main() {
 
   const ops = await prisma.user.upsert({
     where: { email: "ops@demo.local" },
-    update: { passwordHash },
+    update: {
+      passwordHash,
+      emailVerifiedAt: new Date(),
+      authProvider: "local",
+    },
     create: {
       email: "ops@demo.local",
       passwordHash,
+      emailVerifiedAt: new Date(),
+      authProvider: "local",
     },
   });
 
@@ -132,6 +145,11 @@ async function main() {
   });
 
   console.log("Seed complete:", { tenantId: tenant.id });
+
+  const catalogSeeded = await seedCatalogOfferingsIfEmpty();
+  if (catalogSeeded > 0) {
+    console.log(`Catalog seed complete: ${catalogSeeded} offerings`);
+  }
 }
 
 main()

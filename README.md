@@ -21,7 +21,12 @@ This starts local dependencies:
 - PostgreSQL on `5432`
 - Redis on `6379` (runtime skeleton dependency for worker/scheduler)
 
-Create `server/.env` from `server/.env.example` — set **`DATABASE_URL`** and a long **`JWT_SECRET`** (32+ chars). Then:
+Create `server/.env` from `server/.env.example` and set:
+- `DATABASE_URL` (runtime/pool URL)
+- `DIRECT_URL` (direct migration URL)
+- `JWT_SECRET` (32+ chars)
+
+Then:
 
 ```bash
 cd server
@@ -74,6 +79,8 @@ Expected: `200` and body `{"status":"ok"}`.
 | `server` | `npm run start:scheduler` | Run compiled scheduler runtime |
 | `server` | `npm test`     | Vitest unit (`/health`, no DB) |
 | `server` | `npm run test:integration` | Auth tests — needs Postgres + `server/.env.test` |
+| `server` | `npm run events:synthetic` | Synthetic publish->dispatch event flow verification |
+| `server` | `npm run observability:synthetic` | Synthetic error/event injection for alert-route validation |
 | `client` | `npm run dev`  | Vite dev + HMR |
 | `client` | `npm run build`| Production bundle |
 
@@ -88,6 +95,9 @@ Expected: `200` and body `{"status":"ok"}`.
 ## Environment
 
 - **`server/.env.example`** — required backend runtime variables.
+- Prisma datasource uses:
+  - `DATABASE_URL` for runtime connections
+  - `DIRECT_URL` for migration path
 - **`client/.env.example`** — optional frontend overrides.
 - Validate backend environment before startup:
   - `cd server && npm run env:check`
@@ -96,6 +106,9 @@ Expected: `200` and body `{"status":"ok"}`.
   - `docs/secrets-policy.md`
   - `docs/data-baseline-s0-4.md`
   - `docs/auth-rbac-consent-contracts-s0-5.md`
+  - `docs/event-queue-baseline-s0-6.md`
+  - `docs/integrations-scaffolding-s0-7.md`
+  - `docs/observability-baseline-s0-8.md`
 
 Do not commit `.env` files with secrets.
 
@@ -104,6 +117,10 @@ Do not commit `.env` files with secrets.
 - API: `http://localhost:3001/api/v1/health`
 - Worker: `http://localhost:3101/health`
 - Scheduler: `http://localhost:3102/health`
+
+### Integration webhook skeleton (S0.7)
+
+- Stripe webhook: `POST http://localhost:3001/api/v1/integrations/stripe/webhook`
 
 ## Project layout
 

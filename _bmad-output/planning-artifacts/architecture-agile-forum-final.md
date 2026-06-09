@@ -1,14 +1,16 @@
 ---
 
 ## stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8]
+
 workflowType: 'architecture'
 lastStep: 8
 status: 'complete'
 completedAt: '2026-05-25'
 inputDocuments:
-  - '{project-root}/_bmad-output/planning-artifacts/prd-agile-forum.md'
-  - '{project-root}/_bmad-output/planning-artifacts/epics-agile-forum.md'
-  - '{project-root}/_bmad-output/planning-artifacts/mvp-cost-minimized-architecture-v1.md'
+
+- '{project-root}/_bmad-output/planning-artifacts/prd-agile-forum.md'
+- '{project-root}/_bmad-output/planning-artifacts/epics-agile-forum.md'
+- '{project-root}/_bmad-output/planning-artifacts/mvp-cost-minimized-architecture-v1.md'
 project_name: mybmadproj
 user_name: Dhirender
 date: '2026-05-25'

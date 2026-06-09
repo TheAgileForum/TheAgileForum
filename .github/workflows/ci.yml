@@ -6,6 +6,8 @@ on:
     branches:
       - main
       - master
+      - sprint/**
+      - feature/**
 
 jobs:
   client:
@@ -40,6 +42,30 @@ jobs:
     defaults:
       run:
         working-directory: server
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: agileforum
+          POSTGRES_PASSWORD: agileforum
+          POSTGRES_DB: agileforum_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U agileforum -d agileforum_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://agileforum:agileforum@localhost:5432/agileforum_test
+      DIRECT_URL: postgresql://agileforum:agileforum@localhost:5432/agileforum_test
+      CATALOG_USE_DB: "true"
+      GUEST_CART_USE_DB: "true"
+      NODE_ENV: test
+      JWT_SECRET: test-jwt-secret-must-be-32-chars-min!!
+      INTEGRATION_PROVIDER_MODE: stub
+      STRIPE_WEBHOOK_SECRET: whsec_stub
+      CORS_ALLOWED_ORIGINS: http://localhost:5173
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -59,6 +85,12 @@ jobs:
 
       - name: Unit tests
         run: npm test
+
+      - name: Deploy database migrations
+        run: npm run db:deploy
+
+      - name: Integration tests
+        run: npm run test:integration
 
       - name: Build
         run: npm run build

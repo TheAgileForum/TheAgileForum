@@ -10,9 +10,14 @@ export default async function globalSetup(): Promise<void> {
       "DATABASE_URL missing — set server/.env.test or env before test:integration",
     );
   }
-  execSync("npx prisma migrate deploy", {
+  execSync("npm run db:deploy", {
     cwd: root,
     stdio: "inherit",
-    env: { ...process.env, NODE_ENV: process.env.NODE_ENV ?? "test" },
+    env: {
+      ...process.env,
+      NODE_ENV: process.env.NODE_ENV ?? "test",
+      CATALOG_USE_DB: "true",
+    },
+    shell: true,
   });
 }

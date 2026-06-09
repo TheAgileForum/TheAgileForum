@@ -15,12 +15,15 @@ Define the baseline database domains, migration workflow, and rollback checks fo
 ## Migration Workflow
 
 1. Review `server/prisma/schema.prisma` changes.
-2. Apply migrations in dev:
+2. Verify connection strategy in env:
+   - `DATABASE_URL` for runtime/pool
+   - `DIRECT_URL` for migration path
+3. Apply migrations in dev:
    - `cd server`
    - `npm run db:migrate`
-3. Generate and verify Prisma client:
+4. Generate and verify Prisma client:
    - `npm run db:generate`
-4. Seed baseline reference data:
+5. Seed baseline reference data:
    - `npm run db:seed`
 
 ## Idempotency Expectations
@@ -43,3 +46,9 @@ Define the baseline database domains, migration workflow, and rollback checks fo
 - Schema ownership: Backend platform lead
 - Migration approval: Tech lead + reviewer
 - Seed data approval: Product + backend owner
+
+## Shared-dev/Stage Hardening
+
+- Use Supabase pooler URL for app runtime `DATABASE_URL`.
+- Use Supabase direct DB URL for `DIRECT_URL` during migrations.
+- Keep integration tests isolated via a separate Supabase test project.

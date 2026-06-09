@@ -1,0 +1,11 @@
+{
+    "settings":  {
+                     "terminal.integrated.cwd":  "C:\\AgileForum\\mybmadproj"
+                 },
+    "folders":  [
+                    {
+                        "name":  "The Agile Forum (mybmadproj)",
+                        "path":  "C:\\AgileForum\\mybmadproj"
+                    }
+                ]
+}

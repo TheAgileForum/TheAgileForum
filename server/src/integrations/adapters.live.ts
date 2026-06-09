@@ -24,11 +24,29 @@ export class LiveStripeAdapter implements StripeAdapter {
 
   async parseWebhookEvent(payload: Buffer): Promise<StripeWebhookEvent> {
     const raw = payload.toString("utf8");
-    return {
-      id: `live_evt_${Date.now()}`,
-      type: "unknown",
-      rawPayload: raw,
-    };
+    let id = `live_evt_${Date.now()}`;
+    let type = "unknown";
+    let orderId: string | undefined;
+    let sessionId: string | undefined;
+    try {
+      const json = JSON.parse(raw) as {
+        id?: string;
+        type?: string;
+        data?: { object?: Record<string, unknown> };
+      };
+      if (json.id) id = String(json.id);
+      if (json.type) type = String(json.type);
+      const obj = (json.data?.object ?? json) as {
+        id?: string;
+        client_reference_id?: string;
+        metadata?: { order_id?: string };
+      };
+      orderId = obj.metadata?.order_id ?? obj.client_reference_id;
+      sessionId = obj.id;
+    } catch {
+      // keep placeholder id/type when payload is not JSON
+    }
+    return { id, type, rawPayload: raw, orderId, sessionId };
   }
 }
 

@@ -25,7 +25,7 @@ export function CheckoutSuccessPage() {
       <Button variant="contained" component={RouterLink} to={`/orders/${orderId}`}>
         Track order
       </Button>
-      <Button component={RouterLink} to="/menu">
+      <Button component={RouterLink} to="/demo/menu">
         Order something else
       </Button>
     </Stack>
