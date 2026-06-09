@@ -1,3 +1,4 @@
+import Collapse from "@mui/material/Collapse";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -22,9 +23,11 @@ import {
 import { getCommerceJourneyOrigin } from "../../lib/commerce-journey";
 import { formatPrice } from "../../lib/format-price";
 import {
+  applyCheckoutCoupon,
   completeCheckout,
   getCart,
   listOfferings,
+  removeCheckoutCoupon,
   startCheckout,
   type CartSummary,
   type InstallmentProvider,
@@ -49,8 +52,14 @@ export function ForumCheckoutPage() {
   const [busy, setBusy] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [couponExpanded, setCouponExpanded] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponBusy, setCouponBusy] = useState(false);
+  const [couponError, setCouponError] = useState<string | null>(null);
 
   const emptyCart = cart !== null && cart.items.length === 0;
+  const payableTotal = cart?.adjustedTotal ?? cart?.subtotal ?? "0";
+  const hasCoupon = Boolean(cart?.couponCode && cart.discountApplied);
 
   useEffect(() => {
     if (!user) return;
@@ -66,6 +75,43 @@ export function ForumCheckoutPage() {
         setLoadError(err instanceof ApiRequestError ? err.message : "Could not load cart.");
       });
   }, [user, geo, currency]);
+
+  useEffect(() => {
+    if (cart?.couponCode) {
+      setCouponCode(cart.couponCode);
+      setCouponExpanded(true);
+    }
+  }, [cart?.couponCode]);
+
+  async function applyCoupon() {
+    if (!cart || !couponCode.trim()) return;
+    setCouponBusy(true);
+    setCouponError(null);
+    try {
+      const result = await applyCheckoutCoupon(cart.id, couponCode.trim(), { geo, currency });
+      setCart(result.cart);
+      trackEvent("coupon_applied", { coupon_code: result.couponCode ?? couponCode.trim() });
+    } catch (err) {
+      setCouponError(err instanceof ApiRequestError ? err.message : "Could not apply coupon.");
+    } finally {
+      setCouponBusy(false);
+    }
+  }
+
+  async function clearCoupon() {
+    if (!cart) return;
+    setCouponBusy(true);
+    setCouponError(null);
+    try {
+      const result = await removeCheckoutCoupon(cart.id, { geo, currency });
+      setCart(result.cart);
+      setCouponCode("");
+    } catch (err) {
+      setCouponError(err instanceof ApiRequestError ? err.message : "Could not remove coupon.");
+    } finally {
+      setCouponBusy(false);
+    }
+  }
 
   const lineSummary = useMemo(
     () =>
@@ -179,9 +225,21 @@ export function ForumCheckoutPage() {
           </Typography>
           {lineSummary}
           {cart ? (
-            <Typography sx={{ mt: 1, fontWeight: 600 }}>
-              Subtotal {formatPrice(cart.currency, cart.subtotal)}
-            </Typography>
+            <Stack spacing={0.5} sx={{ mt: 1 }}>
+              <Typography sx={{ fontWeight: 600 }}>
+                Subtotal {formatPrice(cart.currency, cart.subtotal)}
+              </Typography>
+              {hasCoupon ? (
+                <>
+                  <Typography variant="body2" color="success.main">
+                    Coupon {cart.couponCode} − {formatPrice(cart.currency, cart.discountApplied!)}
+                  </Typography>
+                  <Typography sx={{ fontWeight: 600 }}>
+                    Total {formatPrice(cart.currency, payableTotal)}
+                  </Typography>
+                </>
+              ) : null}
+            </Stack>
           ) : (
             <LinearProgress sx={{ mt: 1 }} />
           )}
@@ -229,7 +287,7 @@ export function ForumCheckoutPage() {
         </Stack>
       ) : cart ? (
         <CheckoutPaymentModeSelector
-          cartSubtotal={cart.subtotal}
+          cartSubtotal={payableTotal}
           cartCurrency={cart.currency}
           paymentMode={paymentMode}
           installmentProvider={installmentProvider}
@@ -238,18 +296,46 @@ export function ForumCheckoutPage() {
         />
       ) : null}
 
-      <Box
-        sx={{
-          border: 1,
-          borderStyle: "dashed",
-          borderColor: "divider",
-          borderRadius: 1,
-          p: 1.5,
-          fontSize: 13,
-          color: "text.secondary",
-        }}
-      >
-        Have a code? Coupon field collapsed here — not marketed on catalog (FR-179).
+      <Box sx={{ borderTop: 1, borderColor: "divider", pt: 1 }}>
+        <Button
+          variant="text"
+          size="small"
+          onClick={() => setCouponExpanded((open) => !open)}
+          sx={{ px: 0, minWidth: 0, textTransform: "none" }}
+        >
+          {couponExpanded ? "Hide promo code" : "Have a promo code?"}
+        </Button>
+        <Collapse in={couponExpanded}>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ mt: 1 }}>
+            <TextField
+              label="Promo code"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value)}
+              size="small"
+              fullWidth
+              disabled={couponBusy || hasCoupon}
+            />
+            {hasCoupon ? (
+              <Button variant="outlined" onClick={() => void clearCoupon()} disabled={couponBusy}>
+                Remove
+              </Button>
+            ) : (
+              <Button
+                variant="outlined"
+                onClick={() => void applyCoupon()}
+                disabled={couponBusy || !couponCode.trim() || emptyCart}
+              >
+                Apply
+              </Button>
+            )}
+          </Stack>
+          {couponBusy ? <LinearProgress sx={{ mt: 1 }} /> : null}
+          {couponError ? (
+            <Alert severity="error" sx={{ mt: 1 }}>
+              {couponError}
+            </Alert>
+          ) : null}
+        </Collapse>
       </Box>
 
       {busy ? <LinearProgress /> : null}

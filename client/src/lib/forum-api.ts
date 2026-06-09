@@ -283,6 +283,9 @@ export type CartSummary = {
   currency: string;
   subtotal: string;
   lineCount?: number;
+  couponCode?: string;
+  discountApplied?: string;
+  adjustedTotal?: string;
   items: Array<{
     id: string;
     offeringCode: string;
@@ -526,6 +529,35 @@ export async function updateCartItemQuantity(
       method: "PATCH",
       body: JSON.stringify({ quantity }),
     },
+  );
+}
+
+export type CheckoutCouponResult = {
+  couponCode: string | null;
+  discount_applied: string;
+  adjusted_total: string;
+  currency: string;
+  cart: CartSummary;
+};
+
+export async function applyCheckoutCoupon(
+  sessionId: string,
+  couponCode: string,
+  pricing?: PricingRequest,
+) {
+  return apiFetch<CheckoutCouponResult>(
+    `/api/v1/commerce/checkout/sessions/${encodeURIComponent(sessionId)}/coupon${pricingQuery(pricing?.geo, pricing?.currency)}`,
+    {
+      method: "POST",
+      body: JSON.stringify({ coupon_code: couponCode }),
+    },
+  );
+}
+
+export async function removeCheckoutCoupon(sessionId: string, pricing?: PricingRequest) {
+  return apiFetch<CheckoutCouponResult>(
+    `/api/v1/commerce/checkout/sessions/${encodeURIComponent(sessionId)}/coupon${pricingQuery(pricing?.geo, pricing?.currency)}`,
+    { method: "DELETE" },
   );
 }
 

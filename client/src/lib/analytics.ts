@@ -1,4 +1,6 @@
-/** Lightweight client analytics — Clarity custom tags when configured; dev console otherwise. */
+/** Lightweight client analytics — Clarity + PostHog when configured; dev console otherwise. */
+
+import { capturePosthogEvent } from "./posthog.ts";
 
 export type AnalyticsEvent =
   | "home_hero_cta_click"
@@ -21,6 +23,7 @@ export type AnalyticsEvent =
   | "global_cart_viewed"
   | "global_cart_clicked"
   | "checkout_started"
+  | "coupon_applied"
   | "installment_checkout_started"
   | "installment_option_impression"
   | "cart_line_removed"
@@ -31,6 +34,7 @@ export function trackEvent(name: AnalyticsEvent, props?: Record<string, string |
   if (import.meta.env.DEV) {
     console.debug("[analytics]", name, props ?? {});
   }
+  capturePosthogEvent(name, props);
   if (typeof window !== "undefined" && window.clarity) {
     window.clarity("event", name);
     if (props) {

@@ -32,8 +32,23 @@ function getPosthogClient(): PostHog | null {
   return client;
 }
 
+function enrichEventProperties(
+  properties: Record<string, unknown>,
+): Record<string, unknown> {
+  const env = getEnv();
+  return {
+    ...properties,
+    app_env: env.NODE_ENV,
+    release: env.OBSERVABILITY_RELEASE,
+    service: "mybmadproj-server",
+  };
+}
+
 export async function captureProductEvent(input: PosthogEventInput): Promise<boolean> {
-  const parsed = posthogEventSchema.safeParse(input);
+  const parsed = posthogEventSchema.safeParse({
+    ...input,
+    properties: enrichEventProperties(input.properties ?? {}),
+  });
   if (!parsed.success) {
     logWarn("PostHog event rejected by schema", {
       component: "observability",
@@ -70,6 +85,13 @@ export async function captureProductEvent(input: PosthogEventInput): Promise<boo
   posthog.capture(parsed.data);
   await posthog.flush();
   return true;
+}
+
+export async function shutdownPosthogClient(): Promise<void> {
+  if (client) {
+    await client.shutdown();
+    client = null;
+  }
 }
 
 export function resetPosthogClientForTests(): void {

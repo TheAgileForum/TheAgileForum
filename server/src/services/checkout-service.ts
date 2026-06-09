@@ -34,6 +34,13 @@ import {
   trackCheckoutStarted,
   trackNamedProductEvent,
 } from "../observability/commerce-analytics.js";
+import {
+  clearAppliedCoupon,
+  computeAdjustedTotal,
+  computeDiscountAmount,
+  getAppliedCouponCode,
+  validateStubCouponCode,
+} from "../commerce/coupon-service.js";
 
 export type CheckoutVariant = "standard" | "org_reimbursement";
 
@@ -139,6 +146,16 @@ export async function startCheckout(
     priced.lines.map((line) => [line.offeringCode, line]),
   );
 
+  let orderTotal = priced.subtotal;
+  const appliedCouponCode = getAppliedCouponCode(cart.id);
+  if (appliedCouponCode) {
+    const coupon = validateStubCouponCode(appliedCouponCode);
+    if (coupon.ok) {
+      const discountApplied = computeDiscountAmount(priced.subtotal, coupon.percentOff);
+      orderTotal = computeAdjustedTotal(priced.subtotal, discountApplied);
+    }
+  }
+
   const order = await prisma.$transaction(async (tx) => {
     const created = await tx.order.create({
       data: {
@@ -148,7 +165,7 @@ export async function startCheckout(
         cartId: cart.id,
         status: "checkout_started",
         currency: priced.currency,
-        totalAmount: new Decimal(priced.subtotal),
+        totalAmount: new Decimal(orderTotal),
         items: {
           create: cart.items.map((item) => {
             const line = pricedByCode.get(item.offeringCode);
@@ -303,6 +320,9 @@ async function markOrderPaid(
   order: { id: string; orderNumber: string; cartId: string | null; status: string },
   paymentRef: string,
 ) {
+  if (order.cartId) {
+    clearAppliedCoupon(order.cartId);
+  }
   return prisma.$transaction(async (tx) => {
     const row = await tx.order.update({
       where: { id: order.id },

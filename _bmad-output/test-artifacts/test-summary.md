@@ -73,6 +73,8 @@
 | P1 | Razorpay EMI live sandbox (FR-170) | emi plan — stub done |
 | P2 | Global cart shell FE badge (FR-177) | **Done** — Playwright `client/e2e/global-cart-badge.spec.ts` (3 tests) |
 | P2 | Journey origin PostHog events (FR-176) | **Done** — `product-events.ts` + `commerce-analytics.ts` wired on cart/checkout |
+| P2 | Live PostHog capture in staging | **Ready** — set `POSTHOG_API_KEY` + run `npm run observability:posthog-verify`; see `docs/staging-posthog-setup.md` |
+| P2 | Client PostHog browser events | **Done** — `posthog-js` + `VITE_POSTHOG_KEY` via `trackEvent()` |
 | P2 | Installment analytics events (FR-175) | emi plan |
 | P3 | Homepage diagnosis-primary regression (FR-161) | catalog plan |
 | P3 | LinkedIn OAuth live mode | auth plan |
@@ -82,4 +84,5 @@
 1. Manual E2E per `docs/sprint-1-e2e-smoke.md`.
 2. Stripe test-mode CI secret for webhook integration.
 3. CI required check: `cd server && npm run test`.
-4. Wire PostHog events for installment funnel completion (FR-175).
+4. Set staging secrets and run `cd server && npm run observability:posthog-verify` (see `docs/staging-posthog-setup.md`).
+5. Wire PostHog events for installment funnel completion (FR-175).

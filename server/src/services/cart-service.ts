@@ -11,6 +11,7 @@ import {
   type PricingHttpInput,
 } from "../pricing/pricing-service.js";
 import type { Request } from "express";
+import { resolveCartCouponTotals } from "../commerce/coupon-service.js";
 
 export async function getOrCreateActiveCart(auth: SessionClaims) {
   const existing = await prisma.cart.findFirst({
@@ -156,12 +157,25 @@ export async function serializeCart(
   );
   const lineCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
+  const couponTotals = resolveCartCouponTotals(
+    cart.id,
+    totals.subtotal,
+    totals.currency,
+  );
+
   return {
     id: cart.id,
     status: cart.status,
     currency: totals.currency,
     lineCount,
     subtotal: totals.subtotal,
+    ...(couponTotals
+      ? {
+          couponCode: couponTotals.couponCode,
+          discountApplied: couponTotals.discountApplied,
+          adjustedTotal: couponTotals.adjustedTotal,
+        }
+      : {}),
     currencyContext: {
       currency: context.currency,
       geoDetected: context.geoDetected,

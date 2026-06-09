@@ -15,6 +15,15 @@ import {
   serializeCart,
 } from "./cart-service.js";
 import {
+  memoryAddGuestCartItem,
+  memoryGetActiveGuestCart,
+  memoryGetOrCreateGuestCart,
+  memoryMarkGuestCartMerged,
+  memoryRemoveGuestCartItem,
+  memoryUpdateGuestCartItemQuantity,
+  type GuestCartRecord,
+} from "./guest-cart-memory-store.js";
+import {
   parsePricingInputFromRequest,
   quoteOfferingPrice,
   resolveCartLineTotals,
@@ -23,7 +32,32 @@ import {
 } from "../pricing/pricing-service.js";
 import type { Request } from "express";
 
-type GuestCartWithItems = Awaited<ReturnType<typeof getActiveGuestCartByToken>>;
+type GuestCartWithItems = GuestCartRecord | NonNullable<Awaited<ReturnType<typeof getActiveGuestCartByTokenFromDb>>>;
+
+function usesGuestCartDatabase(): boolean {
+  if (process.env.GUEST_CART_USE_DB === "false") return false;
+  if (process.env.GUEST_CART_USE_DB === "true") return true;
+  return process.env.NODE_ENV !== "test";
+}
+
+let guestCartDbAvailable: boolean | null = null;
+
+async function shouldUseGuestCartDb(): Promise<boolean> {
+  if (!usesGuestCartDatabase()) return false;
+  if (guestCartDbAvailable !== null) return guestCartDbAvailable;
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    guestCartDbAvailable = true;
+  } catch {
+    guestCartDbAvailable = false;
+    if (process.env.NODE_ENV === "development") {
+      console.warn(
+        "[guest-cart] Database unavailable; using in-memory guest cart store",
+      );
+    }
+  }
+  return guestCartDbAvailable;
+}
 
 function scheduleKey(scheduleRef: string | null | undefined): string {
   return scheduleRef?.trim() || "";
@@ -73,7 +107,7 @@ export function ensureGuestSessionToken(
   return token;
 }
 
-async function getActiveGuestCartByToken(sessionToken: string) {
+async function getActiveGuestCartByTokenFromDb(sessionToken: string) {
   return prisma.guestCart.findFirst({
     where: { sessionToken, status: "active" },
     include: { items: true },
@@ -81,18 +115,29 @@ async function getActiveGuestCartByToken(sessionToken: string) {
   });
 }
 
-export async function getOrCreateGuestCart(sessionToken: string) {
-  const existing = await getActiveGuestCartByToken(sessionToken);
-  if (existing) return existing;
+async function getActiveGuestCartByToken(sessionToken: string) {
+  if (await shouldUseGuestCartDb()) {
+    return getActiveGuestCartByTokenFromDb(sessionToken);
+  }
+  return memoryGetActiveGuestCart(sessionToken);
+}
 
-  return prisma.guestCart.create({
-    data: {
-      sessionToken,
-      status: "active",
-      currency: "USD",
-    },
-    include: { items: true },
-  });
+export async function getOrCreateGuestCart(sessionToken: string) {
+  if (await shouldUseGuestCartDb()) {
+    const existing = await getActiveGuestCartByTokenFromDb(sessionToken);
+    if (existing) return existing;
+
+    return prisma.guestCart.create({
+      data: {
+        sessionToken,
+        status: "active",
+        currency: "USD",
+      },
+      include: { items: true },
+    });
+  }
+
+  return memoryGetOrCreateGuestCart(sessionToken);
 }
 
 export async function serializeGuestCart(
@@ -168,46 +213,60 @@ export async function addGuestCartItem(
 
   const context = resolveCurrencyContext(pricingInput ?? { geo: "US" });
   const quoted = quoteOfferingPrice(offering, context);
-  const cart = await getOrCreateGuestCart(sessionToken);
   const scheduleRef = input.scheduleRef?.trim() || null;
   const quantity = input.quantity ?? 1;
+  const unitPrice = new Decimal(quoted.amount);
 
-  if (cart.currency !== context.currency) {
-    await prisma.guestCart.update({
-      where: { id: cart.id },
-      data: { currency: context.currency },
-    });
-    cart.currency = context.currency;
+  if (await shouldUseGuestCartDb()) {
+    const cart = await getOrCreateGuestCart(sessionToken);
+
+    if (cart.currency !== context.currency) {
+      await prisma.guestCart.update({
+        where: { id: cart.id },
+        data: { currency: context.currency },
+      });
+      cart.currency = context.currency;
+    }
+
+    const existingLine = cart.items.find(
+      (item) =>
+        item.offeringCode === input.offeringCode &&
+        scheduleKey(item.scheduleRef) === scheduleKey(scheduleRef),
+    );
+
+    let item;
+    if (existingLine) {
+      item = await prisma.guestCartItem.update({
+        where: { id: existingLine.id },
+        data: {
+          quantity: existingLine.quantity + quantity,
+          unitPrice,
+          currency: context.currency,
+        },
+      });
+    } else {
+      item = await prisma.guestCartItem.create({
+        data: {
+          guestCartId: cart.id,
+          offeringCode: input.offeringCode,
+          scheduleRef,
+          quantity,
+          unitPrice,
+          currency: context.currency,
+        },
+      });
+    }
+
+    return { ok: true as const, cartId: cart.id, item };
   }
 
-  const existingLine = cart.items.find(
-    (item) =>
-      item.offeringCode === input.offeringCode &&
-      scheduleKey(item.scheduleRef) === scheduleKey(scheduleRef),
-  );
-
-  let item;
-  if (existingLine) {
-    item = await prisma.guestCartItem.update({
-      where: { id: existingLine.id },
-      data: {
-        quantity: existingLine.quantity + quantity,
-        unitPrice: new Decimal(quoted.amount),
-        currency: context.currency,
-      },
-    });
-  } else {
-    item = await prisma.guestCartItem.create({
-      data: {
-        guestCartId: cart.id,
-        offeringCode: input.offeringCode,
-        scheduleRef,
-        quantity,
-        unitPrice: new Decimal(quoted.amount),
-        currency: context.currency,
-      },
-    });
-  }
+  const { cart, item } = memoryAddGuestCartItem(sessionToken, {
+    offeringCode: input.offeringCode,
+    scheduleRef,
+    quantity,
+    unitPrice,
+    currency: context.currency,
+  });
 
   return { ok: true as const, cartId: cart.id, item };
 }
@@ -221,7 +280,13 @@ export async function removeGuestCartItem(sessionToken: string, itemId: string) 
       error: { code: "CART_ITEM_NOT_FOUND", message: "Cart line not found" },
     };
   }
-  await prisma.guestCartItem.delete({ where: { id: itemId } });
+
+  if (await shouldUseGuestCartDb()) {
+    await prisma.guestCartItem.delete({ where: { id: itemId } });
+  } else {
+    memoryRemoveGuestCartItem(sessionToken, itemId);
+  }
+
   return { ok: true as const };
 }
 
@@ -238,12 +303,26 @@ export async function updateGuestCartItemQuantity(
       error: { code: "CART_ITEM_NOT_FOUND", message: "Cart line not found" },
     };
   }
-  if (quantity < 1) {
-    await prisma.guestCartItem.delete({ where: { id: itemId } });
-    return { ok: true as const, removed: true as const };
+  if (await shouldUseGuestCartDb()) {
+    if (quantity < 1) {
+      await prisma.guestCartItem.delete({ where: { id: itemId } });
+      return { ok: true as const, removed: true as const };
+    }
+    await prisma.guestCartItem.update({
+      where: { id: itemId },
+      data: { quantity },
+    });
+    return { ok: true as const, removed: false as const };
   }
-  await prisma.guestCartItem.update({ where: { id: itemId }, data: { quantity } });
-  return { ok: true as const, removed: false as const };
+
+  const result = memoryUpdateGuestCartItemQuantity(sessionToken, itemId, quantity);
+  if (!result.ok) {
+    return {
+      ok: false as const,
+      error: { code: "CART_ITEM_NOT_FOUND", message: "Cart line not found" },
+    };
+  }
+  return { ok: true as const, removed: result.removed };
 }
 
 export async function mergeGuestCartIntoUserCart(
@@ -258,6 +337,67 @@ export async function mergeGuestCartIntoUserCart(
       merged: false as const,
       guestCartId: guestCart?.id ?? null,
       cart: await serializeCart(userCart, pricingInput),
+    };
+  }
+
+  if (!(await shouldUseGuestCartDb())) {
+    const mergedCart = await prisma.$transaction(async (tx) => {
+      let userCart = await tx.cart.findFirst({
+        where: { userId: auth.userId, status: "active" },
+        include: { items: true },
+        orderBy: { updatedAt: "desc" },
+      });
+
+      if (!userCart) {
+        userCart = await tx.cart.create({
+          data: {
+            userId: auth.userId,
+            tenantId: auth.tenantId,
+            status: "active",
+            currency: guestCart.currency,
+          },
+          include: { items: true },
+        });
+      }
+
+      for (const guestItem of guestCart.items) {
+        const existingLine = userCart.items.find(
+          (item) =>
+            item.offeringCode === guestItem.offeringCode &&
+            scheduleKey(item.scheduleRef) === scheduleKey(guestItem.scheduleRef),
+        );
+
+        if (existingLine) {
+          await tx.cartItem.update({
+            where: { id: existingLine.id },
+            data: { quantity: existingLine.quantity + guestItem.quantity },
+          });
+        } else {
+          await tx.cartItem.create({
+            data: {
+              cartId: userCart.id,
+              offeringCode: guestItem.offeringCode,
+              scheduleRef: guestItem.scheduleRef,
+              quantity: guestItem.quantity,
+              unitPrice: guestItem.unitPrice,
+              currency: guestItem.currency,
+            },
+          });
+        }
+      }
+
+      return tx.cart.findUniqueOrThrow({
+        where: { id: userCart.id },
+        include: { items: true },
+      });
+    });
+
+    memoryMarkGuestCartMerged(sessionToken);
+
+    return {
+      merged: true as const,
+      guestCartId: guestCart.id,
+      cart: await serializeCart(mergedCart, pricingInput),
     };
   }
 

@@ -34,6 +34,10 @@ import {
   startCheckout,
 } from "../services/checkout-service.js";
 import {
+  applyCouponToCheckoutSession,
+  removeCouponFromCheckoutSession,
+} from "../commerce/coupon-service.js";
+import {
   trackCartUpdated,
   trackGlobalCartViewed,
 } from "../observability/commerce-analytics.js";
@@ -78,6 +82,10 @@ const checkoutStartBody = z.object({
 const checkoutCompleteBody = z.object({
   orderId: z.string().uuid(),
   paymentRef: z.string().min(1).optional(),
+});
+
+const checkoutCouponBody = z.object({
+  coupon_code: z.string().min(1),
 });
 
 commerceRouter.get("/payment-modes", (req, res) => {
@@ -407,5 +415,58 @@ commerceRouter.post(
       return res.status(404).json({ error: result.error });
     }
     return res.json({ order: result.order });
+  },
+);
+
+commerceRouter.post(
+  "/checkout/sessions/:sessionId/coupon",
+  requireAuth,
+  withBodyValidation(checkoutCouponBody),
+  async (req, res) => {
+    const body = req.body as z.infer<typeof checkoutCouponBody>;
+    const result = await applyCouponToCheckoutSession(
+      req.auth!,
+      req.params.sessionId,
+      body.coupon_code,
+      parsePricingInputFromRequest(req),
+    );
+    if (!result.ok) {
+      const status =
+        result.error.code === "CHECKOUT_SESSION_NOT_FOUND"
+          ? 404
+          : result.error.code === "INVALID_COUPON"
+            ? 400
+            : 400;
+      return res.status(status).json({ error: result.error });
+    }
+    return res.json({
+      couponCode: result.coupon.couponCode,
+      discount_applied: result.coupon.discountApplied,
+      adjusted_total: result.coupon.adjustedTotal,
+      currency: result.coupon.currency,
+      cart: result.coupon.cart,
+    });
+  },
+);
+
+commerceRouter.delete(
+  "/checkout/sessions/:sessionId/coupon",
+  requireAuth,
+  async (req, res) => {
+    const result = await removeCouponFromCheckoutSession(
+      req.auth!,
+      req.params.sessionId,
+      parsePricingInputFromRequest(req),
+    );
+    if (!result.ok) {
+      return res.status(404).json({ error: result.error });
+    }
+    return res.json({
+      couponCode: null,
+      discount_applied: result.coupon.discountApplied,
+      adjusted_total: result.coupon.adjustedTotal,
+      currency: result.coupon.currency,
+      cart: result.coupon.cart,
+    });
   },
 );

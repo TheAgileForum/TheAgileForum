@@ -1,0 +1,33 @@
+The Agile Forum — Automated Test Evidence
+==========================================
+Date: 2026-06-09
+Branch: sprint/s1-foundation-revenue-slice
+Triggered by: S0.10 evidence pack + UX-09.2/10/11 sync
+
+Unit / contract suite (npm run test)
+------------------------------------
+Result: 174 passed (43 files)
+Duration: ~25s
+Notable coverage this run:
+  - payment-mode.test.ts: 11 tests (geo EMI resolver)
+  - commerce.integration-related unit: razorpay-checkout-service, installment-plans-service
+  - recommendations/upsell-service.test.ts: role-based upsell + FR-178 currency
+  - pricing-service.test.ts, pricing.routes.test.ts, quote-service.test.ts
+
+Integration suite (npm run test:integration)
+--------------------------------------------
+Result: 46 passed (3 files)
+Duration: ~89s
+Breakdown:
+  - auth.integration.test.ts: 23
+  - diagnosis.integration.test.ts: 5
+  - commerce.integration.test.ts: 18 (installment checkout, Stripe webhook, org reimbursement, guest cart)
+
+Combined: 220 passed
+
+Client build (npm run build)
+----------------------------
+Result: PASS (tsc -b && vite build, ~17s)
+Note: chunk size warning (>500 kB) — non-blocking for Sprint 1 gate.
+
+S0.10 gate evidence: automated tests green; clean-machine bootstrap (Docker) and human sign-off still pending.

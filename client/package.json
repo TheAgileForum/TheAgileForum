@@ -17,13 +17,14 @@
     "@mui/icons-material": "^9.0.0",
     "@mui/material": "^9.0.0",
     "@mui/x-data-grid": "^9.0.3",
+    "posthog-js": "^1.383.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2"
   },
   "devDependencies": {
-    "@playwright/test": "^1.52.0",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.52.0",
     "@types/node": "^24.12.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
