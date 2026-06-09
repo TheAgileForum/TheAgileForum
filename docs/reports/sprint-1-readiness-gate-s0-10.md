@@ -1,19 +1,26 @@
-# Sprint 1 readiness gate (S0.10)
+# Sprint 1 Readiness Gate Report (S0.10)
 
-Generated: 2026-05-31T19:24:20.994Z
+- Generated at: 2026-05-31T19:24:20.994Z
+- Decision: **GO**
 
-Decision: **GO**
+## Check Results
 
-## Check matrix
-
-| Check | Description | Blocking | Result | Exit |
-| --- | --- | --- | --- | --- |
+| ID | Check | Required | Status | Exit |
+|---|---|---|---|---|
 | S0.2-env | Environment validation | yes | PASS | 0 |
 | S0.8-unit | Server unit test suite | yes | PASS | 0 |
 | S0.3-build | TypeScript build | yes | PASS | 0 |
 | S0.8-observability | Synthetic observability flow | yes | PASS | 0 |
 | S0.5-auth-integration | Auth/RBAC integration tests | no | PASS | 0 |
 
-## Findings
+## Blocking Findings
 
-- All checks passed.
+- None
+
+## Non-Blocking Findings
+
+- None
+
+## Notes
+
+- S0.5-auth-integration: Optional in local runs if dedicated integration DB is unavailable.

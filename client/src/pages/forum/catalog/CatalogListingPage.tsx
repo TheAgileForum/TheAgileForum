@@ -42,7 +42,8 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
   const [addingCode, setAddingCode] = useState<string | null>(null);
   const [facets, setFacets] = useState<CatalogFacets | null>(null);
 
-  const filters = parseCatalogFilters(searchParams.toString());
+  const searchKey = searchParams.toString();
+  const filters = parseCatalogFilters(searchKey);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -61,7 +62,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
     } finally {
       setLoading(false);
     }
-  }, [categoryPath, searchParams.toString(), geo, currency]);
+  }, [categoryPath, searchKey, geo, currency, filters]);
 
   useEffect(() => {
     setCommerceJourneyOrigin("catalog");

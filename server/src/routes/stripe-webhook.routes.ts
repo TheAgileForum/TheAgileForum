@@ -34,7 +34,7 @@ stripeWebhookRouter.post("/webhook", stripeWebhookLimiter, async (req, res) => {
       });
       if (!paid.ok) {
         throw new IntegrationError(
-          "STRIPE_ORDER_NOT_FOUND",
+          "INTEGRATION_PROVIDER_FAILURE",
           paid.error.message,
           "stripe",
         );

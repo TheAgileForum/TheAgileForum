@@ -195,11 +195,12 @@ export async function startCheckout(
   let razorpayEmiPlans:
     | Array<{ provider: string; monthlyAmount: string; currency: string }>
     | undefined;
-  let razorpayCheckout: RazorpayCheckoutSession | null = null;
+  let razorpaySession: RazorpayCheckoutSession | null = null;
   let paymentProvider: "stripe" | "razorpay" | null = null;
 
-  async function bindRazorpaySession(session: RazorpayCheckoutSession) {
-    razorpayCheckout = session;
+  async function bindRazorpaySession(
+    session: RazorpayCheckoutSession,
+  ): Promise<RazorpayCheckoutSession> {
     razorpayCheckoutUrl = session.checkoutUrl;
     razorpayPaymentRef = session.paymentRef;
     if (session.paymentRef) {
@@ -208,6 +209,7 @@ export async function startCheckout(
         data: { paymentRef: session.paymentRef },
       });
     }
+    return session;
   }
 
   if (
@@ -222,7 +224,7 @@ export async function startCheckout(
       priced.currency,
       context.geoDetected,
     );
-    await bindRazorpaySession(
+    razorpaySession = await bindRazorpaySession(
       await createRazorpayCheckoutSession({
         orderId: order.id,
         orderNumber: order.orderNumber,
@@ -236,7 +238,7 @@ export async function startCheckout(
     paymentProvider = paymentModes.fullPayProvider;
 
     if (paymentModes.fullPayProvider === "razorpay") {
-      await bindRazorpaySession(
+      razorpaySession = await bindRazorpaySession(
         await createRazorpayCheckoutSession({
           orderId: order.id,
           orderNumber: order.orderNumber,
@@ -283,6 +285,16 @@ export async function startCheckout(
     });
   }
 
+  const razorpayCheckoutPayload = razorpaySession
+    ? {
+        mode: razorpaySession.mode,
+        keyId: razorpaySession.keyId,
+        amountMinor: razorpaySession.amountMinor,
+        currency: razorpaySession.currency,
+        providerOrderId: razorpaySession.providerOrderId,
+      }
+    : undefined;
+
   return {
     ok: true as const,
     checkout: {
@@ -299,15 +311,7 @@ export async function startCheckout(
       stripeCheckoutUrl,
       razorpayCheckoutUrl,
       razorpayPaymentRef,
-      razorpayCheckout: razorpayCheckout
-        ? {
-            mode: razorpayCheckout.mode,
-            keyId: razorpayCheckout.keyId,
-            amountMinor: razorpayCheckout.amountMinor,
-            currency: razorpayCheckout.currency,
-            providerOrderId: razorpayCheckout.providerOrderId,
-          }
-        : undefined,
+      razorpayCheckout: razorpayCheckoutPayload,
       razorpayEmiPlans,
       commerceJourneyOrigin: input.commerceJourneyOrigin ?? null,
       paymentMode: paymentSelection.paymentMode,

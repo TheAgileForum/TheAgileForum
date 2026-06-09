@@ -111,7 +111,8 @@ authRouter.get("/oauth/:provider/start", async (req, res, next) => {
         error: { code: "UNKNOWN_OAUTH_PROVIDER", message: "Unsupported OAuth provider" },
       });
     }
-    const url = await buildOAuthStartUrl(provider);
+    const oauthProvider = provider as (typeof oauthProviders)[number];
+    const url = await buildOAuthStartUrl(oauthProvider);
     return res.redirect(url);
   } catch (error) {
     if (error instanceof Error && error.message === "OAUTH_NOT_CONFIGURED") {
@@ -142,7 +143,8 @@ authRouter.get("/oauth/:provider/callback", async (req, res, next) => {
       });
     }
     const { completeOAuthLogin } = await import("../services/oauth-service.js");
-    const result = await completeOAuthLogin(provider, code, state);
+    const oauthProvider = provider as (typeof oauthProviders)[number];
+    const result = await completeOAuthLogin(oauthProvider, code, state);
     const env = getEnv();
     res.cookie(env.AUTH_COOKIE_NAME, result.token, getCookieOptions());
     return res.redirect(result.returnUrl);

@@ -9,6 +9,7 @@ import { publishEvent } from "../events/publisher.js";
 import { validateResumeUpload } from "../security/upload-policy.js";
 import { scheduleAnalysisRun } from "./analysis-runner.js";
 import { upsertSessionJourney } from "./journey-state-service.js";
+import type { PrimaryAction } from "./contracts.js";
 import { enrichAnalysisPayload } from "./result-enrichment.js";
 
 function nextStepForStatus(status: DiagnosisSessionStatus): string {
@@ -334,12 +335,7 @@ export async function getAnalysisResult(runId: string) {
 
   const strengths = run.gapInsight.strengths as string[];
   const gaps = run.gapInsight.gaps as string[];
-  const primaryAction = run.recommendation.primaryAction as {
-    type: string;
-    label: string;
-    href: string;
-    offeringCode?: string;
-  };
+  const primaryAction = run.recommendation.primaryAction as PrimaryAction;
   const rationale = run.recommendation.rationale as Array<{ label: string; detail: string }>;
 
   return enrichAnalysisPayload({
