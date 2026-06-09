@@ -58,8 +58,13 @@ jobs:
           --health-retries 5
     env:
       DATABASE_URL: postgresql://agileforum:agileforum@localhost:5432/agileforum_test
+      DIRECT_URL: postgresql://agileforum:agileforum@localhost:5432/agileforum_test
       CATALOG_USE_DB: "true"
       NODE_ENV: test
+      JWT_SECRET: test-jwt-secret-must-be-32-chars-min!!
+      INTEGRATION_PROVIDER_MODE: stub
+      STRIPE_WEBHOOK_SECRET: whsec_stub
+      CORS_ALLOWED_ORIGINS: http://localhost:5173
     steps:
       - name: Checkout
         uses: actions/checkout@v4
