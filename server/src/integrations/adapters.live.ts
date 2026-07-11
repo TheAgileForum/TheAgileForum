@@ -7,46 +7,37 @@ import type {
 } from "./contracts.js";
 import { executeWithRetry } from "./external-call.js";
 import { mapProviderFailure } from "./errors.js";
+import {
+  parseStripeWebhookEvent,
+  verifyStripeWebhookSignature,
+} from "./stripe-api.js";
 
 export class LiveStripeAdapter implements StripeAdapter {
   provider: "live" = "live";
 
   async verifyWebhookSignature(
-    _payload: Buffer,
-    _signature: string | undefined,
+    payload: Buffer,
+    signature: string | undefined,
   ): Promise<boolean> {
-    const result = await executeWithRetry(async () => {
-      // Placeholder for Stripe SDK-based signature verification.
-      return true;
+    const secret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
+    if (!secret) return false;
+    return verifyStripeWebhookSignature({
+      payload: payload.toString("utf8"),
+      signatureHeader: signature,
+      secret,
     });
-    return result.ok && result.data === true;
   }
 
   async parseWebhookEvent(payload: Buffer): Promise<StripeWebhookEvent> {
     const raw = payload.toString("utf8");
-    let id = `live_evt_${Date.now()}`;
-    let type = "unknown";
-    let orderId: string | undefined;
-    let sessionId: string | undefined;
-    try {
-      const json = JSON.parse(raw) as {
-        id?: string;
-        type?: string;
-        data?: { object?: Record<string, unknown> };
-      };
-      if (json.id) id = String(json.id);
-      if (json.type) type = String(json.type);
-      const obj = (json.data?.object ?? json) as {
-        id?: string;
-        client_reference_id?: string;
-        metadata?: { order_id?: string };
-      };
-      orderId = obj.metadata?.order_id ?? obj.client_reference_id;
-      sessionId = obj.id;
-    } catch {
-      // keep placeholder id/type when payload is not JSON
-    }
-    return { id, type, rawPayload: raw, orderId, sessionId };
+    const parsed = parseStripeWebhookEvent(raw);
+    return {
+      id: parsed.id,
+      type: parsed.type,
+      rawPayload: raw,
+      orderId: parsed.orderId,
+      sessionId: parsed.sessionId,
+    };
   }
 }
 

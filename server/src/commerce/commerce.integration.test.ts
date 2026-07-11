@@ -1,7 +1,8 @@
+import { createHmac } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
-import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { resetRateLimitBuckets } from "../middleware/rate-limit.js";
 import request from "supertest";
 import { createApp } from "../app.js";
@@ -9,6 +10,11 @@ import { prisma } from "../db/client.js";
 
 const hasDb = Boolean(process.env.DATABASE_URL);
 const serverRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "../..");
+const savedPaymentEnv = {
+  razorpayKeyId: process.env.RAZORPAY_KEY_ID,
+  razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET,
+  stripeSecret: process.env.STRIPE_SECRET_KEY,
+};
 
 describe.skipIf(!hasDb)("commerce integration (Sprint 1)", () => {
   const app = createApp();
@@ -23,6 +29,29 @@ describe.skipIf(!hasDb)("commerce integration (Sprint 1)", () => {
 
   beforeEach(() => {
     resetRateLimitBuckets();
+    delete process.env.RAZORPAY_KEY_ID;
+    delete process.env.RAZORPAY_KEY_SECRET;
+    delete process.env.STRIPE_SECRET_KEY;
+    vi.unstubAllGlobals();
+  });
+
+  afterEach(() => {
+    if (savedPaymentEnv.razorpayKeyId !== undefined) {
+      process.env.RAZORPAY_KEY_ID = savedPaymentEnv.razorpayKeyId;
+    } else {
+      delete process.env.RAZORPAY_KEY_ID;
+    }
+    if (savedPaymentEnv.razorpayKeySecret !== undefined) {
+      process.env.RAZORPAY_KEY_SECRET = savedPaymentEnv.razorpayKeySecret;
+    } else {
+      delete process.env.RAZORPAY_KEY_SECRET;
+    }
+    if (savedPaymentEnv.stripeSecret !== undefined) {
+      process.env.STRIPE_SECRET_KEY = savedPaymentEnv.stripeSecret;
+    } else {
+      delete process.env.STRIPE_SECRET_KEY;
+    }
+    vi.unstubAllGlobals();
   });
 
   const loginCustomer = async () => {
@@ -52,7 +81,18 @@ describe.skipIf(!hasDb)("commerce integration (Sprint 1)", () => {
   });
 
   it("returns 402 for paid mock exam access without entitlement (FR-85–87)", async () => {
-    const agent = await loginCustomer();
+    const email = `exam-402-${Date.now()}@demo.local`;
+    await request(app).post("/api/v1/auth/register").send({
+      email,
+      password: "password123",
+      policyVersion: "v1",
+      acceptTerms: true,
+    });
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email, password: "password123" })
+      .expect(200);
     const res = await agent.post("/api/v1/commerce/exam/access").send({
       offeringCode: "exam-mock-certification",
     });
@@ -433,5 +473,175 @@ describe.skipIf(!hasDb)("commerce integration (Sprint 1)", () => {
     ]);
     expect(checkout.body.razorpayCheckoutUrl).toContain("/checkout/razorpay/stub");
     expect(checkout.body.stripeCheckoutUrl).toBeNull();
+  });
+
+  describe("Razorpay live sandbox path (FR-170)", () => {
+    const originalKeyId = process.env.RAZORPAY_KEY_ID;
+    const originalKeySecret = process.env.RAZORPAY_KEY_SECRET;
+    const testKeyId = "rzp_test_integration_key";
+    const testSecret = "rzp_test_integration_secret";
+    const providerOrderId = "order_live_integration_1";
+
+    afterEach(() => {
+      process.env.RAZORPAY_KEY_ID = originalKeyId;
+      process.env.RAZORPAY_KEY_SECRET = originalKeySecret;
+      vi.unstubAllGlobals();
+    });
+
+    it("creates live session, checkout-config, and confirms signed payment (EMI)", async () => {
+      process.env.RAZORPAY_KEY_ID = testKeyId;
+      process.env.RAZORPAY_KEY_SECRET = testSecret;
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue({
+          ok: true,
+          json: async () => ({
+            id: providerOrderId,
+            amount: 166500,
+            currency: "INR",
+            status: "created",
+          }),
+        }),
+      );
+
+      const agent = await loginCustomer();
+      await agent.post("/api/v1/commerce/cart/items?geo=IN").send({
+        offeringCode: "exam-mock-certification",
+        quantity: 1,
+      });
+
+      const checkout = await agent.post("/api/v1/commerce/checkout/start?geo=IN").send({
+        variant: "standard",
+        paymentMode: "installment",
+        installmentProvider: "razorpay_emi",
+      });
+      expect(checkout.status).toBe(201);
+      expect(checkout.body.razorpayCheckout?.mode).toBe("live");
+      expect(checkout.body.razorpayCheckoutUrl).toContain("/checkout/razorpay?");
+      expect(checkout.body.razorpayCheckoutUrl).not.toContain("/stub");
+      expect(checkout.body.razorpayPaymentRef).toBe(`razorpay:pending:${providerOrderId}`);
+
+      const configRes = await agent.get(
+        `/api/v1/commerce/razorpay/checkout-config/${checkout.body.orderId}`,
+      );
+      expect(configRes.status).toBe(200);
+      expect(configRes.body.config.providerOrderId).toBe(providerOrderId);
+      expect(configRes.body.config.keyId).toBe(testKeyId);
+      expect(configRes.body.config.mode).toBe("live");
+
+      const paymentId = "pay_integration_test";
+      const signature = createHmac("sha256", testSecret)
+        .update(`${providerOrderId}|${paymentId}`)
+        .digest("hex");
+
+      const confirm = await agent.post("/api/v1/commerce/checkout/razorpay/confirm").send({
+        orderId: checkout.body.orderId,
+        razorpayOrderId: providerOrderId,
+        razorpayPaymentId: paymentId,
+        razorpaySignature: signature,
+        paymentMode: "installment",
+      });
+      expect(confirm.status).toBe(200);
+      expect(confirm.body.order.status).toBe("paid");
+      expect(confirm.body.order.paymentRef).toBe(`razorpay:${providerOrderId}:${paymentId}`);
+
+      const orderRow = await prisma.order.findUnique({
+        where: { id: checkout.body.orderId },
+      });
+      expect(orderRow?.status).toBe("paid");
+    });
+
+    it("rejects Razorpay confirm when signature is invalid", async () => {
+      process.env.RAZORPAY_KEY_ID = testKeyId;
+      process.env.RAZORPAY_KEY_SECRET = testSecret;
+      const invalidSigOrderId = "order_live_integration_invalid_sig";
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue({
+          ok: true,
+          json: async () => ({
+            id: invalidSigOrderId,
+            amount: 166500,
+            currency: "INR",
+            status: "created",
+          }),
+        }),
+      );
+
+      const agent = await loginCustomer();
+      await agent.post("/api/v1/commerce/cart/items?geo=IN").send({
+        offeringCode: "exam-mock-certification",
+        quantity: 1,
+      });
+      const checkout = await agent.post("/api/v1/commerce/checkout/start?geo=IN").send({
+        variant: "standard",
+      });
+      expect(checkout.status).toBe(201);
+
+      const confirm = await agent.post("/api/v1/commerce/checkout/razorpay/confirm").send({
+        orderId: checkout.body.orderId,
+        razorpayOrderId: invalidSigOrderId,
+        razorpayPaymentId: "pay_bad",
+        razorpaySignature: "deadbeef",
+      });
+      expect(confirm.status).toBe(400);
+      expect(confirm.body.error.code).toBe("RAZORPAY_SIGNATURE_INVALID");
+    });
+  });
+
+  describe("Stripe live sandbox path", () => {
+    const originalSecret = process.env.STRIPE_SECRET_KEY;
+
+    afterEach(() => {
+      process.env.STRIPE_SECRET_KEY = originalSecret;
+      vi.unstubAllGlobals();
+    });
+
+    it("creates live session and confirms paid session", async () => {
+      process.env.STRIPE_SECRET_KEY = "sk_test_integration";
+      const sessionId = "cs_test_integration";
+      const fetchMock = vi.fn().mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          id: sessionId,
+          url: "https://checkout.stripe.com/c/pay/cs_test_integration",
+        }),
+      });
+      vi.stubGlobal("fetch", fetchMock);
+
+      const agent = await loginCustomer();
+      await agent.post("/api/v1/commerce/cart/items?geo=US").send({
+        offeringCode: "exam-mock-certification",
+        quantity: 1,
+      });
+      const checkout = await agent.post("/api/v1/commerce/checkout/start?geo=US").send({
+        variant: "standard",
+      });
+      expect(checkout.status).toBe(201);
+      expect(checkout.body.paymentProvider).toBe("stripe");
+      expect(checkout.body.stripeCheckout?.mode).toBe("live");
+      expect(checkout.body.stripeCheckoutUrl).toContain("checkout.stripe.com");
+      expect(checkout.body.stripePaymentRef).toBe(`stripe:pending:${sessionId}`);
+
+      const orderId = checkout.body.orderId as string;
+      fetchMock.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          id: sessionId,
+          payment_status: "paid",
+          status: "complete",
+          client_reference_id: orderId,
+          metadata: { order_id: orderId },
+        }),
+      });
+
+      const confirm = await agent.post("/api/v1/commerce/checkout/stripe/confirm").send({
+        orderId,
+        stripeSessionId: sessionId,
+      });
+      expect(confirm.status).toBe(200);
+      expect(confirm.body.order.status).toBe("paid");
+      expect(confirm.body.order.paymentRef).toBe(`stripe:${sessionId}:confirm`);
+    });
   });
 });

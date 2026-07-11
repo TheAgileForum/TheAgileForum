@@ -157,6 +157,13 @@ export type CatalogOffering = {
   certBody?: string;
   deliveryMode: "live" | "self_paced";
   upcomingBatchId?: string;
+  slug?: string;
+  certificationName?: string;
+  summary?: string;
+  durationHours?: number;
+  scheduleLabel?: string;
+  includes?: string[];
+  learningOutcomes?: string[];
   priceQuote?: {
     amount: string;
     currency: string;
@@ -341,6 +348,12 @@ export type CheckoutStartResult = {
   currency: string;
   cart: CartSummary;
   stripeCheckoutUrl?: string | null;
+  stripePaymentRef?: string | null;
+  stripeCheckout?: {
+    mode: "live";
+    sessionId: string;
+    checkoutUrl: string;
+  };
   razorpayCheckoutUrl?: string | null;
   razorpayPaymentRef?: string | null;
   razorpayCheckout?: RazorpayCheckoutConfig;
@@ -603,6 +616,19 @@ export async function confirmRazorpayCheckout(input: {
 }) {
   return apiFetch<{ order: { id: string; orderNumber: string; status: string; paymentRef?: string } }>(
     "/api/v1/commerce/checkout/razorpay/confirm",
+    {
+      method: "POST",
+      body: JSON.stringify(input),
+    },
+  );
+}
+
+export async function confirmStripeCheckout(input: {
+  orderId: string;
+  stripeSessionId: string;
+}) {
+  return apiFetch<{ order: { id: string; orderNumber: string; status: string; paymentRef?: string } }>(
+    "/api/v1/commerce/checkout/stripe/confirm",
     {
       method: "POST",
       body: JSON.stringify(input),

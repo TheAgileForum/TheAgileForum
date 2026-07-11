@@ -30,6 +30,7 @@ import { commerceJourneyOriginSchema } from "../commerce/journey-origin.js";
 import {
   completeCheckout,
   completeOrderFromRazorpayPayment,
+  completeOrderFromStripePayment,
   getRazorpayCheckoutConfig,
   startCheckout,
 } from "../services/checkout-service.js";
@@ -342,6 +343,11 @@ const razorpayConfirmBody = z.object({
   paymentMode: paymentModeSchema.optional(),
 });
 
+const stripeConfirmBody = z.object({
+  orderId: z.string().uuid(),
+  stripeSessionId: z.string().min(1),
+});
+
 commerceRouter.get(
   "/razorpay/checkout-config/:orderId",
   requireAuth,
@@ -376,6 +382,31 @@ commerceRouter.post(
           ? 404
           : result.error.code === "RAZORPAY_SIGNATURE_INVALID"
             ? 400
+            : 400;
+      return res.status(status).json({ error: result.error });
+    }
+    return res.json({ order: result.order });
+  },
+);
+
+commerceRouter.post(
+  "/checkout/stripe/confirm",
+  requireAuth,
+  requireVerifiedEmail,
+  withBodyValidation(stripeConfirmBody),
+  async (req, res) => {
+    const body = req.body as z.infer<typeof stripeConfirmBody>;
+    const result = await completeOrderFromStripePayment({
+      auth: req.auth!,
+      orderId: body.orderId,
+      stripeSessionId: body.stripeSessionId,
+    });
+    if (!result.ok) {
+      const status =
+        result.error.code === "ORDER_NOT_FOUND"
+          ? 404
+          : result.error.code === "STRIPE_PAYMENT_INCOMPLETE"
+            ? 402
             : 400;
       return res.status(status).json({ error: result.error });
     }
