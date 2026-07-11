@@ -82,9 +82,19 @@ export async function captureProductEvent(input: PosthogEventInput): Promise<boo
     return false;
   }
 
-  posthog.capture(parsed.data);
-  await posthog.flush();
-  return true;
+  try {
+    posthog.capture(parsed.data);
+    await posthog.flush();
+    return true;
+  } catch (err) {
+    logWarn("PostHog flush failed", {
+      component: "observability",
+      event: "posthog_flush_error",
+      posthogEvent: parsed.data.event,
+      reason: err instanceof Error ? err.message : String(err),
+    });
+    return false;
+  }
 }
 
 export async function shutdownPosthogClient(): Promise<void> {

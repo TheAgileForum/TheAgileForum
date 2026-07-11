@@ -55,14 +55,52 @@ describe("pricing-service (FR-178)", () => {
     expect(convertFromUsd(49, "INR")).toBe((49 * 83).toFixed(2));
   });
 
+  it("converts USD base price to IDR without decimals", () => {
+    expect(convertFromUsd(49, "IDR")).toBe(String(49 * 16000));
+  });
+
+  it("geo-detects CAD for Canada", () => {
+    const ctx = resolveCurrencyContext({ geo: "CA" });
+    expect(ctx.currency).toBe("CAD");
+  });
+
+  it("geo-detects NGN for Nigeria", () => {
+    const ctx = resolveCurrencyContext({ geo: "NG" });
+    expect(ctx.currency).toBe("NGN");
+  });
+
   it("quotes offering in session currency with installment plans for India", () => {
     const ctx = resolveCurrencyContext({ geo: "IN" });
     const quote = quoteOfferingPrice(
-      { code: "safe-leading-safe", defaultUnitPrice: "999.00" },
+      { code: "safe-leading-safe", defaultUnitPrice: "549.00" },
       ctx,
     );
     expect(quote.currency).toBe("INR");
+    expect(quote.amount).toBe("33999.00");
     expect(quote.installmentPlans?.length).toBeGreaterThan(0);
+    expect(quote.installmentPlans?.[0]?.monthlyAmount).toBe(
+      (33999 / 6).toFixed(2),
+    );
+  });
+
+  it("keeps USD list price for SAFe certs outside India", () => {
+    const ctx = resolveCurrencyContext({ geo: "US", currencyOverride: "USD" });
+    const quote = quoteOfferingPrice(
+      { code: "safe-leading-safe", defaultUnitPrice: "549.00" },
+      ctx,
+    );
+    expect(quote.currency).toBe("USD");
+    expect(quote.amount).toBe("549.00");
+  });
+
+  it("uses FX conversion when no regional list price exists", () => {
+    const ctx = resolveCurrencyContext({ geo: "IN" });
+    const quote = quoteOfferingPrice(
+      { code: "exam-mock-certification", defaultUnitPrice: "49.00" },
+      ctx,
+    );
+    expect(quote.currency).toBe("INR");
+    expect(quote.amount).toBe((49 * 83).toFixed(2));
   });
 
   it("omits installment plans for Singapore geo (FR-169)", () => {

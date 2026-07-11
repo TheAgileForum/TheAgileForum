@@ -23,7 +23,8 @@
     "db:reset": "prisma migrate reset",
     "observability:synthetic": "tsx scripts/observability-synthetic-failure.ts",
     "observability:posthog-verify": "tsx scripts/posthog-staging-verify.ts",
-    "readiness:gate": "tsx scripts/sprint-1-readiness-gate.ts"
+    "readiness:gate": "tsx scripts/sprint-1-readiness-gate.ts",
+    "staging:preflight": "tsx scripts/staging-preflight.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",

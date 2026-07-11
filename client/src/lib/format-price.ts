@@ -3,15 +3,34 @@ const CURRENCY_SYMBOL: Record<string, string> = {
   INR: "₹",
   EUR: "€",
   GBP: "£",
+  CAD: "CA$",
+  AUD: "A$",
+  SGD: "S$",
+  AED: "AED ",
+  NGN: "₦",
+  IDR: "Rp",
+  BRL: "R$",
 };
 
-/** Format catalog/checkout amounts consistently (e.g. USD 299.00 → $299). */
+const ZERO_DECIMAL_CURRENCIES = new Set(["IDR"]);
+
+/** Format catalog/checkout amounts consistently (e.g. INR 33999 → ₹33,999). */
 export function formatPrice(currency: string, amount: string): string {
-  const symbol = CURRENCY_SYMBOL[currency.toUpperCase()] ?? `${currency} `;
+  const code = currency.toUpperCase();
+  const symbol = CURRENCY_SYMBOL[code] ?? `${code} `;
   const num = Number.parseFloat(amount);
   if (Number.isNaN(num)) return `${symbol}${amount}`;
-  const formatted = Number.isInteger(num) ? String(num) : num.toFixed(2).replace(/\.00$/, "");
-  return `${symbol}${formatted}`;
+  if (ZERO_DECIMAL_CURRENCIES.has(code)) {
+    return `${symbol}${Math.round(num).toLocaleString("en-US")}`;
+  }
+  const isWhole = Math.abs(num - Math.round(num)) < 0.005;
+  if (isWhole) {
+    return `${symbol}${Math.round(num).toLocaleString("en-US")}`;
+  }
+  return `${symbol}${num.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 }
 
 type PricedOffering = {

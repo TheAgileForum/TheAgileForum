@@ -34,12 +34,27 @@ const SCHEDULE_OPTIONS = [
   { id: "cohort-2026-07", label: "July 2026 cohort" },
 ];
 
-const INCLUSIONS = [
+const DEFAULT_INCLUSIONS = [
   "Live mentor-led labs",
   "Community access for your cohort",
   "Certificate prep materials",
   "Mock interview bundle option",
 ];
+
+function scheduleOptionsFor(offering: CatalogOffering) {
+  if (offering.cohortSchedules?.length) {
+    return offering.cohortSchedules;
+  }
+  if (offering.upcomingBatchId) {
+    return [
+      {
+        id: offering.upcomingBatchId,
+        label: offering.scheduleLabel ?? offering.upcomingBatchId,
+      },
+    ];
+  }
+  return SCHEDULE_OPTIONS;
+}
 
 export function OfferPage() {
   const { code } = useParams<{ code: string }>();
@@ -120,6 +135,8 @@ export function OfferPage() {
 
   const priced = resolvedOfferingPrice(offering);
   const priceLabel = formatPrice(priced.currency, priced.amount);
+  const inclusions = offering.includes?.length ? offering.includes : DEFAULT_INCLUSIONS;
+  const scheduleOptions = scheduleOptionsFor(offering);
 
   return (
     <Stack spacing={2}>
@@ -135,19 +152,37 @@ export function OfferPage() {
       </Typography>
       <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }}>
         <Chip label={offering.kind} size="small" variant="outlined" />
+        {offering.certificationName ? (
+          <Chip label={offering.certificationName} size="small" color="primary" variant="outlined" />
+        ) : null}
+        {offering.durationLabel ? (
+          <Chip label={offering.durationLabel} size="small" variant="outlined" />
+        ) : offering.durationHours ? (
+          <Chip label={`${offering.durationHours} hrs`} size="small" variant="outlined" />
+        ) : null}
         {offering.scheduleBound ? <Chip label="Schedule required" size="small" color="info" variant="outlined" /> : null}
       </Stack>
 
+      {offering.summary ? (
+        <Typography variant="body1" color="text.secondary">
+          {offering.summary}
+        </Typography>
+      ) : null}
+
       <Card variant="outlined">
         <CardContent>
-          <Typography variant="overline" color="text.secondary">
-            Investment · {priced.currency}
+          <Typography variant="overline" color="text.secondary" sx={{ letterSpacing: "0.08em" }}>
+            Investment
           </Typography>
-          <Typography variant="h4" sx={{ fontWeight: 700 }}>
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: 700, letterSpacing: "-0.02em", color: "text.primary", mt: 0.5 }}
+          >
             {priceLabel}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
             Price shown matches checkout total for this session currency.
+            {offering.scheduleLabel ? ` · ${offering.scheduleLabel}` : ""}
           </Typography>
           <EmiAffordabilityModule
             amount={priced.amount}
@@ -164,7 +199,7 @@ export function OfferPage() {
             What&apos;s included
           </Typography>
           <Stack component="ul" sx={{ m: 0, pl: 2.5 }} spacing={0.5}>
-            {INCLUSIONS.map((item) => (
+            {inclusions.map((item) => (
               <Typography key={item} component="li" variant="body2" color="text.secondary">
                 {item}
               </Typography>
@@ -172,6 +207,23 @@ export function OfferPage() {
           </Stack>
         </CardContent>
       </Card>
+
+      {offering.learningOutcomes?.length ? (
+        <Card variant="outlined">
+          <CardContent>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+              What you&apos;ll learn
+            </Typography>
+            <Stack component="ul" sx={{ m: 0, pl: 2.5 }} spacing={0.5}>
+              {offering.learningOutcomes.map((item) => (
+                <Typography key={item} component="li" variant="body2" color="text.secondary">
+                  {item}
+                </Typography>
+              ))}
+            </Stack>
+          </CardContent>
+        </Card>
+      ) : null}
 
       {offering.scheduleBound ? (
         <TextField
@@ -183,7 +235,7 @@ export function OfferPage() {
           fullWidth
           helperText="Required before add to cart — schedule is attached to your cart line"
         >
-          {SCHEDULE_OPTIONS.map((s) => (
+          {scheduleOptions.map((s) => (
             <MenuItem key={s.id} value={s.id}>
               {s.label}
             </MenuItem>

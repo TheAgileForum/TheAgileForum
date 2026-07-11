@@ -21,16 +21,11 @@ export const resumeBody = z.object({
   checksum: z.string().optional(),
 });
 
-export const jdBody = z
-  .object({
-    jdText: z.string().optional(),
-    jdUrl: z.string().url().optional(),
-    targetRole: z.string().min(1),
-  })
-  .refine((value) => Boolean(value.jdText?.trim() || value.jdUrl), {
-    message: "Provide jdText or jdUrl",
-    path: ["jdText"],
-  });
+export const jdBody = z.object({
+  jdText: z.string().optional(),
+  jdUrl: z.string().url().optional(),
+  targetRole: z.string().min(1),
+});
 
 export const analyzeBody = z.object({
   runReason: z.string().optional(),

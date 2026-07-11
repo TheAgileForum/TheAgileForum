@@ -68,6 +68,16 @@ describe("diagnosis API contracts (no DB)", () => {
     expect(res.body.error.code).toBe("CONSENT_REQUIRED");
   });
 
+  it("PUT /jd accepts targetRole without jd text (resume-only path)", async () => {
+    const diagnosisService = await import("./diagnosis-service.js");
+    vi.mocked(diagnosisService.saveJdInput).mockResolvedValue({ saved: true, nextStep: "step_2" });
+    const res = await request(createApp())
+      .put("/api/v1/diagnosis/session/sess-1/jd")
+      .send({ targetRole: "Scrum Master" });
+    expect(res.status).toBe(200);
+    expect(res.body.saved).toBe(true);
+  });
+
   it("POST /resume returns 400 for unsupported mime", async () => {
     const { ApiError } = await import("../errors/api-error.js");
     mockRegisterResume.mockRejectedValue(

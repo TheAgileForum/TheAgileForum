@@ -2,6 +2,22 @@ import type { Request } from "express";
 import { resolvePaymentModes } from "../commerce/payment-mode.js";
 import type { OfferingMeta } from "../catalog/offerings.js";
 import { getOffering } from "../catalog/offerings.js";
+import {
+  currencyDecimals,
+  formatAmountFromUsd,
+  GEO_DEFAULT_CURRENCY,
+} from "./supported-currencies.js";
+
+export {
+  GEO_DEFAULT_CURRENCY,
+  SUPPORTED_CURRENCIES,
+  SUPPORTED_CURRENCY_CODES,
+  USD_CONVERSION_RATES,
+  currencyDecimals,
+  formatAmountFromUsd,
+  geoFromCurrency,
+  isSupportedCurrency,
+} from "./supported-currencies.js";
 
 export type CurrencySource = "geo" | "user";
 
@@ -32,32 +48,8 @@ export const SESSION_CURRENCY_COOKIE = "af_session_currency";
 
 export const SESSION_CURRENCY_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 
-const GEO_DEFAULT_CURRENCY: Record<string, string> = {
-  IN: "INR",
-  US: "USD",
-  CA: "USD",
-  GB: "GBP",
-  AU: "AUD",
-  NZ: "NZD",
-  SG: "SGD",
-  AE: "AED",
-  DE: "EUR",
-  FR: "EUR",
-};
-
 /** Installment term shared across catalog, checkout, and payments APIs (FR-174). */
 export const INSTALLMENT_TERM_MONTHS = 6;
-
-const USD_CONVERSION_RATES: Record<string, number> = {
-  USD: 1,
-  INR: 83,
-  GBP: 0.79,
-  AED: 3.67,
-  SGD: 1.35,
-  AUD: 1.52,
-  NZD: 1.64,
-  EUR: 0.92,
-};
 
 const GEO_HEADER_KEYS = ["x-geo", "cf-ipcountry", "x-vercel-ip-country"] as const;
 
@@ -67,6 +59,11 @@ function normalizeGeo(geo: string): string {
   if (code === "USA") return "US";
   if (code === "UK") return "GB";
   if (code === "UAE") return "AE";
+  if (code === "CANADA") return "CA";
+  if (code === "NIGERIA") return "NG";
+  if (code === "INDONESIA") return "ID";
+  if (code === "BRAZIL") return "BR";
+  if (code === "NETHERLANDS") return "NL";
   return code;
 }
 
@@ -146,12 +143,28 @@ export function resolveCurrencyContext(input: PricingHttpInput): CurrencyContext
 }
 
 export function convertFromUsd(amountUsd: number, targetCurrency: string): string {
-  const rate = USD_CONVERSION_RATES[targetCurrency] ?? 1;
-  return (amountUsd * rate).toFixed(2);
+  return formatAmountFromUsd(amountUsd, targetCurrency);
 }
 
 function amountUsdFromOffering(offering: Pick<OfferingMeta, "defaultUnitPrice">): number {
   return Number.parseFloat(offering.defaultUnitPrice);
+}
+
+/** Prefer explicit regional list price over FX from USD catalog base. */
+function resolveQuotedAmount(
+  offering: Pick<OfferingMeta, "code" | "defaultUnitPrice" | "regionalUnitPrices">,
+  currency: string,
+): string {
+  const code = currency.toUpperCase();
+  const stub = getOffering(offering.code);
+  const regional =
+    offering.regionalUnitPrices?.[code] ?? stub?.regionalUnitPrices?.[code];
+  if (regional) {
+    const decimals = currencyDecimals(code);
+    const num = Number.parseFloat(regional);
+    if (Number.isFinite(num)) return num.toFixed(decimals);
+  }
+  return convertFromUsd(amountUsdFromOffering(offering), code);
 }
 
 export function buildInstallmentPlans(
@@ -168,7 +181,9 @@ export function buildInstallmentPlans(
   ) {
     return undefined;
   }
-  const monthly = (amountNum / INSTALLMENT_TERM_MONTHS).toFixed(2);
+  const monthly = (amountNum / INSTALLMENT_TERM_MONTHS).toFixed(
+    currencyDecimals(currency),
+  );
   return paymentModes.installmentProviders.map((provider) => ({
     provider,
     monthlyAmount: monthly,
@@ -177,12 +192,10 @@ export function buildInstallmentPlans(
 }
 
 export function quoteOfferingPrice(
-  offering: Pick<OfferingMeta, "code" | "defaultUnitPrice">,
+  offering: Pick<OfferingMeta, "code" | "defaultUnitPrice" | "regionalUnitPrices">,
   context: CurrencyContext,
 ): PriceQuote {
-  const amountUsd = amountUsdFromOffering(offering);
-  const amount = convertFromUsd(amountUsd, context.currency);
-  const paymentModes = resolvePaymentModes(context.geoDetected);
+  const amount = resolveQuotedAmount(offering, context.currency);
   const quote: PriceQuote = {
     offerId: offering.code,
     amount,
@@ -229,7 +242,9 @@ export type ResolvedCartLine = {
 export async function resolveCartLineTotals(
   items: Array<{ offeringCode: string; quantity: number }>,
   context: CurrencyContext,
-  lookupOffering: (code: string) => Promise<Pick<OfferingMeta, "code" | "defaultUnitPrice"> | null>,
+  lookupOffering: (
+    code: string,
+  ) => Promise<Pick<OfferingMeta, "code" | "defaultUnitPrice" | "regionalUnitPrices"> | null>,
 ): Promise<{ currency: string; subtotal: string; lines: ResolvedCartLine[] }> {
   const lines: ResolvedCartLine[] = [];
   let subtotal = 0;
@@ -238,7 +253,8 @@ export async function resolveCartLineTotals(
     const offering = await lookupOffering(item.offeringCode);
     if (!offering) continue;
     const quote = quoteOfferingPrice(offering, context);
-    const lineTotal = (Number.parseFloat(quote.amount) * item.quantity).toFixed(2);
+    const decimals = currencyDecimals(context.currency);
+    const lineTotal = (Number.parseFloat(quote.amount) * item.quantity).toFixed(decimals);
     subtotal += Number.parseFloat(lineTotal);
     lines.push({
       offeringCode: item.offeringCode,
@@ -251,7 +267,7 @@ export async function resolveCartLineTotals(
 
   return {
     currency: context.currency,
-    subtotal: subtotal.toFixed(2),
+    subtotal: subtotal.toFixed(currencyDecimals(context.currency)),
     lines,
   };
 }

@@ -18,6 +18,9 @@ import { recommendationsRouter } from "./routes/recommendations.routes.js";
 
 export function createApp() {
   const app = express();
+  if (process.env.NODE_ENV === "production") {
+    app.set("trust proxy", 1);
+  }
   app.use(requestIdMiddleware);
   app.use(securityHeadersMiddleware);
   app.use(corsMiddleware);

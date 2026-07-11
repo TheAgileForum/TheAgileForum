@@ -20,7 +20,8 @@ type DiagnosisContextValue = {
   sessionId: string | null;
   runId: string | null;
   resumeStep: string | null;
-  loading: boolean;
+  /** True only while restoring a stored session on load — do not block new diagnosis CTAs. */
+  resumeLoading: boolean;
   startSession: (campaignId?: string) => Promise<string>;
   setRunId: (runId: string | null) => void;
   reset: () => void;
@@ -32,12 +33,19 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
   const [sessionId, setSessionId] = useState<string | null>(() => getStoredSessionId());
   const [runId, setRunId] = useState<string | null>(null);
   const [resumeStep, setResumeStep] = useState<string | null>(null);
-  const [loading, setLoading] = useState(() => Boolean(getStoredSessionId()));
+  const [resumeLoading, setResumeLoading] = useState(() => Boolean(getStoredSessionId()));
 
   useEffect(() => {
     const stored = getStoredSessionId();
     if (!stored) return;
-    void getJourneyState(stored)
+
+    const timeoutMs = 15_000;
+    const journeyPromise = getJourneyState(stored);
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      window.setTimeout(() => reject(new Error("JOURNEY_STATE_TIMEOUT")), timeoutMs);
+    });
+
+    void Promise.race([journeyPromise, timeoutPromise])
       .then((state) => {
         setSessionId(stored);
         setResumeStep(state.currentStep);
@@ -49,8 +57,10 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
       .catch(() => {
         clearStoredSessionId();
         setSessionId(null);
+        setResumeStep(null);
+        setRunId(null);
       })
-      .finally(() => setLoading(false));
+      .finally(() => setResumeLoading(false));
   }, []);
 
   const startSession = useCallback(async (campaignId?: string) => {
@@ -74,12 +84,12 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
       sessionId,
       runId,
       resumeStep,
-      loading,
+      resumeLoading,
       startSession,
       setRunId,
       reset,
     }),
-    [sessionId, runId, resumeStep, loading, startSession, reset],
+    [sessionId, runId, resumeStep, resumeLoading, startSession, reset],
   );
 
   return (

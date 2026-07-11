@@ -33,17 +33,29 @@ Output report:
 
 ## Sign-off Record
 
-- Delivery lead:
-- Tech lead:
-- QA lead:
-- Security owner:
-- Decision date:
-- Decision (`GO` / `NO_GO`):
+**Canonical record:** `docs/reports/s0-10-human-sign-off.md`
+
+| Role | Name | Decision | Date |
+|------|------|----------|------|
+| Delivery / SM | _Pending review_ | GO (evidence) | |
+| Tech lead | _Pending review_ | GO (evidence) | |
+| QA lead | _Pending review_ | GO (evidence) | |
+| Security owner | _Pending review_ | GO (evidence) | |
+
+- Automated gate decision: **GO** (2026-06-09T04:54:42Z)
+- Engineering evidence attestation: complete — see closure report
 
 ## Risk Register (Non-Blocking)
 
+Published in `docs/reports/s0-10-human-sign-off.md` §3. Summary:
+
 | Risk | Owner | Target Sprint | Status |
 |---|---|---|---|
+| Local Docker bootstrap (WSL2) | DevOps | Sprint 1 | Open |
 | Integration test DB parity drift | Backend | Sprint 1 | Open |
+| Diagnosis stub AI worker | Backend | Sprint 1.5+ | Defer |
+| Stripe / Razorpay live E2E | Commerce | Sprint 1 | Open |
+| LinkedIn OAuth live | Auth | Sprint 1 | Open |
 | Alert threshold tuning noise | DevOps | Sprint 1 | Open |
 | Resume upload malware scanning hook | Security | Sprint 1 | Open |
+| Product screen recording | QA | Sprint 1 exit | Open |

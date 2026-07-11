@@ -2,10 +2,14 @@ import { Router } from "express";
 import { buildCatalogFacets } from "../catalog/facets.js";
 import { filterOfferings, parseCatalogFilterQuery } from "../catalog/filter.js";
 import {
-  getOfferingFromCatalog,
   listOfferingsByCategoryFromCatalog,
   listOfferingsFromCatalog,
+  getOfferingFromCatalog,
 } from "../catalog/catalog-repository.js";
+import {
+  listCertificationCourses,
+  listTrainingCourses,
+} from "../catalog/catalog-seed-data.js";
 import type { OfferingMeta, OfferingCategory } from "../catalog/offerings.js";
 import {
   parsePricingInputFromRequest,
@@ -30,6 +34,15 @@ function serializeOffering(o: OfferingMeta, context: CurrencyContext) {
     certBody: o.certBody,
     deliveryMode: o.deliveryMode,
     upcomingBatchId: o.upcomingBatchId,
+    slug: o.slug,
+    certificationName: o.certificationName,
+    summary: o.summary,
+    durationHours: o.durationHours,
+    durationLabel: o.durationLabel,
+    scheduleLabel: o.scheduleLabel,
+    cohortSchedules: o.cohortSchedules,
+    includes: o.includes,
+    learningOutcomes: o.learningOutcomes,
     priceQuote: {
       amount: priceQuote.amount,
       currency: priceQuote.currency,
@@ -102,7 +115,30 @@ function categoryListing(category: OfferingCategory) {
       ...(req.query as Record<string, string | undefined>),
       category,
     });
-    const base = await listOfferingsByCategoryFromCatalog(category);
+    let base = await listOfferingsByCategoryFromCatalog(category);
+    // Browse pages: prefer stub details when DB is sparse/stale (same pattern as certifications).
+    if (category === "certification") {
+      const courses = base.filter((o) => o.kind === "course");
+      const byCode = new Map(courses.map((o) => [o.code, o]));
+      for (const stub of listCertificationCourses()) {
+        const existing = byCode.get(stub.code);
+        // Prefer stub when it carries live-site enrichment (summary) or row is missing.
+        if (!existing || stub.summary) {
+          byCode.set(stub.code, stub);
+        }
+      }
+      base = [...byCode.values()];
+    } else if (category === "training") {
+      const courses = base.filter((o) => o.kind === "course");
+      const byCode = new Map(courses.map((o) => [o.code, o]));
+      for (const stub of listTrainingCourses()) {
+        const existing = byCode.get(stub.code);
+        if (!existing || stub.summary) {
+          byCode.set(stub.code, stub);
+        }
+      }
+      base = [...byCode.values()];
+    }
     const filtered = filterOfferings(base, query);
     const offerings = filtered.map((o) => serializeOffering(o, context));
     return res.json({

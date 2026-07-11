@@ -27,6 +27,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link as RouterLink, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 import { useAuth } from "../../contexts/AuthContext";
+import { apiUrl } from "../../lib/api-base.js";
 
 
 
@@ -177,11 +178,8 @@ export function LoginPage() {
 
 
   const oauthStartUrl = useMemo(
-
-    () => (provider: string) => `/api/v1/auth/oauth/${provider}/start`,
-
+    () => (provider: string) => apiUrl(`/api/v1/auth/oauth/${provider}/start`),
     [],
-
   );
 
 
