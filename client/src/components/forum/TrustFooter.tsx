@@ -158,7 +158,7 @@ export function TrustFooter() {
             <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.45)", pt: 0.5 }}>
               Connect &amp; follow
             </Typography>
-            <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+            <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: "wrap" }}>
               {SOCIAL_LINKS.map(({ label, href, Icon }) => (
                 <IconButton
                   key={label}
@@ -232,7 +232,7 @@ export function TrustFooter() {
             gap: 1.5,
           }}
         >
-          <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
+          <Stack direction="row" spacing={2} useFlexGap sx={{ flexWrap: "wrap" }}>
             {LEGAL_LINKS.map((item) => (
               <Link key={item.to} component={RouterLink} to={item.to} sx={{ ...footerLinkSx, fontSize: "0.8rem" }}>
                 {item.label}
