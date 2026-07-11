@@ -29,12 +29,30 @@ describe("auth contract baseline (no DB dependency)", () => {
     expect(res.headers.location).toMatch(/oauth\/google\/callback/);
   });
 
+  it("redirects linkedin OAuth start in stub/test mode", async () => {
+    const res = await request(createApp())
+      .get("/api/v1/auth/oauth/linkedin/start")
+      .redirects(0);
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toMatch(/oauth\/linkedin\/callback/);
+  });
+
   it("returns 501 when stub disabled and provider not configured", async () => {
     process.env.OAUTH_STUB_MODE = "false";
     delete process.env.GOOGLE_CLIENT_ID;
     delete process.env.GOOGLE_CLIENT_SECRET;
     resetEnvCache();
     const res = await request(createApp()).get("/api/v1/auth/oauth/google/start");
+    expect(res.status).toBe(501);
+    expect(res.body.error.code).toBe("OAUTH_NOT_CONFIGURED");
+  });
+
+  it("returns 501 for linkedin when stub disabled and credentials missing", async () => {
+    process.env.OAUTH_STUB_MODE = "false";
+    delete process.env.LINKEDIN_CLIENT_ID;
+    delete process.env.LINKEDIN_CLIENT_SECRET;
+    resetEnvCache();
+    const res = await request(createApp()).get("/api/v1/auth/oauth/linkedin/start");
     expect(res.status).toBe(501);
     expect(res.body.error.code).toBe("OAUTH_NOT_CONFIGURED");
   });

@@ -22,7 +22,11 @@ import {
   type InstallmentProvider,
   type PaymentMode,
 } from "../commerce/payment-mode.js";
-import { createCheckoutSession } from "./stripe-checkout-service.js";
+import {
+  createCheckoutSession,
+  fetchStripeCheckoutSession,
+  type StripeCheckoutMode,
+} from "./stripe-checkout-service.js";
 import {
   createRazorpayCheckoutSession,
   getRazorpayKeySecret,
@@ -190,6 +194,10 @@ export async function startCheckout(
   });
 
   let stripeCheckoutUrl: string | null = null;
+  let stripePaymentRef: string | null = null;
+  let stripeCheckout:
+    | { mode: StripeCheckoutMode; sessionId: string; checkoutUrl: string }
+    | undefined;
   let razorpayCheckoutUrl: string | null = null;
   let razorpayPaymentRef: string | null = null;
   let razorpayEmiPlans:
@@ -197,6 +205,23 @@ export async function startCheckout(
     | undefined;
   let razorpaySession: RazorpayCheckoutSession | null = null;
   let paymentProvider: "stripe" | "razorpay" | null = null;
+
+  async function bindStripeSession(
+    session: NonNullable<Awaited<ReturnType<typeof createCheckoutSession>>>,
+  ) {
+    stripeCheckoutUrl = session.checkoutUrl;
+    stripePaymentRef = session.paymentRef;
+    stripeCheckout = {
+      mode: session.mode,
+      sessionId: session.sessionId,
+      checkoutUrl: session.checkoutUrl,
+    };
+    await prisma.order.update({
+      where: { id: order.id },
+      data: { paymentRef: session.paymentRef },
+    });
+    return session;
+  }
 
   async function bindRazorpaySession(
     session: RazorpayCheckoutSession,
@@ -259,7 +284,9 @@ export async function startCheckout(
         currency: order.currency,
         customerEmail: user?.email,
       });
-      stripeCheckoutUrl = stripeSession?.checkoutUrl ?? null;
+      if (stripeSession) {
+        await bindStripeSession(stripeSession);
+      }
     }
   }
 
@@ -309,6 +336,8 @@ export async function startCheckout(
         variant === "org_reimbursement" ? input.orgReimbursement : undefined,
       paymentProvider,
       stripeCheckoutUrl,
+      stripePaymentRef,
+      stripeCheckout,
       razorpayCheckoutUrl,
       razorpayPaymentRef,
       razorpayCheckout: razorpayCheckoutPayload,
@@ -591,6 +620,116 @@ export async function completeOrderFromStripeWebhook(input: {
   const paymentRef = `stripe:${input.stripeSessionId}:${input.stripeEventId}`;
   const updated = await markOrderPaid(order, paymentRef);
   await deliverPaidOrderNotifications(updated);
+
+  return {
+    ok: true as const,
+    order: {
+      id: updated.id,
+      orderNumber: updated.orderNumber,
+      status: updated.status,
+      paymentRef: updated.paymentRef,
+      alreadyCompleted: false,
+    },
+  };
+}
+
+export async function completeOrderFromStripePayment(input: {
+  auth: SessionClaims;
+  orderId: string;
+  stripeSessionId: string;
+}) {
+  if (!process.env.STRIPE_SECRET_KEY?.trim()) {
+    return {
+      ok: false as const,
+      error: {
+        code: "STRIPE_NOT_CONFIGURED",
+        message: "Stripe is not configured",
+      },
+    };
+  }
+
+  const order = await prisma.order.findFirst({
+    where: { id: input.orderId, userId: input.auth.userId },
+    include: { items: true },
+  });
+  if (!order) {
+    return {
+      ok: false as const,
+      error: { code: "ORDER_NOT_FOUND", message: "Order not found" },
+    };
+  }
+
+  if (order.status === "paid") {
+    return {
+      ok: true as const,
+      order: {
+        id: order.id,
+        orderNumber: order.orderNumber,
+        status: order.status,
+        paymentRef: order.paymentRef,
+        alreadyCompleted: true,
+      },
+    };
+  }
+
+  const pendingRef = order.paymentRef ?? "";
+  const pendingMatch = pendingRef.match(/^stripe:pending:(.+)$/);
+  if (pendingMatch && pendingMatch[1] !== input.stripeSessionId) {
+    return {
+      ok: false as const,
+      error: {
+        code: "STRIPE_SESSION_MISMATCH",
+        message: "Stripe session does not match this order",
+      },
+    };
+  }
+
+  let session;
+  try {
+    session = await fetchStripeCheckoutSession(input.stripeSessionId);
+  } catch {
+    return {
+      ok: false as const,
+      error: {
+        code: "STRIPE_SESSION_LOOKUP_FAILED",
+        message: "Could not verify Stripe checkout session",
+      },
+    };
+  }
+
+  const sessionOrderId =
+    session.metadata?.order_id ?? session.client_reference_id ?? undefined;
+  if (sessionOrderId && sessionOrderId !== order.id) {
+    return {
+      ok: false as const,
+      error: {
+        code: "STRIPE_SESSION_MISMATCH",
+        message: "Stripe session belongs to a different order",
+      },
+    };
+  }
+
+  if (session.payment_status !== "paid" && session.status !== "complete") {
+    return {
+      ok: false as const,
+      error: {
+        code: "STRIPE_PAYMENT_INCOMPLETE",
+        message: "Stripe payment is not complete yet",
+      },
+    };
+  }
+
+  const paymentRef = `stripe:${input.stripeSessionId}:confirm`;
+  const updated = await markOrderPaid(order, paymentRef);
+  await deliverPaidOrderNotifications(updated);
+
+  void trackCheckoutConfirmed({
+    distinctId: input.auth.userId,
+    orderId: updated.id,
+    orderNumber: updated.orderNumber,
+    currency: updated.currency,
+    paymentMode: "full_pay",
+  });
 
   return {
     ok: true as const,

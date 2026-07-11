@@ -1,15 +1,28 @@
 /**
- * Optional Stripe Checkout Session creation when STRIPE_SECRET_KEY is configured.
- * Falls back to stub payment in checkout-service when not configured.
+ * Stripe Checkout Session for non-IN geo (full_pay).
+ * Uses live Sessions API when STRIPE_SECRET_KEY is configured.
  */
 
-export type StripeCheckoutSession = {
+import {
+  createStripeCheckoutSession,
+  retrieveStripeCheckoutSession,
+} from "../integrations/stripe-api.js";
+
+export type StripeCheckoutMode = "stub" | "live";
+
+export type StripeCheckoutSessionResult = {
+  mode: StripeCheckoutMode;
   checkoutUrl: string;
   sessionId: string;
+  paymentRef: string;
 };
 
+export function getStripeSecretKey(): string | undefined {
+  return process.env.STRIPE_SECRET_KEY?.trim() || undefined;
+}
+
 export function isStripeConfigured(): boolean {
-  return Boolean(process.env.STRIPE_SECRET_KEY?.trim());
+  return Boolean(getStripeSecretKey());
 }
 
 export async function createCheckoutSession(input: {
@@ -18,52 +31,37 @@ export async function createCheckoutSession(input: {
   amount: string;
   currency: string;
   customerEmail?: string;
-}): Promise<StripeCheckoutSession | null> {
-  const secret = process.env.STRIPE_SECRET_KEY?.trim();
+}): Promise<StripeCheckoutSessionResult | null> {
+  const secret = getStripeSecretKey();
   if (!secret) return null;
 
   const appUrl = process.env.APP_PUBLIC_URL?.trim() || "http://localhost:5173";
-  const amountCents = Math.round(Number(input.amount) * 100);
-  if (!Number.isFinite(amountCents) || amountCents < 1) {
-    throw new Error("STRIPE_INVALID_AMOUNT");
-  }
+  const successUrl = `${appUrl}/checkout/success?order=${encodeURIComponent(input.orderNumber)}&orderId=${encodeURIComponent(input.orderId)}&session_id={CHECKOUT_SESSION_ID}&provider=stripe`;
+  const cancelUrl = `${appUrl}/checkout`;
 
-  const params = new URLSearchParams();
-  params.set("mode", "payment");
-  params.set("success_url", `${appUrl}/checkout/success?order=${encodeURIComponent(input.orderNumber)}`);
-  params.set("cancel_url", `${appUrl}/checkout`);
-  params.set("client_reference_id", input.orderId);
-  params.set("metadata[order_id]", input.orderId);
-  params.set("metadata[order_number]", input.orderNumber);
-  params.set("line_items[0][quantity]", "1");
-  params.set("line_items[0][price_data][currency]", input.currency.toLowerCase());
-  params.set("line_items[0][price_data][unit_amount]", String(amountCents));
-  params.set(
-    "line_items[0][price_data][product_data][name]",
-    `The Agile Forum — ${input.orderNumber}`,
-  );
-  if (input.customerEmail) {
-    params.set("customer_email", input.customerEmail);
-  }
-
-  const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${secret}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: params,
+  const session = await createStripeCheckoutSession({
+    secretKey: secret,
+    orderId: input.orderId,
+    orderNumber: input.orderNumber,
+    amount: input.amount,
+    currency: input.currency,
+    customerEmail: input.customerEmail,
+    successUrl,
+    cancelUrl,
   });
 
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`STRIPE_SESSION_FAILED:${res.status}:${body.slice(0, 200)}`);
-  }
+  return {
+    mode: "live",
+    checkoutUrl: session.url,
+    sessionId: session.id,
+    paymentRef: `stripe:pending:${session.id}`,
+  };
+}
 
-  const json = (await res.json()) as { id?: string; url?: string };
-  if (!json.id || !json.url) {
-    throw new Error("STRIPE_SESSION_INVALID_RESPONSE");
+export async function fetchStripeCheckoutSession(sessionId: string) {
+  const secret = getStripeSecretKey();
+  if (!secret) {
+    throw new Error("STRIPE_NOT_CONFIGURED");
   }
-
-  return { sessionId: json.id, checkoutUrl: json.url };
+  return retrieveStripeCheckoutSession({ secretKey: secret, sessionId });
 }

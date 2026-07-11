@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { SignJWT, jwtVerify } from "jose";
-import { getEnv } from "../config/env.js";
+import { getEnv, getApiPublicUrl, getAppPublicUrl } from "../config/env.js";
 import { prisma } from "../db/client.js";
 import { Role } from "@prisma/client";
 import { registerUser } from "./registration-service.js";
@@ -11,6 +11,23 @@ export type OAuthProvider = "google" | "linkedin";
 
 const STATE_TTL_SEC = 600;
 
+const PLACEHOLDER_OAUTH_VALUES = new Set([
+  "test",
+  "changeme",
+  "change-me",
+  "your-client-id",
+  "your-client-secret",
+  "xxx",
+  "placeholder",
+]);
+
+function isRealOAuthCredential(value: string | undefined): boolean {
+  const trimmed = value?.trim();
+  if (!trimmed) return false;
+  if (PLACEHOLDER_OAUTH_VALUES.has(trimmed.toLowerCase())) return false;
+  return trimmed.length >= 8;
+}
+
 function oauthStubEnabled(): boolean {
   if (process.env.OAUTH_STUB_MODE === "false") return false;
   if (process.env.OAUTH_STUB_MODE === "true") return true;
@@ -19,9 +36,38 @@ function oauthStubEnabled(): boolean {
 
 function providerConfigured(provider: OAuthProvider): boolean {
   if (provider === "google") {
-    return Boolean(process.env.GOOGLE_CLIENT_ID?.trim() && process.env.GOOGLE_CLIENT_SECRET?.trim());
+    return (
+      isRealOAuthCredential(process.env.GOOGLE_CLIENT_ID) &&
+      isRealOAuthCredential(process.env.GOOGLE_CLIENT_SECRET)
+    );
   }
-  return Boolean(process.env.LINKEDIN_CLIENT_ID?.trim() && process.env.LINKEDIN_CLIENT_SECRET?.trim());
+  return (
+    isRealOAuthCredential(process.env.LINKEDIN_CLIENT_ID) &&
+    isRealOAuthCredential(process.env.LINKEDIN_CLIENT_SECRET)
+  );
+}
+
+function hasPartialProviderCredentials(provider: OAuthProvider): boolean {
+  if (provider === "google") {
+    return Boolean(
+      process.env.GOOGLE_CLIENT_ID?.trim() || process.env.GOOGLE_CLIENT_SECRET?.trim(),
+    );
+  }
+  return Boolean(
+    process.env.LINKEDIN_CLIENT_ID?.trim() || process.env.LINKEDIN_CLIENT_SECRET?.trim(),
+  );
+}
+
+function shouldUseOAuthStub(provider: OAuthProvider): boolean {
+  if (oauthStubEnabled()) return true;
+  if (providerConfigured(provider)) return false;
+  if (process.env.OAUTH_STUB_MODE === "false") {
+    // Stub explicitly disabled: fail closed unless dev env still has placeholder/partial creds.
+    if (getEnv().NODE_ENV === "production") return false;
+    return hasPartialProviderCredentials(provider);
+  }
+  // Local dev: avoid broken redirects when credentials are missing or placeholders.
+  return getEnv().NODE_ENV !== "production";
 }
 
 export function isOAuthProviderSupported(provider: string): provider is OAuthProvider {
@@ -48,18 +94,18 @@ export async function verifyOAuthState(state: string, provider: OAuthProvider): 
 }
 
 function publicAppUrl(): string {
-  return process.env.APP_PUBLIC_URL?.trim() || "http://localhost:5173";
+  return getAppPublicUrl();
 }
 
 function apiPublicUrl(): string {
-  return process.env.API_PUBLIC_URL?.trim() || `http://localhost:${getEnv().PORT}`;
+  return getApiPublicUrl();
 }
 
 export async function buildOAuthStartUrl(provider: OAuthProvider): Promise<string> {
   const state = await signOAuthState(provider);
   const redirectUri = `${apiPublicUrl()}/api/v1/auth/oauth/${provider}/callback`;
 
-  if (!providerConfigured(provider) && oauthStubEnabled()) {
+  if (shouldUseOAuthStub(provider)) {
     const params = new URLSearchParams({ code: "dev-stub", state });
     return `${redirectUri}?${params.toString()}`;
   }

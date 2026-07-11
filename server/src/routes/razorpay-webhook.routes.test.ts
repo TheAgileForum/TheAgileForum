@@ -15,6 +15,7 @@ vi.mock("../events/publisher.js", () => ({
   publishEvent: (...args: unknown[]) => mockPublishEvent(...args),
 }));
 
+import { resetRateLimitBuckets } from "../middleware/rate-limit.js";
 import { razorpayWebhookRouter } from "./razorpay-webhook.routes.js";
 
 function app() {
@@ -31,6 +32,7 @@ describe("razorpay webhook route (FR-170)", () => {
   const originalSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
 
   beforeEach(() => {
+    resetRateLimitBuckets();
     mockCompleteOrderFromRazorpayWebhook.mockReset();
     mockPublishEvent.mockReset();
     mockCompleteOrderFromRazorpayWebhook.mockResolvedValue({

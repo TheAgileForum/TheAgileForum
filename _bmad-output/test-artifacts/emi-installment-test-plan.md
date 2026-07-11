@@ -11,7 +11,7 @@
 |----|-------------|-------------------|
 | FR-169 | Course-page EMI preview (geo-asymmetric; no chip SG/UAE/default) | `payment-mode.test.ts`; offer API + FE (pending) |
 | FR-178 | EMI amounts in session currency | `shell-trust-commerce-test-plan.md` (pending) |
-| FR-170 | India Razorpay EMI + UPI | `payment-mode.test.ts`; Razorpay integration (pending) |
+| FR-170 | India Razorpay EMI + UPI | `payment-mode.test.ts`; live Orders API + confirm + webhook (`razorpay-api.test.ts`, `commerce.integration.test.ts` mocked); **manual `rzp_test_*` modal E2E pending** |
 | FR-171 | Geo-specific BNPL matrix | `payment-mode.test.ts` (all country groups); provider integration (pending) |
 | FR-172 | Full pay + installment at checkout | checkout integration (pending) |
 | FR-173 | Gateway-owned disclaimers | FE snapshot + manual compliance review |
@@ -48,7 +48,8 @@
 ## Integration tests (pending)
 
 - [ ] `POST /v1/payments/installment-plans` returns plans for IN with Razorpay provider
-- [ ] India: Razorpay EMI + UPI checkout paths (FR-170)
+- [x] India: Razorpay EMI checkout — live path mocked in `commerce.integration.test.ts` (Orders API stub + signature confirm)
+- [ ] India: Razorpay EMI + UPI checkout paths — **manual sandbox modal** with real test keys (FR-170)
 - [ ] US/CA: Affirm and Klarna widget routing (FR-171)
 - [ ] UK: Klarna and Clearpay
 - [ ] AU: Afterpay and Zip
@@ -57,7 +58,7 @@
 - [ ] SG: PayNow + cards — **no EMI chip, no empty shell** (FR-169)
 - [ ] AE: cards only — **no EMI chip, no empty shell**
 - [ ] Default geo: full-pay-only — **no EMI UI rendered**
-- [ ] FR-178: installment preview amounts match session `currency_context`
+- [ ] FR-178: installment preview amounts match session `currency_context` (all launch currencies: USD, INR, CAD, NGN, AUD, IDR, SGD, BRL, EUR, AED, GBP)
 - [ ] FR-172: checkout presents both full pay and installment when plans exist
 - [ ] Multi-provider geo: user `installment_provider` selection persists to confirmation
 - [ ] FR-173: provider disclaimer ref returned and rendered on FE
