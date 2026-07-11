@@ -22,7 +22,11 @@ import {
   type InstallmentProvider,
   type PaymentMode,
 } from "../commerce/payment-mode.js";
-import { createCheckoutSession, fetchStripeCheckoutSession } from "./stripe-checkout-service.js";
+import {
+  createCheckoutSession,
+  fetchStripeCheckoutSession,
+  type StripeCheckoutMode,
+} from "./stripe-checkout-service.js";
 import {
   createRazorpayCheckoutSession,
   getRazorpayKeySecret,
@@ -192,7 +196,7 @@ export async function startCheckout(
   let stripeCheckoutUrl: string | null = null;
   let stripePaymentRef: string | null = null;
   let stripeCheckout:
-    | { mode: "live"; sessionId: string; checkoutUrl: string }
+    | { mode: StripeCheckoutMode; sessionId: string; checkoutUrl: string }
     | undefined;
   let razorpayCheckoutUrl: string | null = null;
   let razorpayPaymentRef: string | null = null;
