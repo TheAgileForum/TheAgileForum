@@ -23,6 +23,7 @@ describe("result-enrichment", () => {
   it("includes escalation only for low confidence", () => {
     expect(buildEscalation("high", "PO")).toBeNull();
     expect(buildEscalation("low", "PO")?.mentorCtaLabel).toMatch(/mentor validation/i);
+    expect(buildEscalation("low", "PO")?.mentorHref).toBe("https://topmate.io/coach_dhirender_verma");
   });
 
   it("enriches full analysis payload", () => {

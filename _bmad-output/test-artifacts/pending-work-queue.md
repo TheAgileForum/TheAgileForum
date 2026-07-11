@@ -4,9 +4,9 @@
 
 **Artifacts root:** `C:\AgileForum\mybmadproj\_bmad-output\test-artifacts`  
 
-**Branch:** `sprint/s1-foundation-revenue-slice`  
+**Branch:** `main`  
 
-**Last updated:** 2026-06-08 (Amelia follow-up — FR-182 POST gate, Razorpay EMI stub)
+**Last updated:** 2026-06-08 (S0.10 sign-off evidence run)
 
 
 
@@ -18,9 +18,9 @@
 
 - [x] Created `test-artifacts/` with README, test-summary, commerce plan, pending queue
 
-- [x] Unit suite green: **95 passed** (`npm run test`) — 2026-06-08
+- [x] Unit suite green: **181 passed** (`npm run test`) — 2026-06-08 S0.10 run
 
-- [x] Integration suite green: **38 passed** (`npm run test:integration`) — 2026-06-08
+- [x] Integration suite green: **46 passed** (`npm run test:integration`) — 2026-06-08 S0.10 run
 
 - [x] Added exam access integration tests (402 paid / 200 free) in `commerce.integration.test.ts`
 
@@ -66,21 +66,23 @@
 
 - [x] Full integration: **38 passed** — recorded in `test-summary.md` (2026-06-08)
 
-- [x] Archive run log under `docs/reports/` if needed for S0.10 sign-off
+- [x] Archive run log under `docs/reports/` if needed for S0.10 sign-off — `test-run-2026-06-08.txt`, `test-integration-run-2026-06-08.txt`, `gate-evidence-2026-06-08.log`
+
+- [x] S0.10 sign-off evidence package — `docs/reports/s0-10-human-sign-off.md`, bootstrap smoke, S0.9 security review
 
 - [ ] Stripe test-mode CI integration test
 
-- [ ] Razorpay EMI sandbox checkout (FR-170 live API) — stub done; sandbox E2E remains
+- [ ] Razorpay EMI sandbox checkout (FR-170 live API) — stub done; **integration proxy** covers live confirm path (`commerce.integration.test.ts`); **manual sandbox with `rzp_test_*` keys** remains
 
 
 
 ### P2 — Sprint 1 tracker (see `implementation-artifacts/sprint-1-remaining-work-tracker.md`)
 
-- [ ] Clean-machine bootstrap smoke
+- [ ] Clean-machine bootstrap smoke — local Docker blocked (WSL2); CI + integration proxy PASS
 
-- [ ] Security/compliance checklist review (S0.9)
+- [x] Security/compliance checklist review (S0.9) — `docs/reports/s0-9-security-checklist-review.md`
 
-- [ ] Sign-off names on readiness gate
+- [ ] Sign-off names on readiness gate — evidence ready; initials pending in `s0-10-human-sign-off.md`
 
 - [ ] LinkedIn OAuth live mode — see `auth-consent-rbac-test-plan.md`
 
@@ -96,7 +98,7 @@
 
 - [ ] Global cart shell FE + badge count (FR-177) — UX-08.5
 
-- [ ] Multi-currency session + header override (FR-178) — UX-10.1
+- [x] Multi-currency session + header override (FR-178) — UX-10.1 _(2026-07-11: CAD, NGN, AUD, IDR, SGD, BRL, EUR/Europe, AED + existing USD/INR/GBP)_
 
 - [ ] No public discount fields on catalog API (FR-179) — UX-10.2
 

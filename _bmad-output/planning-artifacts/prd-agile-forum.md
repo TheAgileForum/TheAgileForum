@@ -446,6 +446,7 @@ These are acceptance-critical requirements for replacing current pages and legac
 - FR-14: Users can complete payment and receive confirmation and basic invoicing artifacts.
 - FR-15: System can support currency handling relevant to target geographies.
 - FR-16: Platform can detect user geography (with user override) and present localized currency/pricing defaults consistently across landing pages, offers, cart, and checkout.
+- FR-178: Platform maintains a single session currency (user override wins over geo default). On first visit, currency resolves from CDN/proxy geo headers (`cf-ipcountry`, `x-vercel-ip-country`, `x-geo`) via `GET /api/v1/pricing/currency-context` with no client override; local/dev may stub geo with `?geo=`. Header currency selection or the `af_session_currency` cookie (30-day, set on explicit override) takes precedence over geo detection on subsequent loads. Launch currencies: USD, INR, CAD, NGN, AUD, IDR, SGD, BRL, EUR (Europe), AED, GBP. Header selector shows `CODE — Region` (e.g. `EUR — Europe`); IDR amounts omit decimals. Pricing resolver is SSOT for catalog, cart, checkout, and EMI preview.
 - FR-85: Platform can enforce exam monetization rules where skill-assessment exams are free and certification mock/practice exams are paid.
 - FR-86: Certification mock/practice exams must require paid enrollment/checkout before access.
 - FR-87: Exam listing and detail pages must clearly label access type ("Free Skill Assessment" vs "Paid Certification Mock Exam") before CTA click.

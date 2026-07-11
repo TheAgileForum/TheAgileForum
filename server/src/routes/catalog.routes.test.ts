@@ -49,23 +49,56 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
     ).toBe(true);
   });
 
-  it("exposes exam access labels on certification listings (FR-85/86/87)", async () => {
+  it("lists published SAFe certification courses aligned to live site", async () => {
     const res = await request(app()).get("/api/v1/catalog/certifications");
     expect(res.status).toBe(200);
+    expect(res.body.offerings.every((o: { category: string; kind: string }) =>
+      o.category === "certification" && o.kind === "course",
+    )).toBe(true);
 
-    const exams = res.body.offerings.filter(
-      (o: { kind: string }) => o.kind === "exam" || o.kind === "certification_mock",
+    const codes = res.body.offerings.map((o: { code: string }) => o.code);
+    expect(codes).toEqual(
+      expect.arrayContaining([
+        "safe-leading-safe",
+        "safe-product-owner-product-manager-certification-training",
+        "safe-scrum-master-certification-training",
+      ]),
     );
-    expect(exams.length).toBeGreaterThanOrEqual(2);
+    expect(codes).not.toContain("exam-practice-free");
+    expect(codes).not.toContain("exam-mock-certification");
+    expect(res.body.offerings).toHaveLength(3);
 
-    const freeExam = exams.find(
-      (o: { code: string }) => o.code === "exam-practice-free",
+    const leading = res.body.offerings.find(
+      (o: { code: string }) => o.code === "safe-leading-safe",
     );
-    const paidExam = exams.find(
-      (o: { code: string }) => o.code === "exam-mock-certification",
+    expect(leading?.title).toContain("Leading SAFe");
+    expect(leading?.defaultUnitPrice).toBe("549.00");
+    expect(leading?.certificationName).toContain("SAFe Agilist");
+    expect(leading?.durationHours).toBe(16);
+  });
+
+  it("resolves live-site slug alias for Leading SAFe detail", async () => {
+    const res = await request(app()).get(
+      "/api/v1/catalog/offerings/safe-agilist-leading-safe-certification-training?geo=US",
     );
-    expect(freeExam?.examAccess).toBe("free");
-    expect(paidExam?.examAccess).toBe("paid");
+    expect(res.status).toBe(200);
+    expect(res.body.offering.code).toBe("safe-leading-safe");
+    expect(res.body.offering.slug).toBe(
+      "safe-agilist-leading-safe-certification-training",
+    );
+  });
+
+  it("keeps free/paid exam SKUs available by code (FR-85/86/87)", async () => {
+    const free = await request(app()).get(
+      "/api/v1/catalog/offerings/exam-practice-free",
+    );
+    const paid = await request(app()).get(
+      "/api/v1/catalog/offerings/exam-mock-certification",
+    );
+    expect(free.status).toBe(200);
+    expect(paid.status).toBe(200);
+    expect(free.body.offering.examAccess).toBe("free");
+    expect(paid.body.offering.examAccess).toBe("paid");
   });
 
   it("applies combined role, delivery mode, and batch filters (FR-163)", async () => {
@@ -109,8 +142,8 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
     expect(res.body.offerings.length).toBeGreaterThan(0);
     expect(res.body.offerings[0].priceQuote.currency).toBe("INR");
     expect(res.body.offerings.every(
-      (o: { priceQuote: { currency: string } }) =>
-        o.priceQuote.currency === "INR",
+      (o: { priceQuote: { currency: string; amount: string } }) =>
+        o.priceQuote.currency === "INR" && o.priceQuote.amount === "33999.00",
     )).toBe(true);
   });
 
@@ -147,14 +180,14 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
 
   it("applies price range filter on services category (FR-163)", async () => {
     const res = await request(app()).get(
-      "/api/v1/catalog/services?min_price=50&max_price=100",
+      "/api/v1/catalog/services?min_price=100&max_price=300",
     );
     expect(res.status).toBe(200);
     expect(res.body.offerings.length).toBeGreaterThan(0);
     expect(
       res.body.offerings.every((o: { defaultUnitPrice: string }) => {
         const price = Number.parseFloat(o.defaultUnitPrice);
-        return price >= 50 && price <= 100;
+        return price >= 100 && price <= 300;
       }),
     ).toBe(true);
   });

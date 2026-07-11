@@ -1,4 +1,5 @@
 import type { PrimaryAction } from "./contracts.js";
+import { MENTOR_BOOKING_URL } from "../constants/platform.js";
 
 export type ConfidenceTier = "high" | "medium" | "low";
 
@@ -91,7 +92,7 @@ export function buildSecondaryActions(): SecondaryAction[] {
     {
       id: "mentor",
       label: "Book paid mentor call",
-      href: "mailto:support@theagileforum.com?subject=Mentor%20call%20request",
+      href: MENTOR_BOOKING_URL,
       type: "mentor",
     },
   ];
@@ -107,8 +108,7 @@ export function buildEscalation(
     title: "Validate before you enroll",
     message: `Resume signals for ${role} were thin or ambiguous. A 30-minute mentor call confirms your gaps and saves you from the wrong program.`,
     mentorCtaLabel: "Book mentor validation call · from ₹49 / $9",
-    mentorHref:
-      "mailto:support@theagileforum.com?subject=Low%20confidence%20diagnosis%20validation",
+    mentorHref: MENTOR_BOOKING_URL,
     supportHref: "mailto:support@theagileforum.com?subject=Diagnosis%20support",
   };
 }

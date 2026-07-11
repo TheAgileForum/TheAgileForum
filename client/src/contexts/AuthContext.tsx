@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components -- module exports context hook */
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { apiUrl } from "../lib/api-base.js";
 
 
 
@@ -98,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
 
-      const me = await fetch("/api/v1/auth/me", { credentials: "include" });
+      const me = await fetch(apiUrl("/api/v1/auth/me"), { credentials: "include" });
 
       const meJson = (await me.json()) as MeResponse & { error?: unknown };
 
@@ -146,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setDemoMode(false);
 
-    const res = await fetch("/api/v1/auth/login", {
+    const res = await fetch(apiUrl("/api/v1/auth/login"), {
 
       method: "POST",
 
@@ -188,7 +189,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setDemoMode(false);
 
-    const res = await fetch("/api/v1/auth/register", {
+    const res = await fetch(apiUrl("/api/v1/auth/register"), {
 
       method: "POST",
 
@@ -236,7 +237,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const resendVerificationEmail = useCallback(async () => {
 
-    const res = await fetch("/api/v1/auth/verify-email/resend", {
+    const res = await fetch(apiUrl("/api/v1/auth/verify-email/resend"), {
 
       method: "POST",
 
@@ -252,7 +253,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
 
-    await fetch("/api/v1/auth/logout", { method: "POST", credentials: "include" });
+    await fetch(apiUrl("/api/v1/auth/logout"), { method: "POST", credentials: "include" });
 
     setUser(null);
 

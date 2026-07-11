@@ -48,10 +48,11 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    const parsedFilters = parseCatalogFilters(searchKey);
     try {
       const res = await listCatalogCategory(
         categoryPath,
-        filtersToApiQuery(filters),
+        filtersToApiQuery(parsedFilters),
         { geo, currency },
       );
       setOfferings(res.offerings);
@@ -62,7 +63,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
     } finally {
       setLoading(false);
     }
-  }, [categoryPath, searchKey, geo, currency, filters]);
+  }, [categoryPath, searchKey, geo, currency]);
 
   useEffect(() => {
     setCommerceJourneyOrigin("catalog");
@@ -124,7 +125,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
       {loading ? <LinearProgress /> : null}
       {error ? <Alert severity="error">{error}</Alert> : null}
 
-      {!loading && offerings.length === 0 ? (
+      {!loading && !error && offerings.length === 0 ? (
         <Alert
           severity="info"
           action={

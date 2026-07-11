@@ -44,6 +44,7 @@
 - `commerce.integration.test.ts` — IN installment checkout returns EMI plans without live API
 
 ### Pricing & currency (FR-178)
+- `server/src/pricing/supported-currencies.ts` + `.test.ts` — launch currency list, geo map, IDR zero-decimal formatting
 - `server/src/pricing/currency-context.ts` + `.test.ts`
 - `server/src/pricing/quote-service.ts` + `.test.ts`
 - `server/src/routes/pricing.routes.ts` + `.test.ts`

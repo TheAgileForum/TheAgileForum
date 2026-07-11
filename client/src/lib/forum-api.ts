@@ -161,7 +161,9 @@ export type CatalogOffering = {
   certificationName?: string;
   summary?: string;
   durationHours?: number;
+  durationLabel?: string;
   scheduleLabel?: string;
+  cohortSchedules?: Array<{ id: string; label: string }>;
   includes?: string[];
   learningOutcomes?: string[];
   priceQuote?: {
@@ -231,6 +233,11 @@ export function getStoredDiagnosisGapTags(): string[] {
   return raw ? raw.split(",").map((t) => t.trim()).filter(Boolean) : [];
 }
 
+export type CurrencyContextRequest = {
+  geo?: string;
+  currencyOverride?: string;
+};
+
 function pricingQuery(geo?: string, currency?: string): string {
   const params = new URLSearchParams();
   if (geo) params.set("geo", geo);
@@ -239,9 +246,15 @@ function pricingQuery(geo?: string, currency?: string): string {
   return qs ? `?${qs}` : "";
 }
 
-export async function getCurrencyContext(geo?: string, currencyOverride?: string) {
+function currencyContextQuery(options?: CurrencyContextRequest): string {
+  if (!options) return "";
+  return pricingQuery(options.geo, options.currencyOverride);
+}
+
+/** Detect-only when called with no args (server uses CDN geo headers or defaults to US). */
+export async function getCurrencyContext(options?: CurrencyContextRequest) {
   return apiFetch<CurrencyContextResponse>(
-    `/api/v1/pricing/currency-context${pricingQuery(geo, currencyOverride)}`,
+    `/api/v1/pricing/currency-context${currencyContextQuery(options)}`,
   );
 }
 

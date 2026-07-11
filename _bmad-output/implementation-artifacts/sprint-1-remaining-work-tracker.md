@@ -1,8 +1,8 @@
 # Sprint 1 Remaining Work Tracker
 
 **Project:** The Agile Forum  
-**Branch:** `sprint/s1-foundation-revenue-slice`  
-**Last updated:** 2026-06-08  
+**Branch:** `main` (PR #4 merged)  
+**Last updated:** 2026-06-08 (S0.10 sign-off evidence run)  
 **Purpose:** Single checklist for open gaps called out in delivery review. Keep this file updated as items close.
 
 ---
@@ -23,14 +23,14 @@
 
 ### Tasks
 
-- [x] Run full CI on `sprint/s1-foundation-revenue-slice` and attach results to closure report. _(2026-05-31: `docs/reports/gate-evidence-20260529.log`, `s0-10-closure-report.md`.)_
-- [ ] Clean-machine bootstrap: `docker compose up`, `prisma migrate deploy`, `npm test` (server), `npm run build` (client). _(Run on second machine before production sign-off.)_
-- [ ] Smoke: API health, Redis/worker/scheduler (if used), diagnosis → analyze → result, checkout start/complete.
-- [x] Run auth/RBAC/consent contract + integration suites; capture pass/fail counts. _(59 unit + 27 integration tests passed.)_
-- [x] Run synthetic event + observability scripts (`observability:synthetic`, readiness-gate script). _(Gate **GO**.)_
-- [ ] Security/compliance checklist review (S0.9 baseline).
-- [ ] Publish risk register (owners + target sprint).
-- [x] Go/no-go meeting + documented decision. _(Automated **GO**; human sign-off names pending.)_
+- [x] Run full CI on integration branch and attach results to closure report. _(PR #4 merged to `main`; logs 2026-06-08.)_
+- [ ] Clean-machine bootstrap: `docker compose up`, `prisma migrate deploy`, `npm test` (server), `npm run build` (client). _(Local Docker blocked — WSL2; automated tests + CI Postgres proxy **PASS** — `docs/reports/s0-10-bootstrap-smoke-2026-06-08.md`.)_
+- [x] Smoke: API health, diagnosis → analyze → result, checkout start/complete. _(Integration proxy **46 passed**; Redis/worker live smoke deferred until compose up.)_
+- [x] Run auth/RBAC/consent contract + integration suites; capture pass/fail counts. _(181 unit + 46 integration = **227 passed** — 2026-06-08.)_
+- [x] Run synthetic event + observability scripts (`observability:synthetic`, readiness-gate script). _(Gate **GO** — `gate-evidence-2026-06-08.log`.)_
+- [x] Security/compliance checklist review (S0.9 baseline). _(No high-severity open — `docs/reports/s0-9-security-checklist-review.md`.)_
+- [x] Publish risk register (owners + target sprint). _( `docs/reports/s0-10-human-sign-off.md` §3.)_
+- [x] Go/no-go meeting + documented decision. _(Automated **GO** + sign-off record; named stakeholders pending initials.)_
 
 ### Acceptance checklist (from S0.10)
 
@@ -38,23 +38,23 @@
 - [x] No blocking issues on Sprint 1 critical path (enabler scope).
 - [x] Go/no-go documented — `docs/reports/sprint-1-readiness-gate-s0-10.md`.
 - [x] Evidence: closure report, test outputs — `docs/reports/s0-10-closure-report.md`.
-- [ ] Sign-off record (Tech, QA, Security, SM names/dates).
+- [ ] Sign-off record (Tech, QA, Security, SM names/dates). _(Evidence package ready — `docs/reports/s0-10-human-sign-off.md`; initials pending.)_
 
 ---
 
 ## 2) Story 1.1 — Google / LinkedIn OAuth
 
-**Current:** Dev-stub OAuth + Google live path when `GOOGLE_CLIENT_*` set; LinkedIn live pending.
+**Current:** Dev-stub OAuth + Google/LinkedIn **live paths** when `GOOGLE_CLIENT_*` / `LINKEDIN_CLIENT_*` set.
 
 ### Tasks
 
-- [ ] Configure OAuth apps (Google, LinkedIn) in provider consoles; store secrets in `server/.env` (never commit).
+- [ ] Configure OAuth apps (Google, LinkedIn) in provider consoles; store secrets in staging + `server/.env`. _(Templates: `deploy/staging.server.env.example`, `docs/staging-deploy.md`.)_
 - [x] Add routes: `GET /api/v1/auth/oauth/:provider/start`, `GET /api/v1/auth/oauth/:provider/callback`.
 - [x] Map provider identity → user record (link or create); issue same session/JWT pattern as email login.
 - [x] FE: login page buttons for Google + LinkedIn; handle callback/error states.
-- [x] Tests: `server/src/auth.oauth.test.ts` (stub redirect); OAuth callback in `auth.integration.test.ts`.
+- [x] Tests: `oauth-service.test.ts`, `auth.oauth.test.ts`, LinkedIn callback in `auth.integration.test.ts`.
 - [x] Update `server/.env.example` with OAuth env vars.
-- [ ] LinkedIn token exchange + profile fetch (live mode).
+- [x] LinkedIn token exchange + profile fetch (live mode) — `oauth-service.ts` + unit tests.
 
 **Done when:** Story 1.1 acceptance criteria (signup/login via Google and LinkedIn) pass in staging.
 
@@ -182,7 +182,7 @@ Quick reference — detail in `s1-3-ux-implementation-epics-stories-tasks.md`:
 - [x] UX-08.3–08.5 (partial): cart remove/qty, upsell rail, catalog facets API, `commerce_journey_origin` on checkout. _(2026-06-08.)_
 - [x] UX-09.1 (partial): EMI preview module on catalog cards + offer + checkout note (geo-asymmetric stub). _(2026-06-08.)_
 - [ ] UX-09.2+: checkout EMI payment mode UI, gateway plan parity (FR-174).
-- [x] UX-10/11: full FR-178 price resolver BE, upsell personalization from diagnosis role. _(2026-06-08: PricingContext + resolver quotes on catalog/offer/cart; upsell API with gap ranking + session currency.)_
+- [x] UX-10/11: full FR-178 price resolver BE, upsell personalization from diagnosis role. _(2026-06-08: PricingContext + resolver quotes on catalog/offer/cart; upsell API with gap ranking + session currency. 2026-07-11: expanded currencies — CAD, NGN, AUD, IDR, SGD, BRL, EUR/Europe, AED + USD/INR/GBP.)_
 
 ---
 

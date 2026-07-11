@@ -1,0 +1,26 @@
+{
+  "brand": "The Agile Forum",
+  "staging": {
+    "appPublicUrl": "https://app.staging.theagileforum.com",
+    "apiPublicUrl": "https://api.staging.theagileforum.com",
+    "corsAllowedOrigins": ["https://app.staging.theagileforum.com"],
+    "oauthRedirects": {
+      "google": "https://api.staging.theagileforum.com/api/v1/auth/oauth/google/callback",
+      "linkedin": "https://api.staging.theagileforum.com/api/v1/auth/oauth/linkedin/callback"
+    },
+    "clientBuildEnv": {
+      "VITE_API_URL": "https://api.staging.theagileforum.com",
+      "VITE_APP_ENV": "staging",
+      "VITE_OBSERVABILITY_RELEASE": "staging"
+    }
+  },
+  "production": {
+    "appPublicUrl": "https://app.theagileforum.com",
+    "apiPublicUrl": "https://api.theagileforum.com",
+    "corsAllowedOrigins": ["https://app.theagileforum.com"],
+    "oauthRedirects": {
+      "google": "https://api.theagileforum.com/api/v1/auth/oauth/google/callback",
+      "linkedin": "https://api.theagileforum.com/api/v1/auth/oauth/linkedin/callback"
+    }
+  }
+}

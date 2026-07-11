@@ -75,13 +75,15 @@ export function ForumCartProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener(CURRENCY_CHANGE_EVENT, onCurrencyChange);
   }, [refresh]);
 
+  const itemCount = countItems(cart);
+
   useEffect(() => {
     if (authLoading || loading) return;
     trackEvent("global_cart_viewed", {
-      count: countItems(cart),
+      count: itemCount,
       guest: user ? 0 : 1,
     });
-  }, [authLoading, loading, user, cart]);
+  }, [authLoading, loading, user, itemCount]);
 
   useEffect(() => {
     if (!user || authLoading) return;
@@ -123,14 +125,14 @@ export function ForumCartProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       cart,
-      itemCount: countItems(cart),
+      itemCount,
       loading,
       refresh,
       addItem,
       removeItem,
       setQuantity,
     }),
-    [cart, loading, refresh, addItem, removeItem, setQuantity],
+    [cart, itemCount, loading, refresh, addItem, removeItem, setQuantity],
   );
 
   return <ForumCartContext.Provider value={value}>{children}</ForumCartContext.Provider>;

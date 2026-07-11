@@ -28,6 +28,17 @@ function draftKey(sessionId: string) {
 
 type Step2Draft = { jdText: string; targetRole: string };
 
+function inferResumeMimeType(file: File): string {
+  if (file.type && ALLOWED_TYPES.includes(file.type)) return file.type;
+  const lower = file.name.toLowerCase();
+  if (lower.endsWith(".pdf")) return "application/pdf";
+  if (lower.endsWith(".doc")) return "application/msword";
+  if (lower.endsWith(".docx")) {
+    return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+  }
+  return file.type;
+}
+
 export function DiagnosisStep2Page() {
   const navigate = useNavigate();
   const { sessionId, setRunId } = useDiagnosis();
@@ -84,7 +95,7 @@ export function DiagnosisStep2Page() {
       trackEvent("diagnosis_resume_upload_failure", { reason: "missing_file" });
       return;
     }
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    if (!ALLOWED_TYPES.includes(inferResumeMimeType(file))) {
       setError("Only PDF, DOC, or DOCX files are supported.");
       trackEvent("diagnosis_resume_upload_failure", { reason: "invalid_type" });
       return;
@@ -101,12 +112,16 @@ export function DiagnosisStep2Page() {
         setError("Session missing.");
         return;
       }
+      const mimeType = inferResumeMimeType(file);
       await uploadResumeMetadata(sid, {
         fileName: file.name,
-        mimeType: file.type,
+        mimeType,
         sizeBytes: file.size,
       });
-      await saveJdInput(sid, { jdText: jdText.trim() || undefined, targetRole });
+      const trimmedJd = jdText.trim();
+      if (trimmedJd) {
+        await saveJdInput(sid, { jdText: trimmedJd, targetRole });
+      }
       trackEvent("diagnosis_resume_upload_success", { hasJd: Boolean(jdText.trim()) });
       const run = await requestAnalysis(sid, "user-initiated");
       setRunId(run.analysisRunId);

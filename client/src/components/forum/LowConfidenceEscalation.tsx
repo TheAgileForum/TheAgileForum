@@ -24,6 +24,8 @@ export function LowConfidenceEscalation({ escalation }: LowConfidenceEscalationP
           color="warning"
           size="medium"
           href={escalation.mentorHref}
+          target="_blank"
+          rel="noopener noreferrer"
           onClick={() => trackEvent("diagnosis_mentor_escalation_click")}
         >
           {escalation.mentorCtaLabel}

@@ -31,8 +31,8 @@ export function DiagnosisActionModule({
       setSnack("Micro-exams unlock from your dashboard after you start a program.");
       return;
     }
-    if (action.href.startsWith("mailto:")) {
-      window.open(action.href, "_blank");
+    if (action.href.startsWith("mailto:") || action.href.startsWith("http")) {
+      window.open(action.href, "_blank", "noopener,noreferrer");
     }
   }
 

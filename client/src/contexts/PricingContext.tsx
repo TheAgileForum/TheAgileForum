@@ -17,6 +17,8 @@ import {
 import {
   geoFromSessionCurrency,
   getSessionCurrency,
+  hasExplicitSessionCurrencyOverride,
+  markExplicitSessionCurrencyOverride,
   setSessionCurrency,
   type SessionCurrency,
 } from "../lib/session-currency";
@@ -36,6 +38,7 @@ const PricingContext = createContext<PricingContextValue | null>(null);
 const CURRENCY_CHANGE_EVENT = "af-session-currency-change";
 
 function syncSessionStorage(currency: SessionCurrency) {
+  if (getSessionCurrency() === currency) return;
   setSessionCurrency(currency);
   window.dispatchEvent(new CustomEvent(CURRENCY_CHANGE_EVENT, { detail: currency }));
 }
@@ -45,11 +48,20 @@ export function PricingProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    const stored = getSessionCurrency();
-    const geo = geoFromSessionCurrency(stored);
-    const res = await getCurrencyContext(geo, stored);
+    if (hasExplicitSessionCurrencyOverride()) {
+      const stored = getSessionCurrency();
+      const res = await getCurrencyContext({
+        geo: geoFromSessionCurrency(stored),
+        currencyOverride: stored,
+      });
+      setContext(res);
+      syncSessionStorage(res.currency as SessionCurrency);
+      return;
+    }
+
+    const res = await getCurrencyContext();
     setContext(res);
-    if (res.currency !== stored && (res.source === "geo" || !sessionStorage.getItem("af_session_currency"))) {
+    if (res.source === "geo") {
       syncSessionStorage(res.currency as SessionCurrency);
     }
   }, []);
@@ -60,8 +72,9 @@ export function PricingProvider({ children }: { children: ReactNode }) {
   }, [refresh]);
 
   const setCurrency = useCallback(async (currency: SessionCurrency) => {
-    const geo = geoFromSessionCurrency(currency);
+    markExplicitSessionCurrencyOverride();
     syncSessionStorage(currency);
+    const geo = geoFromSessionCurrency(currency);
     const res = await postSessionCurrency(currency, geo);
     setContext(res);
   }, []);

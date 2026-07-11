@@ -103,6 +103,8 @@ Expected: `200` and body `{"status":"ok"}`.
   - `cd server && npm run env:check`
 - Detailed setup docs:
   - `docs/environment-bootstrap.md`
+  - `docs/staging-deploy.md` — staging URLs, OAuth, Render/Vercel examples
+  - `docs/linkedin-oauth-setup.md`
   - `docs/secrets-policy.md`
   - `docs/data-baseline-s0-4.md`
   - `docs/auth-rbac-consent-contracts-s0-5.md`

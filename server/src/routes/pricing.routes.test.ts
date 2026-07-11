@@ -21,6 +21,16 @@ describe("pricing routes (FR-178)", () => {
     expect(res.body.source).toBe("geo");
   });
 
+  it("GET /currency-context geo-detects INR from cf-ipcountry header only", async () => {
+    const res = await request(app())
+      .get("/api/v1/pricing/currency-context")
+      .set("cf-ipcountry", "IN");
+    expect(res.status).toBe(200);
+    expect(res.body.currency).toBe("INR");
+    expect(res.body.geoDetected).toBe("IN");
+    expect(res.body.source).toBe("geo");
+  });
+
   it("GET /context is an alias for currency-context", async () => {
     const res = await request(app()).get("/api/v1/pricing/context?geo=US");
     expect(res.status).toBe(200);
@@ -53,6 +63,19 @@ describe("pricing routes (FR-178)", () => {
     expect(res.body.currency).toBe("GBP");
     expect(res.body.saved).toBe(true);
     expect(res.headers["set-cookie"]?.join(";")).toContain(SESSION_CURRENCY_COOKIE);
+  });
+
+  it("GET /currency-context geo-detects CAD for Canada", async () => {
+    const res = await request(app()).get("/api/v1/pricing/currency-context?geo=CA");
+    expect(res.status).toBe(200);
+    expect(res.body.currency).toBe("CAD");
+    expect(res.body.source).toBe("geo");
+  });
+
+  it("GET /currency-context geo-detects IDR for Indonesia", async () => {
+    const res = await request(app()).get("/api/v1/pricing/currency-context?geo=ID");
+    expect(res.status).toBe(200);
+    expect(res.body.currency).toBe("IDR");
   });
 
   it("POST /quote returns single-currency quotes", async () => {

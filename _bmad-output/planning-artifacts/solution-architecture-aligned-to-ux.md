@@ -172,7 +172,7 @@ Translate the approved UX journeys into an implementation-ready technical archit
 1. **BFF shape:** single API gateway vs route-level domain APIs to frontend.
 2. **Vector strategy:** Postgres/pgvector only vs external retrieval store later.
 3. **Mentor geo source precedence:** IP, user profile country, payment country.
-4. **Checkout currency policy:** when user override conflicts with geo recommendation.
+4. **Checkout currency policy:** user session override wins over geo default (FR-178). Launch currencies: USD, INR, CAD, NGN, AUD, IDR, SGD, BRL, EUR (Europe), AED, GBP — see `supported-currencies.ts`.
 5. **Event bus evolution:** Redis-only in MVP vs managed event backbone after scale.
 
 ---

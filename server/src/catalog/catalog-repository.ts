@@ -12,6 +12,7 @@ import { prisma } from "../db/client.js";
 import {
   listStubOfferings,
   OFFERING_STUB_CATALOG,
+  resolveOfferingCode,
 } from "./catalog-seed-data.js";
 import type { OfferingCategory as ApiOfferingCategory, OfferingMeta } from "./offerings.js";
 
@@ -144,31 +145,89 @@ function usesCatalogDatabase(): boolean {
   return process.env.NODE_ENV !== "test";
 }
 
+const DEV_CATALOG_CACHE_MS = 30_000;
+/** Fail open to stub catalog when Postgres/Prisma hangs (common on remote/dev DB stalls). */
+const CATALOG_DB_TIMEOUT_MS = Number(process.env.CATALOG_DB_TIMEOUT_MS ?? 2_500);
+let devCatalogCache: { at: number; rows: OfferingMeta[] } | null = null;
+
+async function withCatalogDbTimeout<T>(operation: Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      operation,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error(`Catalog DB timeout after ${CATALOG_DB_TIMEOUT_MS}ms`)),
+          CATALOG_DB_TIMEOUT_MS,
+        );
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 async function queryPublishedOfferings(): Promise<OfferingMeta[] | null> {
   if (!usesCatalogDatabase()) {
     return null;
   }
+  if (
+    process.env.NODE_ENV === "development" &&
+    devCatalogCache &&
+    Date.now() - devCatalogCache.at < DEV_CATALOG_CACHE_MS
+  ) {
+    return devCatalogCache.rows;
+  }
   try {
-    const rows = await prisma.offering.findMany({
-      where: { enabled: true, deletedAt: null },
-      include: {
-        schedules: {
-          where: { enabled: true, deletedAt: null },
-          orderBy: { startsAt: "asc" },
+    const rows = await withCatalogDbTimeout(
+      prisma.offering.findMany({
+        where: { enabled: true, deletedAt: null },
+        include: {
+          schedules: {
+            where: { enabled: true, deletedAt: null },
+            orderBy: { startsAt: "asc" },
+          },
         },
-      },
-      orderBy: { title: "asc" },
-    });
+        orderBy: { title: "asc" },
+      }),
+    );
     if (rows.length === 0) return null;
-    return rows.map(mapOfferingToMeta);
+    const mapped = rows.map(mapOfferingToMeta);
+    if (process.env.NODE_ENV === "development") {
+      devCatalogCache = { at: Date.now(), rows: mapped };
+    }
+    return mapped;
   } catch {
     return null;
   }
 }
 
+function enrichOfferingFromStub(meta: OfferingMeta): OfferingMeta {
+  const stub = OFFERING_STUB_CATALOG[meta.code];
+  if (!stub?.summary) return meta;
+  return {
+    ...meta,
+    title: stub.title,
+    defaultUnitPrice: stub.defaultUnitPrice,
+    regionalUnitPrices: stub.regionalUnitPrices,
+    roleTags: stub.roleTags,
+    slug: stub.slug,
+    certificationName: stub.certificationName,
+    summary: stub.summary,
+    durationHours: stub.durationHours,
+    durationLabel: stub.durationLabel,
+    scheduleLabel: stub.scheduleLabel,
+    cohortSchedules: stub.cohortSchedules,
+    includes: stub.includes,
+    learningOutcomes: stub.learningOutcomes,
+    upcomingBatchId: stub.upcomingBatchId ?? meta.upcomingBatchId,
+  };
+}
+
 export async function listOfferingsFromCatalog(): Promise<OfferingMeta[]> {
   const fromDb = await queryPublishedOfferings();
-  return fromDb ?? stubFallback();
+  const base = fromDb ?? stubFallback();
+  return base.map(enrichOfferingFromStub);
 }
 
 export async function listOfferingsByCategoryFromCatalog(
@@ -181,34 +240,43 @@ export async function listOfferingsByCategoryFromCatalog(
 export async function getOfferingFromCatalog(
   code: string,
 ): Promise<OfferingMeta | undefined> {
+  const resolved = resolveOfferingCode(code);
+  const stub = OFFERING_STUB_CATALOG[resolved];
+  // Prefer stub when it carries live-site enrichment (avoids stale DB titles/prices).
+  if (stub?.summary) {
+    return stub;
+  }
   if (usesCatalogDatabase()) {
     try {
-      const row = await prisma.offering.findFirst({
-        where: { code, enabled: true, deletedAt: null },
-        include: {
-          schedules: {
-            where: { enabled: true, deletedAt: null },
-            orderBy: { startsAt: "asc" },
+      const row = await withCatalogDbTimeout(
+        prisma.offering.findFirst({
+          where: { code: resolved, enabled: true, deletedAt: null },
+          include: {
+            schedules: {
+              where: { enabled: true, deletedAt: null },
+              orderBy: { startsAt: "asc" },
+            },
           },
-        },
-      });
+        }),
+      );
       if (row) return mapOfferingToMeta(row);
     } catch {
       /* fall through to stub */
     }
   }
-  return OFFERING_STUB_CATALOG[code];
+  return stub;
 }
 
 export async function getOfferingByCodeAdmin(
   code: string,
 ): Promise<OfferingMeta | null> {
+  const resolved = resolveOfferingCode(code);
   if (!usesCatalogDatabase()) {
-    return OFFERING_STUB_CATALOG[code] ?? null;
+    return OFFERING_STUB_CATALOG[resolved] ?? null;
   }
   try {
     const row = await prisma.offering.findFirst({
-      where: { code, deletedAt: null },
+      where: { code: resolved, deletedAt: null },
       include: {
         schedules: {
           where: { deletedAt: null },

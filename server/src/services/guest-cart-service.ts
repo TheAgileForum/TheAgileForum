@@ -37,7 +37,8 @@ type GuestCartWithItems = GuestCartRecord | NonNullable<Awaited<ReturnType<typeo
 function usesGuestCartDatabase(): boolean {
   if (process.env.GUEST_CART_USE_DB === "false") return false;
   if (process.env.GUEST_CART_USE_DB === "true") return true;
-  return process.env.NODE_ENV !== "test";
+  // Dev/test use in-memory guest carts by default (remote DB round-trips are slow locally).
+  return process.env.NODE_ENV === "production";
 }
 
 let guestCartDbAvailable: boolean | null = null;
