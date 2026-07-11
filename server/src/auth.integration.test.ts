@@ -381,6 +381,29 @@ describe.skipIf(!hasDb)("auth integration", () => {
     expect(cookies.some((c) => c.startsWith("access_token="))).toBe(true);
   });
 
+  it("completes linkedin OAuth stub callback and sets session cookie", async () => {
+    const start = await request(app)
+      .get("/api/v1/auth/oauth/linkedin/start")
+      .redirects(0);
+    expect(start.status).toBe(302);
+    const location = start.headers.location as string;
+    const parsed = new URL(location, "http://localhost");
+    const callback = await request(app).get(`${parsed.pathname}${parsed.search}`);
+    expect(callback.status).toBe(302);
+    expect(String(callback.headers.location)).toContain("oauth=success");
+    const setCookie = callback.headers["set-cookie"];
+    const cookies = Array.isArray(setCookie) ? setCookie : setCookie ? [setCookie] : [];
+    expect(cookies.some((c) => c.startsWith("access_token="))).toBe(true);
+
+    const { prisma } = await import("./db/client.js");
+    const created = await prisma.user.findFirst({
+      where: { email: { endsWith: "@oauth.stub.local" }, authProvider: "linkedin" },
+      orderBy: { id: "desc" },
+    });
+    expect(created).toBeTruthy();
+    expect(created?.emailVerifiedAt).toBeTruthy();
+  });
+
   it("verifies email via token link", async () => {
     const email = `verify-${Date.now()}@demo.local`;
     const register = await request(app).post("/api/v1/auth/register").send({
