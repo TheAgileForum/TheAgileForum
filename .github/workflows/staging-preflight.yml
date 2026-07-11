@@ -17,18 +17,6 @@ jobs:
     defaults:
       run:
         working-directory: server
-    env:
-      NODE_ENV: production
-      APP_PUBLIC_URL: https://app.staging.theagileforum.com
-      API_PUBLIC_URL: https://api.staging.theagileforum.com
-      CORS_ALLOWED_ORIGINS: https://app.staging.theagileforum.com
-      OAUTH_STUB_MODE: "false"
-      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
-      JWT_SECRET: staging-preflight-jwt-secret-32chars!!
-      LINKEDIN_CLIENT_ID: ci-linkedin-id
-      LINKEDIN_CLIENT_SECRET: ci-linkedin-secret
-      GOOGLE_CLIENT_ID: ci-google-id
-      GOOGLE_CLIENT_SECRET: ci-google-secret
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -38,3 +26,15 @@ jobs:
           cache-dependency-path: server/package-lock.json
       - run: npm ci
       - run: npm run staging:preflight
+        env:
+          NODE_ENV: production
+          APP_PUBLIC_URL: https://app.staging.theagileforum.com
+          API_PUBLIC_URL: https://api.staging.theagileforum.com
+          CORS_ALLOWED_ORIGINS: https://app.staging.theagileforum.com
+          OAUTH_STUB_MODE: "false"
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+          JWT_SECRET: staging-preflight-jwt-secret-32chars!!
+          LINKEDIN_CLIENT_ID: ci-linkedin-id
+          LINKEDIN_CLIENT_SECRET: ci-linkedin-secret
+          GOOGLE_CLIENT_ID: ci-google-id
+          GOOGLE_CLIENT_SECRET: ci-google-secret
