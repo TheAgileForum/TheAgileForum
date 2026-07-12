@@ -87,14 +87,10 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
     }
     setAddingCode(offering.code);
     setError(null);
-    try {
-      await addItem(offering.code);
-      trackEvent("catalog_add_to_cart", { code: offering.code, category: categoryPath });
-    } catch (err) {
+    trackEvent("catalog_add_to_cart", { code: offering.code, category: categoryPath });
+    void addItem(offering.code).catch((err) => {
       setError(err instanceof ApiRequestError ? err.message : "Could not add to cart.");
-    } finally {
-      setAddingCode(null);
-    }
+    }).finally(() => setAddingCode(null));
   }
 
   const title = TITLES[categoryPath];

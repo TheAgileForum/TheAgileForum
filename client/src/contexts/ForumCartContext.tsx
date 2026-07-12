@@ -15,7 +15,6 @@ import {
   addToCart,
   getCart,
   getGuestCart,
-  getOfferingDetail,
   mergeGuestCart,
   removeCartItem,
   removeGuestCartItem,
@@ -49,6 +48,7 @@ export function ForumCartProvider({ children }: { children: ReactNode }) {
   const { currency, geo } = usePricing();
   const [cart, setCart] = useState<CartSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pendingAdds, setPendingAdds] = useState(0);
 
   const pricing = useMemo(
     (): PricingRequest => ({ geo, currency }),
@@ -76,7 +76,7 @@ export function ForumCartProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener(CURRENCY_CHANGE_EVENT, onCurrencyChange);
   }, [refresh]);
 
-  const itemCount = countItems(cart);
+  const itemCount = countItems(cart) + pendingAdds;
 
   useEffect(() => {
     if (authLoading || loading) return;
@@ -95,23 +95,21 @@ export function ForumCartProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback(
     async (offeringCode: string, scheduleRef?: string) => {
-      let resolvedSchedule = scheduleRef?.trim() || undefined;
-      if (!resolvedSchedule) {
-        try {
-          const detail = await getOfferingDetail(offeringCode, geo, currency);
-          if (detail.offering.scheduleBound && detail.offering.upcomingBatchId) {
-            resolvedSchedule = detail.offering.upcomingBatchId;
-          }
-        } catch {
-          /* catalog lookup failed — let cart API return a clear error */
-        }
+      setPendingAdds((count) => count + 1);
+      try {
+        const res = user
+          ? await addToCart(offeringCode, scheduleRef?.trim() || undefined, pricing)
+          : await addGuestCartItem(
+              offeringCode,
+              scheduleRef?.trim() || undefined,
+              pricing,
+            );
+        setCart(res.cart);
+      } finally {
+        setPendingAdds((count) => Math.max(0, count - 1));
       }
-      const res = user
-        ? await addToCart(offeringCode, resolvedSchedule, pricing)
-        : await addGuestCartItem(offeringCode, resolvedSchedule, pricing);
-      setCart(res.cart);
     },
-    [user, pricing, geo, currency],
+    [user, pricing],
   );
 
   const removeItem = useCallback(

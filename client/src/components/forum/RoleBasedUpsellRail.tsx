@@ -77,9 +77,9 @@ export function RoleBasedUpsellRail({
     setFeedback(null);
     setAddingCode(item.code);
     trackEvent("upsell_click", { code: item.code, context });
+    setFeedback({ severity: "success", message: `${item.title} added to cart.` });
     try {
       await onAddOffering(item.code, item.scheduleRef ?? undefined);
-      setFeedback({ severity: "success", message: `${item.title} added to cart.` });
     } catch (err) {
       const message =
         err instanceof ApiRequestError

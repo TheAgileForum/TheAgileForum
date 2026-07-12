@@ -1,6 +1,7 @@
 import { Decimal } from "@prisma/client/runtime/library";
 import { prisma } from "../db/client.js";
 import { getOfferingFromCatalog } from "../catalog/catalog-repository.js";
+import { getOffering } from "../catalog/offerings.js";
 import { validateAddToCartLine } from "../commerce/checkout-policy.js";
 import type { SessionClaims } from "./auth-service.js";
 import {
@@ -36,6 +37,10 @@ export function pricingInputFromRequest(req: Request): PricingHttpInput {
   return parsePricingInputFromRequest(req);
 }
 
+async function resolveOfferingForCommerce(code: string) {
+  return getOffering(code) ?? (await getOfferingFromCatalog(code));
+}
+
 export async function addCartItem(
   auth: SessionClaims,
   input: {
@@ -45,7 +50,7 @@ export async function addCartItem(
   },
   pricingInput?: PricingHttpInput,
 ) {
-  const offering = await getOfferingFromCatalog(input.offeringCode);
+  const offering = await resolveOfferingForCommerce(input.offeringCode);
   if (!offering) {
     return {
       ok: false as const,
@@ -56,15 +61,19 @@ export async function addCartItem(
     };
   }
 
-  const policyError = validateAddToCartLine(input, offering);
+  const context = resolveCurrencyContext(pricingInput ?? { geo: "US" });
+  const quoted = quoteOfferingPrice(offering, context);
+  const scheduleRef =
+    input.scheduleRef?.trim() || offering.upcomingBatchId?.trim() || null;
+  const policyError = validateAddToCartLine(
+    { ...input, scheduleRef: scheduleRef ?? undefined },
+    offering,
+  );
   if (policyError) {
     return { ok: false as const, error: policyError };
   }
 
-  const context = resolveCurrencyContext(pricingInput ?? { geo: "US" });
-  const quoted = quoteOfferingPrice(offering, context);
   const cart = await getOrCreateActiveCart(auth);
-  const scheduleRef = input.scheduleRef?.trim() || null;
   const quantity = input.quantity ?? 1;
 
   if (cart.currency !== context.currency) {
@@ -101,7 +110,19 @@ export async function addCartItem(
         },
       });
 
-  return { ok: true as const, cartId: cart.id, item };
+  const refreshedCart = {
+    ...cart,
+    items: existingLine
+      ? cart.items.map((line) => (line.id === existingLine.id ? item : line))
+      : [...cart.items, item],
+  } as Awaited<ReturnType<typeof getOrCreateActiveCart>>;
+
+  return {
+    ok: true as const,
+    cartId: cart.id,
+    item,
+    cart: refreshedCart,
+  };
 }
 
 export async function removeCartItem(auth: SessionClaims, itemId: string) {
@@ -149,7 +170,7 @@ export async function serializeCart(
       quantity: item.quantity,
     })),
     context,
-    async (code) => (await getOfferingFromCatalog(code)) ?? null,
+    async (code) => getOffering(code) ?? (await getOfferingFromCatalog(code)) ?? null,
   );
 
   const pricedByCode = new Map(

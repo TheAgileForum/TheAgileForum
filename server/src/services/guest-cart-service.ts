@@ -3,6 +3,7 @@ import type { Response } from "express";
 import { Decimal } from "@prisma/client/runtime/library";
 import { prisma } from "../db/client.js";
 import { getOfferingFromCatalog } from "../catalog/catalog-repository.js";
+import { getOffering } from "../catalog/offerings.js";
 import { validateAddToCartLine } from "../commerce/checkout-policy.js";
 import {
   GUEST_CART_COOKIE_MAX_AGE_MS,
@@ -152,7 +153,7 @@ export async function serializeGuestCart(
       quantity: item.quantity,
     })),
     context,
-    async (code) => (await getOfferingFromCatalog(code)) ?? null,
+    async (code) => getOffering(code) ?? (await getOfferingFromCatalog(code)) ?? null,
   );
 
   const pricedByCode = new Map(
@@ -187,6 +188,10 @@ export async function serializeGuestCart(
   };
 }
 
+async function resolveOfferingForCommerce(code: string) {
+  return getOffering(code) ?? (await getOfferingFromCatalog(code));
+}
+
 export async function addGuestCartItem(
   sessionToken: string,
   input: {
@@ -196,7 +201,7 @@ export async function addGuestCartItem(
   },
   pricingInput?: PricingHttpInput,
 ) {
-  const offering = await getOfferingFromCatalog(input.offeringCode);
+  const offering = await resolveOfferingForCommerce(input.offeringCode);
   if (!offering) {
     return {
       ok: false as const,
@@ -207,14 +212,17 @@ export async function addGuestCartItem(
     };
   }
 
-  const policyError = validateAddToCartLine(input, offering);
+  const context = resolveCurrencyContext(pricingInput ?? { geo: "US" });
+  const quoted = quoteOfferingPrice(offering, context);
+  const scheduleRef =
+    input.scheduleRef?.trim() || offering.upcomingBatchId?.trim() || null;
+  const policyError = validateAddToCartLine(
+    { ...input, scheduleRef: scheduleRef ?? undefined },
+    offering,
+  );
   if (policyError) {
     return { ok: false as const, error: policyError };
   }
-
-  const context = resolveCurrencyContext(pricingInput ?? { geo: "US" });
-  const quoted = quoteOfferingPrice(offering, context);
-  const scheduleRef = input.scheduleRef?.trim() || null;
   const quantity = input.quantity ?? 1;
   const unitPrice = new Decimal(quoted.amount);
 
@@ -258,7 +266,18 @@ export async function addGuestCartItem(
       });
     }
 
-    return { ok: true as const, cartId: cart.id, item };
+    const refreshedCart = {
+      ...cart,
+      items: existingLine
+        ? cart.items.map((line) => (line.id === existingLine.id ? item : line))
+        : [...cart.items, item],
+    } as Awaited<ReturnType<typeof getOrCreateGuestCart>>;
+    return {
+      ok: true as const,
+      cartId: cart.id,
+      item,
+      cart: refreshedCart,
+    };
   }
 
   const { cart, item } = memoryAddGuestCartItem(sessionToken, {
@@ -269,7 +288,14 @@ export async function addGuestCartItem(
     currency: context.currency,
   });
 
-  return { ok: true as const, cartId: cart.id, item };
+  const refreshedCart = (memoryGetActiveGuestCart(sessionToken) ??
+    cart) as Awaited<ReturnType<typeof getOrCreateGuestCart>>;
+  return {
+    ok: true as const,
+    cartId: cart.id,
+    item,
+    cart: refreshedCart,
+  };
 }
 
 export async function removeGuestCartItem(sessionToken: string, itemId: string) {

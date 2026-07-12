@@ -132,7 +132,7 @@ commerceRouter.post(
     if (!result.ok) {
       return res.status(400).json({ error: result.error });
     }
-    const cart = await getOrCreateGuestCart(sessionToken);
+    const cart = result.cart ?? (await getOrCreateGuestCart(sessionToken));
     const serialized = await serializeGuestCart(cart, pricingInput);
     void trackCartUpdated({
       distinctId: sessionToken,
@@ -267,7 +267,7 @@ commerceRouter.post(
     if (!result.ok) {
       return res.status(400).json({ error: result.error });
     }
-    const cart = await getOrCreateActiveCart(req.auth!);
+    const cart = result.cart ?? (await getOrCreateActiveCart(req.auth!));
     const serialized = await serializeCart(cart, pricingInput);
     void trackCartUpdated({
       distinctId: req.auth!.userId,

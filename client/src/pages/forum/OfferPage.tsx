@@ -108,11 +108,12 @@ export function OfferPage() {
     setError(null);
     setSuccess(null);
     setAdding(true);
+    setSuccess("Added to cart.");
     try {
       await addItem(offering.code, offering.scheduleBound ? scheduleRef : undefined);
       trackEvent("catalog_add_to_cart", { code: offering.code, source: "offer_detail" });
-      setSuccess("Added to cart.");
     } catch (err) {
+      setSuccess(null);
       setError(err instanceof ApiRequestError ? `${err.code}: ${err.message}` : "Could not add to cart.");
     } finally {
       setAdding(false);
