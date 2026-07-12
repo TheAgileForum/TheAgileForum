@@ -15,6 +15,7 @@ import {
   addToCart,
   getCart,
   getGuestCart,
+  getOfferingDetail,
   mergeGuestCart,
   removeCartItem,
   removeGuestCartItem,
@@ -94,12 +95,23 @@ export function ForumCartProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback(
     async (offeringCode: string, scheduleRef?: string) => {
+      let resolvedSchedule = scheduleRef?.trim() || undefined;
+      if (!resolvedSchedule) {
+        try {
+          const detail = await getOfferingDetail(offeringCode, geo, currency);
+          if (detail.offering.scheduleBound && detail.offering.upcomingBatchId) {
+            resolvedSchedule = detail.offering.upcomingBatchId;
+          }
+        } catch {
+          /* catalog lookup failed — let cart API return a clear error */
+        }
+      }
       const res = user
-        ? await addToCart(offeringCode, scheduleRef, pricing)
-        : await addGuestCartItem(offeringCode, scheduleRef, pricing);
+        ? await addToCart(offeringCode, resolvedSchedule, pricing)
+        : await addGuestCartItem(offeringCode, resolvedSchedule, pricing);
       setCart(res.cart);
     },
-    [user, pricing],
+    [user, pricing, geo, currency],
   );
 
   const removeItem = useCallback(
