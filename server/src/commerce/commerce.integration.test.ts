@@ -115,6 +115,101 @@ describe.skipIf(!hasDb)("commerce integration (Sprint 1)", () => {
     expect(res.body.access.examAccess).toBe("free");
   });
 
+  it("preserves cart items after checkout start when payment is not completed", async () => {
+    const email = `cart-preserve-${Date.now()}@demo.local`;
+    await request(app)
+      .post("/api/v1/auth/register")
+      .send({
+        email,
+        password: "password123",
+        policyVersion: "v1",
+        acceptTerms: true,
+      });
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email, password: "password123" })
+      .expect(200);
+
+    await agent.post("/api/v1/commerce/cart/items").send({
+      offeringCode: "exam-practice-free",
+      quantity: 1,
+    });
+
+    const start = await agent
+      .post("/api/v1/commerce/checkout/start")
+      .send({ variant: "standard" });
+    expect(start.status).toBe(201);
+
+    const cartRes = await agent.get("/api/v1/commerce/cart");
+    expect(cartRes.status).toBe(200);
+    expect(cartRes.body.cart.items).toHaveLength(1);
+    expect(cartRes.body.cart.items[0].offeringCode).toBe("exam-practice-free");
+    expect(cartRes.body.cart.status).toBe("active");
+
+    const order = await prisma.order.findUnique({
+      where: { id: start.body.orderId as string },
+    });
+    expect(order?.status).toBe("checkout_started");
+  });
+
+  it("preserves cart after failed Razorpay payment confirmation", async () => {
+    process.env.RAZORPAY_KEY_ID = "rzp_test_integration_key";
+    process.env.RAZORPAY_KEY_SECRET = "rzp_test_integration_secret";
+    const providerOrderId = "order_failed_payment_1";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          id: providerOrderId,
+          amount: 166500,
+          currency: "INR",
+          status: "created",
+        }),
+      }),
+    );
+
+    const email = `cart-razorpay-fail-${Date.now()}@demo.local`;
+    await request(app)
+      .post("/api/v1/auth/register")
+      .send({
+        email,
+        password: "password123",
+        policyVersion: "v1",
+        acceptTerms: true,
+      });
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email, password: "password123" })
+      .expect(200);
+
+    await agent.post("/api/v1/commerce/cart/items?geo=IN").send({
+      offeringCode: "exam-mock-certification",
+      quantity: 1,
+    });
+
+    const start = await agent.post("/api/v1/commerce/checkout/start?geo=IN").send({
+      variant: "standard",
+    });
+    expect(start.status).toBe(201);
+
+    const confirm = await agent.post("/api/v1/commerce/checkout/razorpay/confirm").send({
+      orderId: start.body.orderId,
+      razorpayOrderId: providerOrderId,
+      razorpayPaymentId: "pay_bad",
+      razorpaySignature: "deadbeef",
+    });
+    expect(confirm.status).toBe(400);
+    expect(confirm.body.error.code).toBe("RAZORPAY_SIGNATURE_INVALID");
+
+    const cartRes = await agent.get("/api/v1/commerce/cart");
+    expect(cartRes.status).toBe(200);
+    expect(cartRes.body.cart.items).toHaveLength(1);
+    expect(cartRes.body.cart.items[0].offeringCode).toBe("exam-mock-certification");
+  });
+
   it("completes checkout and publishes enrollment events", async () => {
     const agent = await loginCustomer();
     const email = `s1-checkout-${Date.now()}@demo.local`;

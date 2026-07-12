@@ -15,12 +15,28 @@ import type { Request } from "express";
 import { resolveCartCouponTotals } from "../commerce/coupon-service.js";
 
 export async function getOrCreateActiveCart(auth: SessionClaims) {
-  const existing = await prisma.cart.findFirst({
-    where: { userId: auth.userId, status: "active" },
+  const candidates = await prisma.cart.findMany({
+    where: {
+      userId: auth.userId,
+      status: { in: ["active", "checkout_in_progress"] },
+    },
     include: { items: true },
     orderBy: { updatedAt: "desc" },
   });
-  if (existing) return existing;
+
+  const withItems = candidates.filter((cart) => cart.items.length > 0);
+  const existing = withItems[0] ?? candidates[0];
+
+  if (existing) {
+    if (existing.status === "checkout_in_progress") {
+      return prisma.cart.update({
+        where: { id: existing.id },
+        data: { status: "active" },
+        include: { items: true },
+      });
+    }
+    return existing;
+  }
 
   return prisma.cart.create({
     data: {
