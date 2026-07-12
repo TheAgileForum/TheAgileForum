@@ -152,7 +152,62 @@ LIMIT 10;
 
 ---
 
-## 8. Troubleshooting
+## 8. Email verification on staging
+
+Set on the **staging API** host (Render env for `agile-forum-api-staging`):
+
+```env
+REQUIRE_EMAIL_VERIFICATION=true
+APP_PUBLIC_URL=https://app.staging.theagileforum.com
+API_PUBLIC_URL=https://api.staging.theagileforum.com
+```
+
+**Behavior**
+
+| Path | Effect |
+|------|--------|
+| `POST /api/v1/commerce/checkout/start` (and confirm routes) | `403 EMAIL_NOT_VERIFIED` when user has no `email_verified_at` |
+| OAuth sign-in (LinkedIn / Google) | User auto-verified — checkout allowed |
+| Seeded `customer@demo.local` | Already verified — checkout allowed |
+| `GET /api/v1/auth/me` | Returns `requireEmailVerification: true` when flag is on |
+| SPA | `EmailVerificationBanner` shows for unverified users |
+
+**Known limitation:** `INTEGRATION_PROVIDER_MODE=live` uses `LiveEmailAdapter`, which **does not send real mail** yet (returns a stub `messageId` only). Verification tokens are stored in the DB; use SQL or a future email provider to complete verification in staging until transactional email is wired.
+
+**Render dashboard** (when CLI/API key unavailable):
+
+1. [Render Dashboard](https://dashboard.render.com/) → **agile-forum-api-staging**
+2. **Environment** → add or edit `REQUIRE_EMAIL_VERIFICATION` = `true`
+3. Confirm `APP_PUBLIC_URL` and `API_PUBLIC_URL` match `deploy/domains.json`
+4. **Manual Deploy** → Deploy latest commit (env changes trigger redeploy automatically)
+
+**API smoke (replace emails/passwords as needed):**
+
+```bash
+API=https://api.staging.theagileforum.com
+
+# 1) Register unverified user
+curl -s -c /tmp/cookies.txt -X POST "$API/api/v1/auth/register" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"verify-test-'$(date +%s)'@example.com","password":"TestPass123!","policyVersion":"2026-01","acceptTerms":true}'
+
+# 2) Checkout blocked
+curl -s -b /tmp/cookies.txt -X POST "$API/api/v1/commerce/checkout/start" \
+  -H "Content-Type: application/json" \
+  -d '{"variant":"standard","commerceJourneyOrigin":"catalog_trainings"}'
+# Expect: {"error":{"code":"EMAIL_NOT_VERIFIED",...}}
+
+# 3) Demo user still works
+curl -s -c /tmp/demo.txt -X POST "$API/api/v1/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"customer@demo.local","password":"password123"}'
+curl -s -b /tmp/demo.txt "$API/api/v1/auth/me"
+# Expect: requireEmailVerification true, user.emailVerified set
+```
+
+---
+
+## 9. Troubleshooting
 
 | Issue | Fix |
 |-------|-----|
@@ -161,6 +216,8 @@ LIMIT 10;
 | OAuth succeeds but `/me` 401 | `VITE_API_URL` must point to the host that set the cookie; check cookie domain in DevTools |
 | `OAUTH_NOT_CONFIGURED` | Set client id/secret; `OAUTH_STUB_MODE=false` on staging |
 | Mixed content | Use `https` for both `APP_PUBLIC_URL` and `API_PUBLIC_URL` in staging |
+| `EMAIL_NOT_VERIFIED` at checkout | Expected for password-registered users until verified; OAuth and seeded demo users bypass |
+| No verification email received | Live email adapter is stub-only — check DB `email_verification_token` or wire a provider |
 
 ---
 
