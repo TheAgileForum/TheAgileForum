@@ -21,6 +21,7 @@ import {
   resolveStubPaymentRef,
 } from "../../lib/checkout-redirect";
 import { getCommerceJourneyOrigin } from "../../lib/commerce-journey";
+import { getCheckoutConfirmLabel } from "../../lib/checkout-labels";
 import { formatPrice } from "../../lib/format-price";
 import {
   applyCheckoutCoupon,
@@ -124,24 +125,23 @@ export function ForumCheckoutPage() {
     [cart],
   );
 
-  const confirmLabel = useMemo(() => {
-    if (variant === "org_reimbursement") {
-      return "Submit org reimbursement request";
-    }
-    if (paymentMode === "installment" && installmentProvider) {
-      return "Continue to installment checkout";
-    }
-    if (currency === "INR" || geo === "IN") {
-      return "Continue to Razorpay";
-    }
-    return "Confirm payment";
-  }, [currency, geo, installmentProvider, paymentMode, variant]);
+  const confirmLabel = useMemo(
+    () =>
+      getCheckoutConfirmLabel({
+        variant,
+        geo,
+        currency,
+        paymentMode,
+        installmentProvider,
+      }),
+    [currency, geo, installmentProvider, paymentMode, variant],
+  );
 
   if (loading) return <LinearProgress />;
   if (!user) {
     return (
       <Stack spacing={2}>
-        <Typography variant="h5">Checkout</Typography>
+        <Typography variant="h5">Secure Checkout</Typography>
         <Alert severity="info">Sign in to complete your purchase.</Alert>
         <Button variant="contained" component={RouterLink} to="/login" state={{ returnTo: "/checkout" }}>
           Sign in
@@ -210,7 +210,7 @@ export function ForumCheckoutPage() {
   return (
     <Stack spacing={2}>
       <Typography variant="h5" sx={{ fontWeight: 600 }}>
-        Checkout
+        Secure Checkout
       </Typography>
       <Typography color="text.secondary">Signed in as {user.email}</Typography>
       {loadError ? <Alert severity="error">{loadError}</Alert> : null}

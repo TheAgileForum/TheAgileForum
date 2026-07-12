@@ -16,6 +16,11 @@ import {
   type PaymentMode,
   type PaymentModesResponse,
 } from "../../lib/forum-api";
+import {
+  getFullPayModeLabel,
+  isIndiaCheckoutContext,
+  INDIA_FULL_PAY_MESSAGE,
+} from "../../lib/checkout-labels";
 import { formatPrice } from "../../lib/format-price";
 import { trackEvent } from "../../lib/analytics";
 
@@ -146,10 +151,9 @@ export function CheckoutPaymentModeSelector({
   if (loading) return <LinearProgress sx={{ my: 1 }} />;
   if (!modes) return null;
 
-  const fullPayLabel =
-    modes.fullPayProvider === "razorpay"
-      ? "Pay in full (Razorpay / UPI)"
-      : "Pay in full (card)";
+  const isIndiaRazorpay =
+    modes.fullPayProvider === "razorpay" && isIndiaCheckoutContext(geo, cartCurrency);
+  const fullPayLabel = getFullPayModeLabel(modes.fullPayProvider, geo, cartCurrency);
 
   return (
     <Box sx={{ p: 2, border: 1, borderColor: "divider", borderRadius: 2 }}>
@@ -169,7 +173,11 @@ export function CheckoutPaymentModeSelector({
           }
         }}
       >
-        <FormControlLabel value="full_pay" control={<Radio />} label={fullPayLabel} />
+        {isIndiaRazorpay && !installmentAvailable ? (
+          <Typography variant="body2">{INDIA_FULL_PAY_MESSAGE}</Typography>
+        ) : (
+          <FormControlLabel value="full_pay" control={<Radio />} label={fullPayLabel} />
+        )}
         {installmentAvailable ? (
           <FormControlLabel
             value="installment"
