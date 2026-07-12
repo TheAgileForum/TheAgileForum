@@ -10,6 +10,7 @@ import { StickyMobileCta } from "../../components/forum/StickyMobileCta";
 import { useAuth } from "../../contexts/AuthContext";
 import { useDiagnosis } from "../../contexts/DiagnosisContext";
 import { trackEvent } from "../../lib/analytics";
+import { apiUrl } from "../../lib/api-base";
 import { openMentorBooking } from "../../lib/mentor-booking";
 
 const ACCENT = "#0f9f8f";
@@ -288,10 +289,12 @@ function PrimaryCta({
   children,
   onClick,
   disabled,
+  onWarm,
 }: {
   children: ReactNode;
   onClick: () => void;
   disabled?: boolean;
+  onWarm?: () => void;
 }) {
   return (
     <Button
@@ -299,6 +302,8 @@ function PrimaryCta({
       size="large"
       disabled={disabled}
       onClick={onClick}
+      onMouseEnter={onWarm}
+      onFocus={onWarm}
       sx={{
         bgcolor: ACCENT,
         color: "#04241f",
@@ -357,27 +362,33 @@ function SectionInner({ children }: { children: ReactNode }) {
 export function ForumHomePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { resumeLoading, resumeStep, startSession } = useDiagnosis();
+  const { resumeLoading, resumeStep, startSession, prefetchSession } = useDiagnosis();
   const [startError, setStartError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
 
-  async function handleStart(source = "hero") {
+  useEffect(() => {
+    void fetch(apiUrl("/api/v1/health"), { credentials: "include" }).catch(() => undefined);
+    prefetchSession();
+  }, [prefetchSession]);
+
+  function handleStart(source = "hero") {
     setStartError(null);
     setStarting(true);
     trackEvent("home_hero_cta_click", { source });
-    try {
-      await startSession(source === "hero" ? "home-hero" : `home-${source}`);
-      navigate("/diagnosis/step-1");
-    } catch (error) {
-      const message =
-        error instanceof Error && error.message
-          ? error.message
-          : "Could not start assessment. Check that the API is running and try again.";
-      setStartError(message);
-    } finally {
-      setStarting(false);
-    }
+    navigate("/diagnosis/step-1");
+    const campaignId = source === "hero" ? "home-hero" : `home-${source}`;
+    void startSession(campaignId)
+      .catch((error) => {
+        const message =
+          error instanceof Error && error.message
+            ? error.message
+            : "Could not start assessment. Check that the API is running and try again.";
+        setStartError(message);
+      })
+      .finally(() => setStarting(false));
   }
+
+  const warmSession = () => prefetchSession();
 
   function handleContinue() {
     trackEvent("home_continue_journey_click", { step: resumeStep ?? "unknown" });
@@ -501,7 +512,11 @@ export function ForumHomePage() {
             spacing={1.5}
             sx={{ justifyContent: "center", alignItems: "center" }}
           >
-            <PrimaryCta disabled={starting} onClick={() => void handleStart("hero")}>
+            <PrimaryCta
+              disabled={starting}
+              onWarm={warmSession}
+              onClick={() => void handleStart("hero")}
+            >
               Start Assessment →
             </PrimaryCta>
             <GhostCta onClick={handleMentorCall}>Book mentor call</GhostCta>
@@ -928,7 +943,11 @@ export function ForumHomePage() {
             spacing={1.5}
             sx={{ justifyContent: "center", alignItems: "center" }}
           >
-            <PrimaryCta disabled={starting} onClick={() => void handleStart("close-cta")}>
+            <PrimaryCta
+              disabled={starting}
+              onWarm={warmSession}
+              onClick={() => void handleStart("close-cta")}
+            >
               Start Assessment →
             </PrimaryCta>
             <GhostCta onClick={handleMentorCall}>Or book a mentor call</GhostCta>
@@ -936,7 +955,12 @@ export function ForumHomePage() {
         </SectionInner>
       </Box>
 
-      <StickyMobileCta label="Start Assessment →" disabled={starting} onClick={() => void handleStart("sticky")} />
+      <StickyMobileCta
+        label="Start Assessment →"
+        disabled={starting}
+        onWarm={warmSession}
+        onClick={() => void handleStart("sticky")}
+      />
     </Box>
   );
 }

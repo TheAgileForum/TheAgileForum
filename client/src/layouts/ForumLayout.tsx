@@ -19,6 +19,7 @@ import { SessionCurrencySelector } from "../components/forum/SessionCurrencySele
 import { TrustFooter } from "../components/forum/TrustFooter";
 import { EmailVerificationBanner } from "../components/EmailVerificationBanner";
 import { useAuth } from "../contexts/AuthContext";
+import { useDiagnosis } from "../contexts/DiagnosisContext";
 
 const CATALOG_PATHS = ["/trainings", "/certifications", "/services", "/cart"];
 const INK = "#0a1628";
@@ -43,6 +44,7 @@ const navButtonSx = {
 
 export function ForumLayout() {
   const { user, logout } = useAuth();
+  const { prefetchSession } = useDiagnosis();
   const { pathname } = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const isHome = pathname === "/";
@@ -103,7 +105,18 @@ export function ForumLayout() {
           </Box>
           <Stack direction="row" spacing={0.5} sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}>
             {PRIMARY_NAV.map((item) => (
-              <Button key={item.to} component={RouterLink} to={item.to} size="small" sx={navButtonSx}>
+              <Button
+                key={item.to}
+                component={RouterLink}
+                to={item.to}
+                size="small"
+                sx={navButtonSx}
+                onMouseEnter={
+                  item.to === "/diagnosis/step-1"
+                    ? () => prefetchSession("nav-prefetch")
+                    : undefined
+                }
+              >
                 {item.label}
               </Button>
             ))}
@@ -166,6 +179,11 @@ export function ForumLayout() {
                 to={item.to}
                 selected={selected}
                 onClick={closeMobileNav}
+                onMouseEnter={
+                  item.to === "/diagnosis/step-1"
+                    ? () => prefetchSession("nav-prefetch")
+                    : undefined
+                }
                 sx={{
                   mx: 1,
                   borderRadius: 1,

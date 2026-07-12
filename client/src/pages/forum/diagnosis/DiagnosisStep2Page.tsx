@@ -1,5 +1,7 @@
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import LinearProgress from "@mui/material/LinearProgress";
 import Stack from "@mui/material/Stack";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
@@ -48,6 +50,7 @@ export function DiagnosisStep2Page() {
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
   const [draftSaved, setDraftSaved] = useState(false);
 
   useEffect(() => {
@@ -106,6 +109,7 @@ export function DiagnosisStep2Page() {
       return;
     }
     setSubmitting(true);
+    setLoadingMessage("Uploading resume…");
     try {
       const sid = sessionId;
       if (!sid) {
@@ -120,8 +124,10 @@ export function DiagnosisStep2Page() {
       });
       const trimmedJd = jdText.trim();
       if (trimmedJd) {
+        setLoadingMessage("Saving job context…");
         await saveJdInput(sid, { jdText: trimmedJd, targetRole });
       }
+      setLoadingMessage("Starting analysis…");
       trackEvent("diagnosis_resume_upload_success", { hasJd: Boolean(jdText.trim()) });
       const run = await requestAnalysis(sid, "user-initiated");
       setRunId(run.analysisRunId);
@@ -133,21 +139,42 @@ export function DiagnosisStep2Page() {
       trackEvent("diagnosis_resume_upload_failure", { reason: "api_error" });
     } finally {
       setSubmitting(false);
+      setLoadingMessage(null);
     }
   }
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} aria-busy={submitting}>
       <DiagnosisStepper activeStep={1} />
       <Typography variant="h5" sx={{ fontWeight: 600 }}>
         Resume &amp; job context
       </Typography>
-      <Tabs value={tab} onChange={(_, v) => setTab(v)}>
-        <Tab label="Upload resume" />
-        <Tab label="Paste JD (optional)" />
+      {submitting ? <LinearProgress /> : null}
+      {loadingMessage ? (
+        <Alert
+          severity="info"
+          role="status"
+          aria-live="polite"
+          icon={<CircularProgress size={18} color="inherit" />}
+        >
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+            {loadingMessage}
+          </Typography>
+          <Typography variant="body2">Please wait — this usually takes a few seconds.</Typography>
+        </Alert>
+      ) : null}
+      <Tabs value={tab} onChange={(_, v) => setTab(v)} aria-disabled={submitting}>
+        <Tab label="Upload resume" disabled={submitting} />
+        <Tab label="Paste JD (optional)" disabled={submitting} />
       </Tabs>
       {tab === 0 ? (
-        <ResumeDropZone file={file} onFile={setFile} maxMb={MAX_MB} accept={ACCEPT} />
+        <ResumeDropZone
+          file={file}
+          onFile={setFile}
+          maxMb={MAX_MB}
+          accept={ACCEPT}
+          disabled={submitting}
+        />
       ) : (
         <Stack spacing={2}>
           <TextField
@@ -155,6 +182,7 @@ export function DiagnosisStep2Page() {
             value={targetRole}
             onChange={(e) => setTargetRole(e.target.value)}
             fullWidth
+            disabled={submitting}
           />
           <TextField
             label="Job description"
@@ -163,6 +191,7 @@ export function DiagnosisStep2Page() {
             multiline
             minRows={4}
             fullWidth
+            disabled={submitting}
             placeholder="Paste JD text to improve gap analysis (optional)"
           />
         </Stack>
@@ -178,8 +207,14 @@ export function DiagnosisStep2Page() {
         </Typography>
       ) : null}
       {error ? <Alert severity="error">{error}</Alert> : null}
-      <Button variant="contained" size="large" disabled={submitting} onClick={() => void onAnalyze()}>
-        Run analysis
+      <Button
+        variant="contained"
+        size="large"
+        disabled={submitting}
+        onClick={() => void onAnalyze()}
+        startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : null}
+      >
+        {submitting ? "Please wait…" : "Run analysis"}
       </Button>
     </Stack>
   );
