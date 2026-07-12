@@ -88,9 +88,12 @@ export function OfferPage() {
       .finally(() => setLoading(false));
   }, [code, catalogFrom, geo, currency]);
 
-  async function handleAddToCartForCode(codeToAdd: string) {
+  async function handleAddToCartForCode(codeToAdd: string, scheduleRefFromUpsell?: string) {
     if (codeToAdd !== offering?.code) {
-      navigate(`/offers/${codeToAdd}`, { state: { fromCatalog: catalogFrom } });
+      setError(null);
+      setSuccess(null);
+      await addItem(codeToAdd, scheduleRefFromUpsell);
+      setSuccess("Added to cart.");
       return;
     }
     await handleAddToCart();
@@ -250,7 +253,7 @@ export function OfferPage() {
         context="detail"
         offerId={offering.code}
         gapTags={upsellGaps}
-        onAddOffering={(c) => void handleAddToCartForCode(c)}
+        onAddOffering={(c, scheduleRef) => handleAddToCartForCode(c, scheduleRef)}
       />
 
       {success ? <Alert severity="success">{success}</Alert> : null}

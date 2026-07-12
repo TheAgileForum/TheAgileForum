@@ -10,6 +10,7 @@ describe("role-based upsell recommendations (FR-181)", () => {
       currency: "USD",
     });
     expect(result.safeCertSkus.length).toBeGreaterThan(0);
+    expect(result.safeCertSkus[0]?.scheduleRef).toBeTruthy();
     expect(result.mockInterviewSkus.length).toBeGreaterThan(0);
     expect(result.mockInterviewSkus[0]?.code).toBe("service-mock-interview-sm");
     expect(result.primaryCta?.offeringCode).toBeTruthy();

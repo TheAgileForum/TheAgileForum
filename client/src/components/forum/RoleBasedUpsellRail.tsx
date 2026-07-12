@@ -1,12 +1,15 @@
+import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import CircularProgress from "@mui/material/CircularProgress";
 import LinearProgress from "@mui/material/LinearProgress";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useEffect, useRef, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { usePricing } from "../../contexts/PricingContext";
+import { ApiRequestError } from "../../lib/api";
 import { trackEvent } from "../../lib/analytics";
 import { formatPrice } from "../../lib/format-price";
 import { getUpsellRecommendations, type UpsellItem } from "../../lib/forum-api";
@@ -16,7 +19,7 @@ type RoleBasedUpsellRailProps = {
   context?: "diagnosis" | "dashboard" | "cart" | "detail" | "post_webinar";
   offerId?: string;
   gapTags?: string[];
-  onAddOffering?: (code: string) => void;
+  onAddOffering?: (code: string, scheduleRef?: string) => Promise<void>;
 };
 
 export function RoleBasedUpsellRail({
@@ -29,6 +32,10 @@ export function RoleBasedUpsellRail({
   const { currency, geo } = usePricing();
   const [items, setItems] = useState<UpsellItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [addingCode, setAddingCode] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<{ severity: "success" | "error"; message: string } | null>(
+    null,
+  );
   const impressed = useRef(false);
 
   useEffect(() => {
@@ -65,6 +72,25 @@ export function RoleBasedUpsellRail({
     };
   }, [targetRole, context, offerId, gapTags.join(","), geo, currency]);
 
+  async function handleAdd(item: UpsellItem) {
+    if (!onAddOffering) return;
+    setFeedback(null);
+    setAddingCode(item.code);
+    trackEvent("upsell_click", { code: item.code, context });
+    try {
+      await onAddOffering(item.code, item.scheduleRef ?? undefined);
+      setFeedback({ severity: "success", message: `${item.title} added to cart.` });
+    } catch (err) {
+      const message =
+        err instanceof ApiRequestError
+          ? err.message
+          : "Could not add to cart. Try again or open the offer page.";
+      setFeedback({ severity: "error", message });
+    } finally {
+      setAddingCode(null);
+    }
+  }
+
   if (!targetRole?.trim()) return null;
   if (loading) return <LinearProgress sx={{ my: 1 }} />;
   if (items.length === 0) return null;
@@ -94,12 +120,13 @@ export function RoleBasedUpsellRail({
                 <Button
                   size="small"
                   variant="outlined"
-                  onClick={() => {
-                    trackEvent("upsell_click", { code: item.code, context });
-                    onAddOffering?.(item.code);
-                  }}
+                  disabled={addingCode !== null}
+                  onClick={() => void handleAdd(item)}
+                  startIcon={
+                    addingCode === item.code ? <CircularProgress size={14} color="inherit" /> : null
+                  }
                 >
-                  Add
+                  {addingCode === item.code ? "Adding…" : "Add"}
                 </Button>
               ) : (
                 <Button
@@ -109,12 +136,17 @@ export function RoleBasedUpsellRail({
                   to={`/offers/${item.code}`}
                   onClick={() => trackEvent("upsell_click", { code: item.code, context })}
                 >
-                  Book
+                  View
                 </Button>
               )}
             </Stack>
           ))}
         </Stack>
+        {feedback ? (
+          <Alert severity={feedback.severity} sx={{ mt: 1.5 }} onClose={() => setFeedback(null)}>
+            {feedback.message}
+          </Alert>
+        ) : null}
         <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1 }}>
           Role-based suggestions · Session {currency} · No discount marketing (FR-181)
         </Typography>

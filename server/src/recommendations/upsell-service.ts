@@ -25,6 +25,8 @@ export type UpsellSku = {
     currency: string;
   };
   action: "add" | "book";
+  /** Default cohort when schedule-bound offerings can be added directly (FR-157). */
+  scheduleRef?: string | null;
   relevanceScore: number;
 };
 
@@ -81,6 +83,9 @@ function serializeUpsellSku(
   relevanceScore: number,
 ): UpsellSku {
   const quote = quoteOfferingPrice(offering, currencyContext);
+  const canQuickAdd =
+    offering.kind !== "service" &&
+    (!offering.scheduleBound || Boolean(offering.upcomingBatchId));
   return {
     code: offering.code,
     title: offering.title,
@@ -90,7 +95,8 @@ function serializeUpsellSku(
       amount: quote.amount,
       currency: quote.currency,
     },
-    action: offering.kind === "service" ? "book" : "add",
+    action: canQuickAdd ? "add" : "book",
+    scheduleRef: offering.scheduleBound ? (offering.upcomingBatchId ?? null) : null,
     relevanceScore,
   };
 }

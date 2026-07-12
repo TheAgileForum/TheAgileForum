@@ -166,7 +166,7 @@ export function ForumCartPage() {
           targetRole={upsellRole}
           context="cart"
           gapTags={upsellGaps}
-          onAddOffering={(code) => void addItem(code).catch(() => setError("Could not add upsell item."))}
+          onAddOffering={(code, scheduleRef) => addItem(code, scheduleRef)}
         />
       ) : null}
 

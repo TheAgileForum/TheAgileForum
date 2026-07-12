@@ -202,6 +202,7 @@ export type UpsellItem = {
   kind: string;
   priceQuote: { amount: string; currency: string };
   action: "add" | "book";
+  scheduleRef?: string | null;
   relevanceScore: number;
 };
 
