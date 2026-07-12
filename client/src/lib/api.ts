@@ -53,6 +53,17 @@ export async function apiFetch<T>(
         ...rest.headers,
       },
     });
+    const contentType = res.headers.get("content-type") ?? "";
+    if (!contentType.includes("application/json")) {
+      throw new ApiRequestError(res.status, {
+        error: {
+          code: "INVALID_API_RESPONSE",
+          message:
+            "API returned non-JSON (check /api proxy on SPA host or VITE_API_URL).",
+          retryable: true,
+        },
+      });
+    }
     const data = (await res.json().catch(() => ({}))) as T & ApiErrorBody;
     if (!res.ok) {
       throw new ApiRequestError(res.status, data);
