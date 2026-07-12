@@ -35,8 +35,11 @@ import { CatalogListingPage } from "./pages/forum/catalog/CatalogListingPage";
 import { ForumCartPage } from "./pages/forum/ForumCartPage";
 import { OfferPage } from "./pages/forum/OfferPage";
 import { AboutPage } from "./pages/forum/AboutPage";
-import { LegalPlaceholderPage } from "./pages/forum/LegalPlaceholderPage";
+import { PrivacyPage } from "./pages/forum/PrivacyPage";
+import { RefundPolicyPage } from "./pages/forum/RefundPolicyPage";
 import { ResourcesPage } from "./pages/forum/ResourcesPage";
+import { TermsPage } from "./pages/forum/TermsPage";
+import { TestimonialsPage } from "./pages/forum/TestimonialsPage";
 import { WebinarsPage } from "./pages/forum/WebinarsPage";
 import { DecisionsPage } from "./pages/ops/DecisionsPage";
 import { OpsHome } from "./pages/ops/OpsHome";
@@ -81,34 +84,11 @@ function App() {
               <Route path="services" element={<CatalogListingPage categoryPath="services" />} />
               <Route path="resources" element={<ResourcesPage />} />
               <Route path="webinars" element={<WebinarsPage />} />
+              <Route path="testimonials" element={<TestimonialsPage />} />
               <Route path="about" element={<AboutPage />} />
-              <Route
-                path="privacy"
-                element={
-                  <LegalPlaceholderPage
-                    title="Privacy policy"
-                    summary="How The Agile Forum collects, uses, and protects personal data across assessment, account, and checkout flows."
-                  />
-                }
-              />
-              <Route
-                path="terms"
-                element={
-                  <LegalPlaceholderPage
-                    title="Terms of use"
-                    summary="Terms governing use of The Agile Forum site, programs, mentorship, and related digital services."
-                  />
-                }
-              />
-              <Route
-                path="refund-policy"
-                element={
-                  <LegalPlaceholderPage
-                    title="Refund policy"
-                    summary="Satisfaction and refund rules aligned with published program promises and checkout disclosures."
-                  />
-                }
-              />
+              <Route path="privacy" element={<PrivacyPage />} />
+              <Route path="terms" element={<TermsPage />} />
+              <Route path="refund-policy" element={<RefundPolicyPage />} />
               <Route path="cart" element={<ForumCartPage />} />
               <Route path="diagnosis/step-1" element={<DiagnosisStep1Page />} />
               <Route path="diagnosis/step-2" element={<DiagnosisStep2Page />} />

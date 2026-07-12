@@ -54,7 +54,7 @@ Register **exact** redirect URIs from `deploy/domains.json` → `staging.oauthRe
 ### 5. Client (Vercel)
 
 - Root: `client/`
-- Build: `npm ci && npm run build`
+- Build: `npm ci --include=dev && npm run build` (required when `NODE_ENV=production` is set on Render)
 - Output: `dist`
 - Env: `VITE_API_URL=https://api.staging.theagileforum.com` (+ see `staging.client.env.example`)
 
