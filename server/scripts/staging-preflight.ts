@@ -94,6 +94,19 @@ function main(): void {
   }
   ok("DATABASE_URL and JWT_SECRET present");
 
+  const stripeKey = process.env.STRIPE_SECRET_KEY?.trim();
+  const razorpayId = process.env.RAZORPAY_KEY_ID?.trim();
+  if (stripeKey) {
+    ok(`STRIPE_SECRET_KEY set (${stripeKey.startsWith("sk_test_") ? "test" : "live"} mode)`);
+  } else {
+    console.warn("WARN: STRIPE_SECRET_KEY missing — non-IN checkout will not redirect to Stripe");
+  }
+  if (razorpayId) {
+    ok("RAZORPAY_KEY_ID set");
+  } else {
+    console.warn("WARN: RAZORPAY_KEY_ID missing — INR checkout will not open Razorpay modal");
+  }
+
   console.log("\nPreflight passed. Next:");
   console.log("  1. Register OAuth redirect URIs (printed above) in LinkedIn + Google consoles");
   console.log("  2. Build client with VITE_API_URL=" + normalizeUrl(apiUrl));

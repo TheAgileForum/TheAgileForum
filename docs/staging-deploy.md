@@ -116,7 +116,7 @@ Details: `docs/linkedin-oauth-setup.md`
 
 ### API on Render
 
-1. New **Web Service** → repo root `server/`, build `npm install && npm run build`, start `npm start`.
+1. New **Web Service** → repo root `server/`, build `npm ci --include=dev && npm run build`, start `npm start`.
 2. Add env from `deploy/staging.server.env.example`.
 3. Run migrations once: `npm run db:deploy` (Render shell or CI).
 4. Custom domain: `api.staging.theagileforum.com` → note HTTPS URL for `API_PUBLIC_URL`.

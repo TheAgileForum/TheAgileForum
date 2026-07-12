@@ -6,7 +6,8 @@ services:
     name: agile-forum-api-staging
     runtime: node
     rootDir: server
-    buildCommand: npm ci && npm run build
+    # --include=dev: NODE_ENV=production skips devDependencies (@types/node, typescript, prisma CLI)
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /api/v1/health
     envVars:

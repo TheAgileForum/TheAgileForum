@@ -11,6 +11,7 @@ import { scheduleAnalysisRun } from "./analysis-runner.js";
 import { upsertSessionJourney } from "./journey-state-service.js";
 import type { PrimaryAction } from "./contracts.js";
 import { enrichAnalysisPayload } from "./result-enrichment.js";
+import { logError } from "../runtime/logger.js";
 
 function nextStepForStatus(status: DiagnosisSessionStatus): string {
   switch (status) {
@@ -58,14 +59,20 @@ export async function createDiagnosisSession(input: {
     },
   });
 
-  await upsertSessionJourney({
+  void upsertSessionJourney({
     sessionId: session.id,
     currentFlow: "diagnosis",
     currentStep: "step_1",
     resumePayload: { diagnosisSessionId: session.id },
+  }).catch((error) => {
+    logError("diagnosis journey upsert failed", {
+      component: "diagnosis",
+      diagnosisSessionId: session.id,
+      error: error instanceof Error ? error.message : String(error),
+    });
   });
 
-  await publishEvent({
+  void publishEvent({
     eventName: "diagnosis.started",
     source: "api",
     idempotencyKey: `diagnosis.started:${session.id}`,
@@ -73,6 +80,12 @@ export async function createDiagnosisSession(input: {
       diagnosisSessionId: session.id,
       campaignId: input.campaignId ?? null,
     },
+  }).catch((error) => {
+    logError("diagnosis.started event publish failed", {
+      component: "diagnosis",
+      diagnosisSessionId: session.id,
+      error: error instanceof Error ? error.message : String(error),
+    });
   });
 
   return {

@@ -8,10 +8,11 @@ type StickyMobileCtaProps = {
   label: string;
   onClick: () => void;
   disabled?: boolean;
+  onWarm?: () => void;
   secondary?: ReactNode;
 };
 
-export function StickyMobileCta({ label, onClick, disabled, secondary }: StickyMobileCtaProps) {
+export function StickyMobileCta({ label, onClick, disabled, onWarm, secondary }: StickyMobileCtaProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -39,6 +40,8 @@ export function StickyMobileCta({ label, onClick, disabled, secondary }: StickyM
         fullWidth
         disabled={disabled}
         onClick={onClick}
+        onMouseEnter={onWarm}
+        onFocus={onWarm}
         sx={{
           bgcolor: "primary.main",
           color: "primary.contrastText",

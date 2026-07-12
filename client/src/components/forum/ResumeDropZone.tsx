@@ -8,26 +8,28 @@ type ResumeDropZoneProps = {
   onFile: (file: File | null) => void;
   maxMb: number;
   accept: string;
+  disabled?: boolean;
 };
 
-export function ResumeDropZone({ file, onFile, maxMb, accept }: ResumeDropZoneProps) {
+export function ResumeDropZone({ file, onFile, maxMb, accept, disabled = false }: ResumeDropZoneProps) {
   const [dragOver, setDragOver] = useState(false);
 
   const handleDrop = useCallback(
     (e: DragEvent) => {
       e.preventDefault();
       setDragOver(false);
+      if (disabled) return;
       const dropped = e.dataTransfer.files[0];
       if (dropped) onFile(dropped);
     },
-    [onFile],
+    [disabled, onFile],
   );
 
   return (
     <Box
       onDragOver={(e) => {
         e.preventDefault();
-        setDragOver(true);
+        if (!disabled) setDragOver(true);
       }}
       onDragLeave={() => setDragOver(false)}
       onDrop={handleDrop}
@@ -39,7 +41,9 @@ export function ResumeDropZone({ file, onFile, maxMb, accept }: ResumeDropZonePr
         p: 3,
         textAlign: "center",
         bgcolor: dragOver ? "action.hover" : "background.paper",
-        cursor: "pointer",
+        cursor: disabled ? "not-allowed" : "pointer",
+        opacity: disabled ? 0.65 : 1,
+        pointerEvents: disabled ? "none" : "auto",
         transition: "border-color 0.15s, background-color 0.15s",
       }}
       component="label"
@@ -48,6 +52,7 @@ export function ResumeDropZone({ file, onFile, maxMb, accept }: ResumeDropZonePr
         type="file"
         hidden
         accept={accept}
+        disabled={disabled}
         onChange={(e) => onFile(e.target.files?.[0] ?? null)}
       />
       <CloudUploadOutlinedIcon color="action" sx={{ fontSize: 40, mb: 1 }} />
