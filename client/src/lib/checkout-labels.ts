@@ -3,6 +3,8 @@ import type { InstallmentProvider, PaymentMode } from "./forum-api";
 export const INDIA_FULL_PAY_MESSAGE =
   "All payment Option Available - Credit Card, Debit Card, Installments(EMI), UPI, Netbanking, Wallets Etc.";
 
+export const INSTALLMENT_MODE_LABEL = "Pay in 3/6/12 Monthly installments";
+
 export function isIndiaCheckoutContext(geo: string, currency: string): boolean {
   return geo === "IN" || currency === "INR";
 }

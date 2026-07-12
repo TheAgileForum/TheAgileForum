@@ -8,7 +8,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useEffect, useMemo, useState } from "react";
 import { CURRENCY_CHANGE_EVENT, usePricing } from "../../contexts/PricingContext";
-import { EMI_TERM_MONTHS, emiPreviewFromPlans } from "../../lib/emi-resolver";
+import { emiPreviewFromPlans } from "../../lib/emi-resolver";
 import {
   getPaymentModes,
   postInstallmentPlans,
@@ -20,6 +20,7 @@ import {
   getFullPayModeLabel,
   isIndiaCheckoutContext,
   INDIA_FULL_PAY_MESSAGE,
+  INSTALLMENT_MODE_LABEL,
 } from "../../lib/checkout-labels";
 import { formatPrice } from "../../lib/format-price";
 import { trackEvent } from "../../lib/analytics";
@@ -182,7 +183,7 @@ export function CheckoutPaymentModeSelector({
           <FormControlLabel
             value="installment"
             control={<Radio />}
-            label={`Pay in ${EMI_TERM_MONTHS} installments`}
+            label={INSTALLMENT_MODE_LABEL}
           />
         ) : null}
       </RadioGroup>
