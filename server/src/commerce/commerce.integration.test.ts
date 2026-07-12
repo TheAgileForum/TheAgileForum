@@ -71,13 +71,18 @@ describe.skipIf(!hasDb)("commerce integration (Sprint 1)", () => {
     expect(res.body.error.code).toBe("UNAUTHENTICATED");
   });
 
-  it("blocks add-to-cart without scheduleRef for schedule-bound offering", async () => {
+  it("auto-fills scheduleRef from upcomingBatchId when omitted (schedule-bound offering)", async () => {
     const agent = await loginCustomer();
     const res = await agent.post("/api/v1/commerce/cart/items").send({
       offeringCode: "course-agile-fundamentals",
     });
-    expect(res.status).toBe(400);
-    expect(res.body.error.code).toBe("SCHEDULE_REQUIRED");
+    expect(res.status).toBe(201);
+    expect(res.body.item.scheduleRef).toBe("batch-1-jul-2026");
+    expect(res.body.cart.items.some(
+      (line: { offeringCode: string; scheduleRef: string | null }) =>
+        line.offeringCode === "course-agile-fundamentals" &&
+        line.scheduleRef === "batch-1-jul-2026",
+    )).toBe(true);
   });
 
   it("returns 402 for paid mock exam access without entitlement (FR-85–87)", async () => {
