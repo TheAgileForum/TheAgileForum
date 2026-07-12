@@ -74,7 +74,7 @@ export function RoleBasedUpsellRail({
     try {
       await onAddOffering(item.code, item.scheduleRef ?? undefined, item.title);
     } catch {
-      /* global cart snackbar shows the error */
+      // Error surfaced by ForumCartContext snackbar
     } finally {
       setAddingCode(null);
     }

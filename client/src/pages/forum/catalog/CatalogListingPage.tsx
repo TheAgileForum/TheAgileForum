@@ -89,7 +89,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
     setError(null);
     trackEvent("catalog_add_to_cart", { code: offering.code, category: categoryPath });
     void addItem(offering.code, undefined, offering.title).catch(() => {
-      /* global cart snackbar shows the error */
+      // Error surfaced by ForumCartContext snackbar
     }).finally(() => setAddingCode(null));
   }
 

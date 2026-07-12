@@ -519,6 +519,26 @@ describe.skipIf(!hasDb)("commerce integration (Sprint 1)", () => {
   });
 
   it("installment-plans API matches checkout EMI amounts (FR-174)", async () => {
+    const email = `emi-fr174-${Date.now()}@demo.local`;
+    await request(app)
+      .post("/api/v1/auth/register")
+      .send({
+        email,
+        password: "password123",
+        policyVersion: "v1",
+        acceptTerms: true,
+      });
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email, password: "password123" })
+      .expect(200);
+
+    await agent.post("/api/v1/commerce/cart/items?geo=IN").send({
+      offeringCode: "exam-mock-certification",
+      quantity: 1,
+    });
+
     const plansRes = await request(app)
       .post("/api/v1/payments/installment-plans")
       .send({
@@ -528,12 +548,6 @@ describe.skipIf(!hasDb)("commerce integration (Sprint 1)", () => {
       });
     expect(plansRes.status).toBe(200);
     expect(plansRes.body.plans?.length).toBeGreaterThan(0);
-
-    const agent = await loginCustomer();
-    await agent.post("/api/v1/commerce/cart/items?geo=IN").send({
-      offeringCode: "exam-mock-certification",
-      quantity: 1,
-    });
     const checkout = await agent
       .post("/api/v1/commerce/checkout/start?geo=IN")
       .send({
