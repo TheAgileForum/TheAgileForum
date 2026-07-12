@@ -197,23 +197,22 @@ export function CheckoutPaymentModeSelector({
             <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5 }}>
               {emiPreview.disclaimer}
             </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5 }}>
-              Subject to approval · Gateway T&amp;C apply (FR-173)
-            </Typography>
           </Box>
 
-          <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap" }}>
-            {modes.installmentProviders.map((provider) => (
-              <Chip
-                key={provider}
-                label={PROVIDER_LABELS[provider]}
-                color={installmentProvider === provider ? "primary" : "default"}
-                variant={installmentProvider === provider ? "filled" : "outlined"}
-                onClick={() => onInstallmentProviderChange(provider)}
-                clickable
-              />
-            ))}
-          </Stack>
+          {modes.installmentProviders.length > 1 ? (
+            <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap" }}>
+              {modes.installmentProviders.map((provider) => (
+                <Chip
+                  key={provider}
+                  label={PROVIDER_LABELS[provider]}
+                  color={installmentProvider === provider ? "primary" : "default"}
+                  variant={installmentProvider === provider ? "filled" : "outlined"}
+                  onClick={() => onInstallmentProviderChange(provider)}
+                  clickable
+                />
+              ))}
+            </Stack>
+          ) : null}
         </Stack>
       ) : null}
 
