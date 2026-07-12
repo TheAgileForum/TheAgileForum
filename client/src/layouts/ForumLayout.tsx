@@ -180,7 +180,7 @@ export function ForumLayout() {
               >
                 <ListItemText
                   primary={item.label}
-                  primaryTypographyProps={{ fontSize: "0.95rem", letterSpacing: "0.04em" }}
+                  slotProps={{ primary: { sx: { fontSize: "0.95rem", letterSpacing: "0.04em" } } }}
                 />
               </ListItemButton>
             );
