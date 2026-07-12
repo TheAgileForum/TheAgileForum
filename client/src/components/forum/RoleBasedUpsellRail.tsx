@@ -1,4 +1,3 @@
-import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -9,7 +8,6 @@ import Typography from "@mui/material/Typography";
 import { useEffect, useRef, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { usePricing } from "../../contexts/PricingContext";
-import { ApiRequestError } from "../../lib/api";
 import { trackEvent } from "../../lib/analytics";
 import { formatPrice } from "../../lib/format-price";
 import { getUpsellRecommendations, type UpsellItem } from "../../lib/forum-api";
@@ -19,7 +17,7 @@ type RoleBasedUpsellRailProps = {
   context?: "diagnosis" | "dashboard" | "cart" | "detail" | "post_webinar";
   offerId?: string;
   gapTags?: string[];
-  onAddOffering?: (code: string, scheduleRef?: string) => Promise<void>;
+  onAddOffering?: (code: string, scheduleRef?: string, label?: string) => Promise<void>;
 };
 
 export function RoleBasedUpsellRail({
@@ -33,9 +31,6 @@ export function RoleBasedUpsellRail({
   const [items, setItems] = useState<UpsellItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [addingCode, setAddingCode] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<{ severity: "success" | "error"; message: string } | null>(
-    null,
-  );
   const impressed = useRef(false);
 
   useEffect(() => {
@@ -74,18 +69,12 @@ export function RoleBasedUpsellRail({
 
   async function handleAdd(item: UpsellItem) {
     if (!onAddOffering) return;
-    setFeedback(null);
     setAddingCode(item.code);
     trackEvent("upsell_click", { code: item.code, context });
-    setFeedback({ severity: "success", message: `${item.title} added to cart.` });
     try {
-      await onAddOffering(item.code, item.scheduleRef ?? undefined);
-    } catch (err) {
-      const message =
-        err instanceof ApiRequestError
-          ? err.message
-          : "Could not add to cart. Try again or open the offer page.";
-      setFeedback({ severity: "error", message });
+      await onAddOffering(item.code, item.scheduleRef ?? undefined, item.title);
+    } catch {
+      /* global cart snackbar shows the error */
     } finally {
       setAddingCode(null);
     }
@@ -142,11 +131,6 @@ export function RoleBasedUpsellRail({
             </Stack>
           ))}
         </Stack>
-        {feedback ? (
-          <Alert severity={feedback.severity} sx={{ mt: 1.5 }} onClose={() => setFeedback(null)}>
-            {feedback.message}
-          </Alert>
-        ) : null}
         <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1 }}>
           Role-based suggestions · Session {currency} · No discount marketing (FR-181)
         </Typography>

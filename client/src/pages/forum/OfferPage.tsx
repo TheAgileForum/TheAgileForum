@@ -66,7 +66,6 @@ export function OfferPage() {
   const [offering, setOffering] = useState<CatalogOffering | null>(null);
   const [scheduleRef, setScheduleRef] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
 
@@ -88,12 +87,14 @@ export function OfferPage() {
       .finally(() => setLoading(false));
   }, [code, catalogFrom, geo, currency]);
 
-  async function handleAddToCartForCode(codeToAdd: string, scheduleRefFromUpsell?: string) {
+  async function handleAddToCartForCode(codeToAdd: string, scheduleRefFromUpsell?: string, label?: string) {
     if (codeToAdd !== offering?.code) {
       setError(null);
-      setSuccess(null);
-      await addItem(codeToAdd, scheduleRefFromUpsell);
-      setSuccess("Added to cart.");
+      try {
+        await addItem(codeToAdd, scheduleRefFromUpsell, label);
+      } catch (err) {
+        setError(err instanceof ApiRequestError ? err.message : "Could not add to cart.");
+      }
       return;
     }
     await handleAddToCart();
@@ -106,14 +107,15 @@ export function OfferPage() {
       return;
     }
     setError(null);
-    setSuccess(null);
     setAdding(true);
-    setSuccess("Added to cart.");
     try {
-      await addItem(offering.code, offering.scheduleBound ? scheduleRef : undefined);
+      await addItem(
+        offering.code,
+        offering.scheduleBound ? scheduleRef : undefined,
+        offering.title,
+      );
       trackEvent("catalog_add_to_cart", { code: offering.code, source: "offer_detail" });
     } catch (err) {
-      setSuccess(null);
       setError(err instanceof ApiRequestError ? `${err.code}: ${err.message}` : "Could not add to cart.");
     } finally {
       setAdding(false);
@@ -254,10 +256,9 @@ export function OfferPage() {
         context="detail"
         offerId={offering.code}
         gapTags={upsellGaps}
-        onAddOffering={(c, scheduleRef) => handleAddToCartForCode(c, scheduleRef)}
+        onAddOffering={(c, scheduleRef, label) => handleAddToCartForCode(c, scheduleRef, label)}
       />
 
-      {success ? <Alert severity="success">{success}</Alert> : null}
       {error ? <Alert severity="error">{error}</Alert> : null}
 
       <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>

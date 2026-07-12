@@ -166,7 +166,7 @@ export function ForumCartPage() {
           targetRole={upsellRole}
           context="cart"
           gapTags={upsellGaps}
-          onAddOffering={(code, scheduleRef) => addItem(code, scheduleRef)}
+          onAddOffering={(code, scheduleRef, label) => addItem(code, scheduleRef, label)}
         />
       ) : null}
 

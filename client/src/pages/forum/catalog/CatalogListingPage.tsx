@@ -88,8 +88,8 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
     setAddingCode(offering.code);
     setError(null);
     trackEvent("catalog_add_to_cart", { code: offering.code, category: categoryPath });
-    void addItem(offering.code).catch((err) => {
-      setError(err instanceof ApiRequestError ? err.message : "Could not add to cart.");
+    void addItem(offering.code, undefined, offering.title).catch(() => {
+      /* global cart snackbar shows the error */
     }).finally(() => setAddingCode(null));
   }
 
