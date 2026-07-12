@@ -35,7 +35,7 @@ Canonical QA documentation and run evidence for **The Agile Forum** (`mybmadproj
 | `shell-trust-commerce-test-plan.md` | FR-176–182 shell, currency, trust, upsell, admin catalog matrix |
 
 | `pending-work-queue.md` | Ordered backlog of QA tasks |
-
+| `e2e/client-global-cart-badge-2026-07-12.json` | Playwright FR-177 global cart badge run (3 passed) |
 
 
 ## Planning doc traceability

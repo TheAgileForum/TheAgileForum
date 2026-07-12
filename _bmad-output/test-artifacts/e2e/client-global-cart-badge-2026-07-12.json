@@ -1,0 +1,14 @@
+{
+  "suite": "client/e2e",
+  "spec": "global-cart-badge.spec.ts",
+  "featureRef": "FR-177",
+  "runDate": "2026-07-12",
+  "status": "passed",
+  "failedTests": [],
+  "tests": [
+    "shows cart affordance with zero count on forum home",
+    "is hidden on login page (minimal auth flow)",
+    "updates badge count after add-to-cart from catalog"
+  ],
+  "sourceArtifact": "client/test-results/.last-run.json"
+}

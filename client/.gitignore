@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Playwright ephemeral output (archived under _bmad-output/test-artifacts/e2e/)
+test-results/
+playwright-report/

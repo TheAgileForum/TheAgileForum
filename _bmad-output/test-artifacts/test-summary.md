@@ -2,13 +2,14 @@
 
 **Location:** `_bmad-output/test-artifacts/`  
 **Branch:** `sprint/s1-foundation-revenue-slice`  
-**Last run:** 2026-06-08 (Amelia follow-up — FR-182 POST gate, Razorpay EMI stub)  
+**Last run:** 2026-07-12 (Playwright FR-177 global cart badge — 3 passed)  
 **Last planning reconciliation:** 2026-06-08 (Quinn)
 
 ## Latest Run Status
 
 | Suite | Result |
 |-------|--------|
+| `client` Playwright `e2e/global-cart-badge.spec.ts` | **3 passed** — 2026-07-12 (`e2e/client-global-cart-badge-2026-07-12.json`) |
 | `npm run test` (unit/contract) | **160 passed** (39 files) — 2026-06-08 |
 | `npm run test:integration` (full) | **45 passed** (3 files) — 2026-06-08 |
 
