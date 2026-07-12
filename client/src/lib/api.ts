@@ -27,6 +27,9 @@ export class ApiRequestError extends Error {
 /** Default request budget so hung proxies/APIs surface an error instead of an infinite spinner. */
 const DEFAULT_API_TIMEOUT_MS = 12_000;
 
+/** Checkout start may hit Render cold start plus Stripe session creation. */
+export const CHECKOUT_START_TIMEOUT_MS = 45_000;
+
 export async function apiFetch<T>(
   path: string,
   init?: RequestInit & { timeoutMs?: number },
@@ -61,7 +64,7 @@ export async function apiFetch<T>(
       throw new ApiRequestError(408, {
         error: {
           code: "REQUEST_TIMEOUT",
-          message: "Request timed out. Check that the API server is running.",
+          message: "Request timed out. The server may be waking up — please try again.",
           retryable: true,
         },
       });

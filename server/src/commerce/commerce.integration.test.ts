@@ -743,5 +743,29 @@ describe.skipIf(!hasDb)("commerce integration (Sprint 1)", () => {
       expect(confirm.body.order.status).toBe("paid");
       expect(confirm.body.order.paymentRef).toBe(`stripe:${sessionId}:confirm`);
     });
+
+    it("returns retryable error when Stripe session creation fails", async () => {
+      process.env.STRIPE_SECRET_KEY = "sk_test_integration";
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue({
+          ok: false,
+          status: 401,
+          text: async () => "Invalid API Key provided",
+        }),
+      );
+
+      const agent = await loginCustomer();
+      await agent.post("/api/v1/commerce/cart/items?geo=US").send({
+        offeringCode: "exam-mock-certification",
+        quantity: 1,
+      });
+      const checkout = await agent.post("/api/v1/commerce/checkout/start?geo=US").send({
+        variant: "standard",
+      });
+      expect(checkout.status).toBe(502);
+      expect(checkout.body.error.code).toBe("STRIPE_CHECKOUT_FAILED");
+      expect(checkout.body.error.retryable).toBe(true);
+    });
   });
 });

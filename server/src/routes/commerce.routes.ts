@@ -427,7 +427,11 @@ commerceRouter.post(
     });
     if (!result.ok) {
       const status =
-        result.error.code === "ORG_CHECKOUT_NOT_ELIGIBLE" ? 403 : 400;
+        result.error.code === "ORG_CHECKOUT_NOT_ELIGIBLE"
+          ? 403
+          : result.error.code === "STRIPE_CHECKOUT_FAILED"
+            ? 502
+            : 400;
       return res.status(status).json({ error: result.error });
     }
     return res.status(201).json(result.checkout);

@@ -1,4 +1,4 @@
-import { apiFetch } from "./api";
+import { apiFetch, CHECKOUT_START_TIMEOUT_MS } from "./api";
 
 const SESSION_KEY = "af_diagnosis_session_id";
 
@@ -603,6 +603,7 @@ export async function startCheckout(
     `/api/v1/commerce/checkout/start${pricingQs}`,
     {
       method: "POST",
+      timeoutMs: CHECKOUT_START_TIMEOUT_MS,
       body: JSON.stringify({
         variant,
         orgReimbursement: options?.orgReimbursement,

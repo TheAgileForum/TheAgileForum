@@ -277,15 +277,28 @@ export async function startCheckout(
         where: { id: auth.userId },
         select: { email: true },
       });
-      const stripeSession = await createCheckoutSession({
-        orderId: order.id,
-        orderNumber: order.orderNumber,
-        amount: order.totalAmount.toString(),
-        currency: order.currency,
-        customerEmail: user?.email,
-      });
-      if (stripeSession) {
-        await bindStripeSession(stripeSession);
+      try {
+        const stripeSession = await createCheckoutSession({
+          orderId: order.id,
+          orderNumber: order.orderNumber,
+          amount: order.totalAmount.toString(),
+          currency: order.currency,
+          customerEmail: user?.email,
+        });
+        if (stripeSession) {
+          await bindStripeSession(stripeSession);
+        }
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Stripe checkout is temporarily unavailable";
+        return {
+          ok: false as const,
+          error: {
+            code: "STRIPE_CHECKOUT_FAILED",
+            message,
+            retryable: true,
+          },
+        };
       }
     }
   }

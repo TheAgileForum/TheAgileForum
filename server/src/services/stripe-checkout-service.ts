@@ -7,6 +7,8 @@ import {
   createStripeCheckoutSession,
   retrieveStripeCheckoutSession,
 } from "../integrations/stripe-api.js";
+import { executeWithRetry } from "../integrations/external-call.js";
+import { mapProviderFailure } from "../integrations/errors.js";
 
 export type StripeCheckoutMode = "stub" | "live";
 
@@ -39,16 +41,22 @@ export async function createCheckoutSession(input: {
   const successUrl = `${appUrl}/checkout/success?order=${encodeURIComponent(input.orderNumber)}&orderId=${encodeURIComponent(input.orderId)}&session_id={CHECKOUT_SESSION_ID}&provider=stripe`;
   const cancelUrl = `${appUrl}/checkout`;
 
-  const session = await createStripeCheckoutSession({
-    secretKey: secret,
-    orderId: input.orderId,
-    orderNumber: input.orderNumber,
-    amount: input.amount,
-    currency: input.currency,
-    customerEmail: input.customerEmail,
-    successUrl,
-    cancelUrl,
-  });
+  const result = await executeWithRetry(async () =>
+    createStripeCheckoutSession({
+      secretKey: secret,
+      orderId: input.orderId,
+      orderNumber: input.orderNumber,
+      amount: input.amount,
+      currency: input.currency,
+      customerEmail: input.customerEmail,
+      successUrl,
+      cancelUrl,
+    }),
+  );
+  if (!result.ok || !result.data) {
+    throw mapProviderFailure("stripe", result.error ?? "Stripe checkout session failed");
+  }
+  const session = result.data;
 
   return {
     mode: "live",
@@ -63,5 +71,11 @@ export async function fetchStripeCheckoutSession(sessionId: string) {
   if (!secret) {
     throw new Error("STRIPE_NOT_CONFIGURED");
   }
-  return retrieveStripeCheckoutSession({ secretKey: secret, sessionId });
+  const result = await executeWithRetry(async () =>
+    retrieveStripeCheckoutSession({ secretKey: secret, sessionId }),
+  );
+  if (!result.ok || !result.data) {
+    throw mapProviderFailure("stripe", result.error ?? "Stripe session lookup failed");
+  }
+  return result.data;
 }
