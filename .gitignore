@@ -10,6 +10,8 @@ dist/
 .env.test
 .env.local
 .env.*.local
+deploy/staging.server.env
+deploy/staging.client.env
 
 # Logs & OS
 *.log

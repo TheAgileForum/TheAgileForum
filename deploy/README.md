@@ -34,15 +34,14 @@ Copy and fill (never commit):
 
 ```powershell
 cd server
-$env:APP_PUBLIC_URL="https://app.staging.theagileforum.com"
-$env:API_PUBLIC_URL="https://api.staging.theagileforum.com"
-$env:CORS_ALLOWED_ORIGINS="https://app.staging.theagileforum.com"
-$env:OAUTH_STUB_MODE="false"
-$env:LINKEDIN_CLIENT_ID="..."
-$env:LINKEDIN_CLIENT_SECRET="..."
-# plus DATABASE_URL, JWT_SECRET from your .env
+# Load staging URL wiring from deploy/staging.server.env (copy from .example, fill secrets)
+Get-Content ..\deploy\staging.server.env | ForEach-Object {
+  if ($_ -match '^([^#=]+)=(.*)$') { Set-Item -Path "env:$($matches[1])" -Value $matches[2] }
+}
 npm run staging:preflight
 ```
+
+Or set vars manually — see `deploy/staging.server.env.example`.
 
 ### 4. OAuth consoles
 
