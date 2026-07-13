@@ -68,7 +68,11 @@ export function ForumLayout() {
   const showCatalogNav =
     CATALOG_PATHS.some((p) => pathname.startsWith(p)) || pathname.startsWith("/offers/");
   const wideLayout =
-    showCatalogNav || pathname.startsWith("/cart") || pathname.startsWith("/testimonials") || isHome;
+    showCatalogNav ||
+    pathname.startsWith("/cart") ||
+    pathname.startsWith("/testimonials") ||
+    pathname.startsWith("/resources") ||
+    isHome;
 
   const closeMobileNav = () => setMobileOpen(false);
 
