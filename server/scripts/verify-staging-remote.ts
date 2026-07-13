@@ -54,6 +54,28 @@ async function main(): Promise<void> {
   );
 
   results.push(
+    await probe("spa-catalog-proxy", async () => {
+      const res = await fetch(`${APP}/api/v1/catalog/trainings`);
+      const contentType = res.headers.get("content-type") ?? "";
+      if (!contentType.includes("application/json")) {
+        const snippet = (await res.text()).slice(0, 80);
+        return {
+          name: "spa-catalog-proxy",
+          ok: false,
+          detail: `${res.status} non-JSON (${contentType || "no content-type"}) — ${snippet}`,
+        };
+      }
+      const json = (await res.json()) as { offerings?: unknown[] };
+      const count = json.offerings?.length ?? 0;
+      return {
+        name: "spa-catalog-proxy",
+        ok: res.ok && count > 0,
+        detail: `${res.status} ${count} trainings via ${APP}/api proxy`,
+      };
+    }),
+  );
+
+  results.push(
     await probe("linkedin-oauth", async () => {
       const res = await fetch(`${API}/api/v1/auth/oauth/linkedin/start`, { redirect: "manual" });
       const location = res.headers.get("location");
