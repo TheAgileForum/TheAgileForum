@@ -53,15 +53,18 @@ function CatalogListingSkeleton() {
           sx={{
             border: "1px solid",
             borderColor: "divider",
-            borderRadius: 1,
-            p: 2.5,
+            borderRadius: "14px",
+            overflow: "hidden",
           }}
         >
-          <Skeleton variant="text" width="72%" height={28} />
-          <Skeleton variant="text" width="48%" />
-          <Skeleton variant="text" width="90%" sx={{ mt: 1.5 }} />
-          <Skeleton variant="text" width="80%" />
-          <Skeleton variant="rounded" height={36} sx={{ mt: 2 }} />
+          <Skeleton variant="rectangular" height={148} sx={{ borderRadius: 0 }} />
+          <Box sx={{ p: 2.5 }}>
+            <Skeleton variant="text" width="72%" height={28} />
+            <Skeleton variant="text" width="48%" />
+            <Skeleton variant="text" width="90%" sx={{ mt: 1.5 }} />
+            <Skeleton variant="text" width="80%" />
+            <Skeleton variant="rounded" height={36} sx={{ mt: 2 }} />
+          </Box>
         </Box>
       ))}
     </Box>
