@@ -70,8 +70,20 @@ export type OrgReimbursementInput = {
 };
 
 export function validateOrgReimbursement(
-  input: OrgReimbursementInput,
+  input: OrgReimbursementInput | undefined,
+  options?: { safeOrgEligible?: boolean },
 ): CheckoutPolicyError | null {
+  if (options?.safeOrgEligible) {
+    return null;
+  }
+
+  if (!input) {
+    return {
+      code: "ORG_DETAILS_REQUIRED",
+      message: "Organization reimbursement details are required",
+    };
+  }
+
   if (!input.organizationName.trim()) {
     return { code: "ORG_NAME_REQUIRED", message: "Organization name is required" };
   }

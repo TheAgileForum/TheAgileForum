@@ -73,9 +73,9 @@ const checkoutStartBody = z.object({
   installmentProvider: installmentProviderSchema.optional(),
   orgReimbursement: z
     .object({
-      organizationName: z.string().min(1),
-      purchaseOrderNumber: z.string().min(1),
-      billingContactEmail: z.string().email(),
+      organizationName: z.string().optional(),
+      purchaseOrderNumber: z.string().optional(),
+      billingContactEmail: z.string().email().optional(),
     })
     .optional(),
 });

@@ -48,4 +48,14 @@ describe("checkout policy", () => {
     });
     expect(err).toBeNull();
   });
+
+  it("skips org reimbursement fields for SAFe-eligible carts", () => {
+    expect(validateOrgReimbursement(undefined, { safeOrgEligible: true })).toBeNull();
+    expect(
+      validateOrgReimbursement(
+        { organizationName: "", purchaseOrderNumber: "", billingContactEmail: "" },
+        { safeOrgEligible: true },
+      ),
+    ).toBeNull();
+  });
 });

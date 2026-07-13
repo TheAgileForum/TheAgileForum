@@ -361,6 +361,12 @@ export type CheckoutStartResult = {
   totalAmount: string;
   currency: string;
   cart: CartSummary;
+  orgReimbursementPricing?: {
+    subtotal: string;
+    taxAmount: string;
+    total: string;
+    taxRate: number;
+  };
   stripeCheckoutUrl?: string | null;
   stripePaymentRef?: string | null;
   stripeCheckout?: {
