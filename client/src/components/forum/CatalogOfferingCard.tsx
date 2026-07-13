@@ -226,10 +226,10 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
 
         <Stack
           direction="row"
-          alignItems="center"
           spacing={1.25}
           useFlexGap
           sx={{
+            alignItems: "center",
             flexWrap: "wrap",
             mb: 1.75,
             pb: 1.75,
@@ -283,7 +283,7 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
           <Typography sx={{ fontSize: "0.78rem", fontWeight: 600, color: "text.primary" }}>
             {social.enrolledLabel}
           </Typography>
-          <Stack direction="row" alignItems="center" spacing={0.5} sx={{ ml: "auto" }}>
+          <Stack direction="row" spacing={0.5} sx={{ ml: "auto", alignItems: "center" }}>
             <Typography component="span" sx={{ color: "#f59e0b", fontSize: "0.78rem", letterSpacing: -1 }}>
               ★★★★★
             </Typography>
@@ -319,7 +319,7 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
         )}
 
         <Box sx={{ mt: "auto" }}>
-          <Stack direction="row" alignItems="baseline" spacing={1} useFlexGap sx={{ flexWrap: "wrap", mb: 1.25 }}>
+          <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: "baseline", flexWrap: "wrap", mb: 1.25 }}>
             {displayPrice.mrpFormatted ? (
               <Typography
                 sx={{
