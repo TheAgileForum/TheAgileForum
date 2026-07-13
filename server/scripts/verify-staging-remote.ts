@@ -54,6 +54,34 @@ async function main(): Promise<void> {
   );
 
   results.push(
+    await probe("spa-same-origin-bundle", async () => {
+      const htmlRes = await fetch(`${APP}/trainings`);
+      const html = await htmlRes.text();
+      const match = html.match(/\/assets\/(index-[^"']+\.js)/);
+      if (!match) {
+        return {
+          name: "spa-same-origin-bundle",
+          ok: false,
+          detail: "could not find index-*.js in SPA HTML — redeploy client on Vercel",
+        };
+      }
+      const bundleName = match[1];
+      const bundleRes = await fetch(`${APP}/assets/${bundleName}`);
+      const bundle = await bundleRes.text();
+      const hasSameOriginHosts = bundle.includes("app.staging.theagileforum.com");
+      const hardcodedCrossOrigin = bundle.includes("https://api.staging.theagileforum.com");
+      const ok = hasSameOriginHosts && !hardcodedCrossOrigin;
+      return {
+        name: "spa-same-origin-bundle",
+        ok,
+        detail: ok
+          ? `${bundleName} uses same-origin /api on app.staging`
+          : `${bundleName} stale — cross-origin api.staging baked in; redeploy Vercel client (unset VITE_API_URL optional)`,
+      };
+    }),
+  );
+
+  results.push(
     await probe("spa-catalog-proxy", async () => {
       const res = await fetch(`${APP}/api/v1/catalog/trainings`);
       const contentType = res.headers.get("content-type") ?? "";
