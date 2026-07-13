@@ -29,7 +29,10 @@ function DebouncedPriceField({
 }) {
   const [draft, setDraft] = useState(value?.toString() ?? "");
   const onCommitRef = useRef(onCommit);
-  onCommitRef.current = onCommit;
+
+  useEffect(() => {
+    onCommitRef.current = onCommit;
+  }, [onCommit]);
 
   useEffect(() => {
     setDraft(value?.toString() ?? "");

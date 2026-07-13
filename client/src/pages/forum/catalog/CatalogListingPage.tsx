@@ -75,9 +75,10 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
       setError(err instanceof ApiRequestError ? err.message : "Could not load catalog.");
       setOfferings([]);
     } finally {
-      if (requestId !== requestIdRef.current) return;
-      setLoading(false);
-      setRefreshing(false);
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   }, [categoryPath, searchKey, geo, currency]);
 
