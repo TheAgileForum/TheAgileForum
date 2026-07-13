@@ -64,7 +64,7 @@ type AuthContextValue = {
 
   refreshMe: () => Promise<boolean>;
 
-  resendVerificationEmail: () => Promise<boolean>;
+  resendVerificationEmail: () => Promise<{ ok: boolean; message?: string }>;
 
   enterDemoBrowse: () => void;
 
@@ -290,13 +290,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       });
 
-      return true;
+      return { ok: true as const };
 
     } catch (err) {
 
-      if (err instanceof ApiRequestError && err.status === 202) return true;
+      if (err instanceof ApiRequestError) {
 
-      return false;
+        return { ok: false as const, message: err.message };
+
+      }
+
+      return {
+
+        ok: false as const,
+
+        message: "Could not send verification email. Try again shortly.",
+
+      };
 
     }
 

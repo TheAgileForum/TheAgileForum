@@ -24,7 +24,7 @@ When `INTEGRATION_PROVIDER_MODE=live` and `RESEND_API_KEY` is **unset**, `LiveEm
    RESEND_API_KEY=re_your_key_here
    EMAIL_FROM=onboarding@resend.dev
    ```
-   `onboarding@resend.dev` works without domain verification; Resend only delivers to the email on your Resend account unless you verify a domain.
+   `onboarding@resend.dev` works without domain verification; Resend **only delivers to the email on your Resend account** unless you verify a domain. As of staging setup, the account owner inbox is `theagilefourm@gmail.com` — other addresses (e.g. `dhirugalaxy@gmail.com`) receive **403** from Resend until `theagileforum.com` (or a subdomain) is verified and `EMAIL_FROM` uses that domain.
 4. Quick API check:
    ```bash
    cd server
@@ -60,8 +60,8 @@ Blueprint reference: `deploy/render.yaml.example`.
 2. Register a new user at `https://app.staging.theagileforum.com` with an inbox you control.
 3. Check email for **Verify your Agile Forum account** (from `EMAIL_FROM`).
 4. Click the link → API `GET /api/v1/auth/verify-email?token=...` → redirect to login with `?verified=1`.
-5. If no mail: Resend dashboard → **Emails** for delivery status; confirm `EMAIL_FROM` is verified and recipient is allowed (test domain only sends to your Resend account email).
-6. Resend manually: log in → account/settings flow or `POST /api/v1/auth/verify-email/resend` (authenticated).
+5. If no mail: Resend dashboard → **Emails** for delivery status; confirm `EMAIL_FROM` is verified and recipient is allowed (test domain only sends to your Resend account email). API resend returns `502 EMAIL_DELIVERY_FAILED` with a plain-language message when Resend rejects the send.
+6. Resend manually: log in → verification banner **Resend verification email** (60s cooldown) or `POST /api/v1/auth/verify-email/resend` (authenticated).
 
 ## Implementation reference
 

@@ -14,6 +14,7 @@ import {
 } from "../services/auth-service.js";
 import { registerUser } from "../services/registration-service.js";
 import { mergeGuestCartAfterAuth } from "../services/guest-cart-service.js";
+import { mapEmailDeliveryFailure } from "../services/email-delivery-errors.js";
 import {
   buildVerificationFailureRedirect,
   buildVerificationSuccessRedirect,
@@ -22,6 +23,7 @@ import {
   requireEmailVerificationEnabled,
   verifyEmailByToken,
 } from "../services/email-verification-service.js";
+import { logError } from "../runtime/logger.js";
 import {
   requestPasswordReset,
   resetPasswordByToken,
@@ -286,8 +288,18 @@ authRouter.post("/verify-email/resend", requireAuth, sensitiveLimiter, async (re
   if (isEmailVerified(user)) {
     return res.status(200).json({ ok: true, alreadyVerified: true });
   }
-  await issueEmailVerification(user.id, user.email);
-  return res.status(202).json({ ok: true, alreadyVerified: false });
+  try {
+    await issueEmailVerification(user.id, user.email);
+    return res.status(202).json({ ok: true, alreadyVerified: false });
+  } catch (err) {
+    logError("Verification email resend failed", {
+      component: "auth",
+      event: "email_verification_resend_failed",
+      userId: user.id,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    throw mapEmailDeliveryFailure(err);
+  }
 });
 
 authRouter.post("/logout", (_req, res) => {
