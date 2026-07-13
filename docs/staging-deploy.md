@@ -118,9 +118,9 @@ Details: `docs/linkedin-oauth-setup.md`
 
 ### API on Render
 
-1. New **Web Service** → repo root `server/`, build `npm ci --include=dev && npm run build`, start `npm start`.
-2. Add env from `deploy/staging.server.env.example`.
-3. Run migrations once: `npm run db:deploy` (Render shell or CI).
+1. New **Web Service** → repo root `server/`, build `npm ci --include=dev && npm run build && npm run db:deploy`, start `npm start` (also runs `prisma migrate deploy` before boot).
+2. Add env from `deploy/staging.server.env.example` (`DATABASE_URL`, `DIRECT_URL`, OAuth secrets, etc.).
+3. **Migrations** — `npm start` runs `prisma migrate deploy` before the API (same as `server/Dockerfile`). No manual step on normal deploys. If you ever need to run migrations without restarting: Render shell → `cd server && npm run db:deploy`.
 4. Custom domain: `api.staging.theagileforum.com` → note HTTPS URL for `API_PUBLIC_URL`.
 
 See `deploy/render.yaml.example` for a starter blueprint.
@@ -163,6 +163,7 @@ LIMIT 10;
 | `OAUTH_TOKEN_EXCHANGE_FAILED` | Redirect URI in provider console must match `API_PUBLIC_URL` + path exactly |
 | OAuth succeeds but `/me` 401 | `VITE_API_URL` must point to the host that set the cookie; check cookie domain in DevTools |
 | `OAUTH_NOT_CONFIGURED` | Set client id/secret; `OAUTH_STUB_MODE=false` on staging |
+| `users.display_name` does not exist | Schema behind code — redeploy API so `npm start` runs `prisma migrate deploy`, or Render shell: `cd server && npm run db:deploy` |
 | `spa-same-origin-bundle` FAIL | Vercel serving pre-PR-11 bundle — trigger redeploy; unset `VITE_API_URL` on Vercel |
 | Catalog timeout / 0 results | Same as above, or Render cold start — retry; see `npm run staging:verify` |
 | Mixed content | Use `https` for both `APP_PUBLIC_URL` and `API_PUBLIC_URL` in staging |
