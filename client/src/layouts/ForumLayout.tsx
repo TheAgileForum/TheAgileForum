@@ -20,9 +20,21 @@ import { TrustFooter } from "../components/forum/TrustFooter";
 import { EmailVerificationBanner } from "../components/EmailVerificationBanner";
 import { useAuth } from "../contexts/AuthContext";
 import { userDisplayLabel } from "../lib/user-display";
+import { prefetchCatalogCategory } from "../lib/catalog-cache";
 import { useDiagnosis } from "../contexts/DiagnosisContext";
 
+const CATALOG_PREFETCH_PATHS = {
+  "/trainings": "trainings",
+  "/certifications": "certifications",
+  "/services": "services",
+} as const;
+
 const CATALOG_PATHS = ["/trainings", "/certifications", "/services", "/cart"];
+
+function prefetchCatalogNav(to: string) {
+  const category = CATALOG_PREFETCH_PATHS[to as keyof typeof CATALOG_PREFETCH_PATHS];
+  if (category) prefetchCatalogCategory(category);
+}
 const INK = "#0a1628";
 const DRAWER_WIDTH = 280;
 
@@ -112,11 +124,10 @@ export function ForumLayout() {
                 to={item.to}
                 size="small"
                 sx={navButtonSx}
-                onMouseEnter={
-                  item.to === "/diagnosis/step-1"
-                    ? () => prefetchSession("nav-prefetch")
-                    : undefined
-                }
+                onMouseEnter={() => {
+                  if (item.to === "/diagnosis/step-1") prefetchSession("nav-prefetch");
+                  else prefetchCatalogNav(item.to);
+                }}
               >
                 {item.label}
               </Button>
@@ -180,11 +191,10 @@ export function ForumLayout() {
                 to={item.to}
                 selected={selected}
                 onClick={closeMobileNav}
-                onMouseEnter={
-                  item.to === "/diagnosis/step-1"
-                    ? () => prefetchSession("nav-prefetch")
-                    : undefined
-                }
+                onMouseEnter={() => {
+                  if (item.to === "/diagnosis/step-1") prefetchSession("nav-prefetch");
+                  else prefetchCatalogNav(item.to);
+                }}
                 sx={{
                   mx: 1,
                   borderRadius: 1,

@@ -2,6 +2,7 @@ import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import LinearProgress from "@mui/material/LinearProgress";
+import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -13,14 +14,17 @@ import { usePricing } from "../../../contexts/PricingContext";
 import { ApiRequestError } from "../../../lib/api";
 import { trackEvent } from "../../../lib/analytics";
 import {
-  filtersToApiQuery,
+  fetchCatalogCategoryCached,
+  peekCatalogCache,
+} from "../../../lib/catalog-cache";
+import {
   filtersToSearchParams,
   hasActiveFilters,
   parseCatalogFilters,
   type CatalogCategoryPath,
 } from "../../../lib/catalog-filters";
 import { setCommerceJourneyOrigin } from "../../../lib/commerce-journey";
-import { listCatalogCategory, type CatalogOffering, type CatalogFacets } from "../../../lib/forum-api";
+import type { CatalogOffering, CatalogFacets } from "../../../lib/forum-api";
 
 const TITLES: Record<CatalogCategoryPath, string> = {
   trainings: "Trainings",
@@ -28,9 +32,41 @@ const TITLES: Record<CatalogCategoryPath, string> = {
   services: "Services",
 };
 
+const SKELETON_COUNT = 6;
+
 type CatalogListingPageProps = {
   categoryPath: CatalogCategoryPath;
 };
+
+function CatalogListingSkeleton() {
+  return (
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", lg: "repeat(3, 1fr)" },
+        gap: 2,
+      }}
+    >
+      {Array.from({ length: SKELETON_COUNT }, (_, i) => (
+        <Box
+          key={i}
+          sx={{
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 1,
+            p: 2.5,
+          }}
+        >
+          <Skeleton variant="text" width="72%" height={28} />
+          <Skeleton variant="text" width="48%" />
+          <Skeleton variant="text" width="90%" sx={{ mt: 1.5 }} />
+          <Skeleton variant="text" width="80%" />
+          <Skeleton variant="rounded" height={36} sx={{ mt: 2 }} />
+        </Box>
+      ))}
+    </Box>
+  );
+}
 
 export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
   const navigate = useNavigate();
@@ -52,28 +88,32 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
 
   const load = useCallback(async () => {
     const requestId = ++requestIdRef.current;
-    const background = hasLoadedOnceRef.current;
+    const cached = peekCatalogCache(categoryPath, searchKey, geo, currency);
+    const background = hasLoadedOnceRef.current || Boolean(cached);
+    if (cached && requestId === requestIdRef.current) {
+      setOfferings(cached.offerings);
+      setFacets(cached.facets ?? null);
+      setLoading(false);
+      hasLoadedOnceRef.current = true;
+    }
     if (background) {
       setRefreshing(true);
-    } else {
+    } else if (!cached) {
       setLoading(true);
     }
     setError(null);
-    const parsedFilters = parseCatalogFilters(searchKey);
     try {
-      const res = await listCatalogCategory(
-        categoryPath,
-        filtersToApiQuery(parsedFilters),
-        { geo, currency },
-      );
+      const res = await fetchCatalogCategoryCached(categoryPath, searchKey, geo, currency);
       if (requestId !== requestIdRef.current) return;
       setOfferings(res.offerings);
       setFacets(res.facets ?? null);
       hasLoadedOnceRef.current = true;
     } catch (err) {
       if (requestId !== requestIdRef.current) return;
-      setError(err instanceof ApiRequestError ? err.message : "Could not load catalog.");
-      setOfferings([]);
+      if (!cached) {
+        setError(err instanceof ApiRequestError ? err.message : "Could not load catalog.");
+        setOfferings([]);
+      }
     } finally {
       if (requestId === requestIdRef.current) {
         setLoading(false);
@@ -85,12 +125,21 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
   useEffect(() => {
     hasLoadedOnceRef.current = false;
     requestIdRef.current += 1;
-    setOfferings([]);
-    setFacets(null);
-    setLoading(true);
+    const cached = peekCatalogCache(categoryPath, searchKey, geo, currency);
+    if (cached) {
+      setOfferings(cached.offerings);
+      setFacets(cached.facets ?? null);
+      setLoading(false);
+      hasLoadedOnceRef.current = true;
+    } else {
+      setOfferings([]);
+      setFacets(null);
+      setLoading(true);
+    }
     setRefreshing(false);
+    setError(null);
     viewedRef.current = false;
-  }, [categoryPath]);
+  }, [categoryPath, searchKey, geo, currency]);
 
   useEffect(() => {
     if (pricingLoading) return;
@@ -126,7 +175,9 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
 
   const title = TITLES[categoryPath];
   const showCertBody = categoryPath === "certifications";
-  const showInitialSpinner = loading && offerings.length === 0;
+  const showSkeleton = loading && offerings.length === 0;
+  const showEmptyState = !loading && !error && offerings.length === 0;
+  const resultCountLabel = loading && offerings.length === 0 ? "…" : String(offerings.length);
 
   return (
     <Stack spacing={2.5}>
@@ -135,7 +186,8 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
           {title}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Browse self-serve offerings · {offerings.length} result{offerings.length === 1 ? "" : "s"}
+          Browse self-serve offerings · {resultCountLabel} result
+          {offerings.length === 1 ? "" : "s"}
           {facets?.priceRange
             ? ` · Price ${facets.priceRange.min}–${facets.priceRange.max}`
             : ""}{" "}
@@ -150,7 +202,9 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
         onReset={resetFilters}
       />
 
-      {showInitialSpinner ? <LinearProgress /> : null}
+      {showSkeleton ? (
+        <LinearProgress sx={{ opacity: 0.55 }} />
+      ) : null}
       {refreshing ? (
         <LinearProgress
           color="inherit"
@@ -159,7 +213,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
       ) : null}
       {error ? <Alert severity="error">{error}</Alert> : null}
 
-      {!showInitialSpinner && !error && offerings.length === 0 ? (
+      {showEmptyState ? (
         <Alert
           severity="info"
           action={
@@ -176,24 +230,28 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
         </Alert>
       ) : null}
 
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", lg: "repeat(3, 1fr)" },
-          gap: 2,
-          opacity: refreshing ? 0.72 : 1,
-          transition: "opacity 0.2s ease",
-        }}
-      >
-        {offerings.map((offering) => (
-          <CatalogOfferingCard
-            key={offering.code}
-            offering={offering}
-            onAdd={(o) => void handleAdd(o)}
-            adding={addingCode === offering.code}
-          />
-        ))}
-      </Box>
+      {showSkeleton ? <CatalogListingSkeleton /> : null}
+
+      {!showSkeleton ? (
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", lg: "repeat(3, 1fr)" },
+            gap: 2,
+            opacity: refreshing ? 0.72 : 1,
+            transition: "opacity 0.2s ease",
+          }}
+        >
+          {offerings.map((offering) => (
+            <CatalogOfferingCard
+              key={offering.code}
+              offering={offering}
+              onAdd={(o) => void handleAdd(o)}
+              adding={addingCode === offering.code}
+            />
+          ))}
+        </Box>
+      ) : null}
     </Stack>
   );
 }

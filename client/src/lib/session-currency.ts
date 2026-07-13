@@ -51,6 +51,13 @@ export function hasExplicitSessionCurrencyOverride(): boolean {
   return readSessionCurrencyCookie() !== null;
 }
 
+/** True when geo/currency can be read locally without waiting on currency-context. */
+export function hasPersistedSessionCurrency(): boolean {
+  if (hasExplicitSessionCurrencyOverride()) return true;
+  if (sessionStorage.getItem(STORAGE_KEY)) return true;
+  return readSessionCurrencyCookie() !== null;
+}
+
 export function markExplicitSessionCurrencyOverride() {
   sessionStorage.setItem(OVERRIDE_KEY, "1");
 }
