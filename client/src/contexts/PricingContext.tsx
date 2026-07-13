@@ -37,6 +37,26 @@ const PricingContext = createContext<PricingContextValue | null>(null);
 
 const CURRENCY_CHANGE_EVENT = "af-session-currency-change";
 
+function readInitialCurrencyContext(): CurrencyContextResponse {
+  const currency = getSessionCurrency();
+  return {
+    currency,
+    geoDetected: geoFromSessionCurrency(currency),
+    source: hasExplicitSessionCurrencyOverride() ? "user" : "geo",
+  };
+}
+
+function sameCurrencyContext(
+  a: CurrencyContextResponse | null,
+  b: CurrencyContextResponse,
+): boolean {
+  return (
+    a?.currency === b.currency &&
+    a?.geoDetected === b.geoDetected &&
+    a?.source === b.source
+  );
+}
+
 function syncSessionStorage(currency: SessionCurrency) {
   if (getSessionCurrency() === currency) return;
   setSessionCurrency(currency);
@@ -44,7 +64,7 @@ function syncSessionStorage(currency: SessionCurrency) {
 }
 
 export function PricingProvider({ children }: { children: ReactNode }) {
-  const [context, setContext] = useState<CurrencyContextResponse | null>(null);
+  const [context, setContext] = useState<CurrencyContextResponse | null>(readInitialCurrencyContext);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
@@ -54,13 +74,13 @@ export function PricingProvider({ children }: { children: ReactNode }) {
         geo: geoFromSessionCurrency(stored),
         currencyOverride: stored,
       });
-      setContext(res);
+      setContext((prev) => (sameCurrencyContext(prev, res) ? prev : res));
       syncSessionStorage(res.currency as SessionCurrency);
       return;
     }
 
     const res = await getCurrencyContext();
-    setContext(res);
+    setContext((prev) => (sameCurrencyContext(prev, res) ? prev : res));
     if (res.source === "geo") {
       syncSessionStorage(res.currency as SessionCurrency);
     }
