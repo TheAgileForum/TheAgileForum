@@ -6,6 +6,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vite
 import { resetRateLimitBuckets } from "../middleware/rate-limit.js";
 import request from "supertest";
 import { createApp } from "../app.js";
+import { computeSafeOrgReimbursementPricing } from "./safe-org-reimbursement-pricing.js";
 import { prisma } from "../db/client.js";
 
 const hasDb = Boolean(process.env.DATABASE_URL);
@@ -300,32 +301,49 @@ describe.skipIf(!hasDb)("commerce integration (Sprint 1)", () => {
     expect(order?.paymentRef).toContain("stripe:cs_test_session_1");
   });
 
-  it("completes org reimbursement checkout for SAFe offering", async () => {
+  it("completes org reimbursement checkout for SAFe offering with GST", async () => {
     const agent = await loginCustomer();
 
-    await agent.post("/api/v1/commerce/cart/items").send({
-      offeringCode: "safe-leading-safe",
-      scheduleRef: "cohort-2026-06",
-    });
+    const existingCart = await agent.get("/api/v1/commerce/cart?geo=IN&currency_override=INR");
+    for (const item of existingCart.body.cart?.items ?? []) {
+      await agent.delete(`/api/v1/commerce/cart/items/${item.id}`);
+    }
 
-    const start = await agent.post("/api/v1/commerce/checkout/start").send({
-      variant: "org_reimbursement",
-      orgReimbursement: {
-        organizationName: "Acme Corp",
-        purchaseOrderNumber: "PO-9001",
-        billingContactEmail: "billing@acme.example",
-      },
-    });
+    await agent
+      .post("/api/v1/commerce/cart/items?geo=IN&currency_override=INR")
+      .send({
+        offeringCode: "safe-leading-safe",
+        scheduleRef: "cohort-2026-06",
+      });
+
+    const start = await agent
+      .post("/api/v1/commerce/checkout/start?geo=IN&currency_override=INR")
+      .send({
+        variant: "org_reimbursement",
+      });
     expect(start.status).toBe(201);
     expect(start.body.variant).toBe("org_reimbursement");
 
+    const expected = computeSafeOrgReimbursementPricing(
+      start.body.orgReimbursementPricing.subtotal,
+    );
+    expect(start.body.orgReimbursementPricing).toMatchObject({
+      subtotal: expected.subtotal,
+      taxRate: 0.23,
+      taxAmount: expected.taxAmount,
+      total: expected.total,
+    });
+    expect(start.body.totalAmount).toBe(expected.total);
+
     const complete = await agent.post("/api/v1/commerce/checkout/complete").send({
       orderId: start.body.orderId,
-      paymentRef: "org-po-PO-9001",
+      paymentRef: `org-reimbursement-${start.body.orderNumber}`,
     });
     expect(complete.status).toBe(200);
     expect(complete.body.order.status).toBe("paid");
-    expect(complete.body.order.paymentRef).toBe("org-po-PO-9001");
+    expect(complete.body.order.paymentRef).toBe(
+      `org-reimbursement-${start.body.orderNumber}`,
+    );
   });
 
   it("allows guest add-to-cart without authentication (FR-165)", async () => {

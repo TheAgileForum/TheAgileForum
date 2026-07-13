@@ -6,6 +6,7 @@ import {
   validateOrgReimbursement,
   type OrgReimbursementInput,
 } from "../commerce/checkout-policy.js";
+import { computeSafeOrgReimbursementPricing } from "../commerce/safe-org-reimbursement-pricing.js";
 import { publishEnrollmentNotifications } from "./order-notification-service.js";
 import type { CommerceJourneyOrigin } from "../commerce/journey-origin.js";
 import type { SessionClaims } from "./auth-service.js";
@@ -104,9 +105,10 @@ export async function startCheckout(
 
   const variant = input.variant ?? "standard";
   const offeringCodes = cart.items.map((i) => i.offeringCode);
+  const safeOrgEligible = cartHasSafeOrgEligibleItem(offeringCodes);
 
   if (variant === "org_reimbursement") {
-    if (!cartHasSafeOrgEligibleItem(offeringCodes)) {
+    if (!safeOrgEligible) {
       return {
         ok: false as const,
         error: {
@@ -115,16 +117,9 @@ export async function startCheckout(
         },
       };
     }
-    if (!input.orgReimbursement) {
-      return {
-        ok: false as const,
-        error: {
-          code: "ORG_DETAILS_REQUIRED",
-          message: "Organization reimbursement details are required",
-        },
-      };
-    }
-    const orgError = validateOrgReimbursement(input.orgReimbursement);
+    const orgError = validateOrgReimbursement(input.orgReimbursement, {
+      safeOrgEligible,
+    });
     if (orgError) {
       return { ok: false as const, error: orgError };
     }
@@ -158,6 +153,14 @@ export async function startCheckout(
       const discountApplied = computeDiscountAmount(priced.subtotal, coupon.percentOff);
       orderTotal = computeAdjustedTotal(priced.subtotal, discountApplied);
     }
+  }
+
+  let orgReimbursementPricing:
+    | ReturnType<typeof computeSafeOrgReimbursementPricing>
+    | undefined;
+  if (variant === "org_reimbursement" && safeOrgEligible) {
+    orgReimbursementPricing = computeSafeOrgReimbursementPricing(orderTotal);
+    orderTotal = orgReimbursementPricing.total;
   }
 
   const order = await prisma.$transaction(async (tx) => {
@@ -347,6 +350,7 @@ export async function startCheckout(
       cart: await serializeCart(cart, pricingInput),
       orgReimbursement:
         variant === "org_reimbursement" ? input.orgReimbursement : undefined,
+      orgReimbursementPricing,
       paymentProvider,
       stripeCheckoutUrl,
       stripePaymentRef,

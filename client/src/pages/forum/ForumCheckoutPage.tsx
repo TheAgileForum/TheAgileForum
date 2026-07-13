@@ -23,6 +23,7 @@ import {
 import { getCommerceJourneyOrigin } from "../../lib/commerce-journey";
 import { getCheckoutConfirmLabel } from "../../lib/checkout-labels";
 import { formatPrice } from "../../lib/format-price";
+import { computeSafeOrgReimbursementPricing } from "../../lib/safe-org-reimbursement-pricing";
 import {
   applyCheckoutCoupon,
   completeCheckout,
@@ -59,7 +60,12 @@ export function ForumCheckoutPage() {
   const [couponError, setCouponError] = useState<string | null>(null);
 
   const emptyCart = cart !== null && cart.items.length === 0;
-  const payableTotal = cart?.adjustedTotal ?? cart?.subtotal ?? "0";
+  const payableSubtotal = cart?.adjustedTotal ?? cart?.subtotal ?? "0";
+  const orgReimbursementPricing = useMemo(() => {
+    if (variant !== "org_reimbursement" || !orgEligible) return null;
+    return computeSafeOrgReimbursementPricing(payableSubtotal);
+  }, [orgEligible, payableSubtotal, variant]);
+  const payableTotal = orgReimbursementPricing?.total ?? payableSubtotal;
   const hasCoupon = Boolean(cart?.couponCode && cart.discountApplied);
 
   useEffect(() => {
@@ -171,7 +177,8 @@ export function ForumCheckoutPage() {
       });
 
       const started = await startCheckout(variant, {
-        orgReimbursement: variant === "org_reimbursement" ? org : undefined,
+        orgReimbursement:
+          variant === "org_reimbursement" && !orgEligible ? org : undefined,
         paymentMode: variant === "standard" ? paymentMode : undefined,
         installmentProvider:
           variant === "standard" && paymentMode === "installment"
@@ -186,7 +193,9 @@ export function ForumCheckoutPage() {
 
       const paymentRef =
         variant === "org_reimbursement"
-          ? `org-po-${org.purchaseOrderNumber.trim()}`
+          ? org.purchaseOrderNumber.trim()
+            ? `org-po-${org.purchaseOrderNumber.trim()}`
+            : `org-reimbursement-${started.orderNumber}`
           : resolveStubPaymentRef(started);
 
       const done = await completeCheckout(started.orderId, paymentRef);
@@ -234,10 +243,25 @@ export function ForumCheckoutPage() {
                   <Typography variant="body2" color="success.main">
                     Coupon {cart.couponCode} − {formatPrice(cart.currency, cart.discountApplied!)}
                   </Typography>
-                  <Typography sx={{ fontWeight: 600 }}>
-                    Total {formatPrice(cart.currency, payableTotal)}
+                  <Typography variant="body2">
+                    Subtotal after discount {formatPrice(cart.currency, payableSubtotal)}
                   </Typography>
                 </>
+              ) : null}
+              {orgReimbursementPricing ? (
+                <>
+                  <Typography variant="body2">
+                    GST ({Math.round(orgReimbursementPricing.taxRate * 100)}%){" "}
+                    {formatPrice(cart.currency, orgReimbursementPricing.taxAmount)}
+                  </Typography>
+                  <Typography sx={{ fontWeight: 600 }}>
+                    Total {formatPrice(cart.currency, orgReimbursementPricing.total)}
+                  </Typography>
+                </>
+              ) : hasCoupon ? (
+                <Typography sx={{ fontWeight: 600 }}>
+                  Total {formatPrice(cart.currency, payableTotal)}
+                </Typography>
               ) : null}
             </Stack>
           ) : (
@@ -255,12 +279,12 @@ export function ForumCheckoutPage() {
           <FormControlLabel
             value="org_reimbursement"
             control={<Radio />}
-            label="Organization reimbursement (SAFe eligible)"
+            label="Organization reimbursement (Added GST taxes)"
           />
         </RadioGroup>
       ) : null}
 
-      {variant === "org_reimbursement" ? (
+      {variant === "org_reimbursement" && !orgEligible ? (
         <Stack spacing={1.5}>
           <TextField
             label="Organization name"
@@ -285,9 +309,9 @@ export function ForumCheckoutPage() {
             fullWidth
           />
         </Stack>
-      ) : cart ? (
+      ) : variant === "standard" && cart ? (
         <CheckoutPaymentModeSelector
-          cartSubtotal={payableTotal}
+          cartSubtotal={payableSubtotal}
           cartCurrency={cart.currency}
           paymentMode={paymentMode}
           installmentProvider={installmentProvider}
