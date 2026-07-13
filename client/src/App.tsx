@@ -38,6 +38,9 @@ import { AboutPage } from "./pages/forum/AboutPage";
 import { PrivacyPage } from "./pages/forum/PrivacyPage";
 import { RefundPolicyPage } from "./pages/forum/RefundPolicyPage";
 import { ResourcesPage } from "./pages/forum/ResourcesPage";
+import { BlogsPage } from "./pages/forum/resources/BlogsPage";
+import { InterviewQuestionsAndSupportPage } from "./pages/forum/resources/InterviewQuestionsAndSupportPage";
+import { ScrumBigPicturePage } from "./pages/forum/resources/ScrumBigPicturePage";
 import { TermsPage } from "./pages/forum/TermsPage";
 import { TestimonialsPage } from "./pages/forum/TestimonialsPage";
 import { WebinarsPage } from "./pages/forum/WebinarsPage";
@@ -83,6 +86,9 @@ function App() {
               <Route path="certifications" element={<CatalogListingPage categoryPath="certifications" />} />
               <Route path="services" element={<CatalogListingPage categoryPath="services" />} />
               <Route path="resources" element={<ResourcesPage />} />
+              <Route path="resources/interview-questions-and-support" element={<InterviewQuestionsAndSupportPage />} />
+              <Route path="resources/blogs" element={<BlogsPage />} />
+              <Route path="resources/scrum-big-picture" element={<ScrumBigPicturePage />} />
               <Route path="webinars" element={<WebinarsPage />} />
               <Route path="testimonials" element={<TestimonialsPage />} />
               <Route path="about" element={<AboutPage />} />
