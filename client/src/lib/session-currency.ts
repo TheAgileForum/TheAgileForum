@@ -6,14 +6,14 @@ export type SessionCurrency =
   | "USD"
   | "INR"
   | "CAD"
+  | "EUR"
+  | "AED"
+  | "GBP"
   | "NGN"
   | "AUD"
   | "IDR"
   | "SGD"
-  | "BRL"
-  | "EUR"
-  | "AED"
-  | "GBP";
+  | "BRL";
 
 type CurrencyOption = { code: SessionCurrency; label: string; geo: string };
 
@@ -21,14 +21,14 @@ const OPTIONS: CurrencyOption[] = [
   { code: "USD", label: "United States", geo: "US" },
   { code: "INR", label: "India", geo: "IN" },
   { code: "CAD", label: "Canada", geo: "CA" },
+  { code: "EUR", label: "Europe", geo: "NL" },
+  { code: "AED", label: "UAE", geo: "AE" },
+  { code: "GBP", label: "United Kingdom", geo: "GB" },
   { code: "NGN", label: "Nigeria", geo: "NG" },
   { code: "AUD", label: "Australia", geo: "AU" },
   { code: "IDR", label: "Indonesia", geo: "ID" },
   { code: "SGD", label: "Singapore", geo: "SG" },
   { code: "BRL", label: "Brazil", geo: "BR" },
-  { code: "EUR", label: "Europe", geo: "NL" },
-  { code: "AED", label: "UAE", geo: "AE" },
-  { code: "GBP", label: "United Kingdom", geo: "GB" },
 ];
 
 function isSessionCurrency(value: string): value is SessionCurrency {

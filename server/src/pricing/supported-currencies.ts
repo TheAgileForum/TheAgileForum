@@ -10,14 +10,14 @@ export const SUPPORTED_CURRENCIES: SupportedCurrency[] = [
   { code: "USD", label: "United States", geo: "US", decimals: 2 },
   { code: "INR", label: "India", geo: "IN", decimals: 2 },
   { code: "CAD", label: "Canada", geo: "CA", decimals: 2 },
+  { code: "EUR", label: "Europe", geo: "NL", decimals: 2 },
+  { code: "AED", label: "UAE", geo: "AE", decimals: 2 },
+  { code: "GBP", label: "United Kingdom", geo: "GB", decimals: 2 },
   { code: "NGN", label: "Nigeria", geo: "NG", decimals: 2 },
   { code: "AUD", label: "Australia", geo: "AU", decimals: 2 },
   { code: "IDR", label: "Indonesia", geo: "ID", decimals: 0 },
   { code: "SGD", label: "Singapore", geo: "SG", decimals: 2 },
   { code: "BRL", label: "Brazil", geo: "BR", decimals: 2 },
-  { code: "EUR", label: "Europe", geo: "NL", decimals: 2 },
-  { code: "AED", label: "UAE", geo: "AE", decimals: 2 },
-  { code: "GBP", label: "United Kingdom", geo: "GB", decimals: 2 },
 ];
 
 export const SUPPORTED_CURRENCY_CODES = SUPPORTED_CURRENCIES.map((c) => c.code);
