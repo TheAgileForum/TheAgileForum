@@ -143,6 +143,47 @@ async function main(): Promise<void> {
     }),
   );
 
+  results.push(
+    await probe("auth-register", async () => {
+      const email = `staging-probe-${Date.now()}@example.com`;
+      const res = await fetch(`${API}/api/v1/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          password: "ProbePass123!",
+          policyVersion: "v1",
+          acceptTerms: true,
+        }),
+      });
+      const body = await res.text();
+      return {
+        name: "auth-register",
+        ok: res.status === 201,
+        detail: `${res.status} ${body.slice(0, 120)}`,
+      };
+    }),
+  );
+
+  results.push(
+    await probe("auth-login-demo", async () => {
+      const res = await fetch(`${API}/api/v1/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: "customer@demo.local", password: "password123" }),
+      });
+      const body = await res.text();
+      const ok = res.status === 200 || res.status === 401;
+      return {
+        name: "auth-login-demo",
+        ok,
+        detail: ok
+          ? `${res.status} auth route reachable`
+          : `${res.status} ${body.slice(0, 120)} — check users/oauth migrations`,
+      };
+    }),
+  );
+
   let failed = 0;
   for (const r of results) {
     const tag = r.ok ? "PASS" : "FAIL";

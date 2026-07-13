@@ -2,7 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import bcrypt from "bcrypt";
 import { prisma } from "../db/client.js";
 import { createIntegrationAdapters } from "../integrations/factory.js";
-import { logInfo } from "../runtime/logger.js";
+import { logError, logInfo } from "../runtime/logger.js";
 
 const DEFAULT_TTL_HOURS = 1;
 
@@ -59,11 +59,20 @@ export async function requestPasswordReset(email: string): Promise<{ message: st
 
   const resetUrl = `${appPublicUrl()}/reset-password?token=${encodeURIComponent(token)}`;
   const adapters = createIntegrationAdapters();
-  await adapters.email.sendTransactional({
-    to: user.email,
-    subject: "Reset your Agile Forum password",
-    html: `<p>We received a request to reset your password.</p><p><a href="${resetUrl}">Reset password</a></p><p>This link expires in ${resetTtlHours()} hour(s). If you did not request this, you can ignore this email.</p>`,
-  });
+  try {
+    await adapters.email.sendTransactional({
+      to: user.email,
+      subject: "Reset your Agile Forum password",
+      html: `<p>We received a request to reset your password.</p><p><a href="${resetUrl}">Reset password</a></p><p>This link expires in ${resetTtlHours()} hour(s). If you did not request this, you can ignore this email.</p>`,
+    });
+  } catch (err) {
+    logError("Password reset email failed", {
+      component: "auth",
+      event: "password_reset_email_failed",
+      userId: user.id,
+      error: err instanceof Error ? err.message : String(err),
+    });
+  }
 
   logInfo("Password reset email queued", {
     component: "auth",

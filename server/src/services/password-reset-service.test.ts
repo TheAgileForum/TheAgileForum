@@ -83,6 +83,18 @@ describe("password-reset-service", () => {
     );
   });
 
+  it("returns generic message when email provider fails", async () => {
+    prismaMock.user.findUnique.mockResolvedValue({
+      id: "user-1",
+      email: "local@demo.local",
+      authProvider: "local",
+    });
+    prismaMock.user.update.mockResolvedValue({});
+    emailSend.mockRejectedValueOnce(new Error("RESEND_SEND_FAILED"));
+    const result = await requestPasswordReset("local@demo.local");
+    expect(result.message).toBe(GENERIC_FORGOT_PASSWORD_MESSAGE);
+  });
+
   it("validates active reset token", async () => {
     prismaMock.user.findFirst.mockResolvedValue({
       passwordResetExpiresAt: new Date(Date.now() + 60_000),

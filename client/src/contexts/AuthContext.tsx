@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components -- module exports context hook */
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { apiFetch, ApiRequestError } from "../lib/api.js";
 import { apiUrl } from "../lib/api-base.js";
 
 
@@ -127,11 +128,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
 
-      const me = await fetch(apiUrl("/api/v1/auth/me"), { credentials: "include" });
+      const meJson = await apiFetch<MeResponse>("/api/v1/auth/me", { timeoutMs: 15_000 });
 
-      const meJson = (await me.json()) as MeResponse & { error?: unknown };
-
-      if (me.ok && meJson.user) {
+      if (meJson.user) {
 
         setUser(normalizeUser(meJson.user, meJson.requireEmailVerification));
 
@@ -181,41 +180,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setDemoMode(false);
 
-    const res = await fetch(apiUrl("/api/v1/auth/login"), {
+    try {
 
-      method: "POST",
+      await apiFetch("/api/v1/auth/login", {
 
-      headers: { "Content-Type": "application/json" },
+        method: "POST",
 
-      credentials: "include",
+        body: JSON.stringify({ email, password }),
 
-      body: JSON.stringify({ email, password }),
+        timeoutMs: 20_000,
 
-    });
+      });
 
-    const data = (await res.json().catch(() => ({}))) as {
+      await refreshMe();
 
-      error?: { code?: string; message?: string };
+      return true;
 
-    };
+    } catch (err) {
 
-    if (!res.ok) {
+      if (err instanceof ApiRequestError) {
 
-      const code = typeof data?.error?.code === "string" ? data.error.code : "ERROR";
+        setLoginErrorCode(err.code);
 
-      const msg = typeof data?.error?.message === "string" ? data.error.message : "Login failed";
+        setLoginError(err.message);
 
-      setLoginErrorCode(code);
+      } else {
 
-      setLoginError(msg);
+        setLoginErrorCode("NETWORK_ERROR");
+
+        setLoginError(err instanceof Error ? err.message : "Login failed");
+
+      }
 
       return false;
 
     }
-
-    await refreshMe();
-
-    return true;
 
   }, [refreshMe]);
 
@@ -229,51 +228,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setDemoMode(false);
 
-    const res = await fetch(apiUrl("/api/v1/auth/register"), {
+    try {
 
-      method: "POST",
+      await apiFetch("/api/v1/auth/register", {
 
-      headers: { "Content-Type": "application/json" },
+        method: "POST",
 
-      credentials: "include",
+        body: JSON.stringify({
 
-      body: JSON.stringify({
+          email,
 
-        email,
+          password,
 
-        password,
+          policyVersion: "v1",
 
-        policyVersion: "v1",
+          acceptTerms: true,
 
-        acceptTerms: true,
+        }),
 
-      }),
+        timeoutMs: 30_000,
 
-    });
+      });
 
-    const data = (await res.json().catch(() => ({}))) as {
+      await refreshMe();
 
-      error?: { code?: string; message?: string };
+      return true;
 
-    };
+    } catch (err) {
 
-    if (!res.ok) {
+      if (err instanceof ApiRequestError) {
 
-      const code = typeof data?.error?.code === "string" ? data.error.code : "ERROR";
+        setLoginErrorCode(err.code);
 
-      const msg = typeof data?.error?.message === "string" ? data.error.message : "Registration failed";
+        setLoginError(err.message);
 
-      setLoginErrorCode(code);
+      } else {
 
-      setLoginError(msg);
+        setLoginErrorCode("NETWORK_ERROR");
+
+        setLoginError(err instanceof Error ? err.message : "Registration failed");
+
+      }
 
       return false;
 
     }
-
-    await refreshMe();
-
-    return true;
 
   }, [refreshMe]);
 
@@ -281,15 +280,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const resendVerificationEmail = useCallback(async () => {
 
-    const res = await fetch(apiUrl("/api/v1/auth/verify-email/resend"), {
+    try {
 
-      method: "POST",
+      await apiFetch("/api/v1/auth/verify-email/resend", {
 
-      credentials: "include",
+        method: "POST",
 
-    });
+        timeoutMs: 20_000,
 
-    return res.ok || res.status === 202;
+      });
+
+      return true;
+
+    } catch (err) {
+
+      if (err instanceof ApiRequestError && err.status === 202) return true;
+
+      return false;
+
+    }
 
   }, []);
 
