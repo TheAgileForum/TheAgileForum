@@ -587,8 +587,6 @@ export function ForumHomePage() {
 
       <ProofStrip />
 
-      <WebinarPromoBanner />
-
       {/* Why */}
       <Box component="section" id="why" sx={{ bgcolor: "#fff", py: { xs: 8, md: 12 }, px: { xs: 2.5, md: 6 } }}>
         <SectionInner>
@@ -957,6 +955,8 @@ export function ForumHomePage() {
           </Stack>
         </SectionInner>
       </Box>
+
+      <WebinarPromoBanner />
 
       <StickyMobileCta
         label="Start Assessment →"
