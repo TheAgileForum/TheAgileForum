@@ -7,6 +7,7 @@ import type {
 } from "./contracts.js";
 import { executeWithRetry } from "./external-call.js";
 import { mapProviderFailure } from "./errors.js";
+import { sendResendEmail } from "./resend-api.js";
 import {
   parseStripeWebhookEvent,
   verifyStripeWebhookSignature,
@@ -49,8 +50,28 @@ export class LiveEmailAdapter implements EmailAdapter {
     subject: string;
     html: string;
   }): Promise<{ messageId: string }> {
+    const apiKey = process.env.RESEND_API_KEY?.trim();
+    if (!apiKey) {
+      return { messageId: `live_email_stub_${input.to}_${Date.now()}` };
+    }
+
+    const from = process.env.EMAIL_FROM?.trim();
+    if (!from) {
+      throw mapProviderFailure(
+        "email",
+        "EMAIL_FROM is required when RESEND_API_KEY is set",
+      );
+    }
+
     const result = await executeWithRetry(async () => {
-      return { messageId: `live_email_${input.to}_${Date.now()}` };
+      const sent = await sendResendEmail({
+        apiKey,
+        from,
+        to: input.to,
+        subject: input.subject,
+        html: input.html,
+      });
+      return { messageId: sent.id };
     });
     if (!result.ok || !result.data) {
       throw mapProviderFailure("email", result.error ?? "Live email adapter failed");
