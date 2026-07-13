@@ -319,43 +319,47 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
         )}
 
         <Box sx={{ mt: "auto" }}>
-          <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: "baseline", flexWrap: "wrap", mb: 1.25 }}>
-            {displayPrice.mrpFormatted ? (
+          <Stack spacing={0.75} sx={{ mb: 1.25 }}>
+            <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: "baseline", flexWrap: "wrap" }}>
+              {displayPrice.mrpFormatted ? (
+                <Typography
+                  sx={{
+                    fontSize: "0.9rem",
+                    color: "#94a3b8",
+                    textDecoration: "line-through",
+                  }}
+                >
+                  {displayPrice.mrpFormatted}
+                </Typography>
+              ) : null}
               <Typography
                 sx={{
-                  fontSize: "0.9rem",
-                  color: "#94a3b8",
-                  textDecoration: "line-through",
+                  fontWeight: 700,
+                  fontSize: "1.65rem",
+                  letterSpacing: "-0.02em",
+                  color: "text.primary",
+                  lineHeight: 1.1,
                 }}
               >
-                {displayPrice.mrpFormatted}
+                {displayPrice.saleFormatted}
               </Typography>
-            ) : null}
-            <Typography
-              sx={{
-                fontWeight: 700,
-                fontSize: "1.65rem",
-                letterSpacing: "-0.02em",
-                color: "text.primary",
-                lineHeight: 1.1,
-              }}
-            >
-              {displayPrice.saleFormatted}
-            </Typography>
+            </Stack>
             {displayPrice.discountLabel ? (
-              <Chip
-                label={displayPrice.discountLabel}
-                size="small"
+              <Box
                 sx={{
-                  height: 22,
+                  display: "inline-flex",
+                  alignSelf: "flex-start",
+                  px: 1,
+                  py: 0.25,
+                  borderRadius: "999px",
                   fontSize: "0.72rem",
                   fontWeight: 600,
                   color: "#b45309",
                   bgcolor: "#fef3c7",
-                  border: "none",
-                  "& .MuiChip-label": { px: 1 },
                 }}
-              />
+              >
+                {displayPrice.discountLabel}
+              </Box>
             ) : null}
           </Stack>
 

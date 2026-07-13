@@ -26,6 +26,7 @@ export function catalogDisplayPrice(currency: string, saleAmount: string): {
     saleFormatted: formatPrice(currency, String(sale)),
     mrpFormatted: formatPrice(currency, String(mrp)),
     discountPercent,
-    discountLabel: discountPercent > 0 ? `${discountPercent}% off this week` : "",
+    discountLabel:
+      discountPercent > 0 ? `${discountPercent}% off this week | Lowest Price Guarantee` : "",
   };
 }
