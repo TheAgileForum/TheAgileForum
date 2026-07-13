@@ -23,7 +23,7 @@ https://api.staging.theagileforum.com/api/v1/auth/oauth/linkedin/callback
 https://api.staging.theagileforum.com/api/v1/auth/oauth/google/callback
 ```
 
-Session cookies are set on the **API host** after OAuth callback. `app.*` and `api.*` on the same registrable domain work with `SameSite=Lax` and `credentials: "include"` (already used in the client).
+Session cookies are set on the **API host** after OAuth callback. When the SPA on `app.*` proxies `/api` to `api.*` (see `client/vercel.json`), the auth cookie must be scoped to the **shared parent domain** (e.g. `.staging.theagileforum.com`). The server sets this automatically from `APP_PUBLIC_URL` + `API_PUBLIC_URL`, or you can override with `AUTH_COOKIE_DOMAIN`.
 
 ---
 

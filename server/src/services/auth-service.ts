@@ -101,19 +101,62 @@ export async function authenticateUser(
   };
 }
 
-export function getCookieOptions(): {
+type AuthCookieOptions = {
   httpOnly: boolean;
   secure: boolean;
   sameSite: "lax" | "strict" | "none";
   path: string;
   maxAge: number;
-} {
+  domain?: string;
+};
+
+/**
+ * When the SPA proxies /api on app.* but OAuth callbacks hit api.* directly, the session
+ * cookie must be scoped to the shared parent domain (e.g. .staging.theagileforum.com).
+ */
+export function resolveAuthCookieDomain(): string | undefined {
+  const explicit = process.env.AUTH_COOKIE_DOMAIN?.trim();
+  if (explicit) {
+    return explicit.startsWith(".") ? explicit : `.${explicit}`;
+  }
+
+  const appUrl = process.env.APP_PUBLIC_URL?.trim();
+  const apiUrl = process.env.API_PUBLIC_URL?.trim();
+  if (!appUrl || !apiUrl) return undefined;
+
+  try {
+    const appHost = new URL(appUrl).hostname;
+    const apiHost = new URL(apiUrl).hostname;
+    if (appHost === apiHost || appHost === "localhost" || apiHost === "localhost") {
+      return undefined;
+    }
+
+    const appParent = appHost.includes(".") ? appHost.slice(appHost.indexOf(".") + 1) : null;
+    const apiParent = apiHost.includes(".") ? apiHost.slice(apiHost.indexOf(".") + 1) : null;
+    if (appParent && appParent === apiParent) {
+      return `.${appParent}`;
+    }
+  } catch {
+    return undefined;
+  }
+
+  return undefined;
+}
+
+export function getCookieOptions(): AuthCookieOptions {
   const env = getEnv();
+  const domain = resolveAuthCookieDomain();
   return {
     httpOnly: true,
     secure: env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
     maxAge: 8 * 60 * 60 * 1000,
+    ...(domain ? { domain } : {}),
   };
+}
+
+export function getClearCookieOptions(): Omit<AuthCookieOptions, "maxAge"> {
+  const { maxAge: _maxAge, ...options } = getCookieOptions();
+  return options;
 }

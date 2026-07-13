@@ -57,7 +57,7 @@ type AuthContextValue = {
 
   logout: () => Promise<void>;
 
-  refreshMe: () => Promise<void>;
+  refreshMe: () => Promise<boolean>;
 
   resendVerificationEmail: () => Promise<boolean>;
 
@@ -107,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 
 
-  const refreshMe = useCallback(async () => {
+  const refreshMe = useCallback(async (): Promise<boolean> => {
 
     try {
 
@@ -121,15 +121,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         setDemoMode(false);
 
-      } else {
-
-        setUser(null);
+        return true;
 
       }
+
+      setUser(null);
+
+      return false;
 
     } catch {
 
       setUser(null);
+
+      return false;
 
     } finally {
 
