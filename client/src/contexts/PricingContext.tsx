@@ -18,6 +18,7 @@ import {
   geoFromSessionCurrency,
   getSessionCurrency,
   hasExplicitSessionCurrencyOverride,
+  hasPersistedSessionCurrency,
   markExplicitSessionCurrencyOverride,
   setSessionCurrency,
   type SessionCurrency,
@@ -65,7 +66,7 @@ function syncSessionStorage(currency: SessionCurrency) {
 
 export function PricingProvider({ children }: { children: ReactNode }) {
   const [context, setContext] = useState<CurrencyContextResponse | null>(readInitialCurrencyContext);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => !hasPersistedSessionCurrency());
 
   const refresh = useCallback(async () => {
     if (hasExplicitSessionCurrencyOverride()) {

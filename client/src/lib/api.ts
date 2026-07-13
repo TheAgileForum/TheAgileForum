@@ -120,7 +120,7 @@ export async function apiFetch<T>(
       if (!isRetryableApiError(err) || attempt >= retries) throw err;
       attempt += 1;
       budgetMs = Math.max(budgetMs, CATALOG_FETCH_TIMEOUT_MS);
-      await delay(1_500);
+      await delay(attempt === 1 ? 500 : 1_500);
     }
   }
 }
