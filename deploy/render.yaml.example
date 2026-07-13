@@ -7,7 +7,8 @@ services:
     runtime: node
     rootDir: server
     # --include=dev: NODE_ENV=production skips devDependencies (@types/node, typescript, prisma CLI)
-    buildCommand: npm ci --include=dev && npm run build
+    buildCommand: npm ci --include=dev && npm run build && npm run db:deploy
+    # start runs prisma migrate deploy before the API (see server/package.json "start")
     startCommand: npm start
     healthCheckPath: /api/v1/health
     envVars:
@@ -40,4 +41,5 @@ services:
       - key: GOOGLE_CLIENT_SECRET
         sync: false
 
-# After first deploy: run `npm run db:deploy` and `npm run db:seed` in Render shell.
+# Migrations run automatically on each deploy via `npm start` (prisma migrate deploy).
+# Seed once after first deploy if catalog is empty: `npm run db:seed` in Render shell.
