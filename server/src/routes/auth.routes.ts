@@ -8,6 +8,7 @@ import { withBodyValidation } from "../middleware/validation.js";
 import { logPrivilegedAction } from "../security/audit.js";
 import {
   authenticateUser,
+  getClearCookieOptions,
   getCookieOptions,
   signSessionToken,
 } from "../services/auth-service.js";
@@ -238,12 +239,7 @@ authRouter.post("/verify-email/resend", requireAuth, sensitiveLimiter, async (re
 
 authRouter.post("/logout", (_req, res) => {
   const env = getEnv();
-  res.clearCookie(env.AUTH_COOKIE_NAME, {
-    path: "/",
-    httpOnly: true,
-    secure: env.NODE_ENV === "production",
-    sameSite: "lax",
-  });
+  res.clearCookie(env.AUTH_COOKIE_NAME, getClearCookieOptions());
   return res.status(204).send();
 });
 

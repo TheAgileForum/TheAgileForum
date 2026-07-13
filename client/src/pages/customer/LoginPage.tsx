@@ -77,11 +77,23 @@ export function LoginPage() {
 
       setStatusMessage("Signed in with OAuth. Redirecting…");
 
-      void refreshMe().then(() => {
+      void refreshMe().then((ok) => {
 
-        searchParams.delete("oauth");
+        if (!ok) {
 
-        setSearchParams(searchParams, { replace: true });
+          setStatusMessage(
+
+            "OAuth sign-in completed, but your session could not be restored. Try again or use email login.",
+
+          );
+
+        }
+
+        const next = new URLSearchParams(searchParams);
+
+        next.delete("oauth");
+
+        setSearchParams(next, { replace: true });
 
       });
 
@@ -167,13 +179,13 @@ export function LoginPage() {
 
   useEffect(() => {
 
-    if (!loading && user && oauthStatus !== "success" && verifiedStatus !== "1") {
+    if (!loading && user && verifiedStatus !== "1") {
 
       navigate(returnTo, { replace: true });
 
     }
 
-  }, [loading, user, navigate, returnTo, oauthStatus, verifiedStatus]);
+  }, [loading, user, navigate, returnTo, verifiedStatus]);
 
 
 
