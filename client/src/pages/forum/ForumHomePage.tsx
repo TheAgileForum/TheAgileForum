@@ -7,6 +7,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { ProofStrip } from "../../components/forum/ProofStrip";
 import { StickyMobileCta } from "../../components/forum/StickyMobileCta";
+import { WebinarPromoBanner } from "../../components/forum/WebinarPromoBanner";
 import { useAuth } from "../../contexts/AuthContext";
 import { useDiagnosis } from "../../contexts/DiagnosisContext";
 import { trackEvent } from "../../lib/analytics";
@@ -585,6 +586,8 @@ export function ForumHomePage() {
       ) : null}
 
       <ProofStrip />
+
+      <WebinarPromoBanner />
 
       {/* Why */}
       <Box component="section" id="why" sx={{ bgcolor: "#fff", py: { xs: 8, md: 12 }, px: { xs: 2.5, md: 6 } }}>
