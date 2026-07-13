@@ -40,6 +40,16 @@ services:
         sync: false
       - key: GOOGLE_CLIENT_SECRET
         sync: false
+      - key: INTEGRATION_PROVIDER_MODE
+        value: live
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        value: notifications@theagileforum.com
+      - key: REQUIRE_EMAIL_VERIFICATION
+        value: "true"
+      - key: OPS_ENROLLMENT_ALERT_EMAIL
+        value: ops@theagileforum.com
 
 # Migrations run automatically on each deploy via `npm start` (prisma migrate deploy).
 # Seed once after first deploy if catalog is empty: `npm run db:seed` in Render shell.
