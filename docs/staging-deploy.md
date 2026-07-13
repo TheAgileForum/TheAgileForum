@@ -106,11 +106,14 @@ Details: `docs/linkedin-oauth-setup.md`
 
 ### Google
 
-1. [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → Credentials → OAuth client.
+1. [Google Cloud Console](https://console.cloud.google.com/) → configure **OAuth consent screen**, then **Credentials** → OAuth client (Web application).
 2. **Authorized redirect URIs**:
    `https://api.staging.theagileforum.com/api/v1/auth/oauth/google/callback`
 3. **Authorized JavaScript origins** (optional for redirect flow):
    `https://app.staging.theagileforum.com`
+4. Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` on Render; redeploy API.
+
+Details: `docs/google-oauth-setup.md`
 
 ---
 
@@ -172,6 +175,7 @@ LIMIT 10;
 
 ## Related docs
 
+- `docs/google-oauth-setup.md`
 - `docs/linkedin-oauth-setup.md`
 - `docs/staging-posthog-setup.md`
 - `docs/environment-bootstrap.md`
