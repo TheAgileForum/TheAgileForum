@@ -2,6 +2,11 @@ import { Router } from "express";
 import { buildCatalogFacets } from "../catalog/facets.js";
 import { filterOfferings, parseCatalogFilterQuery } from "../catalog/filter.js";
 import {
+  catalogListCacheKey,
+  readCatalogListCache,
+  writeCatalogListCache,
+} from "../catalog/catalog-list-cache.js";
+import {
   listOfferingsByCategoryFromCatalog,
   listOfferingsFromCatalog,
   getOfferingFromCatalog,
@@ -110,6 +115,15 @@ function categoryListing(category: OfferingCategory) {
     req: import("express").Request,
     res: import("express").Response,
   ) => {
+    const cacheKey = catalogListCacheKey({
+      category,
+      ...(req.query as Record<string, string | undefined>),
+    });
+    const cached = readCatalogListCache<Record<string, unknown>>(cacheKey);
+    if (cached) {
+      return res.json(cached);
+    }
+
     const { context, currencyContext } = pricingEnvelope(req);
     const query = parseCatalogFilterQuery({
       ...(req.query as Record<string, string | undefined>),
@@ -141,13 +155,15 @@ function categoryListing(category: OfferingCategory) {
     }
     const filtered = filterOfferings(base, query);
     const offerings = filtered.map((o) => serializeOffering(o, context));
-    return res.json({
+    const payload = {
       category,
       offerings,
       filters: query,
       facets: buildCatalogFacets(filtered),
       currencyContext,
-    });
+    };
+    writeCatalogListCache(cacheKey, payload);
+    return res.json(payload);
   };
 }
 
