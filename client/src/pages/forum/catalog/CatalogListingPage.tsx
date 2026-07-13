@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import LinearProgress from "@mui/material/LinearProgress";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CatalogFilterBar } from "../../../components/forum/CatalogFilterBar";
 import { CatalogOfferingCard } from "../../../components/forum/CatalogOfferingCard";
@@ -14,6 +14,7 @@ import { ApiRequestError } from "../../../lib/api";
 import { trackEvent } from "../../../lib/analytics";
 import {
   filtersToApiQuery,
+  filtersToSearchParams,
   hasActiveFilters,
   parseCatalogFilters,
   type CatalogCategoryPath,
@@ -35,18 +36,28 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { addItem } = useForumCart();
-  const { currency, geo } = usePricing();
+  const { currency, geo, loading: pricingLoading } = usePricing();
   const [offerings, setOfferings] = useState<CatalogOffering[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [addingCode, setAddingCode] = useState<string | null>(null);
   const [facets, setFacets] = useState<CatalogFacets | null>(null);
+  const hasLoadedOnceRef = useRef(false);
+  const viewedRef = useRef(false);
+  const requestIdRef = useRef(0);
 
   const searchKey = searchParams.toString();
   const filters = parseCatalogFilters(searchKey);
 
   const load = useCallback(async () => {
-    setLoading(true);
+    const requestId = ++requestIdRef.current;
+    const background = hasLoadedOnceRef.current;
+    if (background) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
     setError(null);
     const parsedFilters = parseCatalogFilters(searchKey);
     try {
@@ -55,25 +66,45 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
         filtersToApiQuery(parsedFilters),
         { geo, currency },
       );
+      if (requestId !== requestIdRef.current) return;
       setOfferings(res.offerings);
       setFacets(res.facets ?? null);
+      hasLoadedOnceRef.current = true;
     } catch (err) {
+      if (requestId !== requestIdRef.current) return;
       setError(err instanceof ApiRequestError ? err.message : "Could not load catalog.");
       setOfferings([]);
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   }, [categoryPath, searchKey, geo, currency]);
 
   useEffect(() => {
+    hasLoadedOnceRef.current = false;
+    requestIdRef.current += 1;
+    setOfferings([]);
+    setFacets(null);
+    setLoading(true);
+    setRefreshing(false);
+    viewedRef.current = false;
+  }, [categoryPath]);
+
+  useEffect(() => {
+    if (pricingLoading) return;
     setCommerceJourneyOrigin("catalog");
     void load();
-    trackEvent("catalog_list_viewed", { category: categoryPath });
-  }, [load, categoryPath]);
+    if (!viewedRef.current) {
+      viewedRef.current = true;
+      trackEvent("catalog_list_viewed", { category: categoryPath });
+    }
+  }, [load, categoryPath, pricingLoading]);
 
   function applyFilters(next: typeof filters) {
     trackEvent("catalog_filter_applied", { category: categoryPath });
-    setSearchParams(filtersToApiQuery(next) ? new URLSearchParams(filtersToApiQuery(next)) : {});
+    setSearchParams(filtersToSearchParams(next));
   }
 
   function resetFilters() {
@@ -95,6 +126,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
 
   const title = TITLES[categoryPath];
   const showCertBody = categoryPath === "certifications";
+  const showInitialSpinner = loading && offerings.length === 0;
 
   return (
     <Stack spacing={2.5}>
@@ -118,10 +150,16 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
         onReset={resetFilters}
       />
 
-      {loading ? <LinearProgress /> : null}
+      {showInitialSpinner ? <LinearProgress /> : null}
+      {refreshing ? (
+        <LinearProgress
+          color="inherit"
+          sx={{ height: 2, opacity: 0.45, bgcolor: "action.hover" }}
+        />
+      ) : null}
       {error ? <Alert severity="error">{error}</Alert> : null}
 
-      {!loading && !error && offerings.length === 0 ? (
+      {!showInitialSpinner && !error && offerings.length === 0 ? (
         <Alert
           severity="info"
           action={
@@ -143,6 +181,8 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
           display: "grid",
           gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", lg: "repeat(3, 1fr)" },
           gap: 2,
+          opacity: refreshing ? 0.72 : 1,
+          transition: "opacity 0.2s ease",
         }}
       >
         {offerings.map((offering) => (

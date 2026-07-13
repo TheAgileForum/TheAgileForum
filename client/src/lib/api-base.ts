@@ -1,4 +1,5 @@
 /** SPA hosts that proxy /api to the backend via Vercel (see client/vercel.json). */
+// Catalog and commerce fetches on these hosts must use same-origin /api (not VITE_API_URL).
 const SAME_ORIGIN_API_HOSTS = new Set([
   "app.staging.theagileforum.com",
   "app.theagileforum.com",

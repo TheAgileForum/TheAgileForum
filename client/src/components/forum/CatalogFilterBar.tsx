@@ -3,6 +3,7 @@ import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
+import { useEffect, useRef, useState } from "react";
 import type { CatalogFilters } from "../../lib/catalog-filters";
 import { DELIVERY_FILTER_OPTIONS, ROLE_FILTER_OPTIONS } from "../../lib/catalog-filters";
 
@@ -12,6 +13,53 @@ type CatalogFilterBarProps = {
   onChange: (next: CatalogFilters) => void;
   onReset: () => void;
 };
+
+const PRICE_DEBOUNCE_MS = 400;
+
+function DebouncedPriceField({
+  label,
+  value,
+  onCommit,
+  sx,
+}: {
+  label: string;
+  value?: number;
+  onCommit: (next: number | undefined) => void;
+  sx?: { width: number };
+}) {
+  const [draft, setDraft] = useState(value?.toString() ?? "");
+  const onCommitRef = useRef(onCommit);
+
+  useEffect(() => {
+    onCommitRef.current = onCommit;
+  }, [onCommit]);
+
+  useEffect(() => {
+    setDraft(value?.toString() ?? "");
+  }, [value]);
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => {
+      const trimmed = draft.trim();
+      const next = trimmed ? Number(trimmed) : undefined;
+      const normalized = next !== undefined && Number.isFinite(next) ? next : undefined;
+      if (normalized === value) return;
+      onCommitRef.current(normalized);
+    }, PRICE_DEBOUNCE_MS);
+    return () => window.clearTimeout(handle);
+  }, [draft, value]);
+
+  return (
+    <TextField
+      size="small"
+      label={label}
+      type="number"
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      sx={sx}
+    />
+  );
+}
 
 export function CatalogFilterBar({ filters, showCertBody, onChange, onReset }: CatalogFilterBarProps) {
   return (
@@ -62,30 +110,16 @@ export function CatalogFilterBar({ filters, showCertBody, onChange, onReset }: C
             </MenuItem>
           ))}
         </TextField>
-        <TextField
-          size="small"
+        <DebouncedPriceField
           label="Min price"
-          type="number"
-          value={filters.minPrice ?? ""}
-          onChange={(e) =>
-            onChange({
-              ...filters,
-              minPrice: e.target.value ? Number(e.target.value) : undefined,
-            })
-          }
+          value={filters.minPrice}
+          onCommit={(minPrice) => onChange({ ...filters, minPrice })}
           sx={{ width: 110 }}
         />
-        <TextField
-          size="small"
+        <DebouncedPriceField
           label="Max price"
-          type="number"
-          value={filters.maxPrice ?? ""}
-          onChange={(e) =>
-            onChange({
-              ...filters,
-              maxPrice: e.target.value ? Number(e.target.value) : undefined,
-            })
-          }
+          value={filters.maxPrice}
+          onCommit={(maxPrice) => onChange({ ...filters, maxPrice })}
           sx={{ width: 110 }}
         />
         <Chip
