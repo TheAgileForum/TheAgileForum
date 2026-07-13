@@ -5,6 +5,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState, type ReactNode } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { CareerOutcomesSection } from "../../components/forum/CareerOutcomesSection";
 import { ProofStrip } from "../../components/forum/ProofStrip";
 import { StickyMobileCta } from "../../components/forum/StickyMobileCta";
 import { WebinarPromoBanner } from "../../components/forum/WebinarPromoBanner";
@@ -957,6 +958,8 @@ export function ForumHomePage() {
       </Box>
 
       <WebinarPromoBanner />
+
+      <CareerOutcomesSection />
 
       <StickyMobileCta
         label="Start Assessment →"
