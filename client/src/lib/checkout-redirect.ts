@@ -4,6 +4,7 @@ import type { CheckoutStartResult } from "./forum-api";
 export type CheckoutRedirectState = {
   orderId: string;
   orderNumber: string;
+  variant?: CheckoutStartResult["variant"];
   paymentMode?: CheckoutStartResult["paymentMode"];
   installmentProvider?: CheckoutStartResult["installmentProvider"];
   razorpayCheckout?: CheckoutStartResult["razorpayCheckout"];
@@ -17,6 +18,7 @@ export function redirectAfterCheckoutStart(
   const state: CheckoutRedirectState = {
     orderId: started.orderId,
     orderNumber: started.orderNumber,
+    variant: started.variant,
     paymentMode: started.paymentMode,
     installmentProvider: started.installmentProvider,
     razorpayCheckout: started.razorpayCheckout,

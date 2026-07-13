@@ -16,6 +16,7 @@ import {
 type RazorpayCheckoutState = {
   orderId: string;
   orderNumber?: string;
+  variant?: "standard" | "org_reimbursement";
   paymentMode?: PaymentMode;
   installmentProvider?: InstallmentProvider | null;
   razorpayCheckout?: {
@@ -127,7 +128,7 @@ export function ForumRazorpayCheckoutPage() {
                   state: {
                     orderNumber: done.order.orderNumber,
                     orderId: done.order.id,
-                    variant: "standard",
+                    variant: state?.variant ?? "standard",
                     paymentMode,
                     installmentProvider:
                       paymentMode === "installment" ? ("razorpay_emi" as const) : null,

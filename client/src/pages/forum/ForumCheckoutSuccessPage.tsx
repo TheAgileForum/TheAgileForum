@@ -28,7 +28,7 @@ type SuccessState = {
 };
 
 function paymentModeLabel(state: SuccessState | null): string | null {
-  if (!state || state.variant === "org_reimbursement") return null;
+  if (!state) return null;
   if (state.paymentMode === "installment" && state.installmentProvider) {
     return `Installment · ${PROVIDER_LABELS[state.installmentProvider]}`;
   }
@@ -101,11 +101,9 @@ export function ForumCheckoutSuccessPage() {
       {error ? <Alert severity="warning">{error}</Alert> : null}
       <Typography color="text.secondary">
         Order {state?.orderNumber ?? state?.orderId ?? orderNumber ?? "—"} is confirmed.
-        {state?.variant === "org_reimbursement"
-          ? " Your organization reimbursement request was submitted to ops."
-          : busy
-            ? " Confirming your Stripe payment…"
-            : " Welcome to your program."}
+        {busy
+          ? " Confirming your Stripe payment…"
+          : " Welcome to your program."}
       </Typography>
       {modeLabel ? (
         <Typography variant="body2" color="text.secondary">

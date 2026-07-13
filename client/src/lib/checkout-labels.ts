@@ -16,11 +16,8 @@ export function getCheckoutConfirmLabel(options: {
   paymentMode: PaymentMode;
   installmentProvider: InstallmentProvider | null;
 }): string {
-  const { variant, geo, currency, paymentMode, installmentProvider } = options;
+  const { geo, currency, paymentMode, installmentProvider } = options;
 
-  if (variant === "org_reimbursement") {
-    return "Submit org reimbursement request";
-  }
   if (isIndiaCheckoutContext(geo, currency)) {
     return "Continue to Pay";
   }

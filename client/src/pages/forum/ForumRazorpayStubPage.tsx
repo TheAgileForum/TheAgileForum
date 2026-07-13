@@ -12,6 +12,7 @@ import type { InstallmentProvider, PaymentMode } from "../../lib/forum-api";
 type RazorpayStubState = {
   orderId: string;
   orderNumber?: string;
+  variant?: "standard" | "org_reimbursement";
   paymentMode?: PaymentMode;
   installmentProvider?: InstallmentProvider | null;
 };
@@ -42,7 +43,7 @@ export function ForumRazorpayStubPage() {
         state: {
           orderNumber: done.order.orderNumber,
           orderId: done.order.id,
-          variant: "standard",
+          variant: state?.variant ?? "standard",
           paymentMode: state?.paymentMode ?? "full_pay",
           installmentProvider: state?.installmentProvider ?? null,
           paymentProvider: "razorpay",
