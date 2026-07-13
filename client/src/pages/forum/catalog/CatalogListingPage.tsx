@@ -72,7 +72,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { addItem } = useForumCart();
-  const { currency, geo, loading: pricingLoading } = usePricing();
+  const { currency, geo } = usePricing();
   const [offerings, setOfferings] = useState<CatalogOffering[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -139,17 +139,26 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
     setRefreshing(false);
     setError(null);
     viewedRef.current = false;
+  }, [categoryPath, searchKey]);
+
+  useEffect(() => {
+    const cached = peekCatalogCache(categoryPath, searchKey, geo, currency);
+    if (cached) {
+      setOfferings(cached.offerings);
+      setFacets(cached.facets ?? null);
+      setLoading(false);
+      hasLoadedOnceRef.current = true;
+    }
   }, [categoryPath, searchKey, geo, currency]);
 
   useEffect(() => {
-    if (pricingLoading) return;
     setCommerceJourneyOrigin("catalog");
     void load();
     if (!viewedRef.current) {
       viewedRef.current = true;
       trackEvent("catalog_list_viewed", { category: categoryPath });
     }
-  }, [load, categoryPath, pricingLoading]);
+  }, [load, categoryPath]);
 
   function applyFilters(next: typeof filters) {
     trackEvent("catalog_filter_applied", { category: categoryPath });

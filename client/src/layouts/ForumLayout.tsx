@@ -11,7 +11,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Stack from "@mui/material/Stack";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, Link as RouterLink, useLocation } from "react-router-dom";
 import { CatalogSecondaryNav } from "../components/forum/CatalogSecondaryNav";
 import { GlobalCartButton } from "../components/forum/GlobalCartButton";
@@ -20,7 +20,7 @@ import { TrustFooter } from "../components/forum/TrustFooter";
 import { EmailVerificationBanner } from "../components/EmailVerificationBanner";
 import { useAuth } from "../contexts/AuthContext";
 import { userDisplayLabel } from "../lib/user-display";
-import { prefetchCatalogCategory } from "../lib/catalog-cache";
+import { prefetchCatalogCategory, prefetchDefaultCatalogLists } from "../lib/catalog-cache";
 import { useDiagnosis } from "../contexts/DiagnosisContext";
 
 const CATALOG_PREFETCH_PATHS = {
@@ -60,6 +60,10 @@ export function ForumLayout() {
   const { prefetchSession } = useDiagnosis();
   const { pathname } = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    prefetchDefaultCatalogLists();
+  }, []);
   const isHome = pathname === "/";
   const showCatalogNav =
     CATALOG_PATHS.some((p) => pathname.startsWith(p)) || pathname.startsWith("/offers/");

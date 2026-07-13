@@ -1,4 +1,4 @@
-import { apiFetch, CATALOG_FETCH_TIMEOUT_MS, CHECKOUT_START_TIMEOUT_MS } from "./api";
+import { apiFetch, catalogFetchTimeoutMs, isSameOriginApi, CHECKOUT_START_TIMEOUT_MS } from "./api";
 
 const SESSION_KEY = "af_diagnosis_session_id";
 
@@ -465,13 +465,15 @@ export async function listCatalogCategory(
   path: "trainings" | "certifications" | "services",
   query = "",
   pricing?: { geo?: string; currency?: string },
+  options?: { allowRetry?: boolean },
 ) {
   const base = query ? (query.startsWith("?") ? query : `?${query}`) : "";
   const pricingQs = pricingQuery(pricing?.geo, pricing?.currency);
   const join = base && pricingQs ? `${base}&${pricingQs.slice(1)}` : base || pricingQs;
+  const allowRetry = options?.allowRetry ?? true;
   return apiFetch<CatalogListResponse>(`/api/v1/catalog/${path}${join}`, {
-    timeoutMs: CATALOG_FETCH_TIMEOUT_MS,
-    retries: 1,
+    timeoutMs: catalogFetchTimeoutMs(),
+    retries: allowRetry && !isSameOriginApi() ? 1 : 0,
   });
 }
 

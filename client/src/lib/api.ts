@@ -1,4 +1,4 @@
-import { apiUrl } from "./api-base.js";
+import { apiUrl, getApiBaseUrl } from "./api-base.js";
 
 export type ApiErrorBody = {
   error?: {
@@ -27,8 +27,18 @@ export class ApiRequestError extends Error {
 /** Default request budget so hung proxies/APIs surface an error instead of an infinite spinner. */
 const DEFAULT_API_TIMEOUT_MS = 20_000;
 
-/** Catalog list may wait on Render cold start behind the Vercel /api proxy. */
-export const CATALOG_FETCH_TIMEOUT_MS = 30_000;
+/** Same-origin /api proxy: fail fast and show stale cache while Render wakes. */
+export const CATALOG_FETCH_TIMEOUT_MS = 8_000;
+/** Direct cross-origin API (dev preview hosts): allow longer cold-start budget. */
+export const CATALOG_FETCH_TIMEOUT_MS_EXTERNAL = 30_000;
+
+export function isSameOriginApi(): boolean {
+  return getApiBaseUrl() === "";
+}
+
+export function catalogFetchTimeoutMs(): number {
+  return isSameOriginApi() ? CATALOG_FETCH_TIMEOUT_MS : CATALOG_FETCH_TIMEOUT_MS_EXTERNAL;
+}
 
 /** Checkout start may hit Render cold start plus Stripe session creation. */
 export const CHECKOUT_START_TIMEOUT_MS = 45_000;
@@ -119,7 +129,7 @@ export async function apiFetch<T>(
     } catch (err) {
       if (!isRetryableApiError(err) || attempt >= retries) throw err;
       attempt += 1;
-      budgetMs = Math.max(budgetMs, CATALOG_FETCH_TIMEOUT_MS);
+      budgetMs = Math.max(budgetMs, catalogFetchTimeoutMs());
       await delay(attempt === 1 ? 500 : 1_500);
     }
   }
