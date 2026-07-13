@@ -9,7 +9,6 @@
       "linkedin": "https://api.staging.theagileforum.com/api/v1/auth/oauth/linkedin/callback"
     },
     "clientBuildEnv": {
-      "VITE_API_URL": "https://api.staging.theagileforum.com",
       "VITE_APP_ENV": "staging",
       "VITE_OBSERVABILITY_RELEASE": "staging"
     }

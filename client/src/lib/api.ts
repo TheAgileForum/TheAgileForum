@@ -25,12 +25,30 @@ export class ApiRequestError extends Error {
 }
 
 /** Default request budget so hung proxies/APIs surface an error instead of an infinite spinner. */
-const DEFAULT_API_TIMEOUT_MS = 12_000;
+const DEFAULT_API_TIMEOUT_MS = 20_000;
+
+/** Catalog list may wait on Render cold start behind the Vercel /api proxy. */
+export const CATALOG_FETCH_TIMEOUT_MS = 30_000;
 
 /** Checkout start may hit Render cold start plus Stripe session creation. */
 export const CHECKOUT_START_TIMEOUT_MS = 45_000;
 
-export async function apiFetch<T>(
+const RETRYABLE_HTTP_STATUSES = new Set([408, 502, 503, 504]);
+
+function isRetryableApiError(err: unknown): err is ApiRequestError {
+  return (
+    err instanceof ApiRequestError &&
+    (err.retryable || RETRYABLE_HTTP_STATUSES.has(err.status))
+  );
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+async function apiFetchOnce<T>(
   path: string,
   init?: RequestInit & { timeoutMs?: number },
 ): Promise<T> {
@@ -84,5 +102,25 @@ export async function apiFetch<T>(
   } finally {
     clearTimeout(timer);
     outerSignal?.removeEventListener("abort", onOuterAbort);
+  }
+}
+
+export async function apiFetch<T>(
+  path: string,
+  init?: RequestInit & { timeoutMs?: number; retries?: number },
+): Promise<T> {
+  const { retries = 0, timeoutMs = DEFAULT_API_TIMEOUT_MS, ...rest } = init ?? {};
+  let attempt = 0;
+  let budgetMs = timeoutMs;
+
+  while (true) {
+    try {
+      return await apiFetchOnce<T>(path, { ...rest, timeoutMs: budgetMs });
+    } catch (err) {
+      if (!isRetryableApiError(err) || attempt >= retries) throw err;
+      attempt += 1;
+      budgetMs = Math.max(budgetMs, CATALOG_FETCH_TIMEOUT_MS);
+      await delay(1_500);
+    }
   }
 }

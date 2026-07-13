@@ -79,7 +79,9 @@ cd server && npm run staging:preflight   # with staging env vars set
 Set **build-time** env (Vercel / Netlify / CI), then `npm run build` in `client/`:
 
 ```env
-VITE_API_URL=https://api.staging.theagileforum.com
+# Recommended: leave VITE_API_URL unset on Vercel — client/vercel.json proxies /api.
+# api-base.ts forces same-origin /api on app.staging.theagileforum.com at runtime.
+# VITE_API_URL=https://api.staging.theagileforum.com
 VITE_APP_ENV=staging
 VITE_OBSERVABILITY_RELEASE=staging
 # Optional analytics — see docs/staging-posthog-setup.md
@@ -126,8 +128,9 @@ See `deploy/render.yaml.example` for a starter blueprint.
 ### SPA on Vercel
 
 1. Root directory: `client/`, build: `npm run build`, output: `dist`.
-2. Env: `VITE_API_URL`, `VITE_APP_ENV`, etc.
-3. Optional: copy `client/vercel.json.example` → `client/vercel.json` if using **single-origin** proxy instead of `VITE_API_URL`.
+2. Env: `VITE_APP_ENV`, `VITE_OBSERVABILITY_RELEASE`, etc. **Leave `VITE_API_URL` unset** — `client/vercel.json` proxies `/api` and `api-base.ts` forces same-origin on `app.staging.theagileforum.com`.
+3. After merging client fixes, confirm Vercel redeployed (Deployments tab) — stale bundles keep cross-origin `api.staging` calls and catalog timeouts.
+4. Verify: `cd server && npm run staging:verify` — `spa-same-origin-bundle` must PASS.
 
 ---
 
@@ -160,6 +163,8 @@ LIMIT 10;
 | `OAUTH_TOKEN_EXCHANGE_FAILED` | Redirect URI in provider console must match `API_PUBLIC_URL` + path exactly |
 | OAuth succeeds but `/me` 401 | `VITE_API_URL` must point to the host that set the cookie; check cookie domain in DevTools |
 | `OAUTH_NOT_CONFIGURED` | Set client id/secret; `OAUTH_STUB_MODE=false` on staging |
+| `spa-same-origin-bundle` FAIL | Vercel serving pre-PR-11 bundle — trigger redeploy; unset `VITE_API_URL` on Vercel |
+| Catalog timeout / 0 results | Same as above, or Render cold start — retry; see `npm run staging:verify` |
 | Mixed content | Use `https` for both `APP_PUBLIC_URL` and `API_PUBLIC_URL` in staging |
 
 ---
