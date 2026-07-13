@@ -428,4 +428,58 @@ describe.skipIf(!hasDb)("auth integration", () => {
     const updated = await prisma.user.findUnique({ where: { email } });
     expect(updated?.emailVerifiedAt).toBeTruthy();
   });
+
+  it("forgot-password returns same message for unknown and known emails", async () => {
+    const unknown = await request(app)
+      .post("/api/v1/auth/forgot-password")
+      .send({ email: `missing-${Date.now()}@demo.local` });
+    expect(unknown.status).toBe(200);
+    expect(unknown.body.message).toMatch(/If an account exists/i);
+
+    const known = await request(app)
+      .post("/api/v1/auth/forgot-password")
+      .send({ email: "customer@demo.local" });
+    expect(known.status).toBe(200);
+    expect(known.body.message).toBe(unknown.body.message);
+  });
+
+  it("reset-password flow updates password and clears token", async () => {
+    const email = `reset-${Date.now()}@demo.local`;
+    await request(app).post("/api/v1/auth/register").send({
+      email,
+      password: "password123",
+      policyVersion: "v1",
+      acceptTerms: true,
+    });
+
+    await request(app).post("/api/v1/auth/forgot-password").send({ email });
+
+    const { prisma } = await import("./db/client.js");
+    const user = await prisma.user.findUnique({ where: { email } });
+    expect(user?.passwordResetToken).toBeTruthy();
+
+    const validate = await request(app).get(
+      `/api/v1/auth/reset-password/validate?token=${encodeURIComponent(user!.passwordResetToken!)}`,
+    );
+    expect(validate.status).toBe(200);
+
+    const reset = await request(app).post("/api/v1/auth/reset-password").send({
+      token: user!.passwordResetToken,
+      password: "newpassword9",
+    });
+    expect(reset.status).toBe(200);
+
+    const loginOld = await request(app)
+      .post("/api/v1/auth/login")
+      .send({ email, password: "password123" });
+    expect(loginOld.status).toBe(401);
+
+    const loginNew = await request(app)
+      .post("/api/v1/auth/login")
+      .send({ email, password: "newpassword9" });
+    expect(loginNew.status).toBe(200);
+
+    const cleared = await prisma.user.findUnique({ where: { email } });
+    expect(cleared?.passwordResetToken).toBeNull();
+  });
 });

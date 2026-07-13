@@ -322,6 +322,12 @@ export function LoginPage() {
 
               />
 
+              {mode === "login" ? (
+                <Typography variant="body2" align="right">
+                  <RouterLink to="/forgot-password">Forgot password?</RouterLink>
+                </Typography>
+              ) : null}
+
               {loginError ? (
 
                 <Alert severity="error" role="alert">

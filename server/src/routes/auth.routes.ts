@@ -22,6 +22,11 @@ import {
   requireEmailVerificationEnabled,
   verifyEmailByToken,
 } from "../services/email-verification-service.js";
+import {
+  requestPasswordReset,
+  resetPasswordByToken,
+  validatePasswordResetToken,
+} from "../services/password-reset-service.js";
 
 function serializeAuthUser(
   user: {
@@ -57,6 +62,15 @@ const registerBody = z.object({
   password: z.string().min(8).max(128),
   policyVersion: z.string().min(1),
   acceptTerms: z.literal(true),
+});
+
+const forgotPasswordBody = z.object({
+  email: z.string().email(),
+});
+
+const resetPasswordBody = z.object({
+  token: z.string().min(1),
+  password: z.string().min(8).max(128),
 });
 
 const consentBody = z.object({
@@ -219,6 +233,45 @@ authRouter.get("/verify-email", async (req, res) => {
   }
   return res.redirect(buildVerificationSuccessRedirect());
 });
+
+authRouter.post(
+  "/forgot-password",
+  sensitiveLimiter,
+  withBodyValidation(forgotPasswordBody),
+  async (req, res) => {
+    const { email } = req.body as z.infer<typeof forgotPasswordBody>;
+    const result = await requestPasswordReset(email);
+    return res.status(200).json(result);
+  },
+);
+
+authRouter.get("/reset-password/validate", sensitiveLimiter, async (req, res) => {
+  const token = typeof req.query.token === "string" ? req.query.token : "";
+  const result = await validatePasswordResetToken(token);
+  if (!result.ok) {
+    return res.status(400).json({
+      error: { code: result.code, message: result.message },
+    });
+  }
+  return res.status(200).json({ ok: true });
+});
+
+authRouter.post(
+  "/reset-password",
+  sensitiveLimiter,
+  withBodyValidation(resetPasswordBody),
+  async (req, res) => {
+    const { token, password } = req.body as z.infer<typeof resetPasswordBody>;
+    const result = await resetPasswordByToken(token, password);
+    if (!result.ok) {
+      const status = result.code === "TOKEN_EXPIRED" ? 410 : 400;
+      return res.status(status).json({
+        error: { code: result.code, message: result.message },
+      });
+    }
+    return res.status(200).json({ ok: true });
+  },
+);
 
 authRouter.post("/verify-email/resend", requireAuth, sensitiveLimiter, async (req, res) => {
   const user = await prisma.user.findUnique({

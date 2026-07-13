@@ -17,6 +17,8 @@ import { CheckoutSuccessPage } from "./pages/customer/CheckoutSuccessPage";
 import { ConsentPage } from "./pages/customer/ConsentPage";
 import { HomePage } from "./pages/customer/HomePage";
 import { LoginPage } from "./pages/customer/LoginPage";
+import { ForgotPasswordPage } from "./pages/customer/ForgotPasswordPage";
+import { ResetPasswordPage } from "./pages/customer/ResetPasswordPage";
 import { MenuPage } from "./pages/customer/MenuPage";
 import { OrderTrackPage } from "./pages/customer/OrderTrackPage";
 import { RecoveryPage } from "./pages/customer/RecoveryPage";
@@ -66,6 +68,22 @@ function App() {
               element={
                 <CustomerShell>
                   <LoginPage />
+                </CustomerShell>
+              }
+            />
+            <Route
+              path="/forgot-password"
+              element={
+                <CustomerShell>
+                  <ForgotPasswordPage />
+                </CustomerShell>
+              }
+            />
+            <Route
+              path="/reset-password"
+              element={
+                <CustomerShell>
+                  <ResetPasswordPage />
                 </CustomerShell>
               }
             />

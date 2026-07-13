@@ -143,6 +143,7 @@ See `deploy/render.yaml.example` for a starter blueprint.
 |------|----------|
 | `GET /api/v1/health` | `{"status":"ok"}` |
 | Open `APP_PUBLIC_URL/login` | Page loads |
+| **Forgot password?** on login → submit email | Generic success message; email with `APP_PUBLIC_URL/reset-password?token=...` for local-auth users |
 | **Continue with LinkedIn** | LinkedIn consent → `/login?oauth=success` → signed in |
 | **Continue with Google** | Same |
 | DevTools → Application → Cookies on API domain | `access_token` httpOnly |

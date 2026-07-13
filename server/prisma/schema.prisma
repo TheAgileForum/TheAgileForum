@@ -38,6 +38,8 @@ model User {
   emailVerifiedAt             DateTime?           @map("email_verified_at")
   emailVerificationToken      String?             @unique @map("email_verification_token")
   emailVerificationExpiresAt  DateTime?           @map("email_verification_expires_at")
+  passwordResetToken          String?             @unique @map("password_reset_token")
+  passwordResetExpiresAt      DateTime?           @map("password_reset_expires_at")
   authProvider                String?             @map("auth_provider")
   memberships                 TenantMembership[]
   consentEvents               ConsentEvent[]
