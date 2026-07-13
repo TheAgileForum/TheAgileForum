@@ -261,7 +261,10 @@ export async function startCheckout(
         paymentMode: "installment",
       }),
     );
-  } else if (variant === "standard" && paymentSelection.paymentMode === "full_pay") {
+  } else if (
+    paymentSelection.paymentMode === "full_pay" &&
+    (variant === "standard" || variant === "org_reimbursement")
+  ) {
     const paymentModes = resolvePaymentModes(context.geoDetected);
     paymentProvider = paymentModes.fullPayProvider;
 

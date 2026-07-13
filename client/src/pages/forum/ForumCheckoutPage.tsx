@@ -187,16 +187,11 @@ export function ForumCheckoutPage() {
         pricing: { geo, currency },
       });
 
-      if (variant === "standard" && redirectAfterCheckoutStart(started, navigate)) {
+      if (redirectAfterCheckoutStart(started, navigate)) {
         return;
       }
 
-      const paymentRef =
-        variant === "org_reimbursement"
-          ? org.purchaseOrderNumber.trim()
-            ? `org-po-${org.purchaseOrderNumber.trim()}`
-            : `org-reimbursement-${started.orderNumber}`
-          : resolveStubPaymentRef(started);
+      const paymentRef = resolveStubPaymentRef(started);
 
       const done = await completeCheckout(started.orderId, paymentRef);
       navigate("/checkout/success", {
@@ -251,8 +246,7 @@ export function ForumCheckoutPage() {
               {orgReimbursementPricing ? (
                 <>
                   <Typography variant="body2">
-                    GST ({Math.round(orgReimbursementPricing.taxRate * 100)}%){" "}
-                    {formatPrice(cart.currency, orgReimbursementPricing.taxAmount)}
+                    GST & Taxes {formatPrice(cart.currency, orgReimbursementPricing.taxAmount)}
                   </Typography>
                   <Typography sx={{ fontWeight: 600 }}>
                     Total {formatPrice(cart.currency, orgReimbursementPricing.total)}

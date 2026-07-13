@@ -334,16 +334,17 @@ describe.skipIf(!hasDb)("commerce integration (Sprint 1)", () => {
       total: expected.total,
     });
     expect(start.body.totalAmount).toBe(expected.total);
+    expect(start.body.paymentProvider).toBe("razorpay");
+    expect(start.body.razorpayPaymentRef).toMatch(/^razorpay:/);
+    expect(start.body.razorpayCheckoutUrl).toContain("/checkout/razorpay/stub");
 
     const complete = await agent.post("/api/v1/commerce/checkout/complete").send({
       orderId: start.body.orderId,
-      paymentRef: `org-reimbursement-${start.body.orderNumber}`,
+      paymentRef: start.body.razorpayPaymentRef,
     });
     expect(complete.status).toBe(200);
     expect(complete.body.order.status).toBe("paid");
-    expect(complete.body.order.paymentRef).toBe(
-      `org-reimbursement-${start.body.orderNumber}`,
-    );
+    expect(complete.body.order.paymentRef).toBe(start.body.razorpayPaymentRef);
   });
 
   it("allows guest add-to-cart without authentication (FR-165)", async () => {
