@@ -12,6 +12,10 @@ export type RegisterInput = {
   acceptTerms: boolean;
   authProvider?: "local" | "google" | "linkedin";
   emailVerified?: boolean;
+  displayName?: string;
+  pictureUrl?: string;
+  oauthSubject?: string;
+  oauthProfileUrl?: string;
 };
 
 export type RegisterResult =
@@ -55,6 +59,10 @@ export async function registerUser(input: RegisterInput): Promise<RegisterResult
       email,
       passwordHash,
       authProvider: input.authProvider ?? "local",
+      displayName: input.displayName,
+      pictureUrl: input.pictureUrl,
+      oauthSubject: input.oauthSubject,
+      oauthProfileUrl: input.oauthProfileUrl,
       emailVerifiedAt: verifiedNow ? new Date() : null,
       memberships: {
         create: {

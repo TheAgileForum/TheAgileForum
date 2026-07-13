@@ -137,7 +137,38 @@ export async function buildOAuthStartUrl(provider: OAuthProvider): Promise<strin
   return `https://www.linkedin.com/oauth/v2/authorization?${params.toString()}`;
 }
 
-type OAuthProfile = { email: string; subject: string };
+type OAuthProfile = {
+  email: string;
+  subject: string;
+  displayName?: string | null;
+  pictureUrl?: string | null;
+  profileUrl?: string | null;
+};
+
+function resolveDisplayName(profile: {
+  name?: string;
+  given_name?: string;
+  family_name?: string;
+}): string | null {
+  const fullName = profile.name?.trim();
+  if (fullName) return fullName;
+  const parts = [profile.given_name?.trim(), profile.family_name?.trim()].filter(Boolean);
+  return parts.length > 0 ? parts.join(" ") : null;
+}
+
+async function tryFetchLinkedInProfileUrl(accessToken: string): Promise<string | null> {
+  try {
+    const res = await fetch("https://api.linkedin.com/v2/me?projection=(vanityName)", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { vanityName?: string };
+    const vanity = data.vanityName?.trim();
+    return vanity ? `https://www.linkedin.com/in/${vanity}` : null;
+  } catch {
+    return null;
+  }
+}
 
 async function fetchGoogleProfile(code: string): Promise<OAuthProfile> {
   const redirectUri = `${apiPublicUrl()}/api/v1/auth/oauth/google/callback`;
@@ -160,16 +191,33 @@ async function fetchGoogleProfile(code: string): Promise<OAuthProfile> {
     headers: { Authorization: `Bearer ${tokenJson.access_token}` },
   });
   if (!profileRes.ok) throw new Error("OAUTH_PROFILE_FAILED");
-  const profile = (await profileRes.json()) as { email?: string; sub?: string };
+  const profile = (await profileRes.json()) as {
+    email?: string;
+    sub?: string;
+    name?: string;
+    given_name?: string;
+    family_name?: string;
+    picture?: string;
+  };
   if (!profile.email || !profile.sub) throw new Error("OAUTH_PROFILE_FAILED");
-  return { email: profile.email.toLowerCase(), subject: profile.sub };
+  return {
+    email: profile.email.toLowerCase(),
+    subject: profile.sub,
+    displayName: resolveDisplayName(profile),
+    pictureUrl: profile.picture?.trim() || null,
+    profileUrl: null,
+  };
 }
 
 async function resolveStubProfile(provider: OAuthProvider): Promise<OAuthProfile> {
   const suffix = createHash("sha256").update(randomBytes(8)).digest("hex").slice(0, 8);
+  const label = provider === "linkedin" ? "LinkedIn" : "Google";
   return {
     email: `${provider}-user-${suffix}@oauth.stub.local`,
     subject: `${provider}-stub-${suffix}`,
+    displayName: `${label} Test User`,
+    pictureUrl: null,
+    profileUrl: provider === "linkedin" ? `https://www.linkedin.com/in/stub-${suffix}` : null,
   };
 }
 
@@ -194,9 +242,23 @@ async function fetchLinkedInProfile(code: string): Promise<OAuthProfile> {
     headers: { Authorization: `Bearer ${tokenJson.access_token}` },
   });
   if (!profileRes.ok) throw new Error("OAUTH_PROFILE_FAILED");
-  const profile = (await profileRes.json()) as { email?: string; sub?: string };
+  const profile = (await profileRes.json()) as {
+    email?: string;
+    sub?: string;
+    name?: string;
+    given_name?: string;
+    family_name?: string;
+    picture?: string;
+  };
   if (!profile.email || !profile.sub) throw new Error("OAUTH_PROFILE_FAILED");
-  return { email: profile.email.toLowerCase(), subject: profile.sub };
+  const profileUrl = await tryFetchLinkedInProfileUrl(tokenJson.access_token);
+  return {
+    email: profile.email.toLowerCase(),
+    subject: profile.sub,
+    displayName: resolveDisplayName(profile),
+    pictureUrl: profile.picture?.trim() || null,
+    profileUrl,
+  };
 }
 
 async function resolveProfile(provider: OAuthProvider, code: string): Promise<OAuthProfile> {
@@ -216,19 +278,29 @@ async function ensureUserForOAuthProfile(
   provider: OAuthProvider,
   profile: OAuthProfile,
 ): Promise<SessionClaims> {
+  const oauthProfileData = {
+    displayName: profile.displayName ?? undefined,
+    pictureUrl: profile.pictureUrl ?? undefined,
+    oauthSubject: profile.subject,
+    oauthProfileUrl: profile.profileUrl ?? undefined,
+    authProvider: provider,
+  };
+
   const existing = await prisma.user.findUnique({ where: { email: profile.email } });
   if (existing) {
-    if (!existing.emailVerifiedAt) {
-      await prisma.user.update({
-        where: { id: existing.id },
-        data: {
-          emailVerifiedAt: new Date(),
-          emailVerificationToken: null,
-          emailVerificationExpiresAt: null,
-          authProvider: provider,
-        },
-      });
-    }
+    await prisma.user.update({
+      where: { id: existing.id },
+      data: {
+        ...oauthProfileData,
+        ...(existing.emailVerifiedAt
+          ? {}
+          : {
+              emailVerifiedAt: new Date(),
+              emailVerificationToken: null,
+              emailVerificationExpiresAt: null,
+            }),
+      },
+    });
     const memberships = await prisma.tenantMembership.findMany({
       where: { userId: existing.id },
     });
@@ -248,6 +320,10 @@ async function ensureUserForOAuthProfile(
     acceptTerms: true,
     authProvider: provider,
     emailVerified: true,
+    displayName: profile.displayName ?? undefined,
+    pictureUrl: profile.pictureUrl ?? undefined,
+    oauthSubject: profile.subject,
+    oauthProfileUrl: profile.profileUrl ?? undefined,
   });
   if (!registered.ok) {
     throw new Error(registered.code ?? "OAUTH_REGISTER_FAILED");

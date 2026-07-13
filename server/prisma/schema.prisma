@@ -31,6 +31,10 @@ model User {
   id                          String              @id @default(uuid())
   email                       String              @unique
   passwordHash                String              @map("password_hash")
+  displayName                 String?             @map("display_name")
+  pictureUrl                  String?             @map("picture_url")
+  oauthSubject                String?             @map("oauth_subject")
+  oauthProfileUrl             String?             @map("oauth_profile_url")
   emailVerifiedAt             DateTime?           @map("email_verified_at")
   emailVerificationToken      String?             @unique @map("email_verification_token")
   emailVerificationExpiresAt  DateTime?           @map("email_verification_expires_at")
