@@ -64,9 +64,9 @@ export function cartHasSafeOrgEligibleItem(
 }
 
 export type OrgReimbursementInput = {
-  organizationName: string;
-  purchaseOrderNumber: string;
-  billingContactEmail: string;
+  organizationName?: string;
+  purchaseOrderNumber?: string;
+  billingContactEmail?: string;
 };
 
 export function validateOrgReimbursement(
@@ -84,16 +84,16 @@ export function validateOrgReimbursement(
     };
   }
 
-  if (!input.organizationName.trim()) {
+  if (!input.organizationName?.trim()) {
     return { code: "ORG_NAME_REQUIRED", message: "Organization name is required" };
   }
-  if (!input.purchaseOrderNumber.trim()) {
+  if (!input.purchaseOrderNumber?.trim()) {
     return {
       code: "PO_NUMBER_REQUIRED",
       message: "Purchase order number is required",
     };
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.billingContactEmail)) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.billingContactEmail ?? "")) {
     return {
       code: "INVALID_BILLING_EMAIL",
       message: "Billing contact email is invalid",
