@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { Role } from "@prisma/client";
 import { prisma } from "../db/client.js";
 import { DEFAULT_REGISTRATION_TENANT_ID } from "../constants/platform.js";
+import { logError } from "../runtime/logger.js";
 import type { SessionClaims } from "./auth-service.js";
 import { issueEmailVerification } from "./email-verification-service.js";
 
@@ -85,7 +86,14 @@ export async function registerUser(input: RegisterInput): Promise<RegisterResult
   const membership = user.memberships[0]!;
 
   if (!verifiedNow) {
-    await issueEmailVerification(user.id, email);
+    void issueEmailVerification(user.id, email).catch((err) => {
+      logError("Verification email failed after registration", {
+        component: "auth",
+        event: "email_verification_failed",
+        userId: user.id,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    });
   }
 
   return {
