@@ -110,10 +110,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
       hasLoadedOnceRef.current = true;
     } catch (err) {
       if (requestId !== requestIdRef.current) return;
-      if (!cached) {
-        setError(err instanceof ApiRequestError ? err.message : "Could not load catalog.");
-        setOfferings([]);
-      }
+      setError(err instanceof ApiRequestError ? err.message : "Could not load catalog.");
     } finally {
       if (requestId === requestIdRef.current) {
         setLoading(false);
@@ -124,7 +121,6 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
 
   useEffect(() => {
     hasLoadedOnceRef.current = false;
-    requestIdRef.current += 1;
     const cached = peekCatalogCache(categoryPath, searchKey, geo, currency);
     if (cached) {
       setOfferings(cached.offerings);
