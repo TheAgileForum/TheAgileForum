@@ -19,6 +19,7 @@ import { SessionCurrencySelector } from "../components/forum/SessionCurrencySele
 import { TrustFooter } from "../components/forum/TrustFooter";
 import { EmailVerificationBanner } from "../components/EmailVerificationBanner";
 import { useAuth } from "../contexts/AuthContext";
+import { userDisplayLabel } from "../lib/user-display";
 import { useDiagnosis } from "../contexts/DiagnosisContext";
 
 const CATALOG_PATHS = ["/trainings", "/certifications", "/services", "/cart"];
@@ -127,7 +128,7 @@ export function ForumLayout() {
           {user ? (
             <>
               <Typography variant="caption" sx={{ display: { xs: "none", sm: "block" }, color: "rgba(255,255,255,0.65)" }}>
-                {user.email}
+                {userDisplayLabel(user)}
               </Typography>
               <Button size="small" onClick={() => void logout()} sx={{ color: "#fff", minWidth: { xs: 0 }, px: { xs: 1, sm: 1.5 } }}>
                 Log out

@@ -11,6 +11,12 @@ export type AuthUser = {
 
   email: string;
 
+  displayName: string | null;
+
+  pictureUrl: string | null;
+
+  oauthProfileUrl: string | null;
+
   role: string;
 
   tenantId: string | null;
@@ -72,6 +78,12 @@ function normalizeUser(raw: MeResponse["user"], requireEmailVerification?: boole
   return {
 
     ...raw,
+
+    displayName: raw.displayName ?? null,
+
+    pictureUrl: raw.pictureUrl ?? null,
+
+    oauthProfileUrl: raw.oauthProfileUrl ?? null,
 
     emailVerified: raw.emailVerified === true,
 

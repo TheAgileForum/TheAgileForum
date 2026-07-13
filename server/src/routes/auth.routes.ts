@@ -23,12 +23,22 @@ import {
 } from "../services/email-verification-service.js";
 
 function serializeAuthUser(
-  user: { id: string; email: string; emailVerifiedAt: Date | null },
+  user: {
+    id: string;
+    email: string;
+    emailVerifiedAt: Date | null;
+    displayName?: string | null;
+    pictureUrl?: string | null;
+    oauthProfileUrl?: string | null;
+  },
   session: { role: string; tenantId: string | null; tenantIds: string[] },
 ) {
   return {
     id: user.id,
     email: user.email,
+    displayName: user.displayName ?? null,
+    pictureUrl: user.pictureUrl ?? null,
+    oauthProfileUrl: user.oauthProfileUrl ?? null,
     role: session.role,
     tenantId: session.tenantId,
     tenantIds: session.tenantIds,
@@ -83,7 +93,14 @@ authRouter.post(
 
     const user = await prisma.user.findUnique({
       where: { id: result.userId },
-      select: { id: true, email: true, emailVerifiedAt: true },
+      select: {
+        id: true,
+        email: true,
+        emailVerifiedAt: true,
+        displayName: true,
+        pictureUrl: true,
+        oauthProfileUrl: true,
+      },
     });
 
     return res.status(201).json({
@@ -178,7 +195,14 @@ authRouter.post("/login", sensitiveLimiter, withBodyValidation(loginBody), async
 
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
-    select: { id: true, email: true, emailVerifiedAt: true },
+    select: {
+      id: true,
+      email: true,
+      emailVerifiedAt: true,
+      displayName: true,
+      pictureUrl: true,
+      oauthProfileUrl: true,
+    },
   });
 
   return res.json({
@@ -226,7 +250,14 @@ authRouter.post("/logout", (_req, res) => {
 authRouter.get("/me", requireAuth, async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: req.auth!.userId },
-    select: { id: true, email: true, emailVerifiedAt: true },
+    select: {
+      id: true,
+      email: true,
+      emailVerifiedAt: true,
+      displayName: true,
+      pictureUrl: true,
+      oauthProfileUrl: true,
+    },
   });
   return res.json({
     user: serializeAuthUser(user!, req.auth!),

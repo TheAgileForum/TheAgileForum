@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import { Outlet, Link as RouterLink } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
+import { userDisplayLabel } from "../lib/user-display";
 
 export function CustomerLayout() {
   const { itemCount } = useCart();
@@ -33,7 +34,7 @@ export function CustomerLayout() {
           ) : null}
           {user ? (
             <Typography variant="caption" sx={{ mr: 1, display: { xs: "none", sm: "block" } }}>
-              {user.email}
+              {userDisplayLabel(user)}
             </Typography>
           ) : null}
           <Button component={RouterLink} to="/demo/menu" color="inherit" size="small">

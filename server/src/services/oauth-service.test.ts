@@ -121,7 +121,13 @@ describe("oauth-service", () => {
           json: async () => ({
             sub: "linkedin-sub-123",
             email: "learner@example.com",
+            name: "Jane Learner",
+            picture: "https://media.licdn.com/dms/image/example.jpg",
           }),
+        })
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 403,
         });
 
       prismaMock.user.findUnique.mockResolvedValue({
@@ -129,6 +135,7 @@ describe("oauth-service", () => {
         email: "learner@example.com",
         emailVerifiedAt: new Date(),
       });
+      prismaMock.user.update.mockResolvedValue({});
       prismaMock.tenantMembership.findMany.mockResolvedValue([
         { tenantId: "tenant-1", role: Role.CUSTOMER },
       ]);
@@ -141,14 +148,24 @@ describe("oauth-service", () => {
       expect(result.token).toBeTruthy();
       expect(result.returnUrl).toContain("oauth=success");
 
-      expect(fetchMock).toHaveBeenCalledTimes(2);
-      const [tokenCall, profileCall] = fetchMock.mock.calls;
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+      const [tokenCall, profileCall, vanityCall] = fetchMock.mock.calls;
       expect(tokenCall[0]).toBe("https://www.linkedin.com/oauth/v2/accessToken");
       expect(String(tokenCall[1]?.body)).toContain("grant_type=authorization_code");
       expect(String(tokenCall[1]?.body)).toContain("code=auth-code-xyz");
       expect(profileCall[0]).toBe("https://api.linkedin.com/v2/userinfo");
       expect(profileCall[1]?.headers).toEqual({
         Authorization: "Bearer linkedin-access-token",
+      });
+      expect(vanityCall[0]).toBe("https://api.linkedin.com/v2/me?projection=(vanityName)");
+      expect(prismaMock.user.update).toHaveBeenCalledWith({
+        where: { id: "user-1" },
+        data: expect.objectContaining({
+          displayName: "Jane Learner",
+          oauthSubject: "linkedin-sub-123",
+          pictureUrl: "https://media.licdn.com/dms/image/example.jpg",
+          authProvider: "linkedin",
+        }),
       });
     });
 
