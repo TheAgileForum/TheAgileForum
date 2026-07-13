@@ -9,6 +9,7 @@ export type AnalyticsEvent =
   | "home_webinar_register_click"
   | "home_webinar_promo_click"
   | "home_webinar_promo_webinars_link"
+  | "home_career_outcomes_testimonials_click"
   | "diagnosis_resume_upload_success"
   | "diagnosis_resume_upload_failure"
   | "diagnosis_analysis_timeout"
