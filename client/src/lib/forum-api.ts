@@ -1,4 +1,4 @@
-import { apiFetch, catalogFetchTimeoutMs, isSameOriginApi, CHECKOUT_START_TIMEOUT_MS } from "./api";
+import { apiFetch, catalogFetchTimeoutMs, CHECKOUT_START_TIMEOUT_MS } from "./api";
 
 const SESSION_KEY = "af_diagnosis_session_id";
 
@@ -473,7 +473,7 @@ export async function listCatalogCategory(
   const allowRetry = options?.allowRetry ?? true;
   return apiFetch<CatalogListResponse>(`/api/v1/catalog/${path}${join}`, {
     timeoutMs: catalogFetchTimeoutMs(),
-    retries: allowRetry && !isSameOriginApi() ? 1 : 0,
+    retries: allowRetry ? 1 : 0,
   });
 }
 

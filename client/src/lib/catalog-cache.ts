@@ -40,13 +40,17 @@ function storageKey(key: string): string {
   return `${STORAGE_PREFIX}${key}`;
 }
 
+function hasOfferings(data: CatalogListResponse | undefined): boolean {
+  return Array.isArray(data?.offerings) && data.offerings.length > 0;
+}
+
 function readPersistedEntry(key: string): CacheEntry | null {
   if (typeof sessionStorage === "undefined") return null;
   try {
     const raw = sessionStorage.getItem(storageKey(key));
     if (!raw) return null;
     const parsed = JSON.parse(raw) as CacheEntry;
-    if (!parsed?.data?.offerings || typeof parsed.at !== "number") return null;
+    if (!hasOfferings(parsed?.data) || typeof parsed.at !== "number") return null;
     if (Date.now() - parsed.at > PERSIST_STALE_MS) {
       sessionStorage.removeItem(storageKey(key));
       return null;
@@ -100,6 +104,38 @@ export function peekCatalogCache(
   return readAnyEntry(catalogCacheKey(categoryPath, searchKey, geo, currency))?.data ?? null;
 }
 
+/** Stale catalog list for same category/filters regardless of geo/currency (pricing flip fallback). */
+export function peekCatalogCacheAnyPricing(
+  categoryPath: CatalogCategoryPath,
+  searchKey: string,
+): CatalogListResponse | null {
+  const prefix = `${categoryPath}|${searchKey}|`;
+  let newest: CacheEntry | null = null;
+
+  for (const [key, entry] of memory.entries()) {
+    if (!key.startsWith(prefix) || !hasOfferings(entry.data)) continue;
+    if (!newest || entry.at > newest.at) newest = entry;
+  }
+
+  if (typeof sessionStorage !== "undefined") {
+    try {
+      for (let i = 0; i < sessionStorage.length; i += 1) {
+        const storageItemKey = sessionStorage.key(i);
+        if (!storageItemKey?.startsWith(STORAGE_PREFIX)) continue;
+        const cacheKey = storageItemKey.slice(STORAGE_PREFIX.length);
+        if (!cacheKey.startsWith(prefix)) continue;
+        const entry = readPersistedEntry(cacheKey);
+        if (!entry) continue;
+        if (!newest || entry.at > newest.at) newest = entry;
+      }
+    } catch {
+      // Private mode / quota — memory scan above is enough.
+    }
+  }
+
+  return newest?.data ?? null;
+}
+
 export function hasCatalogCache(
   categoryPath: CatalogCategoryPath,
   searchKey: string,
@@ -137,15 +173,19 @@ export async function fetchCatalogCategoryCached(
 
   const stale = readAnyEntry(key);
   const query = filtersToApiQuery(parseCatalogFilters(searchKey));
+  const anyPricingStale = peekCatalogCacheAnyPricing(categoryPath, searchKey);
   const promise = listCatalogCategory(categoryPath, query, { geo, currency }, {
-    allowRetry: !stale,
+    allowRetry: !stale && !anyPricingStale,
   }).then((res) => {
-    writeCatalogCache(categoryPath, searchKey, geo, currency, res);
+    if (hasOfferings(res)) {
+      writeCatalogCache(categoryPath, searchKey, geo, currency, res);
+    }
     inflight.delete(key);
     return res;
   }).catch((err) => {
     inflight.delete(key);
     if (stale) return stale.data;
+    if (anyPricingStale) return anyPricingStale;
     throw err;
   });
   inflight.set(key, promise);
