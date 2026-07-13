@@ -51,9 +51,13 @@ type AuthContextValue = {
 
   loginError: string | null;
 
-  login: (email: string, password: string) => Promise<void>;
+  loginErrorCode: string | null;
 
-  register: (email: string, password: string) => Promise<void>;
+  clearLoginError: () => void;
+
+  login: (email: string, password: string) => Promise<boolean>;
+
+  register: (email: string, password: string) => Promise<boolean>;
 
   logout: () => Promise<void>;
 
@@ -104,6 +108,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const [loginError, setLoginError] = useState<string | null>(null);
+
+  const [loginErrorCode, setLoginErrorCode] = useState<string | null>(null);
+
+
+
+  const clearLoginError = useCallback(() => {
+
+    setLoginError(null);
+
+    setLoginErrorCode(null);
+
+  }, []);
 
 
 
@@ -157,9 +173,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
 
     setLoginError(null);
+
+    setLoginErrorCode(null);
 
     setDemoMode(false);
 
@@ -187,21 +205,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const msg = typeof data?.error?.message === "string" ? data.error.message : "Login failed";
 
-      setLoginError(`${code}: ${msg}`);
+      setLoginErrorCode(code);
 
-      return;
+      setLoginError(msg);
+
+      return false;
 
     }
 
     await refreshMe();
 
+    return true;
+
   }, [refreshMe]);
 
 
 
-  const register = useCallback(async (email: string, password: string) => {
+  const register = useCallback(async (email: string, password: string): Promise<boolean> => {
 
     setLoginError(null);
+
+    setLoginErrorCode(null);
 
     setDemoMode(false);
 
@@ -239,13 +263,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const msg = typeof data?.error?.message === "string" ? data.error.message : "Registration failed";
 
-      setLoginError(`${code}: ${msg}`);
+      setLoginErrorCode(code);
 
-      return;
+      setLoginError(msg);
+
+      return false;
 
     }
 
     await refreshMe();
+
+    return true;
 
   }, [refreshMe]);
 
@@ -275,9 +303,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setDemoMode(false);
 
-    setLoginError(null);
+    clearLoginError();
 
-  }, []);
+  }, [clearLoginError]);
 
 
 
@@ -287,9 +315,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setUser(null);
 
-    setLoginError(null);
+    clearLoginError();
 
-  }, []);
+  }, [clearLoginError]);
 
 
 
@@ -312,6 +340,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loading,
 
       loginError,
+
+      loginErrorCode,
+
+      clearLoginError,
 
       login,
 
@@ -338,6 +370,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loading,
 
       loginError,
+
+      loginErrorCode,
+
+      clearLoginError,
 
       login,
 

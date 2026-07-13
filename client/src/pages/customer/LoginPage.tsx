@@ -43,7 +43,7 @@ const OAUTH_PROVIDERS = [
 
 export function LoginPage() {
 
-  const { login, register, refreshMe, loginError, user, loading, enterDemoBrowse } = useAuth();
+  const { login, register, refreshMe, loginError, loginErrorCode, clearLoginError, user, loading, enterDemoBrowse } = useAuth();
 
   const [mode, setMode] = useState<"login" | "register">("login");
 
@@ -145,6 +145,18 @@ export function LoginPage() {
 
 
 
+  function switchMode(next: "login" | "register") {
+
+    setMode(next);
+
+    setStatusMessage(null);
+
+    clearLoginError();
+
+  }
+
+
+
   async function onSubmit(e: FormEvent) {
 
     e.preventDefault();
@@ -152,6 +164,8 @@ export function LoginPage() {
     setBusy(true);
 
     setStatusMessage(null);
+
+    clearLoginError();
 
     try {
 
@@ -161,9 +175,13 @@ export function LoginPage() {
 
       } else {
 
-        await register(email, password);
+        const registered = await register(email, password);
 
-        setStatusMessage("Account created. Check your email for a verification link.");
+        if (registered) {
+
+          setStatusMessage("Account created. Check your email for a verification link.");
+
+        }
 
       }
 
@@ -216,7 +234,7 @@ export function LoginPage() {
 
         value={mode}
 
-        onChange={(_, v: "login" | "register") => setMode(v)}
+        onChange={(_, v: "login" | "register") => switchMode(v)}
 
         variant="fullWidth"
 
@@ -310,11 +328,35 @@ export function LoginPage() {
 
                   {loginError}
 
+                  {loginErrorCode === "EMAIL_ALREADY_REGISTERED" ? (
+
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+
+                      Already have an account?{" "}
+
+                      <Button
+
+                        variant="text"
+
+                        size="small"
+
+                        sx={{ p: 0, minWidth: 0, verticalAlign: "baseline", textTransform: "none" }}
+
+                        onClick={() => switchMode("login")}
+
+                      >
+
+                        Sign in instead
+
+                      </Button>
+
+                    </Typography>
+
+                  ) : null}
+
                 </Alert>
 
-              ) : null}
-
-              {statusMessage ? (
+              ) : statusMessage ? (
 
                 <Alert severity={statusMessage.includes("failed") ? "warning" : "info"} role="status">
 
