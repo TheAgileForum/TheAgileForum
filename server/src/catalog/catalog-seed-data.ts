@@ -239,19 +239,20 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
     roleTags: ["scrum_master", "product_owner", "learner"],
     deliveryMode: "live",
     slug: "mock-interview-series-with-interview-preparation",
-    certificationName: "5 mock interviews · 7.5 hrs",
+    certificationName: "5 mock interviews",
     durationLabel: "7.5 hrs",
     summary:
       "Ace your Scrum / Agile project manager interviews with 100+ situational questions and suggested answers. A series of 5 mock interviews to help you excel at each aspect of the interview process.",
     includes: [
+      "Roles covered: SCRUM MASTER | AGILE PROJECT MANAGER | PRODUCT OWNER | BA | AGILE COACH",
       "100+ situational questions with real-world scenarios",
       "Discussion on each question to refine answers from your resume and experience",
       "Personalized feedback to build confidence for live interviews",
       "Self-introduction coaching — impactful opening and closing statements",
       "Guidance on agile vocabulary and how to break down any problem",
-      "Roles covered: Scrum Master, Agile PM, Product Owner, BA, Agile Coach",
     ],
     learningOutcomes: [
+      "Prepare for SCRUM MASTER | AGILE PROJECT MANAGER | PRODUCT OWNER | BA | AGILE COACH interviews",
       "Answer situational Scrum and Agile PM interview questions with structure",
       "Tailor responses to your resume and prior project experience",
       "Deliver a confident self-introduction with strong open and close",

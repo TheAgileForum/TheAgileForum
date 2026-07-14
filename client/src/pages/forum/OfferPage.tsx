@@ -147,6 +147,18 @@ export function OfferPage() {
   const inclusions = offering.includes?.length ? offering.includes : DEFAULT_INCLUSIONS;
   const scheduleOptions = scheduleOptionsFor(offering);
   const extras = getOfferPageExtras(offering.code, offering.certificationName);
+  const durationChipLabel = offering.durationLabel
+    ? offering.durationLabel
+    : offering.durationHours
+      ? `${offering.durationHours} hrs`
+      : null;
+  const showDurationChip =
+    Boolean(durationChipLabel) &&
+    !(
+      offering.certificationName &&
+      durationChipLabel &&
+      offering.certificationName.toLowerCase().includes(durationChipLabel.toLowerCase())
+    );
 
   if (extras) {
     return (
@@ -196,10 +208,8 @@ export function OfferPage() {
         {offering.certificationName ? (
           <Chip label={offering.certificationName} size="small" color="primary" variant="outlined" />
         ) : null}
-        {offering.durationLabel ? (
-          <Chip label={offering.durationLabel} size="small" variant="outlined" />
-        ) : offering.durationHours ? (
-          <Chip label={`${offering.durationHours} hrs`} size="small" variant="outlined" />
+        {showDurationChip && durationChipLabel ? (
+          <Chip label={durationChipLabel} size="small" variant="outlined" />
         ) : null}
         {offering.scheduleBound ? <Chip label="Schedule required" size="small" color="info" variant="outlined" /> : null}
       </Stack>
