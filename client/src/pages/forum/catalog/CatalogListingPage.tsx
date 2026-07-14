@@ -93,7 +93,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { addItem } = useForumCart();
-  const { currency, geo } = usePricing();
+  const { currency, geo, ready: pricingReady } = usePricing();
   const [offerings, setOfferings] = useState<CatalogOffering[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -108,6 +108,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
   const filters = parseCatalogFilters(searchKey);
 
   const load = useCallback(async () => {
+    if (!pricingReady) return;
     const requestId = ++requestIdRef.current;
     const cached = resolveInitialCache(categoryPath, searchKey, geo, currency);
     const background = hasLoadedOnceRef.current || Boolean(cached);
@@ -145,34 +146,42 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
         setRefreshing(false);
       }
     }
-  }, [categoryPath, searchKey, geo, currency]);
+  }, [categoryPath, searchKey, geo, currency, pricingReady]);
 
   useEffect(() => {
     hasLoadedOnceRef.current = false;
+    viewedRef.current = false;
+  }, [categoryPath]);
+
+  useEffect(() => {
+    if (!pricingReady) {
+      setLoading(true);
+      return;
+    }
     const cached = resolveInitialCache(categoryPath, searchKey, geo, currency);
     if (cached) {
       setOfferings(cached.offerings);
       setFacets(cached.facets ?? null);
       setLoading(false);
       hasLoadedOnceRef.current = true;
-    } else {
+    } else if (!hasLoadedOnceRef.current) {
       setOfferings([]);
       setFacets(null);
       setLoading(true);
     }
     setRefreshing(false);
     setError(null);
-    viewedRef.current = false;
-  }, [categoryPath, searchKey, geo, currency]);
+  }, [categoryPath, searchKey, geo, currency, pricingReady]);
 
   useEffect(() => {
+    if (!pricingReady) return;
     setCommerceJourneyOrigin("catalog");
     void load();
     if (!viewedRef.current) {
       viewedRef.current = true;
       trackEvent("catalog_list_viewed", { category: categoryPath });
     }
-  }, [load, categoryPath]);
+  }, [load, categoryPath, pricingReady]);
 
   function applyFilters(next: typeof filters) {
     trackEvent("catalog_filter_applied", { category: categoryPath });

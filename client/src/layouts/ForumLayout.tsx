@@ -19,6 +19,7 @@ import { SessionCurrencySelector } from "../components/forum/SessionCurrencySele
 import { TrustFooter } from "../components/forum/TrustFooter";
 import { EmailVerificationBanner } from "../components/EmailVerificationBanner";
 import { useAuth } from "../contexts/AuthContext";
+import { usePricing } from "../contexts/PricingContext";
 import { userDisplayLabel } from "../lib/user-display";
 import { prefetchCatalogCategory, prefetchDefaultCatalogLists } from "../lib/catalog-cache";
 import { useDiagnosis } from "../contexts/DiagnosisContext";
@@ -57,13 +58,15 @@ const navButtonSx = {
 
 export function ForumLayout() {
   const { user, logout } = useAuth();
+  const { ready: pricingReady } = usePricing();
   const { prefetchSession } = useDiagnosis();
   const { pathname } = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
+    if (!pricingReady) return;
     prefetchDefaultCatalogLists();
-  }, []);
+  }, [pricingReady]);
   const isHome = pathname === "/";
   const showCatalogNav =
     CATALOG_PATHS.some((p) => pathname.startsWith(p)) || pathname.startsWith("/offers/");
