@@ -19,174 +19,186 @@ const STAT_BADGES = [
     id: "career-advanced",
     value: "1000+",
     label: "Career Advanced",
-    mobileValue: "1000+",
-    mobileLabel: "Careers",
     icon: EmojiEventsIcon,
-    position: { top: { xs: "3%", md: "6%" }, left: { xs: "0%", md: "4%" } },
+    position: { top: "6%", left: "4%" },
   },
   {
     id: "max-hike",
     value: "UPTO 175%",
     label: "Salary Hike",
-    mobileValue: "175%",
-    mobileLabel: "Max hike",
     icon: RocketLaunchIcon,
-    position: { top: { xs: "3%", md: "6%" }, right: { xs: "0%", md: "4%" } },
+    position: { top: "6%", right: "4%" },
   },
   {
     id: "avg-hike",
     value: "65%",
     label: "Avg Salary Hike",
-    mobileValue: "65%",
-    mobileLabel: "Avg hike",
     icon: ShowChartIcon,
-    position: { bottom: { xs: "14%", md: "14%" }, left: { xs: "0%", md: "4%" } },
+    position: { bottom: "14%", left: "4%" },
   },
   {
     id: "pass-rate",
     value: "100%",
     label: "Passing Success Rate",
-    mobileValue: "100%",
-    mobileLabel: "Pass rate",
     icon: VerifiedIcon,
-    position: { bottom: { xs: "14%", md: "14%" }, right: { xs: "0%", md: "4%" } },
+    position: { bottom: "14%", right: "4%" },
   },
 ] as const;
 
-function WavyStatBadge({
+function BadgeDisc({
   value,
   label,
-  mobileValue,
-  mobileLabel,
   Icon,
-  position,
+  size,
 }: {
   value: string;
   label: string;
-  mobileValue: string;
-  mobileLabel: string;
   Icon: typeof EmojiEventsIcon;
-  position: Record<string, object>;
+  size: "overlay" | "grid";
 }) {
+  const isGrid = size === "grid";
+
   return (
     <Box
       sx={{
-        position: "absolute",
-        ...position,
-        zIndex: 2,
-        // Fixed mobile diameter — avoid maxWidth % shrinking the circle under the type
-        width: { xs: 92, sm: 118, md: 148 },
-        maxWidth: { xs: 92, sm: "42%" },
-        textAlign: "center",
-        pointerEvents: "none",
+        position: "relative",
+        width: "100%",
+        aspectRatio: "1",
+        display: "grid",
+        placeItems: "center",
+        color: "#fff",
+        overflow: "visible",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          inset: 0,
+          borderRadius: "50%",
+          background: `radial-gradient(circle at 30% 25%, rgba(255,255,255,0.14), transparent 55%),
+            linear-gradient(145deg, #1a2438 0%, ${INK} 55%, #050a12 100%)`,
+          boxShadow: "0 12px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)",
+        },
+        "&::after": {
+          content: '""',
+          position: "absolute",
+          inset: "-6%",
+          borderRadius: "50%",
+          background:
+            "repeating-conic-gradient(from 0deg, rgba(15,159,143,0.35) 0deg 8deg, transparent 8deg 16deg)",
+          opacity: 0.45,
+          filter: "blur(0.5px)",
+        },
       }}
     >
       <Box
         sx={{
           position: "relative",
+          zIndex: 1,
           width: "100%",
-          aspectRatio: "1",
-          display: "grid",
-          placeItems: "center",
-          color: "#fff",
-          overflow: "visible",
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            inset: 0,
-            borderRadius: "50%",
-            background: `radial-gradient(circle at 30% 25%, rgba(255,255,255,0.14), transparent 55%),
-              linear-gradient(145deg, #1a2438 0%, ${INK} 55%, #050a12 100%)`,
-            boxShadow: "0 12px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)",
-          },
-          "&::after": {
-            content: '""',
-            position: "absolute",
-            inset: "-6%",
-            borderRadius: "50%",
-            background:
-              "repeating-conic-gradient(from 0deg, rgba(15,159,143,0.35) 0deg 8deg, transparent 8deg 16deg)",
-            opacity: 0.45,
-            filter: "blur(0.5px)",
-          },
+          px: isGrid ? 1 : { sm: 1.1, md: 1.25 },
+          boxSizing: "border-box",
+          minWidth: 0,
+          textAlign: "center",
         }}
       >
-        <Box
+        <Icon
           sx={{
-            position: "relative",
-            zIndex: 1,
-            width: "100%",
-            px: { xs: 1.25, sm: 1.1, md: 1.25 },
-            boxSizing: "border-box",
-            minWidth: 0,
+            fontSize: isGrid ? 18 : { sm: 22, md: 26 },
+            color: "#f5c842",
+            mb: isGrid ? 0.25 : 0.35,
+          }}
+          aria-hidden
+        />
+        <Typography
+          sx={{
+            m: 0,
+            fontWeight: 800,
+            fontSize: isGrid ? "0.62rem" : { sm: "0.68rem", md: "0.78rem" },
+            letterSpacing: "0.03em",
+            lineHeight: 1.15,
+            textTransform: "uppercase",
           }}
         >
-          <Icon
-            sx={{ fontSize: { xs: 14, sm: 22, md: 26 }, color: "#f5c842", mb: { xs: 0.15, sm: 0.35 } }}
-            aria-hidden
-          />
-          {/* Mobile-short copy */}
-          <Typography
-            sx={{
-              display: { xs: "block", sm: "none" },
-              m: 0,
-              fontWeight: 800,
-              fontSize: "0.5rem",
-              letterSpacing: "0.01em",
-              lineHeight: 1.1,
-              textTransform: "uppercase",
-              whiteSpace: "normal",
-              wordBreak: "keep-all",
-            }}
-          >
-            {mobileValue}
-          </Typography>
-          <Typography
-            sx={{
-              display: { xs: "block", sm: "none" },
-              m: 0,
-              mt: 0.15,
-              fontSize: "0.42rem",
-              letterSpacing: "0.02em",
-              textTransform: "uppercase",
-              color: "rgba(255,255,255,0.72)",
-              lineHeight: 1.15,
-              whiteSpace: "normal",
-              wordBreak: "keep-all",
-            }}
-          >
-            {mobileLabel}
-          </Typography>
-          {/* sm+ full copy */}
-          <Typography
-            sx={{
-              display: { xs: "none", sm: "block" },
-              m: 0,
-              fontWeight: 800,
-              fontSize: { sm: "0.68rem", md: "0.78rem" },
-              letterSpacing: "0.03em",
-              lineHeight: 1.15,
-              textTransform: "uppercase",
-            }}
-          >
-            {value}
-          </Typography>
-          <Typography
-            sx={{
-              display: { xs: "none", sm: "block" },
-              m: 0,
-              mt: 0.25,
-              fontSize: { sm: "0.55rem", md: "0.62rem" },
-              letterSpacing: "0.04em",
-              textTransform: "uppercase",
-              color: "rgba(255,255,255,0.72)",
-              lineHeight: 1.2,
-            }}
-          >
-            {label}
-          </Typography>
-        </Box>
+          {value}
+        </Typography>
+        <Typography
+          sx={{
+            m: 0,
+            mt: isGrid ? 0.2 : 0.25,
+            fontSize: isGrid ? "0.5rem" : { sm: "0.55rem", md: "0.62rem" },
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+            color: "rgba(255,255,255,0.72)",
+            lineHeight: 1.2,
+          }}
+        >
+          {label}
+        </Typography>
       </Box>
+    </Box>
+  );
+}
+
+/** Desktop/tablet overlays — hidden below `md` so they never collide with the JOB OFFER card. */
+function OverlayStatBadge({
+  value,
+  label,
+  Icon,
+  position,
+}: {
+  value: string;
+  label: string;
+  Icon: typeof EmojiEventsIcon;
+  position: Record<string, string>;
+}) {
+  return (
+    <Box
+      sx={{
+        display: { xs: "none", md: "block" },
+        position: "absolute",
+        ...position,
+        zIndex: 2,
+        width: { md: 148 },
+        maxWidth: "42%",
+        pointerEvents: "none",
+      }}
+    >
+      <BadgeDisc value={value} label={label} Icon={Icon} size="overlay" />
+    </Box>
+  );
+}
+
+/** Mobile-only compact metric strip under the hero image (no absolute overlays). */
+function MobileStatsStrip() {
+  return (
+    <Box
+      component="ul"
+      aria-label="Career outcome statistics"
+      sx={{
+        display: { xs: "grid", md: "none" },
+        gridTemplateColumns: "1fr 1fr",
+        gap: { xs: 1.5, sm: 2 },
+        listStyle: "none",
+        m: 0,
+        mt: { xs: 2, sm: 2.5 },
+        p: 0,
+        maxWidth: 360,
+        mx: "auto",
+        width: "100%",
+      }}
+    >
+      {STAT_BADGES.map(({ id, value, label, icon: Icon }) => (
+        <Box
+          component="li"
+          key={id}
+          sx={{
+            width: "100%",
+            maxWidth: { xs: 88, sm: 100 },
+            justifySelf: "center",
+          }}
+        >
+          <BadgeDisc value={value} label={label} Icon={Icon} size="grid" />
+        </Box>
+      ))}
     </Box>
   );
 }
@@ -241,13 +253,12 @@ export function CareerOutcomesSection() {
           maxWidth: 980,
           mx: "auto",
           mb: { xs: 2.5, md: 3 },
-          overflow: "visible",
-          // Keep absolute badges from causing horizontal page scroll on narrow screens
+          overflow: { xs: "hidden", md: "visible" },
           width: "100%",
         }}
       >
         {STAT_BADGES.map(({ icon: Icon, ...badge }) => (
-          <WavyStatBadge key={badge.id} Icon={Icon} {...badge} />
+          <OverlayStatBadge key={badge.id} Icon={Icon} {...badge} />
         ))}
 
         <Box
@@ -263,6 +274,8 @@ export function CareerOutcomesSection() {
             boxShadow: "0 20px 50px rgba(10, 22, 40, 0.18)",
           }}
         />
+
+        <MobileStatsStrip />
       </Box>
 
       <Box
