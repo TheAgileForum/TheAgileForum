@@ -1,3 +1,4 @@
+import { wakeApi } from "./api";
 import {
   filtersToApiQuery,
   parseCatalogFilters,
@@ -16,7 +17,7 @@ import {
 /** In-memory freshness window for deduped fetches. */
 const MEMORY_TTL_MS = 60_000;
 /** Stale sessionStorage entries may render instantly while revalidating. */
-const PERSIST_STALE_MS = 30 * 60_000;
+const PERSIST_STALE_MS = 2 * 60 * 60_000;
 const STORAGE_PREFIX = "af_catalog_cache_v1:";
 
 type CacheEntry = {
@@ -174,8 +175,14 @@ export async function fetchCatalogCategoryCached(
   const stale = readAnyEntry(key);
   const query = filtersToApiQuery(parseCatalogFilters(searchKey));
   const anyPricingStale = peekCatalogCacheAnyPricing(categoryPath, searchKey);
+  const hasFallback = Boolean(stale || anyPricingStale);
+
+  // Wake Render in parallel with the first uncached load (and quietly on revalidate).
+  void wakeApi();
+
   const promise = listCatalogCategory(categoryPath, query, { geo, currency }, {
-    allowRetry: !stale && !anyPricingStale,
+    // Uncached: full cold-start budget. Cached: still retry once so a single 5xx doesn't stick.
+    retries: hasFallback ? 1 : 2,
   }).then((res) => {
     if (hasOfferings(res)) {
       writeCatalogCache(categoryPath, searchKey, geo, currency, res);
@@ -203,6 +210,7 @@ export function prefetchCatalogCategory(categoryPath: CatalogCategoryPath) {
 
 /** Prefetch default catalog lists as soon as the forum shell boots. */
 export function prefetchDefaultCatalogLists() {
+  void wakeApi();
   const categories: CatalogCategoryPath[] = ["trainings", "certifications", "services"];
   for (const category of categories) {
     prefetchCatalogCategory(category);

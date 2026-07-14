@@ -16,6 +16,7 @@ import { trackEvent } from "../../../lib/analytics";
 import {
   fetchCatalogCategoryCached,
   peekCatalogCache,
+  peekCatalogCacheAnyPricing,
 } from "../../../lib/catalog-cache";
 import {
   filtersToSearchParams,
@@ -37,6 +38,23 @@ const SKELETON_COUNT = 6;
 type CatalogListingPageProps = {
   categoryPath: CatalogCategoryPath;
 };
+
+type CatalogLoadError = {
+  message: string;
+  retryable: boolean;
+};
+
+function resolveInitialCache(
+  categoryPath: CatalogCategoryPath,
+  searchKey: string,
+  geo: string,
+  currency: string,
+) {
+  return (
+    peekCatalogCache(categoryPath, searchKey, geo, currency) ??
+    peekCatalogCacheAnyPricing(categoryPath, searchKey)
+  );
+}
 
 function CatalogListingSkeleton() {
   return (
@@ -79,7 +97,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
   const [offerings, setOfferings] = useState<CatalogOffering[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<CatalogLoadError | null>(null);
   const [addingCode, setAddingCode] = useState<string | null>(null);
   const [facets, setFacets] = useState<CatalogFacets | null>(null);
   const hasLoadedOnceRef = useRef(false);
@@ -91,7 +109,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
 
   const load = useCallback(async () => {
     const requestId = ++requestIdRef.current;
-    const cached = peekCatalogCache(categoryPath, searchKey, geo, currency);
+    const cached = resolveInitialCache(categoryPath, searchKey, geo, currency);
     const background = hasLoadedOnceRef.current || Boolean(cached);
     if (cached && requestId === requestIdRef.current) {
       setOfferings(cached.offerings);
@@ -113,7 +131,14 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
       hasLoadedOnceRef.current = true;
     } catch (err) {
       if (requestId !== requestIdRef.current) return;
-      setError(err instanceof ApiRequestError ? err.message : "Could not load catalog.");
+      if (err instanceof ApiRequestError) {
+        setError({
+          message: err.message,
+          retryable: err.retryable || err.code === "REQUEST_TIMEOUT" || err.code === "NETWORK_ERROR",
+        });
+      } else {
+        setError({ message: "Could not load catalog.", retryable: true });
+      }
     } finally {
       if (requestId === requestIdRef.current) {
         setLoading(false);
@@ -124,7 +149,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
 
   useEffect(() => {
     hasLoadedOnceRef.current = false;
-    const cached = peekCatalogCache(categoryPath, searchKey, geo, currency);
+    const cached = resolveInitialCache(categoryPath, searchKey, geo, currency);
     if (cached) {
       setOfferings(cached.offerings);
       setFacets(cached.facets ?? null);
@@ -138,16 +163,6 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
     setRefreshing(false);
     setError(null);
     viewedRef.current = false;
-  }, [categoryPath, searchKey]);
-
-  useEffect(() => {
-    const cached = peekCatalogCache(categoryPath, searchKey, geo, currency);
-    if (cached) {
-      setOfferings(cached.offerings);
-      setFacets(cached.facets ?? null);
-      setLoading(false);
-      hasLoadedOnceRef.current = true;
-    }
   }, [categoryPath, searchKey, geo, currency]);
 
   useEffect(() => {
@@ -185,7 +200,12 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
   const showCertBody = categoryPath === "certifications";
   const showSkeleton = loading && offerings.length === 0;
   const showEmptyState = !loading && !error && offerings.length === 0;
-  const resultCountLabel = loading && offerings.length === 0 ? "…" : String(offerings.length);
+  const resultCountLabel =
+    error && offerings.length === 0
+      ? "—"
+      : loading && offerings.length === 0
+        ? "…"
+        : String(offerings.length);
 
   return (
     <Stack spacing={2.5}>
@@ -219,7 +239,20 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
           sx={{ height: 2, opacity: 0.45, bgcolor: "action.hover" }}
         />
       ) : null}
-      {error ? <Alert severity="error">{error}</Alert> : null}
+      {error ? (
+        <Alert
+          severity={error.retryable ? "warning" : "error"}
+          action={
+            error.retryable ? (
+              <Button color="inherit" size="small" onClick={() => void load()}>
+                Try again
+              </Button>
+            ) : undefined
+          }
+        >
+          {error.message}
+        </Alert>
+      ) : null}
 
       {showEmptyState ? (
         <Alert
