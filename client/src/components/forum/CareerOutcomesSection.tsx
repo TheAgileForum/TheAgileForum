@@ -20,28 +20,28 @@ const STAT_BADGES = [
     value: "1000+",
     label: "Career Advanced",
     icon: EmojiEventsIcon,
-    position: { top: { xs: "4%", md: "6%" }, left: { xs: "2%", md: "4%" } },
+    position: { top: { xs: "3%", md: "6%" }, left: { xs: "0%", md: "4%" } },
   },
   {
     id: "max-hike",
     value: "UPTO 175%",
     label: "Salary Hike",
     icon: RocketLaunchIcon,
-    position: { top: { xs: "4%", md: "6%" }, right: { xs: "2%", md: "4%" } },
+    position: { top: { xs: "3%", md: "6%" }, right: { xs: "0%", md: "4%" } },
   },
   {
     id: "avg-hike",
     value: "65%",
     label: "Avg Salary Hike",
     icon: ShowChartIcon,
-    position: { bottom: { xs: "18%", md: "14%" }, left: { xs: "2%", md: "4%" } },
+    position: { bottom: { xs: "14%", md: "14%" }, left: { xs: "0%", md: "4%" } },
   },
   {
     id: "pass-rate",
     value: "100%",
     label: "Passing Success Rate",
     icon: VerifiedIcon,
-    position: { bottom: { xs: "18%", md: "14%" }, right: { xs: "2%", md: "4%" } },
+    position: { bottom: { xs: "14%", md: "14%" }, right: { xs: "0%", md: "4%" } },
   },
 ] as const;
 
@@ -62,8 +62,10 @@ function WavyStatBadge({
         position: "absolute",
         ...position,
         zIndex: 2,
-        width: { xs: 108, sm: 128, md: 148 },
+        width: { xs: 88, sm: 118, md: 148 },
+        maxWidth: "42%",
         textAlign: "center",
+        pointerEvents: "none",
       }}
     >
       <Box
@@ -74,6 +76,7 @@ function WavyStatBadge({
           display: "grid",
           placeItems: "center",
           color: "#fff",
+          overflow: "visible",
           "&::before": {
             content: '""',
             position: "absolute",
@@ -95,16 +98,17 @@ function WavyStatBadge({
           },
         }}
       >
-        <Box sx={{ position: "relative", zIndex: 1, px: 1 }}>
-          <Icon sx={{ fontSize: { xs: 22, md: 26 }, color: "#f5c842", mb: 0.5 }} aria-hidden />
+        <Box sx={{ position: "relative", zIndex: 1, px: 0.75, minWidth: 0 }}>
+          <Icon sx={{ fontSize: { xs: 18, sm: 22, md: 26 }, color: "#f5c842", mb: 0.35 }} aria-hidden />
           <Typography
             sx={{
               m: 0,
               fontWeight: 800,
-              fontSize: { xs: "0.62rem", sm: "0.72rem", md: "0.78rem" },
-              letterSpacing: "0.04em",
+              fontSize: { xs: "0.55rem", sm: "0.68rem", md: "0.78rem" },
+              letterSpacing: "0.03em",
               lineHeight: 1.15,
               textTransform: "uppercase",
+              overflowWrap: "anywhere",
             }}
           >
             {value}
@@ -112,12 +116,13 @@ function WavyStatBadge({
           <Typography
             sx={{
               m: 0,
-              mt: 0.35,
-              fontSize: { xs: "0.52rem", sm: "0.58rem", md: "0.62rem" },
-              letterSpacing: "0.06em",
+              mt: 0.25,
+              fontSize: { xs: "0.48rem", sm: "0.55rem", md: "0.62rem" },
+              letterSpacing: "0.04em",
               textTransform: "uppercase",
               color: "rgba(255,255,255,0.72)",
               lineHeight: 1.2,
+              overflowWrap: "anywhere",
             }}
           >
             {label}
@@ -157,13 +162,15 @@ export function CareerOutcomesSection() {
           textAlign: "center",
           fontFamily: '"Sora", system-ui, sans-serif',
           fontWeight: 800,
-          fontSize: { xs: "1.35rem", sm: "1.75rem", md: "2.15rem" },
-          lineHeight: 1.25,
+          fontSize: { xs: "1.2rem", sm: "1.75rem", md: "2.15rem" },
+          lineHeight: 1.3,
           letterSpacing: "-0.01em",
           color: "#1a4a7a",
           textWrap: "balance",
+          overflowWrap: "anywhere",
           maxWidth: 920,
           mx: "auto",
+          px: { xs: 0.5, sm: 0 },
         }}
       >
         Become a AI Scrum Master, Agile Project Manager &amp; PO with job-focused mentorship, AI masterclass &amp;
@@ -176,6 +183,9 @@ export function CareerOutcomesSection() {
           maxWidth: 980,
           mx: "auto",
           mb: { xs: 2.5, md: 3 },
+          overflow: "visible",
+          // Keep absolute badges from causing horizontal page scroll on narrow screens
+          width: "100%",
         }}
       >
         {STAT_BADGES.map(({ icon: Icon, ...badge }) => (
@@ -236,9 +246,10 @@ export function CareerOutcomesSection() {
               m: 0,
               color: "#fff",
               fontWeight: 700,
-              fontSize: { xs: "0.95rem", sm: "1.05rem", md: "1.12rem" },
+              fontSize: { xs: "0.9rem", sm: "1.05rem", md: "1.12rem" },
               lineHeight: 1.35,
               textWrap: "balance",
+              overflowWrap: "anywhere",
             }}
           >
             Start Your IT Career, Land Your high paying IT Dream Job!
