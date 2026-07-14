@@ -115,7 +115,7 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
   },
   "safe-leading-safe": {
     code: "safe-leading-safe",
-    title: "AI Empowered Leading SAFe® 6.0 Certification",
+    title: "AI Empowered Leading SAFe® Agilist 6.0 Certification Training",
     kind: "course",
     category: "certification",
     scheduleBound: true,
@@ -153,7 +153,7 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
   },
   "safe-product-owner-product-manager-certification-training": {
     code: "safe-product-owner-product-manager-certification-training",
-    title: "Certified AI-Empowered SAFe 6 Product Owner/Product Manager",
+    title: "AI-Empowered SAFe® 6.0 Product Owner/Product Manager Certification Training",
     kind: "course",
     category: "certification",
     scheduleBound: true,
@@ -189,7 +189,7 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
   },
   "safe-scrum-master-certification-training": {
     code: "safe-scrum-master-certification-training",
-    title: "SAFe® Scrum Master Certification Training",
+    title: "AI Empowered SAFe® 6.0 Scrum Master Certification Training",
     kind: "course",
     category: "certification",
     scheduleBound: true,
