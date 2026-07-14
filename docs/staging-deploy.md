@@ -79,8 +79,8 @@ cd server && npm run staging:preflight   # with staging env vars set
 Set **build-time** env (Vercel / Netlify / CI), then `npm run build` in `client/`:
 
 ```env
-# Recommended: leave VITE_API_URL unset on Vercel — client/vercel.json proxies /api.
-# api-base.ts forces same-origin /api on app.staging.theagileforum.com at runtime.
+# Leave VITE_API_URL unset — api-base.ts maps app.staging → api.staging (direct CORS).
+# vercel.json /api rewrite remains as fallback.
 # VITE_API_URL=https://api.staging.theagileforum.com
 VITE_APP_ENV=staging
 VITE_OBSERVABILITY_RELEASE=staging
@@ -131,9 +131,9 @@ See `deploy/render.yaml.example` for a starter blueprint.
 ### SPA on Vercel
 
 1. Root directory: `client/`, build: `npm run build`, output: `dist`.
-2. Env: `VITE_APP_ENV`, `VITE_OBSERVABILITY_RELEASE`, etc. **Leave `VITE_API_URL` unset** — `client/vercel.json` proxies `/api` and `api-base.ts` forces same-origin on `app.staging.theagileforum.com`.
-3. After merging client fixes, confirm Vercel redeployed (Deployments tab) — stale bundles keep cross-origin `api.staging` calls and catalog timeouts.
-4. Verify: `cd server && npm run staging:verify` — `spa-same-origin-bundle` must PASS.
+2. Env: `VITE_APP_ENV`, `VITE_OBSERVABILITY_RELEASE`, etc. **Leave `VITE_API_URL` unset** — on `app.staging.theagileforum.com`, `api-base.ts` calls `https://api.staging.theagileforum.com` directly (CORS). `client/vercel.json` `/api` rewrite remains as a fallback for non-browser clients.
+3. After merging client fixes, confirm Vercel redeployed (Deployments tab).
+4. Verify: `cd server && npm run staging:verify` — catalog + SPA probes should PASS.
 
 ---
 
@@ -168,8 +168,8 @@ LIMIT 10;
 | OAuth succeeds but `/me` 401 | `VITE_API_URL` must point to the host that set the cookie; check cookie domain in DevTools |
 | `OAUTH_NOT_CONFIGURED` | Set client id/secret; `OAUTH_STUB_MODE=false` on staging |
 | `users.display_name` does not exist | Schema behind code — redeploy API so `npm start` runs `prisma migrate deploy`, or Render shell: `cd server && npm run db:deploy` |
-| `spa-same-origin-bundle` FAIL | Vercel serving pre-PR-11 bundle — trigger redeploy; unset `VITE_API_URL` on Vercel |
-| Catalog timeout / 0 results | Same as above, or Render cold start — retry; see `npm run staging:verify` |
+| `spa-direct-api-bundle` note | Informational — redeploy client so `api-base.ts` maps app.staging → api.staging |
+| Catalog timeout / 0 results | Render cold start — retry; see `npm run staging:verify`; confirm CORS allows app origin for direct API |
 | Mixed content | Use `https` for both `APP_PUBLIC_URL` and `API_PUBLIC_URL` in staging |
 
 ---

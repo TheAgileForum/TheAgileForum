@@ -130,31 +130,19 @@ function categoryListing(category: OfferingCategory) {
       ...(req.query as Record<string, string | undefined>),
       category,
     });
-    let base = await listOfferingsByCategoryFromCatalog(category);
-    // Browse pages: prefer stub details when DB is sparse/stale (same pattern as certifications).
+
+    // Trainings / certifications: stub seed is the public SSOT (already merged over DB).
+    // Skip Prisma wait on the hot browse path — keeps warm responses under ~100–300ms.
+    let base: OfferingMeta[];
     if (category === "certification") {
-      const courses = base.filter((o) => o.kind === "course");
-      const byCode = new Map(courses.map((o) => [o.code, o]));
-      for (const stub of listCertificationCourses()) {
-        const existing = byCode.get(stub.code);
-        // Prefer stub when it carries live-site enrichment (summary) or row is missing.
-        if (!existing || stub.summary) {
-          byCode.set(stub.code, stub);
-        }
-      }
-      base = [...byCode.values()];
+      base = listCertificationCourses().filter((o) => isPublicCatalogOffering(o.code));
     } else if (category === "training") {
-      const courses = base.filter((o) => o.kind === "course");
-      const byCode = new Map(courses.map((o) => [o.code, o]));
-      for (const stub of listTrainingCourses()) {
-        const existing = byCode.get(stub.code);
-        if (!existing || stub.summary) {
-          byCode.set(stub.code, stub);
-        }
-      }
-      base = [...byCode.values()];
+      base = listTrainingCourses().filter((o) => isPublicCatalogOffering(o.code));
+    } else {
+      base = await listOfferingsByCategoryFromCatalog(category);
+      base = base.filter((o) => isPublicCatalogOffering(o.code));
     }
-    base = base.filter((o) => isPublicCatalogOffering(o.code));
+
     const filtered = filterOfferings(base, query);
     const offerings = filtered.map((o) => serializeOffering(o, context));
     const payload = {

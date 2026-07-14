@@ -18,6 +18,7 @@ import {
   geoFromSessionCurrency,
   getSessionCurrency,
   hasExplicitSessionCurrencyOverride,
+  hasPersistedSessionCurrency,
   markExplicitSessionCurrencyOverride,
   setSessionCurrency,
   type SessionCurrency,
@@ -27,6 +28,8 @@ type PricingContextValue = {
   currency: SessionCurrency;
   geo: string;
   source: "geo" | "user";
+  /** True after initial geo/currency resolve (or immediately when session currency is persisted). */
+  ready: boolean;
   loading: boolean;
   setCurrency: (currency: SessionCurrency) => Promise<void>;
   quoteOfferings: (offerIds: string[]) => Promise<PriceQuote[]>;
@@ -65,24 +68,29 @@ function syncSessionStorage(currency: SessionCurrency) {
 
 export function PricingProvider({ children }: { children: ReactNode }) {
   const [context, setContext] = useState<CurrencyContextResponse | null>(readInitialCurrencyContext);
+  const [ready, setReady] = useState(() => hasPersistedSessionCurrency());
   const [loading, setLoading] = useState(false);
 
   const refresh = useCallback(async () => {
-    if (hasExplicitSessionCurrencyOverride()) {
-      const stored = getSessionCurrency();
-      const res = await getCurrencyContext({
-        geo: geoFromSessionCurrency(stored),
-        currencyOverride: stored,
-      });
-      setContext((prev) => (sameCurrencyContext(prev, res) ? prev : res));
-      syncSessionStorage(res.currency as SessionCurrency);
-      return;
-    }
+    try {
+      if (hasExplicitSessionCurrencyOverride()) {
+        const stored = getSessionCurrency();
+        const res = await getCurrencyContext({
+          geo: geoFromSessionCurrency(stored),
+          currencyOverride: stored,
+        });
+        setContext((prev) => (sameCurrencyContext(prev, res) ? prev : res));
+        syncSessionStorage(res.currency as SessionCurrency);
+        return;
+      }
 
-    const res = await getCurrencyContext();
-    setContext((prev) => (sameCurrencyContext(prev, res) ? prev : res));
-    if (res.source === "geo") {
-      syncSessionStorage(res.currency as SessionCurrency);
+      const res = await getCurrencyContext();
+      setContext((prev) => (sameCurrencyContext(prev, res) ? prev : res));
+      if (res.source === "geo") {
+        syncSessionStorage(res.currency as SessionCurrency);
+      }
+    } finally {
+      setReady(true);
     }
   }, []);
 
@@ -129,12 +137,13 @@ export function PricingProvider({ children }: { children: ReactNode }) {
       currency: (context?.currency ?? getSessionCurrency()) as SessionCurrency,
       geo: context?.geoDetected ?? geoFromSessionCurrency(getSessionCurrency()),
       source: context?.source ?? "geo",
+      ready,
       loading,
       setCurrency,
       quoteOfferings,
       refresh,
     }),
-    [context, loading, setCurrency, quoteOfferings, refresh],
+    [context, ready, loading, setCurrency, quoteOfferings, refresh],
   );
 
   return <PricingContext.Provider value={value}>{children}</PricingContext.Provider>;
