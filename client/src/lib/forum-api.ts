@@ -471,15 +471,18 @@ export async function listCatalogCategory(
   path: "trainings" | "certifications" | "services",
   query = "",
   pricing?: { geo?: string; currency?: string },
-  options?: { allowRetry?: boolean },
+  options?: { allowRetry?: boolean; retries?: number },
 ) {
   const base = query ? (query.startsWith("?") ? query : `?${query}`) : "";
   const pricingQs = pricingQuery(pricing?.geo, pricing?.currency);
   const join = base && pricingQs ? `${base}&${pricingQs.slice(1)}` : base || pricingQs;
   const allowRetry = options?.allowRetry ?? true;
+  const retries =
+    options?.retries ?? (allowRetry ? 2 : 0);
   return apiFetch<CatalogListResponse>(`/api/v1/catalog/${path}${join}`, {
     timeoutMs: catalogFetchTimeoutMs(),
-    retries: allowRetry ? 1 : 0,
+    // Cold-start: up to 3 attempts with growing per-attempt budgets in apiFetch.
+    retries,
   });
 }
 
