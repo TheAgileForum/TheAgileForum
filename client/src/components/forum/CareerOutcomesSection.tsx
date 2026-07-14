@@ -18,30 +18,43 @@ const STAT_BADGES = [
   {
     id: "career-advanced",
     value: "1000+",
+    mobileValue: "1000+",
     label: "Career Advanced",
+    shortLabel: "Careers",
     icon: EmojiEventsIcon,
-    position: { top: "6%", left: "4%" },
+    /** Mobile: outer corners — keep clear of JOB OFFER / face. */
+    mobilePosition: { top: "3%", left: "4px" },
+    desktopPosition: { top: "6%", left: "4%" },
   },
   {
     id: "max-hike",
     value: "UPTO 175%",
+    mobileValue: "175%",
     label: "Salary Hike",
+    shortLabel: "Max hike",
     icon: RocketLaunchIcon,
-    position: { top: "6%", right: "4%" },
+    mobilePosition: { top: "3%", right: "4px" },
+    desktopPosition: { top: "6%", right: "4%" },
   },
   {
     id: "avg-hike",
     value: "65%",
+    mobileValue: "65%",
     label: "Avg Salary Hike",
+    shortLabel: "Avg hike",
     icon: ShowChartIcon,
-    position: { bottom: "14%", left: "4%" },
+    mobilePosition: { bottom: "3%", left: "4px" },
+    desktopPosition: { bottom: "14%", left: "4%" },
   },
   {
     id: "pass-rate",
     value: "100%",
+    mobileValue: "100%",
     label: "Passing Success Rate",
+    shortLabel: "Pass rate",
     icon: VerifiedIcon,
-    position: { bottom: "14%", right: "4%" },
+    mobilePosition: { bottom: "3%", right: "4px" },
+    desktopPosition: { bottom: "14%", right: "4%" },
   },
 ] as const;
 
@@ -54,9 +67,9 @@ function BadgeDisc({
   value: string;
   label: string;
   Icon: typeof EmojiEventsIcon;
-  size: "overlay" | "grid";
+  size: "mobile" | "desktop";
 }) {
-  const isGrid = size === "grid";
+  const isMobile = size === "mobile";
 
   return (
     <Box
@@ -75,16 +88,18 @@ function BadgeDisc({
           borderRadius: "50%",
           background: `radial-gradient(circle at 30% 25%, rgba(255,255,255,0.14), transparent 55%),
             linear-gradient(145deg, #1a2438 0%, ${INK} 55%, #050a12 100%)`,
-          boxShadow: "0 12px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)",
+          boxShadow: isMobile
+            ? "0 6px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)"
+            : "0 12px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)",
         },
         "&::after": {
           content: '""',
           position: "absolute",
-          inset: "-6%",
+          inset: isMobile ? "-5%" : "-6%",
           borderRadius: "50%",
           background:
             "repeating-conic-gradient(from 0deg, rgba(15,159,143,0.35) 0deg 8deg, transparent 8deg 16deg)",
-          opacity: 0.45,
+          opacity: isMobile ? 0.35 : 0.45,
           filter: "blur(0.5px)",
         },
       }}
@@ -94,7 +109,7 @@ function BadgeDisc({
           position: "relative",
           zIndex: 1,
           width: "100%",
-          px: isGrid ? 1 : { sm: 1.1, md: 1.25 },
+          px: isMobile ? 0.6 : { md: 1.25 },
           boxSizing: "border-box",
           minWidth: 0,
           textAlign: "center",
@@ -102,9 +117,9 @@ function BadgeDisc({
       >
         <Icon
           sx={{
-            fontSize: isGrid ? 18 : { sm: 22, md: 26 },
+            fontSize: isMobile ? 14 : { md: 26 },
             color: "#f5c842",
-            mb: isGrid ? 0.25 : 0.35,
+            mb: isMobile ? 0.1 : 0.35,
           }}
           aria-hidden
         />
@@ -112,9 +127,9 @@ function BadgeDisc({
           sx={{
             m: 0,
             fontWeight: 800,
-            fontSize: isGrid ? "0.62rem" : { sm: "0.68rem", md: "0.78rem" },
-            letterSpacing: "0.03em",
-            lineHeight: 1.15,
+            fontSize: isMobile ? "0.52rem" : { md: "0.78rem" },
+            letterSpacing: "0.02em",
+            lineHeight: 1.1,
             textTransform: "uppercase",
           }}
         >
@@ -123,12 +138,12 @@ function BadgeDisc({
         <Typography
           sx={{
             m: 0,
-            mt: isGrid ? 0.2 : 0.25,
-            fontSize: isGrid ? "0.5rem" : { sm: "0.55rem", md: "0.62rem" },
-            letterSpacing: "0.04em",
+            mt: isMobile ? 0.1 : 0.25,
+            fontSize: isMobile ? "0.42rem" : { md: "0.62rem" },
+            letterSpacing: "0.03em",
             textTransform: "uppercase",
             color: "rgba(255,255,255,0.72)",
-            lineHeight: 1.2,
+            lineHeight: 1.15,
           }}
         >
           {label}
@@ -138,8 +153,8 @@ function BadgeDisc({
   );
 }
 
-/** Desktop/tablet overlays — hidden below `md` so they never collide with the JOB OFFER card. */
-function OverlayStatBadge({
+/** Desktop overlays at md+ — larger discs on the sides of the hero. */
+function DesktopOverlayBadge({
   value,
   label,
   Icon,
@@ -162,43 +177,38 @@ function OverlayStatBadge({
         pointerEvents: "none",
       }}
     >
-      <BadgeDisc value={value} label={label} Icon={Icon} size="overlay" />
+      <BadgeDisc value={value} label={label} Icon={Icon} size="desktop" />
     </Box>
   );
 }
 
-/** Mobile-only compact metric strip under the hero image (no absolute overlays). */
-function MobileStatsStrip() {
+/**
+ * Mobile overlays (xs–sm): small corner discs on the hero image.
+ * Tuned so pairs never intersect and the JOB OFFER envelope stays clear.
+ */
+function MobileOverlayBadge({
+  value,
+  label,
+  Icon,
+  position,
+}: {
+  value: string;
+  label: string;
+  Icon: typeof EmojiEventsIcon;
+  position: Record<string, string>;
+}) {
   return (
     <Box
-      component="ul"
-      aria-label="Career outcome statistics"
       sx={{
-        display: { xs: "grid", md: "none" },
-        gridTemplateColumns: "1fr 1fr",
-        gap: { xs: 1.5, sm: 2 },
-        listStyle: "none",
-        m: 0,
-        mt: { xs: 2, sm: 2.5 },
-        p: 0,
-        maxWidth: 360,
-        mx: "auto",
-        width: "100%",
+        display: { xs: "block", md: "none" },
+        position: "absolute",
+        ...position,
+        zIndex: 2,
+        width: { xs: 52, sm: 60 },
+        pointerEvents: "none",
       }}
     >
-      {STAT_BADGES.map(({ id, value, label, icon: Icon }) => (
-        <Box
-          component="li"
-          key={id}
-          sx={{
-            width: "100%",
-            maxWidth: { xs: 88, sm: 100 },
-            justifySelf: "center",
-          }}
-        >
-          <BadgeDisc value={value} label={label} Icon={Icon} size="grid" />
-        </Box>
-      ))}
+      <BadgeDisc value={value} label={label} Icon={Icon} size="mobile" />
     </Box>
   );
 }
@@ -248,17 +258,36 @@ export function CareerOutcomesSection() {
       </Typography>
 
       <Box
+        component="figure"
+        aria-label="Career outcome statistics"
         sx={{
           position: "relative",
           maxWidth: 980,
+          width: "100%",
           mx: "auto",
+          mt: 0,
           mb: { xs: 2.5, md: 3 },
           overflow: { xs: "hidden", md: "visible" },
-          width: "100%",
         }}
       >
         {STAT_BADGES.map(({ icon: Icon, ...badge }) => (
-          <OverlayStatBadge key={badge.id} Icon={Icon} {...badge} />
+          <DesktopOverlayBadge
+            key={`desktop-${badge.id}`}
+            Icon={Icon}
+            value={badge.value}
+            label={badge.label}
+            position={badge.desktopPosition}
+          />
+        ))}
+
+        {STAT_BADGES.map(({ icon: Icon, ...badge }) => (
+          <MobileOverlayBadge
+            key={`mobile-${badge.id}`}
+            Icon={Icon}
+            value={badge.mobileValue}
+            label={badge.shortLabel}
+            position={badge.mobilePosition}
+          />
         ))}
 
         <Box
@@ -274,8 +303,6 @@ export function CareerOutcomesSection() {
             boxShadow: "0 20px 50px rgba(10, 22, 40, 0.18)",
           }}
         />
-
-        <MobileStatsStrip />
       </Box>
 
       <Box
