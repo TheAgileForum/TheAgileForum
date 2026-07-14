@@ -125,12 +125,18 @@ function Chip({ children, teal }: { children: ReactNode; teal?: boolean }) {
       component="span"
       sx={{
         display: "inline-flex",
+        alignItems: "center",
+        m: 0,
         px: 1.25,
-        py: 0.4,
+        py: 0.45,
         borderRadius: 999,
         fontSize: "0.72rem",
         fontWeight: 600,
         letterSpacing: "0.02em",
+        lineHeight: 1.35,
+        whiteSpace: "normal",
+        wordBreak: "break-word",
+        maxWidth: "100%",
         bgcolor: teal ? "rgba(15,159,143,0.14)" : "rgba(15,28,46,0.06)",
         color: teal ? OFFER_ACCENT_DEEP : OFFER_INK,
       }}
@@ -261,24 +267,36 @@ export function OfferDetailView({
                 </Typography>
               ) : null}
 
-              <Stack direction="row" spacing={1} sx={{ mb: 2.5, flexWrap: "wrap" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  columnGap: 1.25,
+                  rowGap: 1.25,
+                  mb: 2.5,
+                }}
+              >
                 {extras.benefitPills.map((pill) => (
                   <Box
                     key={pill}
                     sx={{
+                      m: 0,
                       px: 1.5,
                       py: 0.6,
                       borderRadius: "10px",
                       border: "1px solid rgba(255,255,255,0.12)",
                       bgcolor: "rgba(255,255,255,0.04)",
                       fontSize: "0.8rem",
+                      lineHeight: 1.35,
                       color: "rgba(232,238,244,0.9)",
+                      whiteSpace: "normal",
+                      maxWidth: "100%",
                     }}
                   >
                     {pill}
                   </Box>
                 ))}
-              </Stack>
+              </Box>
 
               <Box
                 sx={{
@@ -322,7 +340,15 @@ export function OfferDetailView({
                 scrollMarginTop: 88,
               }}
             >
-              <Stack direction="row" spacing={0.75} sx={{ mb: 1.5, flexWrap: "wrap" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  columnGap: 1.25,
+                  rowGap: 1.25,
+                  mb: 1.5,
+                }}
+              >
                 <Chip teal>Certification</Chip>
                 {offering.certificationName ? <Chip>{offering.certificationName}</Chip> : null}
                 {offering.durationLabel ? (
@@ -330,7 +356,7 @@ export function OfferDetailView({
                 ) : offering.durationHours ? (
                   <Chip>{`${offering.durationHours} hrs`}</Chip>
                 ) : null}
-              </Stack>
+              </Box>
 
               <Typography
                 sx={{
