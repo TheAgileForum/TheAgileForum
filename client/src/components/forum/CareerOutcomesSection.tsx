@@ -23,7 +23,7 @@ const STAT_BADGES = [
     shortLabel: "Careers",
     icon: EmojiEventsIcon,
     /** Mobile: outer corners — keep clear of JOB OFFER / face. */
-    mobilePosition: { top: "3%", left: "4px" },
+    mobilePosition: { top: "2%", left: "3px" },
     desktopPosition: { top: "6%", left: "4%" },
   },
   {
@@ -33,7 +33,7 @@ const STAT_BADGES = [
     label: "Salary Hike",
     shortLabel: "Max hike",
     icon: RocketLaunchIcon,
-    mobilePosition: { top: "3%", right: "4px" },
+    mobilePosition: { top: "2%", right: "3px" },
     desktopPosition: { top: "6%", right: "4%" },
   },
   {
@@ -43,7 +43,7 @@ const STAT_BADGES = [
     label: "Avg Salary Hike",
     shortLabel: "Avg hike",
     icon: ShowChartIcon,
-    mobilePosition: { bottom: "3%", left: "4px" },
+    mobilePosition: { bottom: "2%", left: "3px" },
     desktopPosition: { bottom: "14%", left: "4%" },
   },
   {
@@ -53,7 +53,7 @@ const STAT_BADGES = [
     label: "Passing Success Rate",
     shortLabel: "Pass rate",
     icon: VerifiedIcon,
-    mobilePosition: { bottom: "3%", right: "4px" },
+    mobilePosition: { bottom: "2%", right: "3px" },
     desktopPosition: { bottom: "14%", right: "4%" },
   },
 ] as const;
@@ -117,9 +117,9 @@ function BadgeDisc({
       >
         <Icon
           sx={{
-            fontSize: isMobile ? 14 : { md: 26 },
+            fontSize: isMobile ? 12 : { md: 26 },
             color: "#f5c842",
-            mb: isMobile ? 0.1 : 0.35,
+            mb: isMobile ? 0 : 0.35,
           }}
           aria-hidden
         />
@@ -127,7 +127,7 @@ function BadgeDisc({
           sx={{
             m: 0,
             fontWeight: 800,
-            fontSize: isMobile ? "0.52rem" : { md: "0.78rem" },
+            fontSize: isMobile ? "0.48rem" : { md: "0.78rem" },
             letterSpacing: "0.02em",
             lineHeight: 1.1,
             textTransform: "uppercase",
@@ -138,12 +138,12 @@ function BadgeDisc({
         <Typography
           sx={{
             m: 0,
-            mt: isMobile ? 0.1 : 0.25,
-            fontSize: isMobile ? "0.42rem" : { md: "0.62rem" },
-            letterSpacing: "0.03em",
+            mt: isMobile ? 0.05 : 0.25,
+            fontSize: isMobile ? "0.38rem" : { md: "0.62rem" },
+            letterSpacing: "0.02em",
             textTransform: "uppercase",
             color: "rgba(255,255,255,0.72)",
-            lineHeight: 1.15,
+            lineHeight: 1.1,
           }}
         >
           {label}
@@ -204,7 +204,7 @@ function MobileOverlayBadge({
         position: "absolute",
         ...position,
         zIndex: 2,
-        width: { xs: 52, sm: 60 },
+        width: { xs: 48, sm: 56 },
         pointerEvents: "none",
       }}
     >
