@@ -36,8 +36,8 @@ describe("result-enrichment", () => {
       primaryAction: {
         type: "offer",
         label: "Start program",
-        href: "/offers/agile-readiness",
-        offeringCode: "agile-readiness",
+        href: "/offers/course-agile-fundamentals",
+        offeringCode: "course-agile-fundamentals",
       },
       rationale: [{ label: "Fit", detail: "Aligned" }],
     });

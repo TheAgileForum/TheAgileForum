@@ -40,22 +40,29 @@ export {
   listCertificationCourses,
   listTrainingCourses,
   resolveOfferingCode,
+  isPublicCatalogOffering,
   OFFERING_CODE_ALIASES,
+  PUBLIC_CATALOG_HIDDEN_CODES,
 } from "./catalog-seed-data.js";
 
 import {
   OFFERING_STUB_CATALOG,
+  isPublicCatalogOffering,
   resolveOfferingCode,
 } from "./catalog-seed-data.js";
 
 /** Sync lookup against stub catalog (unit tests and checkout-policy). */
 export function getOffering(code: string): OfferingMeta | undefined {
-  return OFFERING_STUB_CATALOG[resolveOfferingCode(code)];
+  const resolved = resolveOfferingCode(code);
+  if (!isPublicCatalogOffering(resolved)) return undefined;
+  return OFFERING_STUB_CATALOG[resolved];
 }
 
 /** Sync list against stub catalog (unit tests and filter tests). */
 export function listOfferings(): OfferingMeta[] {
-  return Object.values(OFFERING_STUB_CATALOG);
+  return Object.values(OFFERING_STUB_CATALOG).filter((o) =>
+    isPublicCatalogOffering(o.code),
+  );
 }
 
 export function listOfferingsByCategory(

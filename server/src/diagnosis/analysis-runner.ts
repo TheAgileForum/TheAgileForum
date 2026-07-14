@@ -28,13 +28,16 @@ function buildStubRecommendation(targetRole: string | null): {
     confidence: isPoTransition ? 0.55 : 0.78,
     primaryAction: {
       type: "offer",
-      label: `Start ${role} readiness program`,
-      href: "/offers/agile-readiness",
-      offeringCode: "agile-readiness",
+      label: `Start Live Project Mentorship Masterclass`,
+      href: "/offers/course-agile-fundamentals",
+      offeringCode: "course-agile-fundamentals",
     },
     rationale: [
       { label: "Role fit", detail: `Gaps align with ${role} hiring signals.` },
-      { label: "Fastest win", detail: "Program addresses top two gaps in 4 weeks." },
+      {
+        label: "Fastest win",
+        detail: "Live project mentorship addresses top gaps for SM and PO roles.",
+      },
     ],
   };
 }

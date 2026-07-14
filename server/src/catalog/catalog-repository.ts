@@ -12,6 +12,8 @@ import { prisma } from "../db/client.js";
 import {
   listStubOfferings,
   OFFERING_STUB_CATALOG,
+  isPublicCatalogOffering,
+  PUBLIC_CATALOG_HIDDEN_CODES,
   resolveOfferingCode,
 } from "./catalog-seed-data.js";
 import type { OfferingCategory as ApiOfferingCategory, OfferingMeta } from "./offerings.js";
@@ -227,7 +229,9 @@ function enrichOfferingFromStub(meta: OfferingMeta): OfferingMeta {
 export async function listOfferingsFromCatalog(): Promise<OfferingMeta[]> {
   const fromDb = await queryPublishedOfferings();
   const base = fromDb ?? stubFallback();
-  return base.map(enrichOfferingFromStub);
+  return base
+    .map(enrichOfferingFromStub)
+    .filter((o) => isPublicCatalogOffering(o.code));
 }
 
 export async function listOfferingsByCategoryFromCatalog(
@@ -241,6 +245,9 @@ export async function getOfferingFromCatalog(
   code: string,
 ): Promise<OfferingMeta | undefined> {
   const resolved = resolveOfferingCode(code);
+  if (!isPublicCatalogOffering(resolved)) {
+    return undefined;
+  }
   const stub = OFFERING_STUB_CATALOG[resolved];
   // Prefer stub when it carries live-site enrichment (avoids stale DB titles/prices).
   if (stub?.summary) {
@@ -637,13 +644,33 @@ export async function upsertOfferingFromImport(
 }
 
 export async function seedCatalogOfferingsIfEmpty(): Promise<number> {
+  // Soft-hide retired SKUs still present from prior seeds (no migration required).
+  if (PUBLIC_CATALOG_HIDDEN_CODES.size > 0) {
+    await prisma.offering.updateMany({
+      where: {
+        code: { in: [...PUBLIC_CATALOG_HIDDEN_CODES] },
+        deletedAt: null,
+        enabled: true,
+      },
+      data: { enabled: false },
+    });
+  }
+
   let seeded = 0;
   for (const stub of listStubOfferings()) {
     try {
       const existing = await prisma.offering.findFirst({
         where: { code: stub.code, deletedAt: null },
       });
-      if (existing) continue;
+      if (existing) {
+        if (existing.title !== stub.title) {
+          await prisma.offering.update({
+            where: { id: existing.id },
+            data: { title: stub.title },
+          });
+        }
+        continue;
+      }
 
       await createOfferingInCatalog({
         code: stub.code,

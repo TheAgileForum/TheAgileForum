@@ -50,6 +50,15 @@ describe("catalog repository (FR-182 SSOT)", () => {
     const offerings = await listOfferingsFromCatalog();
     expect(offerings.length).toBe(listStubOfferings().length);
     expect(offerings.some((o) => o.code === "exam-practice-free")).toBe(true);
+    expect(offerings.some((o) => o.code === "agile-readiness")).toBe(false);
+  });
+
+  it("hides retired Agile Readiness offering from public catalog", async () => {
+    expect(await getOfferingFromCatalog("agile-readiness")).toBeUndefined();
+    const titled = await getOfferingFromCatalog("course-agile-fundamentals");
+    expect(titled?.title).toBe(
+      "Live Project Mentorship Masterclass for Scrum Master & Product Owner",
+    );
   });
 
   it("resolves stub offering by code when DB row missing", async () => {
