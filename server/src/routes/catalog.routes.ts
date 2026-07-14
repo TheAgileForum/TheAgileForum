@@ -14,6 +14,7 @@ import {
 import {
   listCertificationCourses,
   listTrainingCourses,
+  isPublicCatalogOffering,
 } from "../catalog/catalog-seed-data.js";
 import type { OfferingMeta, OfferingCategory } from "../catalog/offerings.js";
 import {
@@ -153,6 +154,7 @@ function categoryListing(category: OfferingCategory) {
       }
       base = [...byCode.values()];
     }
+    base = base.filter((o) => isPublicCatalogOffering(o.code));
     const filtered = filterOfferings(base, query);
     const offerings = filtered.map((o) => serializeOffering(o, context));
     const payload = {

@@ -7,37 +7,31 @@ import type { OfferingMeta } from "./offerings.js";
 export const OFFERING_CODE_ALIASES: Record<string, string> = {
   "safe-agilist-leading-safe-certification-training": "safe-leading-safe",
   "scrum-master-mentorship-masterclass": "course-agile-fundamentals",
+  "live-project-mentorship-masterclass-for-scrum-master-product-owner":
+    "course-agile-fundamentals",
   "mock-interview-series-with-interview-preparation": "service-mock-interview-sm",
   "power-resume-cover-letter": "service-power-resume-cover-letter",
 };
+
+/**
+ * Codes retired from the public catalog. Soft-hidden from listings/seed so
+ * existing DB rows and carts are not hard-deleted by migrations.
+ */
+export const PUBLIC_CATALOG_HIDDEN_CODES = new Set<string>(["agile-readiness"]);
 
 export function resolveOfferingCode(code: string): string {
   return OFFERING_CODE_ALIASES[code] ?? code;
 }
 
+export function isPublicCatalogOffering(code: string): boolean {
+  return !PUBLIC_CATALOG_HIDDEN_CODES.has(resolveOfferingCode(code));
+}
+
 /** Stub SKUs migrated from legacy static catalog (seed source). */
 export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
-  "agile-readiness": {
-    code: "agile-readiness",
-    title: "Agile Readiness Program",
-    kind: "course",
-    category: "training",
-    scheduleBound: true,
-    examAccess: "preview_only",
-    safeOrgPaymentEligible: false,
-    defaultUnitPrice: "299.00",
-    currency: "USD",
-    roleTags: ["learner", "scrum_master", "product_owner"],
-    deliveryMode: "live",
-    upcomingBatchId: "batch-agile-readiness-q3",
-    summary:
-      "Assess your agile foundation and close skill gaps before a Scrum Master, Product Owner, or team-lead role. Live cohort with practical readiness checkpoints.",
-    durationLabel: "2 weeks",
-    scheduleLabel: "Live cohort · Next batch opens Q3",
-  },
   "course-agile-fundamentals": {
     code: "course-agile-fundamentals",
-    title: "Scrum Master Mentorship Masterclass",
+    title: "Live Project Mentorship Masterclass for Scrum Master & Product Owner",
     kind: "course",
     category: "training",
     scheduleBound: true,
@@ -49,11 +43,11 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
     roleTags: ["learner", "scrum_master", "product_owner"],
     deliveryMode: "live",
     upcomingBatchId: "batch-1-jul-2026",
-    slug: "scrum-master-mentorship-masterclass",
+    slug: "live-project-mentorship-masterclass-for-scrum-master-product-owner",
     certificationName: "3-week AI-enabled SM/PO mentorship",
     durationLabel: "3 weeks",
     summary:
-      "Practical, job-oriented hands-on training on a live JIRA project with AI. Full Scrum, XP, Kanban, and Agile project management to get into a Scrum Master role — with the option to rejoin the next batch for free.",
+      "Practical, job-oriented hands-on training on a live JIRA project with AI. Full Scrum, XP, Kanban, and Agile project management for Scrum Master and Product Owner roles — with the option to rejoin the next batch for free.",
     scheduleLabel: "Cohort 7 Jul – 27 Jul 2026 · 1.5 hr class weekdays (Mon–Fri)",
     cohortSchedules: [
       {
@@ -299,7 +293,9 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
 };
 
 export function listStubOfferings(): OfferingMeta[] {
-  return Object.values(OFFERING_STUB_CATALOG);
+  return Object.values(OFFERING_STUB_CATALOG).filter((o) =>
+    isPublicCatalogOffering(o.code),
+  );
 }
 
 /** Published certification courses aligned to theagileforum.com live course pages. */

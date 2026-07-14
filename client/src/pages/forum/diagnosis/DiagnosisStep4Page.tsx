@@ -62,7 +62,8 @@ export function DiagnosisStep4Page() {
     );
   }
 
-  const offerCode = result?.primaryAction.offeringCode ?? "agile-readiness";
+  const offerCode =
+    result?.primaryAction.offeringCode ?? "course-agile-fundamentals";
 
   return (
     <Stack spacing={2.5}>
