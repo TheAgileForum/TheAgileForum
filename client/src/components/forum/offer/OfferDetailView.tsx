@@ -232,7 +232,7 @@ export function OfferDetailView({
                   mb: 1,
                 }}
               >
-                Scaled Agile · Live weekend workshop
+                {extras.heroEyebrow ?? "Scaled Agile · Live weekend workshop"}
               </Typography>
 
               <Typography
@@ -324,6 +324,26 @@ export function OfferDetailView({
                   </Box>
                 ))}
               </Box>
+
+              {extras.heroImageUrl ? (
+                <Box
+                  sx={{
+                    mt: 2.5,
+                    borderRadius: "14px",
+                    overflow: "hidden",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    maxWidth: 560,
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src={extras.heroImageUrl}
+                    alt={extras.heroImageAlt ?? offering.title}
+                    loading="eager"
+                    sx={{ width: "100%", display: "block", aspectRatio: "16 / 9", objectFit: "cover" }}
+                  />
+                </Box>
+              ) : null}
             </Box>
 
             {/* Pricing card */}
@@ -349,7 +369,7 @@ export function OfferDetailView({
                   mb: 1.5,
                 }}
               >
-                <Chip teal>Certification</Chip>
+                <Chip teal>{extras.kindChip ?? "Certification"}</Chip>
                 {offering.certificationName ? <Chip>{offering.certificationName}</Chip> : null}
                 {offering.durationLabel ? (
                   <Chip>{offering.durationLabel}</Chip>
@@ -422,9 +442,11 @@ export function OfferDetailView({
                   size="medium"
                   fullWidth
                   href={extras.brochureMailto}
+                  target={extras.brochureMailto.startsWith("http") ? "_blank" : undefined}
+                  rel={extras.brochureMailto.startsWith("http") ? "noopener noreferrer" : undefined}
                   sx={{ color: OFFER_ACCENT_DEEP, fontWeight: 600 }}
                 >
-                  Download Course Content & Brochure
+                  {extras.brochureCtaLabel ?? "Download Course Content & Brochure"}
                 </Button>
                 <Button
                   variant="text"
@@ -460,7 +482,7 @@ export function OfferDetailView({
               >
                 <span>Secure checkout</span>
                 <span>·</span>
-                <span>SPC-led delivery</span>
+                <span>{extras.trustLine ?? "SPC-led delivery"}</span>
               </Stack>
             </Box>
           </Box>
@@ -515,11 +537,17 @@ export function OfferDetailView({
           <Box>
             <SectionHead eyebrow="Course overview" title={extras.overviewTitle} />
             <Typography sx={{ color: OFFER_MUTED, mb: 2 }}>{extras.overviewBody}</Typography>
-            <Typography sx={{ fontWeight: 600, mb: 0.75 }}>Key responsibilities you&apos;ll practice</Typography>
-            <Typography sx={{ color: OFFER_MUTED }}>
-              Team and program facilitation (including PI Planning), coaching with powerful questions, cross-team
-              dependency management, flow and quality practices, and preparing for Inspect & Adapt.
-            </Typography>
+            {extras.overviewPracticeTitle || extras.overviewPracticeBody ? (
+              <>
+                <Typography sx={{ fontWeight: 600, mb: 0.75 }}>
+                  {extras.overviewPracticeTitle ?? "Key responsibilities you'll practice"}
+                </Typography>
+                <Typography sx={{ color: OFFER_MUTED }}>
+                  {extras.overviewPracticeBody ??
+                    "Team and program facilitation (including PI Planning), coaching with powerful questions, cross-team dependency management, flow and quality practices, and preparing for Inspect & Adapt."}
+                </Typography>
+              </>
+            ) : null}
           </Box>
           <Stack spacing={1.5}>
             {extras.overviewStats.map((stat) => (
@@ -640,7 +668,7 @@ export function OfferDetailView({
         <SectionHead
           eyebrow="Outcomes"
           title="What you'll learn"
-          lead="Skills you can use on Monday after the workshop."
+          lead={extras.learnLead ?? "Skills you can use on Monday after the workshop."}
         />
         {extras.videoUrl && extras.videoThumb ? (
           <Box sx={{ mb: 3.5 }}>
@@ -739,8 +767,11 @@ export function OfferDetailView({
         <Section id="curriculum">
           <SectionHead
             eyebrow="Curriculum"
-            title="Modules that mirror how ARTs really work"
-            lead={`${extras.curriculum.length} modules — from foundations through PI planning, iteration execution, and AI for Scrum Masters.`}
+            title={extras.curriculumTitle ?? "Modules that mirror how ARTs really work"}
+            lead={
+              extras.curriculumLead ??
+              `${extras.curriculum.length} modules — from foundations through PI planning, iteration execution, and AI for Scrum Masters.`
+            }
           />
           {extras.curriculum.map((mod, i) => (
             <Accordion
@@ -895,16 +926,22 @@ export function OfferDetailView({
               <Box
                 component="img"
                 src={extras.certImageUrl}
-                alt="AI-Empowered SAFe Scrum Master certification sample"
+                alt={extras.certImageAlt ?? "Program credential or experience"}
                 loading="lazy"
                 sx={{ width: "100%", display: "block" }}
               />
             </Box>
             <Box>
               <SectionHead
-                eyebrow="Your credential"
-                title="How your AI-Empowered SAFe Scrum Master Certification looks like"
-                lead="Industry-recognized credential after you pass the official exam — shareable badge and proof of role-ready facilitation skills."
+                eyebrow={extras.certSectionEyebrow ?? "Your credential"}
+                title={
+                  extras.certSectionTitle ??
+                  "How your AI-Empowered SAFe Scrum Master Certification looks like"
+                }
+                lead={
+                  extras.certSectionLead ??
+                  "Industry-recognized credential after you pass the official exam — shareable badge and proof of role-ready facilitation skills."
+                }
               />
               <Box component="ul" sx={{ m: 0, pl: 0, listStyle: "none" }}>
                 {(extras.certBullets ?? []).map((b) => (
@@ -923,8 +960,11 @@ export function OfferDetailView({
       <Section id="audience" alt>
         <SectionHead
           eyebrow="Audience"
-          title="Who should attend"
-          lead="Built for people stepping into — or leveling up — the Scrum Master role inside SAFe."
+          title={extras.audienceTitle ?? "Who should attend"}
+          lead={
+            extras.audienceLead ??
+            "Built for people stepping into — or leveling up — the Scrum Master role inside SAFe."
+          }
         />
         <Box
           sx={{
@@ -1001,10 +1041,18 @@ export function OfferDetailView({
           }}
         >
           <Typography sx={{ fontSize: "0.95rem" }}>
-            <strong>Download Course Content & Brochure</strong> — module outline, outcomes, and cohort details.
+            <strong>{extras.brochureCtaLabel ?? "Download Course Content & Brochure"}</strong>
+            {" — "}
+            module outline, outcomes, and cohort details.
           </Typography>
-          <Button variant="contained" href={extras.brochureMailto} sx={{ fontWeight: 700, flexShrink: 0 }}>
-            Download brochure
+          <Button
+            variant="contained"
+            href={extras.brochureMailto}
+            target={extras.brochureMailto.startsWith("http") ? "_blank" : undefined}
+            rel={extras.brochureMailto.startsWith("http") ? "noopener noreferrer" : undefined}
+            sx={{ fontWeight: 700, flexShrink: 0 }}
+          >
+            {extras.brochureMailto.startsWith("http") ? "Download syllabus" : "Download brochure"}
           </Button>
         </Box>
       </Section>
@@ -1023,16 +1071,33 @@ export function OfferDetailView({
             alignItems: { sm: "center" },
           }}
         >
-          <Box
-            sx={{
-              width: 64,
-              height: 64,
-              borderRadius: "50%",
-              bgcolor: "rgba(15,159,143,0.35)",
-              flexShrink: 0,
-            }}
-            aria-hidden
-          />
+          {extras.mentorImageUrl ? (
+            <Box
+              component="img"
+              src={extras.mentorImageUrl}
+              alt={extras.mentorName ?? "Program mentor"}
+              loading="lazy"
+              sx={{
+                width: 72,
+                height: 72,
+                borderRadius: "50%",
+                objectFit: "cover",
+                flexShrink: 0,
+                border: "2px solid rgba(126,224,212,0.45)",
+              }}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: 64,
+                height: 64,
+                borderRadius: "50%",
+                bgcolor: "rgba(15,159,143,0.35)",
+                flexShrink: 0,
+              }}
+              aria-hidden
+            />
+          )}
           <Box sx={{ flex: 1 }}>
             <Typography
               sx={{
@@ -1044,7 +1109,7 @@ export function OfferDetailView({
                 mb: 0.75,
               }}
             >
-              Mentor-first, not brochure-first
+              {extras.mentorName ? `Mentor · ${extras.mentorName}` : "Mentor-first, not brochure-first"}
             </Typography>
             <Typography
               sx={{
@@ -1055,11 +1120,11 @@ export function OfferDetailView({
                 mb: 0.75,
               }}
             >
-              Talk to a mentor before you commit
+              {extras.mentorHeadline ?? "Talk to a mentor before you commit"}
             </Typography>
             <Typography sx={{ color: "rgba(232,238,244,0.72)", mb: 2, maxWidth: 520 }}>
-              Not sure if this is the right next step? Book a short mentor conversation — role fit, cohort timing,
-              and whether mock interview add-ons help your goal.
+              {extras.mentorBody ??
+                "Not sure if this is the right next step? Book a short mentor conversation — role fit, cohort timing, and whether mock interview add-ons help your goal."}
             </Typography>
             <Button
               variant="contained"
@@ -1194,10 +1259,11 @@ export function OfferDetailView({
                 mb: 0.75,
               }}
             >
-              Ready to facilitate at scale?
+              {extras.finalCtaTitle ?? "Ready to facilitate at scale?"}
             </Typography>
             <Typography sx={{ color: "rgba(232,238,244,0.72)" }}>
-              Select your schedule, enroll at {priceLabel}, or book a mentor if you want a second opinion first.
+              {extras.finalCtaLead ??
+                `Select your schedule, enroll at ${priceLabel}, or book a mentor if you want a second opinion first.`}
             </Typography>
           </Box>
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>

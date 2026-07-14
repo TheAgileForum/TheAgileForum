@@ -31,7 +31,7 @@ export function isPublicCatalogOffering(code: string): boolean {
 export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
   "course-agile-fundamentals": {
     code: "course-agile-fundamentals",
-    title: "Live Project Mentorship Masterclass for Scrum Master & Product Owner",
+    title: "3-Week AI-Enabled Scrum Master / PO Mentorship Masterclass",
     kind: "course",
     category: "training",
     scheduleBound: true,
@@ -44,10 +44,10 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
     deliveryMode: "live",
     upcomingBatchId: "batch-1-jul-2026",
     slug: "live-project-mentorship-masterclass-for-scrum-master-product-owner",
-    certificationName: "3-week AI-enabled SM/PO mentorship",
+    certificationName: "Live JIRA project mentorship",
     durationLabel: "3 weeks",
     summary:
-      "Practical, job-oriented hands-on training on a live JIRA project with AI. Full Scrum, XP, Kanban, and Agile project management for Scrum Master and Product Owner roles — with the option to rejoin the next batch for free.",
+      "Practical job-oriented hands-on training on a live project in JIRA & AI. Full Scrum, XP, Kanban, and Agile project management for Scrum Master and Product Owner roles — with the option to rejoin the next batch for free.",
     scheduleLabel: "Cohort 7 Jul – 27 Jul 2026 · 1.5 hr class weekdays (Mon–Fri)",
     cohortSchedules: [
       {
@@ -72,15 +72,16 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
       "Trainer support for queries for 3 months after completion",
       "Pay once, attend multiple batches (rejoin next batch free)",
       "Non-certification course — PSM/certification taken after training",
+      "Inner-circle community for continuous support after the cohort",
     ],
     learningOutcomes: [
       "End-to-end knowledge to clear Scrum Master or Agile PM interviews and PSM exam prep",
-      "In-depth JIRA core features for sprints, backlogs, and project management",
+      "In-depth JIRA core features for sprints, backlogs, boards, JQL, and dashboards",
       "Practical Scrum, Kanban, and XP on a live simulated team",
       "User story writing and story-splitting workshop",
       "Collaboration and communication techniques for agile delivery",
       "Templates: capacity sheets, coaching docs, and knowledge documents",
-      "Confidence to answer interview questions and work as a Scrum Master",
+      "Confidence to answer situational interview questions and work as a Scrum Master",
     ],
   },
   /** Kept for commerce/checkout tests; not shown on /certifications (course-only listing). */

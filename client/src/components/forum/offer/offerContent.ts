@@ -1,4 +1,4 @@
-/** Shared shell + SSM-specific extras for certification offer detail pages. */
+/** Shared shell + per-offer extras for rich offer detail pages. */
 
 export const OFFER_INK = "#0a1628";
 export const OFFER_INK_SOFT = "#12233a";
@@ -8,6 +8,7 @@ export const OFFER_ACCENT_DEEP = "#0b7a6e";
 export const OFFER_MUTED = "#5b6b7c";
 
 export const SSM_OFFER_CODE = "safe-scrum-master-certification-training";
+export const MENTORSHIP_OFFER_CODE = "course-agile-fundamentals";
 
 export type FaqItem = { question: string; answer: string };
 export type FaqGroup = { title: string; items: FaqItem[] };
@@ -26,21 +27,48 @@ export type OfferPageExtras = {
   rating: { score: string; meta: string };
   benefitPills: string[];
   keyBenefits: KeyBenefit[];
+  /** Hero eyebrow above the title (defaults to Scaled Agile workshop line). */
+  heroEyebrow?: string;
+  /** Optional full-bleed visual under hero copy (mentorship program shot). */
+  heroImageUrl?: string;
+  heroImageAlt?: string;
+  /** Pricing-card primary chip (defaults to "Certification"). */
+  kindChip?: string;
   overviewTitle: string;
   overviewBody: string;
+  overviewPracticeTitle?: string;
+  overviewPracticeBody?: string;
   overviewStats: Array<{ num: string; label: string }>;
   demand?: DemandCopy;
   videoUrl?: string;
   videoThumb?: string;
   videoCaption?: string;
+  learnLead?: string;
   curriculum: CurriculumModule[];
+  curriculumTitle?: string;
+  curriculumLead?: string;
   audience: Array<{ role: string; detail: string }>;
+  audienceTitle?: string;
+  audienceLead?: string;
+  /** Showcase image — cert badge for SAFe, program visual for mentorship. */
   certImageUrl?: string;
+  certImageAlt?: string;
+  certSectionEyebrow?: string;
+  certSectionTitle?: string;
+  certSectionLead?: string;
   certBullets?: string[];
   faqGroups: FaqGroup[];
   examGuidelines?: { domains: ExamDomain[]; footnote: string; sourceUrl: string };
   brochureMailto: string;
+  brochureCtaLabel?: string;
   corporateMailto: string;
+  trustLine?: string;
+  finalCtaTitle?: string;
+  finalCtaLead?: string;
+  mentorImageUrl?: string;
+  mentorName?: string;
+  mentorHeadline?: string;
+  mentorBody?: string;
 };
 
 const SSM_EXTRAS: OfferPageExtras = {
@@ -48,6 +76,8 @@ const SSM_EXTRAS: OfferPageExtras = {
     score: "4.9",
     meta: "Average learner rating · live workshop cohorts",
   },
+  heroEyebrow: "Scaled Agile · Live weekend workshop",
+  kindChip: "Certification",
   benefitPills: [
     "16 hrs live training",
     "PI planning simulation",
@@ -75,11 +105,31 @@ const SSM_EXTRAS: OfferPageExtras = {
   overviewTitle: "Serve the team — and the train",
   overviewBody:
     "A SAFe Scrum Master is a servant-leader who helps Agile teams succeed inside an Agile Release Train. This workshop goes beyond team Scrum: you practice program-level facilitation, PI planning, and continuous improvement at scale.",
+  overviewPracticeTitle: "Key responsibilities you'll practice",
+  overviewPracticeBody:
+    "Team and program facilitation (including PI Planning), coaching with powerful questions, cross-team dependency management, flow and quality practices, and preparing for Inspect & Adapt.",
   overviewStats: [
     { num: "2 days", label: "Live weekend workshop · 16 hours" },
     { num: "PI simulation", label: "Full Planning Interval event practice" },
     { num: "100%", label: "Past-batch exam success rate (claimed)" },
   ],
+  learnLead: "Skills you can use on Monday after the workshop.",
+  curriculumTitle: "Modules that mirror how ARTs really work",
+  curriculumLead:
+    "7 modules — from foundations through PI planning, iteration execution, and AI for Scrum Masters.",
+  audienceTitle: "Who should attend",
+  audienceLead:
+    "Built for people stepping into — or leveling up — the Scrum Master role inside SAFe.",
+  certImageAlt: "AI-Empowered SAFe Scrum Master certification sample",
+  certSectionEyebrow: "Your credential",
+  certSectionTitle: "How your AI-Empowered SAFe Scrum Master Certification looks like",
+  certSectionLead:
+    "Industry-recognized credential after you pass the official exam — shareable badge and proof of role-ready facilitation skills.",
+  trustLine: "SPC-led delivery",
+  finalCtaTitle: "Ready to facilitate at scale?",
+  finalCtaLead:
+    "Select your schedule, enroll, or book a mentor if you want a second opinion first.",
+  brochureCtaLabel: "Download Course Content & Brochure",
   demand: {
     salary: { min: "$96k", max: "$209k", avg: "$125k" },
     employers: [
@@ -270,6 +320,235 @@ const SSM_EXTRAS: OfferPageExtras = {
     "mailto:contact@theagileforum.com?subject=Corporate%20SAFe%20SSM%20Training",
 };
 
+/** Mentorship / live JIRA masterclass — content aligned to theagileforum.com course page. */
+const MENTORSHIP_EXTRAS: OfferPageExtras = {
+  rating: {
+    score: "4.9",
+    meta: "Average learner rating · small live cohorts (4–6)",
+  },
+  heroEyebrow: "Job-focused mentorship · Live JIRA project",
+  heroImageUrl: "/assets/offers/mentorship-hero.png",
+  heroImageAlt: "Scrum Master mentorship masterclass — live cohort training",
+  kindChip: "Mentorship",
+  benefitPills: [
+    "3 weeks · weekday live classes",
+    "Live JIRA project on your system",
+    "Interview & situational prep",
+    "Rejoin next batch free",
+  ],
+  keyBenefits: [
+    {
+      title: "5× a 2-day cert class",
+      detail: "Full Scrum, XP, Kanban & Agile PM — not slides alone",
+    },
+    {
+      title: "Hands-on every session",
+      detail: "Sprint events simulated on a live JIRA project you own",
+    },
+    {
+      title: "Interview-ready",
+      detail: "Situational questions, coaching roleplays, and guidance",
+    },
+    {
+      title: "Pay once, rejoin free",
+      detail: "Rejoin the next batch at no extra cost; 3 months trainer support",
+    },
+  ],
+  overviewTitle: "Land the role — not just another certificate",
+  overviewBody:
+    "Practical, job-oriented hands-on training on a live project in JIRA & AI. Full Scrum, XP, Kanban, and Agile project management so you can step into a Scrum Master, Agile PM, or Product Owner role with confidence.",
+  overviewPracticeTitle: "What every session builds",
+  overviewPracticeBody:
+    "Every sprint event performed live in Jira on your system, coaching conversations and roleplays, boards/JQL/dashboards, user-story workshops, advanced quality/risk/maturity topics, and situational interview practice — plus an option to rejoin the next batch free.",
+  overviewStats: [
+    { num: "3 weeks", label: "AI-enabled SM/PO mentorship · weekday cohorts" },
+    { num: "1.5 hrs", label: "Live class every weekday (Mon–Fri)" },
+    { num: "4–6", label: "Small cohort size for personal attention" },
+  ],
+  learnLead:
+    "End-to-end knowledge to clear Scrum Master or Agile PM interviews — and prepare for PSM after training.",
+  curriculum: [
+    {
+      title: "Agile foundations — Scrum, XP & Kanban",
+      summary:
+        "Build the mindset and frameworks you need before tools: Agile principles, Scrum roles/events/artifacts, XP practices, and Kanban flow.",
+      bullets: [
+        "Scrum framework end-to-end",
+        "XP practices that power delivery quality",
+        "Kanban for flow and WIP limits",
+      ],
+    },
+    {
+      title: "Live JIRA project on your laptop",
+      summary:
+        "Set up a real JIRA project on every participant’s system and manage sprints, backlogs, and boards hands-on — not demos you only watch.",
+      bullets: ["Project & board setup", "Backlogs, sprints & workflows", "Confluence / knowledge docs where used"],
+    },
+    {
+      title: "Sprint events — full checklist simulations",
+      summary:
+        "Form a scrum team and run planning, daily scrum, review, and retrospective with real checklists, inputs/outputs, and coaching moments.",
+      bullets: [
+        "Sprint planning & backlog refinement",
+        "Daily scrum facilitation",
+        "Review & retrospective facilitation",
+      ],
+    },
+    {
+      title: "Boards, JQL & dashboards",
+      summary:
+        "In-depth JIRA skills: boards, JQL filters, and dashboards so you can run reporting and transparency like a working Scrum Master.",
+    },
+    {
+      title: "User stories & splitting workshop",
+      summary:
+        "Best practices for epics, stories, and tasks — plus a live user-story writing and story-splitting workshop.",
+    },
+    {
+      title: "Coaching conversations & roleplays",
+      summary:
+        "Practice the conversations that make a great Scrum Master: impediments, conflict, collaboration, and servant-leadership patterns.",
+    },
+    {
+      title: "Quality, risks & maturity",
+      summary:
+        "Advanced topics: quality enhancement, risks and mitigations, and maturity assessments — the depth 2-day cert classes usually skip.",
+    },
+    {
+      title: "Interview guidance & situational questions",
+      summary:
+        "Walk through situational interview questions and answer patterns so you leave ready for SM / Agile PM interviews.",
+    },
+    {
+      title: "AI-enabled SM/PO workflows & templates",
+      summary:
+        "AI prompts and workflows for the modern Scrum Master/PO, plus capacity sheets, coaching docs, and knowledge templates to reuse on the job.",
+    },
+  ],
+  curriculumTitle: "3 phases · 9 modules of practical mastery",
+  curriculumLead:
+    "Curriculum mirrors the live mentorship masterclass — from foundations through live JIRA immersion, coaching, interviews, and AI-enabled workflows.",
+  audience: [
+    {
+      role: "Career changers",
+      detail: "Working in a different role and want a path into Scrum Master / Agile PM",
+    },
+    {
+      role: "Non-IT aspirants",
+      detail: "Never worked in software/IT, but want to become Scrum Master / Agile PM",
+    },
+    {
+      role: "Returners",
+      detail: "Career gap and need interview-ready fundamentals plus hands-on practice",
+    },
+    {
+      role: "Working SMs & coaches",
+      detail: "Basics + advanced aren’t crisp — want practical hands-on and interview confidence",
+    },
+  ],
+  audienceTitle: "Who benefits most",
+  audienceLead:
+    "Designed to help you land a Scrum Master or Agile Project Manager job — not just sit through theory.",
+  certImageUrl: "/assets/offers/mentorship-live-project.png",
+  certImageAlt: "Live JIRA project mentorship in session",
+  certSectionEyebrow: "Program experience",
+  certSectionTitle: "Scrum immersion on a live JIRA project",
+  certSectionLead:
+    "Participants form a scrum team and simulate Scrum Master, Product Owner, and BA work on a live JIRA project — every event, checklist, and coaching moment included.",
+  certBullets: [
+    "Online live project on every participant’s system",
+    "Class recordings provided",
+    "All sprint events and simulations on live JIRA",
+    "Non-certification course — take PSM/certification after training",
+    "Inner-circle community support after the cohort",
+  ],
+  faqGroups: [
+    {
+      title: "About the program",
+      items: [
+        {
+          question: "What is the Scrum Master mentorship program?",
+          answer:
+            "A comprehensive 3-week live course with hands-on experience on live JIRA projects — so you can perform the Scrum Master role with confidence and clear Scrum Master or Agile Project Manager interviews. Optional add-ons include SAFe certifications, mock interviews, and resume preparation.",
+        },
+        {
+          question: "How long is the program?",
+          answer:
+            "About 3+ weeks of intensive weekday classes (1.5 hours each, Monday–Friday), with the option to rejoin the next batch free.",
+        },
+        {
+          question: "Do I need prior experience or certifications?",
+          answer:
+            "No. The program accommodates beginners through experienced practitioners — including successful career switchers from non-technical backgrounds.",
+        },
+        {
+          question: "Is this a certification course?",
+          answer:
+            "No — this is a non-certificate mentorship/masterclass. Certifications (e.g. PSM) are taken after training. SAFe certs can be enrolled separately.",
+        },
+      ],
+    },
+    {
+      title: "Delivery & support",
+      items: [
+        {
+          question: "How are live projects conducted in JIRA?",
+          answer:
+            "We help you set up a live JIRA project on your laptop. Hands-on project work is core to the program — you apply learning in a practical setting every session.",
+        },
+        {
+          question: "What is the class size?",
+          answer:
+            "Intentionally small (about 4–6) for personalized attention: lectures, exercises, discussions, and project work.",
+        },
+        {
+          question: "Can I rejoin a future batch for free?",
+          answer:
+            "Yes. Pay once and you may rejoin a future batch at no extra cost. Trainer support for queries continues for 3 months after completion.",
+        },
+        {
+          question: "Do I get materials after the program?",
+          answer:
+            "Yes — recordings, course docs, and templates stay available so you can review at your own pace. Alumni join the inner-circle community for ongoing support.",
+        },
+      ],
+    },
+    {
+      title: "Enrollment",
+      items: [
+        {
+          question: "Do I need a schedule before checkout?",
+          answer:
+            "Yes. This offering is schedule-bound — select a cohort so your cart line carries the right batch.",
+        },
+        {
+          question: "Who teaches the sessions?",
+          answer:
+            "Dhirender Verma — SPC, large-scale transformation consultant, and Scrum/XP/SAFe trainer.",
+        },
+        {
+          question: "Can I change my batch?",
+          answer:
+            "Contact support if scheduling conflicts arise. Batch transfers are accommodated when seats allow — and rejoining the next batch free remains available.",
+        },
+      ],
+    },
+  ],
+  brochureMailto: "https://bit.ly/3pERJqE",
+  brochureCtaLabel: "Download full syllabus (PDF)",
+  corporateMailto:
+    "mailto:contact@theagileforum.com?subject=Corporate%20Scrum%20Master%20Mentorship",
+  trustLine: "Mentor-led · Live JIRA",
+  finalCtaTitle: "Ready for hands-on mentorship?",
+  finalCtaLead:
+    "Select your weekday cohort, enroll at the listed price, or book a mentor call if you want role-fit guidance first.",
+  mentorImageUrl: "/assets/offers/mentor-dhirender.png",
+  mentorName: "Dhirender Verma",
+  mentorHeadline: "Learn with the mentor who runs every cohort",
+  mentorBody:
+    "SPC · large-scale transformation consultant · Scrum/XP/SAFe trainer. Not sure this is your next step? Book a short call — role fit, cohort timing, and whether mock interviews or SAFe add-ons help your goal.",
+};
+
 /** Slim shared extras for other SAFe certs — shell layout without SSM-only demand/video/exam table. */
 function genericCertExtras(certLabel: string): OfferPageExtras {
   return {
@@ -351,6 +630,7 @@ const SAFE_CERT_CODES = new Set([
 
 export function getOfferPageExtras(code: string, certificationName?: string): OfferPageExtras | null {
   if (code === SSM_OFFER_CODE) return SSM_EXTRAS;
+  if (code === MENTORSHIP_OFFER_CODE) return MENTORSHIP_EXTRAS;
   if (SAFE_CERT_CODES.has(code)) {
     return genericCertExtras(certificationName ?? "SAFe® certification");
   }
