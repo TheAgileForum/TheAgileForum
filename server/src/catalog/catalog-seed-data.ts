@@ -39,7 +39,7 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
     safeOrgPaymentEligible: false,
     defaultUnitPrice: "499.00",
     currency: "USD",
-    regionalUnitPrices: { INR: "36000.00" },
+    regionalUnitPrices: { INR: "29990.00" },
     roleTags: ["learner", "scrum_master", "product_owner"],
     deliveryMode: "live",
     upcomingBatchId: "batch-1-jul-2026",

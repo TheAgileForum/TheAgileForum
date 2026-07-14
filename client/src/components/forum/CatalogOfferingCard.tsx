@@ -49,7 +49,11 @@ function FeatureCheck() {
 
 export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOfferingCardProps) {
   const priced = resolvedOfferingPrice(offering);
-  const displayPrice = catalogDisplayPrice(priced.currency, priced.amount);
+  const displayPrice = catalogDisplayPrice(
+    priced.currency,
+    priced.amount,
+    offering.code,
+  );
   const badge = resolveCertBadge(offering);
   const social = catalogSocialProof(offering);
   const popular = isPopularOffering(offering.code);

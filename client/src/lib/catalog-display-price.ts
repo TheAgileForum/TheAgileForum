@@ -2,8 +2,33 @@ import { formatPrice } from "./format-price";
 
 const DISPLAY_DISCOUNT_RATE = 0.3;
 
+/**
+ * Per-offering display overrides (card MRP / discount label).
+ * Sale amount still comes from the API quote; these only affect strikethrough + %.
+ */
+const OFFERING_DISPLAY_OVERRIDES: Record<
+  string,
+  {
+    discountRate: number;
+    /** Fixed MRP when rounding from sale/(1-rate) should show a clean list price. */
+    mrpAmount?: number;
+    /** When set, override applies only for these currencies (e.g. Indian customers). */
+    currencies?: string[];
+  }
+> = {
+  "course-agile-fundamentals": {
+    discountRate: 0.5,
+    mrpAmount: 60_000,
+    currencies: ["INR"],
+  },
+};
+
 /** Derive strikethrough MRP + sale display when API omits list/sale fields (FR-179). */
-export function catalogDisplayPrice(currency: string, saleAmount: string): {
+export function catalogDisplayPrice(
+  currency: string,
+  saleAmount: string,
+  offeringCode?: string,
+): {
   saleFormatted: string;
   mrpFormatted: string;
   discountPercent: number;
@@ -19,7 +44,22 @@ export function catalogDisplayPrice(currency: string, saleAmount: string): {
     };
   }
 
-  const mrp = Math.round(sale / (1 - DISPLAY_DISCOUNT_RATE));
+  const currencyCode = currency.toUpperCase();
+  const override = offeringCode
+    ? OFFERING_DISPLAY_OVERRIDES[offeringCode]
+    : undefined;
+  const overrideApplies =
+    override &&
+    (!override.currencies ||
+      override.currencies.some((c) => c.toUpperCase() === currencyCode));
+
+  const discountRate = overrideApplies
+    ? override.discountRate
+    : DISPLAY_DISCOUNT_RATE;
+  const mrp =
+    overrideApplies && override.mrpAmount != null
+      ? override.mrpAmount
+      : Math.round(sale / (1 - discountRate));
   const discountPercent = Math.round((1 - sale / mrp) * 100);
 
   return {
@@ -27,6 +67,8 @@ export function catalogDisplayPrice(currency: string, saleAmount: string): {
     mrpFormatted: formatPrice(currency, String(mrp)),
     discountPercent,
     discountLabel:
-      discountPercent > 0 ? `${discountPercent}% off this week | Lowest Price Guarantee` : "",
+      discountPercent > 0
+        ? `${discountPercent}% off this week | Lowest Price Guarantee`
+        : "",
   };
 }
