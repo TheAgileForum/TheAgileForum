@@ -19,6 +19,8 @@ const STAT_BADGES = [
     id: "career-advanced",
     value: "1000+",
     label: "Career Advanced",
+    mobileValue: "1000+",
+    mobileLabel: "Careers",
     icon: EmojiEventsIcon,
     position: { top: { xs: "3%", md: "6%" }, left: { xs: "0%", md: "4%" } },
   },
@@ -26,6 +28,8 @@ const STAT_BADGES = [
     id: "max-hike",
     value: "UPTO 175%",
     label: "Salary Hike",
+    mobileValue: "175%",
+    mobileLabel: "Max hike",
     icon: RocketLaunchIcon,
     position: { top: { xs: "3%", md: "6%" }, right: { xs: "0%", md: "4%" } },
   },
@@ -33,6 +37,8 @@ const STAT_BADGES = [
     id: "avg-hike",
     value: "65%",
     label: "Avg Salary Hike",
+    mobileValue: "65%",
+    mobileLabel: "Avg hike",
     icon: ShowChartIcon,
     position: { bottom: { xs: "14%", md: "14%" }, left: { xs: "0%", md: "4%" } },
   },
@@ -40,6 +46,8 @@ const STAT_BADGES = [
     id: "pass-rate",
     value: "100%",
     label: "Passing Success Rate",
+    mobileValue: "100%",
+    mobileLabel: "Pass rate",
     icon: VerifiedIcon,
     position: { bottom: { xs: "14%", md: "14%" }, right: { xs: "0%", md: "4%" } },
   },
@@ -48,11 +56,15 @@ const STAT_BADGES = [
 function WavyStatBadge({
   value,
   label,
+  mobileValue,
+  mobileLabel,
   Icon,
   position,
 }: {
   value: string;
   label: string;
+  mobileValue: string;
+  mobileLabel: string;
   Icon: typeof EmojiEventsIcon;
   position: Record<string, object>;
 }) {
@@ -62,8 +74,9 @@ function WavyStatBadge({
         position: "absolute",
         ...position,
         zIndex: 2,
-        width: { xs: 88, sm: 118, md: 148 },
-        maxWidth: "42%",
+        // Fixed mobile diameter — avoid maxWidth % shrinking the circle under the type
+        width: { xs: 92, sm: 118, md: 148 },
+        maxWidth: { xs: 92, sm: "42%" },
         textAlign: "center",
         pointerEvents: "none",
       }}
@@ -98,31 +111,76 @@ function WavyStatBadge({
           },
         }}
       >
-        <Box sx={{ position: "relative", zIndex: 1, px: 0.75, minWidth: 0 }}>
-          <Icon sx={{ fontSize: { xs: 18, sm: 22, md: 26 }, color: "#f5c842", mb: 0.35 }} aria-hidden />
+        <Box
+          sx={{
+            position: "relative",
+            zIndex: 1,
+            width: "100%",
+            px: { xs: 1.25, sm: 1.1, md: 1.25 },
+            boxSizing: "border-box",
+            minWidth: 0,
+          }}
+        >
+          <Icon
+            sx={{ fontSize: { xs: 14, sm: 22, md: 26 }, color: "#f5c842", mb: { xs: 0.15, sm: 0.35 } }}
+            aria-hidden
+          />
+          {/* Mobile-short copy */}
           <Typography
             sx={{
+              display: { xs: "block", sm: "none" },
               m: 0,
               fontWeight: 800,
-              fontSize: { xs: "0.55rem", sm: "0.68rem", md: "0.78rem" },
+              fontSize: "0.5rem",
+              letterSpacing: "0.01em",
+              lineHeight: 1.1,
+              textTransform: "uppercase",
+              whiteSpace: "normal",
+              wordBreak: "keep-all",
+            }}
+          >
+            {mobileValue}
+          </Typography>
+          <Typography
+            sx={{
+              display: { xs: "block", sm: "none" },
+              m: 0,
+              mt: 0.15,
+              fontSize: "0.42rem",
+              letterSpacing: "0.02em",
+              textTransform: "uppercase",
+              color: "rgba(255,255,255,0.72)",
+              lineHeight: 1.15,
+              whiteSpace: "normal",
+              wordBreak: "keep-all",
+            }}
+          >
+            {mobileLabel}
+          </Typography>
+          {/* sm+ full copy */}
+          <Typography
+            sx={{
+              display: { xs: "none", sm: "block" },
+              m: 0,
+              fontWeight: 800,
+              fontSize: { sm: "0.68rem", md: "0.78rem" },
               letterSpacing: "0.03em",
               lineHeight: 1.15,
               textTransform: "uppercase",
-              overflowWrap: "anywhere",
             }}
           >
             {value}
           </Typography>
           <Typography
             sx={{
+              display: { xs: "none", sm: "block" },
               m: 0,
               mt: 0.25,
-              fontSize: { xs: "0.48rem", sm: "0.55rem", md: "0.62rem" },
+              fontSize: { sm: "0.55rem", md: "0.62rem" },
               letterSpacing: "0.04em",
               textTransform: "uppercase",
               color: "rgba(255,255,255,0.72)",
               lineHeight: 1.2,
-              overflowWrap: "anywhere",
             }}
           >
             {label}
