@@ -56,6 +56,8 @@ export type OfferPageExtras = {
   certSectionEyebrow?: string;
   certSectionTitle?: string;
   certSectionLead?: string;
+  /** Jump-nav label for the cert/showcase section (defaults to "Certification"). */
+  certNavLabel?: string;
   certBullets?: string[];
   faqGroups: FaqGroup[];
   examGuidelines?: { domains: ExamDomain[]; footnote: string; sourceUrl: string };
@@ -455,6 +457,7 @@ const MENTORSHIP_EXTRAS: OfferPageExtras = {
   certSectionTitle: "Scrum immersion on a live JIRA project",
   certSectionLead:
     "Participants form a scrum team and simulate Scrum Master, Product Owner, and BA work on a live JIRA project — every event, checklist, and coaching moment included.",
+  certNavLabel: "Experience",
   certBullets: [
     "Online live project on every participant’s system",
     "Class recordings provided",

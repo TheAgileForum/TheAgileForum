@@ -163,13 +163,25 @@ export function OfferDetailView({
 }: OfferDetailViewProps) {
   const scheduleRequired = offering.scheduleBound;
   const canEnroll = !scheduleRequired || Boolean(scheduleRef);
+  const durationChipLabel = offering.durationLabel
+    ? offering.durationLabel
+    : offering.durationHours
+      ? `${offering.durationHours} hrs`
+      : null;
+  const showDurationChip =
+    Boolean(durationChipLabel) &&
+    !(
+      offering.certificationName &&
+      durationChipLabel &&
+      offering.certificationName.toLowerCase().includes(durationChipLabel.toLowerCase())
+    );
   const jumpLinks = [
     { href: "#overview", label: "Overview" },
     extras.demand ? { href: "#demand", label: "Demand growth" } : null,
     { href: "#learn", label: "What you'll learn" },
     extras.curriculum.length ? { href: "#curriculum", label: "Curriculum" } : null,
     scheduleRequired ? { href: "#schedule", label: "Schedule" } : null,
-    extras.certImageUrl ? { href: "#cert-look", label: "Certification" } : null,
+    extras.certImageUrl ? { href: "#cert-look", label: extras.certNavLabel ?? "Certification" } : null,
     { href: "#audience", label: "Who it's for" },
     { href: "#includes", label: "Includes" },
     { href: "#faq", label: "FAQ" },
@@ -371,11 +383,7 @@ export function OfferDetailView({
               >
                 <Chip teal>{extras.kindChip ?? "Certification"}</Chip>
                 {offering.certificationName ? <Chip>{offering.certificationName}</Chip> : null}
-                {offering.durationLabel ? (
-                  <Chip>{offering.durationLabel}</Chip>
-                ) : offering.durationHours ? (
-                  <Chip>{`${offering.durationHours} hrs`}</Chip>
-                ) : null}
+                {showDurationChip && durationChipLabel ? <Chip>{durationChipLabel}</Chip> : null}
               </Box>
 
               <Typography
