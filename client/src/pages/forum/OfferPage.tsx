@@ -1,4 +1,5 @@
 import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -11,6 +12,8 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
 import { Link as RouterLink, useLocation, useNavigate, useParams } from "react-router-dom";
+import { OfferDetailView } from "../../components/forum/offer/OfferDetailView";
+import { getOfferPageExtras } from "../../components/forum/offer/offerContent";
 import { EmiAffordabilityModule } from "../../components/forum/EmiAffordabilityModule";
 import { OfferTrustBlock } from "../../components/forum/OfferTrustBlock";
 import { RoleBasedUpsellRail } from "../../components/forum/RoleBasedUpsellRail";
@@ -143,6 +146,38 @@ export function OfferPage() {
   const priceLabel = formatPrice(priced.currency, priced.amount);
   const inclusions = offering.includes?.length ? offering.includes : DEFAULT_INCLUSIONS;
   const scheduleOptions = scheduleOptionsFor(offering);
+  const extras = getOfferPageExtras(offering.code, offering.certificationName);
+
+  if (extras) {
+    return (
+      <>
+        <OfferDetailView
+          offering={offering}
+          extras={extras}
+          catalogLink={catalogLink}
+          priceLabel={priceLabel}
+          inclusions={inclusions}
+          scheduleOptions={scheduleOptions}
+          scheduleRef={scheduleRef}
+          onScheduleChange={setScheduleRef}
+          onEnroll={() => void handleAddToCart()}
+          onCheckout={proceedToCheckout}
+          adding={adding}
+          error={error}
+          userLoggedIn={Boolean(user)}
+        />
+        <Box sx={{ maxWidth: 1120, mx: "auto", px: { xs: 2.5, sm: 3 }, py: 3 }}>
+          <RoleBasedUpsellRail
+            targetRole={upsellRole}
+            context="detail"
+            offerId={offering.code}
+            gapTags={upsellGaps}
+            onAddOffering={(c, scheduleRef, label) => handleAddToCartForCode(c, scheduleRef, label)}
+          />
+        </Box>
+      </>
+    );
+  }
 
   return (
     <Stack spacing={2}>
