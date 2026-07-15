@@ -229,7 +229,7 @@ export function OfferPage() {
         {showDurationChip && durationChipLabel ? (
           <Chip label={durationChipLabel} size="small" variant="outlined" />
         ) : null}
-        {offering.scheduleBound ? <Chip label="Schedule required" size="small" color="info" variant="outlined" /> : null}
+        {offering.scheduleBound ? <Chip label="Select Schedule" size="small" color="info" variant="outlined" /> : null}
       </Stack>
 
       {offering.summary ? (
