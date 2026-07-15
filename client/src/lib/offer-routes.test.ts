@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  MENTORSHIP_LEGACY_ROUTE_SEGMENTS,
   MENTORSHIP_OFFER_CODE,
   MENTORSHIP_PUBLIC_SLUG,
   offerDetailPath,
@@ -20,6 +21,14 @@ describe("offer routes", () => {
     expect(resolveOfferRouteCode(MENTORSHIP_PUBLIC_SLUG.toLowerCase())).toBe(
       MENTORSHIP_OFFER_CODE,
     );
+  });
+
+  it("resolves legacy mentorship routes to the stable offer code", () => {
+    for (const routeSegment of MENTORSHIP_LEGACY_ROUTE_SEGMENTS) {
+      expect(resolveOfferRouteCode(routeSegment)).toBe(
+        MENTORSHIP_OFFER_CODE,
+      );
+    }
   });
 
   it("preserves routes for offerings without a public alias", () => {
