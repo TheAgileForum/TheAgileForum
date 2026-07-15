@@ -2,6 +2,13 @@ import { formatPrice } from "./format-price";
 
 const DISPLAY_DISCOUNT_RATE = 0.3;
 
+export type CatalogDisplayPrice = {
+  saleFormatted: string;
+  mrpFormatted: string;
+  discountPercent: number;
+  discountLabel: string;
+};
+
 /**
  * Per-offering display overrides (card MRP / discount label).
  * Sale amount still comes from the API quote; these only affect strikethrough + %.
@@ -28,12 +35,7 @@ export function catalogDisplayPrice(
   currency: string,
   saleAmount: string,
   offeringCode?: string,
-): {
-  saleFormatted: string;
-  mrpFormatted: string;
-  discountPercent: number;
-  discountLabel: string;
-} {
+): CatalogDisplayPrice {
   const sale = Number.parseFloat(saleAmount);
   if (Number.isNaN(sale) || sale <= 0) {
     return {

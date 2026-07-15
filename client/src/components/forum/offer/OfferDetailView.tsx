@@ -17,10 +17,11 @@ import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import type { ReactNode } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { EmiAffordabilityModule } from "../EmiAffordabilityModule";
-import { StickyMobileCta } from "../StickyMobileCta";
+import type { CatalogDisplayPrice } from "../../../lib/catalog-display-price";
 import type { CatalogOffering } from "../../../lib/forum-api";
 import { openMentorBooking } from "../../../lib/mentor-booking";
+import { EmiAffordabilityModule } from "../EmiAffordabilityModule";
+import { StickyMobileCta } from "../StickyMobileCta";
 import {
   OFFER_ACCENT,
   OFFER_ACCENT_DEEP,
@@ -39,9 +40,10 @@ type OfferDetailViewProps = {
   offering: CatalogOffering;
   extras: OfferPageExtras;
   catalogLink: string;
-  priceLabel: string;
+  displayPrice: CatalogDisplayPrice;
   inclusions: string[];
   scheduleOptions: ScheduleOption[];
+  schedulePrompt?: string;
   scheduleRef: string;
   onScheduleChange: (id: string) => void;
   onEnroll: () => void;
@@ -150,9 +152,10 @@ export function OfferDetailView({
   offering,
   extras,
   catalogLink,
-  priceLabel,
+  displayPrice,
   inclusions,
   scheduleOptions,
+  schedulePrompt,
   scheduleRef,
   onScheduleChange,
   onEnroll,
@@ -161,6 +164,7 @@ export function OfferDetailView({
   error,
   userLoggedIn,
 }: OfferDetailViewProps) {
+  const priceLabel = displayPrice.saleFormatted;
   const scheduleRequired = offering.scheduleBound;
   const canEnroll = !scheduleRequired || Boolean(scheduleRef);
   const durationChipLabel = offering.durationLabel
@@ -398,21 +402,72 @@ export function OfferDetailView({
               >
                 Investment
               </Typography>
-              <Typography
-                sx={{
-                  fontFamily: '"Fraunces", Georgia, serif',
-                  fontWeight: 700,
-                  fontSize: { xs: "2rem", md: "2.25rem" },
-                  letterSpacing: "-0.02em",
-                  mt: 0.5,
-                }}
+              <Stack
+                direction="row"
+                spacing={1}
+                useFlexGap
+                aria-label={`Price: ${displayPrice.saleFormatted}`}
+                sx={{ alignItems: "baseline", flexWrap: "wrap", mt: 0.5 }}
               >
-                {priceLabel}
-              </Typography>
-              <Typography sx={{ color: OFFER_MUTED, fontSize: "0.85rem", mt: 0.5, mb: 1 }}>
-                {scheduleRequired ? "Select Schedule" : "Ready to enroll"}
-                {offering.scheduleLabel ? ` · ${offering.scheduleLabel}` : ""}
-              </Typography>
+                {displayPrice.mrpFormatted ? (
+                  <Typography
+                    component="s"
+                    aria-label={`Original price ${displayPrice.mrpFormatted}`}
+                    sx={{ color: "#7b8794", fontSize: { xs: "0.95rem", sm: "1rem" } }}
+                  >
+                    {displayPrice.mrpFormatted}
+                  </Typography>
+                ) : null}
+                <Typography
+                  component="span"
+                  aria-label={`Current price ${displayPrice.saleFormatted}`}
+                  sx={{
+                    fontFamily: '"Fraunces", Georgia, serif',
+                    fontWeight: 700,
+                    fontSize: { xs: "2rem", md: "2.25rem" },
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {displayPrice.saleFormatted}
+                </Typography>
+              </Stack>
+              {displayPrice.discountLabel ? (
+                <Box
+                  sx={{
+                    display: "inline-flex",
+                    maxWidth: "100%",
+                    mt: 1,
+                    px: 1.25,
+                    py: 0.5,
+                    borderRadius: "999px",
+                    bgcolor: "#fef3c7",
+                    color: "#92400e",
+                    fontSize: { xs: "0.74rem", sm: "0.78rem" },
+                    fontWeight: 700,
+                    lineHeight: 1.35,
+                    whiteSpace: "normal",
+                  }}
+                >
+                  {displayPrice.discountLabel}
+                </Box>
+              ) : null}
+              {scheduleRequired ? (
+                <Box sx={{ mt: 1.25, mb: 1 }}>
+                  <Typography sx={{ color: OFFER_MUTED, fontSize: "0.85rem", fontWeight: 700 }}>
+                    Select Schedule:
+                  </Typography>
+                  {schedulePrompt ? (
+                    <Typography sx={{ color: OFFER_MUTED, fontSize: "0.85rem", mt: 0.2 }}>
+                      {schedulePrompt}
+                    </Typography>
+                  ) : null}
+                </Box>
+              ) : (
+                <Typography sx={{ color: OFFER_MUTED, fontSize: "0.85rem", mt: 0.75, mb: 1 }}>
+                  Ready to enroll
+                </Typography>
+              )}
 
               <EmiAffordabilityModule
                 amount={offering.priceQuote?.amount ?? offering.defaultUnitPrice}

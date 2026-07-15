@@ -23,8 +23,9 @@ import { usePricing } from "../../contexts/PricingContext";
 import { ApiRequestError } from "../../lib/api";
 import { trackEvent } from "../../lib/analytics";
 import { PATH_BY_CATEGORY, type CatalogCategoryPath } from "../../lib/catalog-filters";
+import { catalogDisplayPrice } from "../../lib/catalog-display-price";
 import { setCommerceJourneyOrigin } from "../../lib/commerce-journey";
-import { formatPrice, resolvedOfferingPrice } from "../../lib/format-price";
+import { resolvedOfferingPrice } from "../../lib/format-price";
 import {
   getOfferingDetail,
   getStoredDiagnosisGapTags,
@@ -57,6 +58,10 @@ function scheduleOptionsFor(offering: CatalogOffering) {
     ];
   }
   return SCHEDULE_OPTIONS;
+}
+
+function schedulePromptFor(offering: CatalogOffering): string | undefined {
+  return offering.scheduleLabel?.split(/\s+·\s+/u, 1)[0]?.trim() || undefined;
 }
 
 export function OfferPage() {
@@ -161,9 +166,10 @@ export function OfferPage() {
   }
 
   const priced = resolvedOfferingPrice(offering);
-  const priceLabel = formatPrice(priced.currency, priced.amount);
+  const displayPrice = catalogDisplayPrice(priced.currency, priced.amount, offering.code);
   const inclusions = offering.includes?.length ? offering.includes : DEFAULT_INCLUSIONS;
   const scheduleOptions = scheduleOptionsFor(offering);
+  const schedulePrompt = schedulePromptFor(offering);
   const extras = getOfferPageExtras(offering.code, offering.certificationName);
   const durationChipLabel = offering.durationLabel
     ? offering.durationLabel
@@ -185,9 +191,10 @@ export function OfferPage() {
           offering={offering}
           extras={extras}
           catalogLink={catalogLink}
-          priceLabel={priceLabel}
+          displayPrice={displayPrice}
           inclusions={inclusions}
           scheduleOptions={scheduleOptions}
+          schedulePrompt={schedulePrompt}
           scheduleRef={scheduleRef}
           onScheduleChange={setScheduleRef}
           onEnroll={() => void handleAddToCart()}
@@ -244,11 +251,52 @@ export function OfferPage() {
             Investment
           </Typography>
           <Typography
-            variant="h4"
-            sx={{ fontWeight: 700, letterSpacing: "-0.02em", color: "text.primary", mt: 0.5 }}
+            component="div"
+            sx={{
+              display: "flex",
+              alignItems: "baseline",
+              flexWrap: "wrap",
+              gap: 1,
+              mt: 0.5,
+            }}
           >
-            {priceLabel}
+            {displayPrice.mrpFormatted ? (
+              <Typography
+                component="s"
+                aria-label={`Original price ${displayPrice.mrpFormatted}`}
+                sx={{ color: "text.secondary", fontSize: "1rem" }}
+              >
+                {displayPrice.mrpFormatted}
+              </Typography>
+            ) : null}
+            <Typography
+              component="span"
+              variant="h4"
+              aria-label={`Current price ${displayPrice.saleFormatted}`}
+              sx={{ fontWeight: 700, letterSpacing: "-0.02em", color: "text.primary" }}
+            >
+              {displayPrice.saleFormatted}
+            </Typography>
           </Typography>
+          {displayPrice.discountLabel ? (
+            <Box
+              sx={{
+                display: "inline-flex",
+                maxWidth: "100%",
+                mt: 1,
+                px: 1.25,
+                py: 0.5,
+                borderRadius: "999px",
+                bgcolor: "#fef3c7",
+                color: "#92400e",
+                fontSize: "0.78rem",
+                fontWeight: 700,
+                lineHeight: 1.35,
+              }}
+            >
+              {displayPrice.discountLabel}
+            </Box>
+          ) : null}
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
             Price shown matches checkout total for this session currency.
             {offering.scheduleLabel ? ` · ${offering.scheduleLabel}` : ""}
