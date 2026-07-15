@@ -10,6 +10,7 @@ import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { Link as RouterLink } from "react-router-dom";
+import { MENTORSHIP_OFFER_CODE, offerDetailPath } from "../../lib/offer-routes";
 
 const INK = "#0a1628";
 const TEAL = "#0f9f8f";
@@ -24,7 +25,7 @@ const CATALOG_LINKS = [
 /** Key offerings (easy deep-links under catalog browse). */
 const FEATURED_LINKS = [
   { label: "SAFe Scrum Master", to: "/offers/safe-scrum-master-certification-training" },
-  { label: "Mentorship program", to: "/offers/course-agile-fundamentals" },
+  { label: "Mentorship program", to: offerDetailPath(MENTORSHIP_OFFER_CODE) },
 ] as const;
 
 const MORE_EXPLORE_LINKS = [

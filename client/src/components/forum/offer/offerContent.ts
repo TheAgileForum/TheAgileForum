@@ -1,5 +1,7 @@
 /** Shared shell + per-offer extras for rich offer detail pages. */
 
+import { MENTORSHIP_OFFER_CODE } from "../../../lib/offer-routes";
+
 export const OFFER_INK = "#0a1628";
 export const OFFER_INK_SOFT = "#12233a";
 export const OFFER_PAPER = "#f3f6f9";
@@ -8,7 +10,6 @@ export const OFFER_ACCENT_DEEP = "#0b7a6e";
 export const OFFER_MUTED = "#5b6b7c";
 
 export const SSM_OFFER_CODE = "safe-scrum-master-certification-training";
-export const MENTORSHIP_OFFER_CODE = "course-agile-fundamentals";
 export const MENTORSHIP_CANONICAL_CODE = "scrum-master-mentorship-masterclass";
 
 export type FaqItem = { question: string; answer: string };

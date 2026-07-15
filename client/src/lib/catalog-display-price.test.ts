@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { catalogDisplayPrice } from "./catalog-display-price";
+import { MENTORSHIP_OFFER_CODE } from "./offer-routes";
 
 describe("catalogDisplayPrice", () => {
   it("uses ~30% default derivation for generic offerings", () => {
@@ -13,7 +14,7 @@ describe("catalogDisplayPrice", () => {
     const result = catalogDisplayPrice(
       "INR",
       "29990",
-      "course-agile-fundamentals",
+      MENTORSHIP_OFFER_CODE,
     );
     expect(result.saleFormatted).toBe("₹29,990");
     expect(result.mrpFormatted).toBe("₹60,000");
@@ -27,7 +28,7 @@ describe("catalogDisplayPrice", () => {
     const result = catalogDisplayPrice(
       "USD",
       "499",
-      "course-agile-fundamentals",
+      MENTORSHIP_OFFER_CODE,
     );
     expect(result.saleFormatted).toBe("$499");
     expect(result.discountPercent).toBe(30);
