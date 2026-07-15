@@ -69,6 +69,7 @@ export function OfferPage() {
   const [offering, setOffering] = useState<CatalogOffering | null>(null);
   const [scheduleRef, setScheduleRef] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
 
@@ -81,12 +82,22 @@ export function OfferPage() {
     if (!code) return;
     setCommerceJourneyOrigin(catalogFrom ? "catalog" : "guided_path");
     setLoading(true);
+    setLoadError(null);
     void getOfferingDetail(code, geo, currency)
       .then((res) => {
         setOffering(res.offering);
         trackEvent("offer_view", { code: res.offering.code });
       })
-      .catch(() => setOffering(null))
+      .catch((err) => {
+        setOffering(null);
+        if (!(err instanceof ApiRequestError && err.status === 404)) {
+          setLoadError(
+            err instanceof ApiRequestError
+              ? err.message
+              : "Could not load this offer. Please try again.",
+          );
+        }
+      })
       .finally(() => setLoading(false));
   }, [code, catalogFrom, geo, currency]);
 
@@ -134,6 +145,13 @@ export function OfferPage() {
   }
 
   if (loading) return <Typography>Loading offer…</Typography>;
+  if (loadError) {
+    return (
+      <Alert severity="warning">
+        {loadError} <Link href={location.pathname}>Try again</Link>
+      </Alert>
+    );
+  }
   if (!offering) {
     return (
       <Alert severity="error">
