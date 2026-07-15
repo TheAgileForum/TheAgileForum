@@ -97,6 +97,8 @@ const TESTIMONIALS: Testimonial[] = [
   {
     name: "Almas V",
     role: "Scrum Master",
+    linkedinUrl: "https://www.linkedin.com/in/almasvalluru/",
+    rating: 5,
     quote:
       "Any person giving the interview wants is confidence, and this course targets exactly that. I hold an offer currently and got shortlisted for another company's 2nd round. I am very thankful to you and this course. Highly recommended.",
     videoUrl: "https://player.vimeo.com/video/1041809793",
