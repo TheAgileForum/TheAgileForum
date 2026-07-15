@@ -32,6 +32,7 @@ import {
   getStoredDiagnosisTargetRole,
   type CatalogOffering,
 } from "../../lib/forum-api";
+import { offerDetailPath, resolveOfferRouteCode } from "../../lib/offer-routes";
 
 const SCHEDULE_OPTIONS = [
   { id: "cohort-2026-06", label: "June 2026 cohort" },
@@ -65,7 +66,7 @@ function schedulePromptFor(offering: CatalogOffering): string | undefined {
 }
 
 export function OfferPage() {
-  const { code } = useParams<{ code: string }>();
+  const { code: routeCode } = useParams<{ code: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
@@ -82,13 +83,44 @@ export function OfferPage() {
   const catalogLink = catalogFrom ?? (offering ? `/${PATH_BY_CATEGORY[offering.category]}` : "/trainings");
   const upsellRole = getStoredDiagnosisTargetRole();
   const upsellGaps = getStoredDiagnosisGapTags();
+  const offeringCode = routeCode ? resolveOfferRouteCode(routeCode) : undefined;
+  const canonicalPath = offeringCode ? offerDetailPath(offeringCode) : undefined;
 
   useEffect(() => {
-    if (!code) return;
+    if (!routeCode || !canonicalPath || `/offers/${routeCode}` === canonicalPath) return;
+    navigate(
+      {
+        pathname: canonicalPath,
+        search: location.search,
+        hash: location.hash,
+      },
+      { replace: true, state: location.state },
+    );
+  }, [
+    canonicalPath,
+    location.hash,
+    location.search,
+    location.state,
+    navigate,
+    routeCode,
+  ]);
+
+  useEffect(() => {
+    if (!canonicalPath) return;
+    const canonical = document.createElement("link");
+    canonical.rel = "canonical";
+    canonical.href = `${window.location.origin}${canonicalPath}`;
+    canonical.dataset.offerCanonical = "true";
+    document.head.appendChild(canonical);
+    return () => canonical.remove();
+  }, [canonicalPath]);
+
+  useEffect(() => {
+    if (!offeringCode) return;
     setCommerceJourneyOrigin(catalogFrom ? "catalog" : "guided_path");
     setLoading(true);
     setLoadError(null);
-    void getOfferingDetail(code, geo, currency)
+    void getOfferingDetail(offeringCode, geo, currency)
       .then((res) => {
         setOffering(res.offering);
         trackEvent("offer_view", { code: res.offering.code });
@@ -104,7 +136,7 @@ export function OfferPage() {
         }
       })
       .finally(() => setLoading(false));
-  }, [code, catalogFrom, geo, currency]);
+  }, [offeringCode, catalogFrom, geo, currency]);
 
   async function handleAddToCartForCode(codeToAdd: string, scheduleRefFromUpsell?: string, label?: string) {
     if (codeToAdd !== offering?.code) {

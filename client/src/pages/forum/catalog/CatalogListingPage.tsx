@@ -26,6 +26,7 @@ import {
 } from "../../../lib/catalog-filters";
 import { setCommerceJourneyOrigin } from "../../../lib/commerce-journey";
 import type { CatalogOffering, CatalogFacets } from "../../../lib/forum-api";
+import { offerDetailPath } from "../../../lib/offer-routes";
 
 const TITLES: Record<CatalogCategoryPath, string> = {
   trainings: "Trainings",
@@ -194,7 +195,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
 
   async function handleAdd(offering: CatalogOffering) {
     if (offering.scheduleBound) {
-      navigate(`/offers/${offering.code}`, { state: { fromCatalog: categoryPath } });
+      navigate(offerDetailPath(offering.code), { state: { fromCatalog: categoryPath } });
       return;
     }
     setAddingCode(offering.code);

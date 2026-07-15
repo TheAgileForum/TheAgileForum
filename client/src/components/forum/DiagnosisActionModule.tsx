@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import type { EscalationOptions, PrimaryAction, SecondaryAction } from "../../lib/forum-api";
 import { trackEvent } from "../../lib/analytics";
+import { offerDetailPath } from "../../lib/offer-routes";
 import { LowConfidenceEscalation } from "./LowConfidenceEscalation";
 
 type DiagnosisActionModuleProps = {
@@ -53,7 +54,7 @@ export function DiagnosisActionModule({
             size="large"
             fullWidth
             component={RouterLink}
-            to={`/offers/${offerCode}`}
+            to={offerDetailPath(offerCode)}
             onClick={() => trackEvent("diagnosis_primary_cta_click", { offering: offerCode })}
           >
             {primaryAction.label}

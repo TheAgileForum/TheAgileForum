@@ -1,4 +1,5 @@
 import { formatPrice } from "./format-price";
+import { MENTORSHIP_OFFER_CODE } from "./offer-routes";
 
 const DISPLAY_DISCOUNT_RATE = 0.3;
 
@@ -23,7 +24,7 @@ const OFFERING_DISPLAY_OVERRIDES: Record<
     currencies?: string[];
   }
 > = {
-  "course-agile-fundamentals": {
+  [MENTORSHIP_OFFER_CODE]: {
     discountRate: 0.5,
     mrpAmount: 60_000,
     currencies: ["INR"],

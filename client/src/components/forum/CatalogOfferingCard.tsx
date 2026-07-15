@@ -14,6 +14,7 @@ import {
 } from "../../lib/cert-badge";
 import type { CatalogOffering } from "../../lib/forum-api";
 import { resolvedOfferingPrice } from "../../lib/format-price";
+import { offerDetailPath } from "../../lib/offer-routes";
 import { EmiAffordabilityModule } from "./EmiAffordabilityModule";
 
 type CatalogOfferingCardProps = {
@@ -402,7 +403,7 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
             <Button
               size="medium"
               component={RouterLink}
-              to={`/offers/${offering.code}`}
+              to={offerDetailPath(offering.code)}
               sx={{
                 flex: 1,
                 color: "text.primary",
