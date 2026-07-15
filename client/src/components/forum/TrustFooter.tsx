@@ -10,14 +10,25 @@ import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { Link as RouterLink } from "react-router-dom";
+import { MENTORSHIP_OFFER_CODE, offerDetailPath } from "../../lib/offer-routes";
 
 const INK = "#0a1628";
 const TEAL = "#0f9f8f";
 
-const EXPLORE_LINKS = [
+/** Primary catalog destinations — shown first / emphasized. */
+const CATALOG_LINKS = [
   { label: "Trainings", to: "/trainings" },
   { label: "Certifications", to: "/certifications" },
   { label: "Services", to: "/services" },
+] as const;
+
+/** Key offerings (easy deep-links under catalog browse). */
+const FEATURED_LINKS = [
+  { label: "SAFe Scrum Master", to: "/offers/safe-scrum-master-certification-training" },
+  { label: "Mentorship program", to: offerDetailPath(MENTORSHIP_OFFER_CODE) },
+] as const;
+
+const MORE_EXPLORE_LINKS = [
   { label: "Resources", to: "/resources" },
   { label: "Webinars", to: "/webinars" },
   { label: "Assessment", to: "/diagnosis/step-1" },
@@ -87,6 +98,19 @@ const footerLinkSx = {
   display: "block",
   py: 0.35,
   "&:hover": { color: TEAL },
+};
+
+const catalogLinkSx = {
+  ...footerLinkSx,
+  color: "rgba(255,255,255,0.92)",
+  fontWeight: 600,
+};
+
+const featuredLinkSx = {
+  ...footerLinkSx,
+  color: "rgba(255,255,255,0.62)",
+  fontSize: "0.8125rem",
+  pl: 0.5,
 };
 
 function FooterColumnTitle({ children }: { children: string }) {
@@ -182,7 +206,25 @@ export function TrustFooter() {
           <Box>
             <FooterColumnTitle>Explore</FooterColumnTitle>
             <Stack spacing={0.25}>
-              {EXPLORE_LINKS.map((item) => (
+              {CATALOG_LINKS.map((item) => (
+                <Link key={item.to} component={RouterLink} to={item.to} sx={catalogLinkSx}>
+                  {item.label}
+                </Link>
+              ))}
+              <Box
+                aria-hidden
+                sx={{
+                  my: 1,
+                  borderTop: "1px solid rgba(255,255,255,0.1)",
+                  width: "100%",
+                }}
+              />
+              {FEATURED_LINKS.map((item) => (
+                <Link key={item.label} component={RouterLink} to={item.to} sx={featuredLinkSx}>
+                  {item.label}
+                </Link>
+              ))}
+              {MORE_EXPLORE_LINKS.map((item) => (
                 <Link key={item.to} component={RouterLink} to={item.to} sx={footerLinkSx}>
                   {item.label}
                 </Link>

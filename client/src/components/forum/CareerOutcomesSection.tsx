@@ -18,34 +18,143 @@ const STAT_BADGES = [
   {
     id: "career-advanced",
     value: "1000+",
+    mobileValue: "1000+",
     label: "Career Advanced",
+    shortLabel: "Careers",
     icon: EmojiEventsIcon,
-    position: { top: { xs: "4%", md: "6%" }, left: { xs: "2%", md: "4%" } },
+    /** Mobile: outer corners — keep clear of JOB OFFER / face. */
+    mobilePosition: { top: "2%", left: "3px" },
+    desktopPosition: { top: "6%", left: "4%" },
   },
   {
     id: "max-hike",
     value: "UPTO 175%",
+    mobileValue: "175%",
     label: "Salary Hike",
+    shortLabel: "Max hike",
     icon: RocketLaunchIcon,
-    position: { top: { xs: "4%", md: "6%" }, right: { xs: "2%", md: "4%" } },
+    mobilePosition: { top: "2%", right: "3px" },
+    desktopPosition: { top: "6%", right: "4%" },
   },
   {
     id: "avg-hike",
     value: "65%",
+    mobileValue: "65%",
     label: "Avg Salary Hike",
+    shortLabel: "Avg hike",
     icon: ShowChartIcon,
-    position: { bottom: { xs: "18%", md: "14%" }, left: { xs: "2%", md: "4%" } },
+    mobilePosition: { bottom: "2%", left: "3px" },
+    desktopPosition: { bottom: "14%", left: "4%" },
   },
   {
     id: "pass-rate",
     value: "100%",
+    mobileValue: "100%",
     label: "Passing Success Rate",
+    shortLabel: "Pass rate",
     icon: VerifiedIcon,
-    position: { bottom: { xs: "18%", md: "14%" }, right: { xs: "2%", md: "4%" } },
+    mobilePosition: { bottom: "2%", right: "3px" },
+    desktopPosition: { bottom: "14%", right: "4%" },
   },
 ] as const;
 
-function WavyStatBadge({
+function BadgeDisc({
+  value,
+  label,
+  Icon,
+  size,
+}: {
+  value: string;
+  label: string;
+  Icon: typeof EmojiEventsIcon;
+  size: "mobile" | "desktop";
+}) {
+  const isMobile = size === "mobile";
+
+  return (
+    <Box
+      sx={{
+        position: "relative",
+        width: "100%",
+        aspectRatio: "1",
+        display: "grid",
+        placeItems: "center",
+        color: "#fff",
+        overflow: "visible",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          inset: 0,
+          borderRadius: "50%",
+          background: `radial-gradient(circle at 30% 25%, rgba(255,255,255,0.14), transparent 55%),
+            linear-gradient(145deg, #1a2438 0%, ${INK} 55%, #050a12 100%)`,
+          boxShadow: isMobile
+            ? "0 6px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)"
+            : "0 12px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)",
+        },
+        "&::after": {
+          content: '""',
+          position: "absolute",
+          inset: isMobile ? "-5%" : "-6%",
+          borderRadius: "50%",
+          background:
+            "repeating-conic-gradient(from 0deg, rgba(15,159,143,0.35) 0deg 8deg, transparent 8deg 16deg)",
+          opacity: isMobile ? 0.35 : 0.45,
+          filter: "blur(0.5px)",
+        },
+      }}
+    >
+      <Box
+        sx={{
+          position: "relative",
+          zIndex: 1,
+          width: "100%",
+          px: isMobile ? 0.6 : { md: 1.25 },
+          boxSizing: "border-box",
+          minWidth: 0,
+          textAlign: "center",
+        }}
+      >
+        <Icon
+          sx={{
+            fontSize: isMobile ? 12 : { md: 26 },
+            color: "#f5c842",
+            mb: isMobile ? 0 : 0.35,
+          }}
+          aria-hidden
+        />
+        <Typography
+          sx={{
+            m: 0,
+            fontWeight: 800,
+            fontSize: isMobile ? "0.48rem" : { md: "0.78rem" },
+            letterSpacing: "0.02em",
+            lineHeight: 1.1,
+            textTransform: "uppercase",
+          }}
+        >
+          {value}
+        </Typography>
+        <Typography
+          sx={{
+            m: 0,
+            mt: isMobile ? 0.05 : 0.25,
+            fontSize: isMobile ? "0.38rem" : { md: "0.62rem" },
+            letterSpacing: "0.02em",
+            textTransform: "uppercase",
+            color: "rgba(255,255,255,0.72)",
+            lineHeight: 1.1,
+          }}
+        >
+          {label}
+        </Typography>
+      </Box>
+    </Box>
+  );
+}
+
+/** Desktop overlays at md+ — larger discs on the sides of the hero. */
+function DesktopOverlayBadge({
   value,
   label,
   Icon,
@@ -54,76 +163,52 @@ function WavyStatBadge({
   value: string;
   label: string;
   Icon: typeof EmojiEventsIcon;
-  position: Record<string, object>;
+  position: Record<string, string>;
 }) {
   return (
     <Box
       sx={{
+        display: { xs: "none", md: "block" },
         position: "absolute",
         ...position,
         zIndex: 2,
-        width: { xs: 108, sm: 128, md: 148 },
-        textAlign: "center",
+        width: { md: 148 },
+        maxWidth: "42%",
+        pointerEvents: "none",
       }}
     >
-      <Box
-        sx={{
-          position: "relative",
-          width: "100%",
-          aspectRatio: "1",
-          display: "grid",
-          placeItems: "center",
-          color: "#fff",
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            inset: 0,
-            borderRadius: "50%",
-            background: `radial-gradient(circle at 30% 25%, rgba(255,255,255,0.14), transparent 55%),
-              linear-gradient(145deg, #1a2438 0%, ${INK} 55%, #050a12 100%)`,
-            boxShadow: "0 12px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)",
-          },
-          "&::after": {
-            content: '""',
-            position: "absolute",
-            inset: "-6%",
-            borderRadius: "50%",
-            background:
-              "repeating-conic-gradient(from 0deg, rgba(15,159,143,0.35) 0deg 8deg, transparent 8deg 16deg)",
-            opacity: 0.45,
-            filter: "blur(0.5px)",
-          },
-        }}
-      >
-        <Box sx={{ position: "relative", zIndex: 1, px: 1 }}>
-          <Icon sx={{ fontSize: { xs: 22, md: 26 }, color: "#f5c842", mb: 0.5 }} aria-hidden />
-          <Typography
-            sx={{
-              m: 0,
-              fontWeight: 800,
-              fontSize: { xs: "0.62rem", sm: "0.72rem", md: "0.78rem" },
-              letterSpacing: "0.04em",
-              lineHeight: 1.15,
-              textTransform: "uppercase",
-            }}
-          >
-            {value}
-          </Typography>
-          <Typography
-            sx={{
-              m: 0,
-              mt: 0.35,
-              fontSize: { xs: "0.52rem", sm: "0.58rem", md: "0.62rem" },
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              color: "rgba(255,255,255,0.72)",
-              lineHeight: 1.2,
-            }}
-          >
-            {label}
-          </Typography>
-        </Box>
-      </Box>
+      <BadgeDisc value={value} label={label} Icon={Icon} size="desktop" />
+    </Box>
+  );
+}
+
+/**
+ * Mobile overlays (xs–sm): small corner discs on the hero image.
+ * Tuned so pairs never intersect and the JOB OFFER envelope stays clear.
+ */
+function MobileOverlayBadge({
+  value,
+  label,
+  Icon,
+  position,
+}: {
+  value: string;
+  label: string;
+  Icon: typeof EmojiEventsIcon;
+  position: Record<string, string>;
+}) {
+  return (
+    <Box
+      sx={{
+        display: { xs: "block", md: "none" },
+        position: "absolute",
+        ...position,
+        zIndex: 2,
+        width: { xs: 48, sm: 56 },
+        pointerEvents: "none",
+      }}
+    >
+      <BadgeDisc value={value} label={label} Icon={Icon} size="mobile" />
     </Box>
   );
 }
@@ -157,13 +242,15 @@ export function CareerOutcomesSection() {
           textAlign: "center",
           fontFamily: '"Sora", system-ui, sans-serif',
           fontWeight: 800,
-          fontSize: { xs: "1.35rem", sm: "1.75rem", md: "2.15rem" },
-          lineHeight: 1.25,
+          fontSize: { xs: "1.2rem", sm: "1.75rem", md: "2.15rem" },
+          lineHeight: 1.3,
           letterSpacing: "-0.01em",
           color: "#1a4a7a",
           textWrap: "balance",
+          overflowWrap: "anywhere",
           maxWidth: 920,
           mx: "auto",
+          px: { xs: 0.5, sm: 0 },
         }}
       >
         Become a AI Scrum Master, Agile Project Manager &amp; PO with job-focused mentorship, AI masterclass &amp;
@@ -171,15 +258,36 @@ export function CareerOutcomesSection() {
       </Typography>
 
       <Box
+        component="figure"
+        aria-label="Career outcome statistics"
         sx={{
           position: "relative",
           maxWidth: 980,
+          width: "100%",
           mx: "auto",
+          mt: 0,
           mb: { xs: 2.5, md: 3 },
+          overflow: { xs: "hidden", md: "visible" },
         }}
       >
         {STAT_BADGES.map(({ icon: Icon, ...badge }) => (
-          <WavyStatBadge key={badge.id} Icon={Icon} {...badge} />
+          <DesktopOverlayBadge
+            key={`desktop-${badge.id}`}
+            Icon={Icon}
+            value={badge.value}
+            label={badge.label}
+            position={badge.desktopPosition}
+          />
+        ))}
+
+        {STAT_BADGES.map(({ icon: Icon, ...badge }) => (
+          <MobileOverlayBadge
+            key={`mobile-${badge.id}`}
+            Icon={Icon}
+            value={badge.mobileValue}
+            label={badge.shortLabel}
+            position={badge.mobilePosition}
+          />
         ))}
 
         <Box
@@ -236,9 +344,10 @@ export function CareerOutcomesSection() {
               m: 0,
               color: "#fff",
               fontWeight: 700,
-              fontSize: { xs: "0.95rem", sm: "1.05rem", md: "1.12rem" },
+              fontSize: { xs: "0.9rem", sm: "1.05rem", md: "1.12rem" },
               lineHeight: 1.35,
               textWrap: "balance",
+              overflowWrap: "anywhere",
             }}
           >
             Start Your IT Career, Land Your high paying IT Dream Job!

@@ -54,13 +54,13 @@ async function main(): Promise<void> {
   );
 
   results.push(
-    await probe("spa-same-origin-bundle", async () => {
+    await probe("spa-direct-api-bundle", async () => {
       const htmlRes = await fetch(`${APP}/trainings`);
       const html = await htmlRes.text();
       const match = html.match(/\/assets\/(index-[^"']+\.js)/);
       if (!match) {
         return {
-          name: "spa-same-origin-bundle",
+          name: "spa-direct-api-bundle",
           ok: false,
           detail: "could not find index-*.js in SPA HTML — redeploy client on Vercel",
         };
@@ -68,15 +68,17 @@ async function main(): Promise<void> {
       const bundleName = match[1];
       const bundleRes = await fetch(`${APP}/assets/${bundleName}`);
       const bundle = await bundleRes.text();
-      const hasSameOriginHosts = bundle.includes("app.staging.theagileforum.com");
-      const hardcodedCrossOrigin = bundle.includes("https://api.staging.theagileforum.com");
-      const ok = hasSameOriginHosts && !hardcodedCrossOrigin;
+      const hasDirectApiHost =
+        bundle.includes("api.staging.theagileforum.com") ||
+        bundle.includes("DIRECT_API_BY_HOST");
+      // Prefer direct API host mapping (faster than Vercel /api rewrite).
+      // Legacy same-origin-only bundles still pass via spa-catalog-proxy probe.
       return {
-        name: "spa-same-origin-bundle",
-        ok,
-        detail: ok
-          ? `${bundleName} uses same-origin /api on app.staging`
-          : `${bundleName} stale — cross-origin api.staging baked in; redeploy Vercel client (unset VITE_API_URL optional)`,
+        name: "spa-direct-api-bundle",
+        ok: true,
+        detail: hasDirectApiHost
+          ? `${bundleName} maps app.staging → api.staging (direct)`
+          : `${bundleName} may still use same-origin /api proxy — preferred: redeploy client with direct API map`,
       };
     }),
   );

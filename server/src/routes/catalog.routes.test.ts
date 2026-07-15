@@ -88,6 +88,32 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
     );
   });
 
+  it.each([
+    "course-agile-fundamentals",
+    "scrum-master-mentorship-masterclass",
+    "live-project-mentorship-masterclass-for-scrum-master-product-owner",
+  ])("resolves mentorship code or alias %s to the canonical offer", async (code) => {
+    const res = await request(app()).get(
+      `/api/v1/catalog/offerings/${code}?geo=IN`,
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body.offering).toMatchObject({
+      code: "course-agile-fundamentals",
+      category: "training",
+      scheduleBound: true,
+      slug: "live-project-mentorship-masterclass-for-scrum-master-product-owner",
+      durationLabel: "3 weeks",
+    });
+    expect(res.body.offering.title).toContain("Mentorship Masterclass");
+    expect(res.body.offering.includes.length).toBeGreaterThan(5);
+    expect(res.body.offering.cohortSchedules).toHaveLength(2);
+    expect(res.body.priceQuote).toMatchObject({
+      amount: "29990.00",
+      currency: "INR",
+    });
+  });
+
   it("keeps free/paid exam SKUs available by code (FR-85/86/87)", async () => {
     const free = await request(app()).get(
       "/api/v1/catalog/offerings/exam-practice-free",

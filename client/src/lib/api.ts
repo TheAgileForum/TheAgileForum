@@ -85,7 +85,9 @@ async function apiFetchOnce<T>(
       ...rest,
       signal: controller.signal,
       headers: {
-        "Content-Type": "application/json",
+        // Avoid Content-Type on bodyless GETs so cross-origin catalog calls stay
+        // "simple" and skip an OPTIONS preflight round-trip.
+        ...(rest.body ? { "Content-Type": "application/json" } : {}),
         ...rest.headers,
       },
     });

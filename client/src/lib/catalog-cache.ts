@@ -7,6 +7,7 @@ import {
 import {
   geoFromSessionCurrency,
   getSessionCurrency,
+  hasPersistedSessionCurrency,
   type SessionCurrency,
 } from "./session-currency";
 import {
@@ -208,8 +209,12 @@ export function prefetchCatalogCategory(categoryPath: CatalogCategoryPath) {
   void fetchCatalogCategoryCached(categoryPath, "", geo, currency);
 }
 
-/** Prefetch default catalog lists as soon as the forum shell boots. */
+/**
+ * Prefetch default catalog lists once session currency is known.
+ * Skipping before that avoids a wasted USD fetch that geo would replace with INR.
+ */
 export function prefetchDefaultCatalogLists() {
+  if (!hasPersistedSessionCurrency()) return;
   void wakeApi();
   const categories: CatalogCategoryPath[] = ["trainings", "certifications", "services"];
   for (const category of categories) {

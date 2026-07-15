@@ -436,7 +436,7 @@ export function ForumHomePage() {
             linear-gradient(165deg, #061018 0%, ${INK} 45%, #0d1f33 100%)
           `,
           color: "#fff",
-          overflow: "hidden",
+          overflow: { xs: "visible", md: "hidden" },
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
@@ -489,8 +489,11 @@ export function ForumHomePage() {
             sx={{
               m: 0,
               mb: 2.5,
-              fontSize: { xs: "2.35rem", sm: "3.25rem", md: "4.25rem" },
+              fontSize: { xs: "2rem", sm: "3.25rem", md: "4.25rem" },
               color: "#fff",
+              textWrap: "balance",
+              overflowWrap: "anywhere",
+              px: { xs: 0.5, sm: 0 },
             }}
           >
             Know where you stand.

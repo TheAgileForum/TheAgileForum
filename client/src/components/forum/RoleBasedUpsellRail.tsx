@@ -11,6 +11,7 @@ import { usePricing } from "../../contexts/PricingContext";
 import { trackEvent } from "../../lib/analytics";
 import { formatPrice } from "../../lib/format-price";
 import { getUpsellRecommendations, type UpsellItem } from "../../lib/forum-api";
+import { offerDetailPath } from "../../lib/offer-routes";
 
 type RoleBasedUpsellRailProps = {
   targetRole?: string | null;
@@ -122,7 +123,7 @@ export function RoleBasedUpsellRail({
                   size="small"
                   variant="text"
                   component={RouterLink}
-                  to={`/offers/${item.code}`}
+                  to={offerDetailPath(item.code)}
                   onClick={() => trackEvent("upsell_click", { code: item.code, context })}
                 >
                   View

@@ -1,6 +1,14 @@
 import { formatPrice } from "./format-price";
+import { MENTORSHIP_OFFER_CODE } from "./offer-routes";
 
 const DISPLAY_DISCOUNT_RATE = 0.3;
+
+export type CatalogDisplayPrice = {
+  saleFormatted: string;
+  mrpFormatted: string;
+  discountPercent: number;
+  discountLabel: string;
+};
 
 /**
  * Per-offering display overrides (card MRP / discount label).
@@ -16,7 +24,7 @@ const OFFERING_DISPLAY_OVERRIDES: Record<
     currencies?: string[];
   }
 > = {
-  "course-agile-fundamentals": {
+  [MENTORSHIP_OFFER_CODE]: {
     discountRate: 0.5,
     mrpAmount: 60_000,
     currencies: ["INR"],
@@ -28,12 +36,7 @@ export function catalogDisplayPrice(
   currency: string,
   saleAmount: string,
   offeringCode?: string,
-): {
-  saleFormatted: string;
-  mrpFormatted: string;
-  discountPercent: number;
-  discountLabel: string;
-} {
+): CatalogDisplayPrice {
   const sale = Number.parseFloat(saleAmount);
   if (Number.isNaN(sale) || sale <= 0) {
     return {

@@ -14,6 +14,7 @@ import {
 } from "../../lib/cert-badge";
 import type { CatalogOffering } from "../../lib/forum-api";
 import { resolvedOfferingPrice } from "../../lib/format-price";
+import { offerDetailPath } from "../../lib/offer-routes";
 import { EmiAffordabilityModule } from "./EmiAffordabilityModule";
 
 type CatalogOfferingCardProps = {
@@ -58,10 +59,20 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
   const social = catalogSocialProof(offering);
   const popular = isPopularOffering(offering.code);
 
+  const primaryMeta =
+    offering.certificationName || offering.roleTags.slice(0, 2).map(roleLabel).join(" · ");
+  const durationMeta = offering.durationHours
+    ? `${offering.durationHours} hrs`
+    : offering.durationLabel;
+  // Avoid "7.5 hrs · 7.5 hrs" when duration is already embedded in certificationName/subtitle.
+  const durationAlreadyInMeta =
+    Boolean(durationMeta) &&
+    Boolean(primaryMeta) &&
+    primaryMeta.toLowerCase().includes(durationMeta!.toLowerCase());
   const metaParts = [
-    offering.certificationName || offering.roleTags.slice(0, 2).map(roleLabel).join(" · "),
+    primaryMeta,
     offering.certBody,
-    offering.durationHours ? `${offering.durationHours} hrs` : offering.durationLabel,
+    durationAlreadyInMeta ? undefined : durationMeta,
   ].filter(Boolean);
 
   const features = (offering.includes ?? offering.learningOutcomes ?? []).slice(0, 4);
@@ -382,7 +393,7 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
               variant="caption"
               sx={{ display: "block", mt: 1, mb: 1.75, color: "#94a3b8", fontSize: "0.72rem" }}
             >
-              Schedule required at checkout
+              Select Schedule
             </Typography>
           ) : (
             <Box sx={{ mb: 1.75 }} />
@@ -392,7 +403,7 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
             <Button
               size="medium"
               component={RouterLink}
-              to={`/offers/${offering.code}`}
+              to={offerDetailPath(offering.code)}
               sx={{
                 flex: 1,
                 color: "text.primary",
@@ -423,7 +434,7 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
                 },
               }}
             >
-              {offering.scheduleBound ? "Select schedule" : "Add to cart"}
+              {offering.scheduleBound ? "Select Schedule" : "Add to cart"}
             </Button>
           </Stack>
         </Box>

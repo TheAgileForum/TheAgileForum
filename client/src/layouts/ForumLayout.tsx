@@ -19,6 +19,7 @@ import { SessionCurrencySelector } from "../components/forum/SessionCurrencySele
 import { TrustFooter } from "../components/forum/TrustFooter";
 import { EmailVerificationBanner } from "../components/EmailVerificationBanner";
 import { useAuth } from "../contexts/AuthContext";
+import { usePricing } from "../contexts/PricingContext";
 import { userDisplayLabel } from "../lib/user-display";
 import { prefetchCatalogCategory, prefetchDefaultCatalogLists } from "../lib/catalog-cache";
 import { useDiagnosis } from "../contexts/DiagnosisContext";
@@ -57,16 +58,20 @@ const navButtonSx = {
 
 export function ForumLayout() {
   const { user, logout } = useAuth();
+  const { ready: pricingReady } = usePricing();
   const { prefetchSession } = useDiagnosis();
   const { pathname } = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
+    if (!pricingReady) return;
     prefetchDefaultCatalogLists();
-  }, []);
+  }, [pricingReady]);
   const isHome = pathname === "/";
+  const isOfferDetail = pathname.startsWith("/offers/");
   const showCatalogNav =
-    CATALOG_PATHS.some((p) => pathname.startsWith(p)) || pathname.startsWith("/offers/");
+    CATALOG_PATHS.some((p) => pathname.startsWith(p)) || isOfferDetail;
+  const fullBleed = isHome || isOfferDetail;
   const wideLayout =
     showCatalogNav ||
     pathname.startsWith("/cart") ||
@@ -229,12 +234,12 @@ export function ForumLayout() {
         component="main"
         sx={{
           flex: 1,
-          p: isHome ? 0 : { xs: 2, sm: 3 },
-          maxWidth: isHome ? "none" : wideLayout ? 1100 : 800,
+          p: fullBleed ? 0 : { xs: 2, sm: 3 },
+          maxWidth: fullBleed ? "none" : wideLayout ? 1100 : 800,
           mx: "auto",
           width: "100%",
           boxSizing: "border-box",
-          pb: isHome ? { xs: 9, sm: 0 } : undefined,
+          pb: fullBleed ? { xs: 9, sm: 0 } : undefined,
         }}
       >
         <EmailVerificationBanner />

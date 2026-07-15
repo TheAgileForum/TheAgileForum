@@ -17,6 +17,7 @@ import { useDiagnosis } from "../../../contexts/DiagnosisContext";
 import { useForumCart } from "../../../contexts/ForumCartContext";
 import { trackEvent } from "../../../lib/analytics";
 import { getAnalysisResult, storeDiagnosisPersonalization, type AnalysisResult } from "../../../lib/forum-api";
+import { MENTORSHIP_OFFER_CODE } from "../../../lib/offer-routes";
 
 export function DiagnosisStep4Page() {
   const navigate = useNavigate();
@@ -62,8 +63,7 @@ export function DiagnosisStep4Page() {
     );
   }
 
-  const offerCode =
-    result?.primaryAction.offeringCode ?? "course-agile-fundamentals";
+  const offerCode = result?.primaryAction.offeringCode ?? MENTORSHIP_OFFER_CODE;
 
   return (
     <Stack spacing={2.5}>
