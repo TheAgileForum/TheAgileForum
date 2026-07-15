@@ -118,13 +118,12 @@ const TESTIMONIALS: Testimonial[] = [
   },
   {
     name: "Jetinder Singh",
-    role: "Senior Identity & Access Management Consultant",
-    company: "Enterprise Security Professional",
+    role: "",
     photoUrl: "/testimonials/jetinder-singh.png",
     linkedinUrl: "https://www.linkedin.com/in/iam-jetinder-singh/",
     rating: 5,
     quote:
-      "I joined The Agile Forum's Scrum Master Mentorship Program to bridge the gap between Agile theory and real-world implementation. The practical Jira project, SAFe coaching, Product Thinking, AI-driven Agile practices, resume guidance, and mock interviews gave me the confidence to lead Agile transformations. The mentorship was highly interactive, practical, and immediately applicable to my day-to-day work. I would strongly recommend this program to anyone looking to accelerate their Scrum Master or Agile Coach career.",
+      "Got Product Manager Job--> I am Jetinder Singh, working as a Product Manager in the IAM domain with Optum Health. Start of 2024, I attended an exceptional training program led by Dhiren of Agile Forum, focusing on Scrum Master, Agile Methodologies, and SAFe Agile Practices. As a Business Analyst with 16 years of industry experience, I can confidently say that this was the most comprehensive and impactful agile training I've ever participated in. The program stood out for its practical approach, incorporating live projects and real-time examples that bridged the gap between theory and application. Thanks to this training, I feel confident in my ability to lead Agile transformations. It has truly been a career-defining experience.",
     videoUrl: "https://player.vimeo.com/video/1042882790",
   },
   {
@@ -513,9 +512,11 @@ function TestimonialCard({ item, featured = false }: { item: Testimonial; featur
           >
             {item.name}
           </Typography>
-          <Typography sx={{ color: "#475569", fontSize: featured ? "1rem" : "0.9rem", mt: 0.35 }}>
-            {item.role}
-          </Typography>
+          {item.role ? (
+            <Typography sx={{ color: "#475569", fontSize: featured ? "1rem" : "0.9rem", mt: 0.35 }}>
+              {item.role}
+            </Typography>
+          ) : null}
           {item.company ? (
             <Typography sx={{ color: "#8b94a3", fontSize: featured ? "0.9rem" : "0.82rem", mt: 0.2 }}>
               {item.company}
@@ -537,28 +538,6 @@ function TestimonialCard({ item, featured = false }: { item: Testimonial; featur
       >
         &ldquo;{item.quote}&rdquo;
       </Typography>
-
-      {item.linkedinUrl ? (
-        <Link
-          href={item.linkedinUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          sx={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 0.75,
-            alignSelf: { xs: "center", sm: "flex-start" },
-            color: LINKEDIN_BLUE,
-            fontWeight: 600,
-            fontSize: "0.95rem",
-            textDecoration: "none",
-            "&:hover": { textDecoration: "underline" },
-          }}
-        >
-          <LinkedInIcon sx={{ fontSize: 20 }} />
-          View LinkedIn Profile
-        </Link>
-      ) : null}
 
       {item.videoUrl ? (
         <VideoEmbed url={item.videoUrl} title={`${item.name} success story`} />
