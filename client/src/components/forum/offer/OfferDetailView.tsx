@@ -1,3 +1,5 @@
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import Accordion from "@mui/material/Accordion";
@@ -33,6 +35,27 @@ import {
 } from "./offerContent";
 
 const WRAP = { width: "100%", maxWidth: 1120, mx: "auto", px: { xs: 2.5, sm: 3 } } as const;
+const SECONDARY_CTA_SX = {
+  minHeight: 52,
+  px: 2,
+  py: 1.1,
+  borderRadius: "12px",
+  justifyContent: "center",
+  textTransform: "none",
+  fontWeight: 700,
+  color: OFFER_INK,
+  borderColor: "rgba(15,159,143,0.28)",
+  bgcolor: "rgba(15,159,143,0.08)",
+  boxShadow: "inset 0 0 0 1px rgba(15,159,143,0.04)",
+  "&:hover": {
+    borderColor: OFFER_ACCENT,
+    bgcolor: "rgba(15,159,143,0.14)",
+  },
+  "&:focus-visible": {
+    outline: "3px solid rgba(15,159,143,0.26)",
+    outlineOffset: 2,
+  },
+} as const;
 
 type ScheduleOption = { id: string; label: string };
 
@@ -502,22 +525,24 @@ export function OfferDetailView({
                   {adding ? "Adding…" : "Enroll now"}
                 </Button>
                 <Button
-                  variant="text"
-                  size="medium"
+                  variant="outlined"
+                  size="large"
                   fullWidth
                   href={extras.brochureMailto}
                   target={extras.brochureMailto.startsWith("http") ? "_blank" : undefined}
                   rel={extras.brochureMailto.startsWith("http") ? "noopener noreferrer" : undefined}
-                  sx={{ color: OFFER_ACCENT_DEEP, fontWeight: 600 }}
+                  startIcon={<DownloadOutlinedIcon fontSize="small" />}
+                  sx={SECONDARY_CTA_SX}
                 >
                   {extras.brochureCtaLabel ?? "Download Course Content & Brochure"}
                 </Button>
                 <Button
-                  variant="text"
-                  size="medium"
+                  variant="outlined"
+                  size="large"
                   fullWidth
                   onClick={() => openMentorBooking()}
-                  sx={{ color: OFFER_MUTED, fontWeight: 600 }}
+                  startIcon={<CalendarMonthOutlinedIcon fontSize="small" />}
+                  sx={SECONDARY_CTA_SX}
                 >
                   Book mentor
                 </Button>
