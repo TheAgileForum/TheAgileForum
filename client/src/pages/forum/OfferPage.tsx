@@ -33,6 +33,7 @@ import {
   type CatalogOffering,
 } from "../../lib/forum-api";
 import { offerDetailPath, resolveOfferRouteCode } from "../../lib/offer-routes";
+import { formatScheduleLabelForGeo } from "../../lib/schedule-timezone";
 
 const SCHEDULE_OPTIONS = [
   { id: "cohort-2026-06", label: "June 2026 cohort" },
@@ -200,7 +201,10 @@ export function OfferPage() {
   const priced = resolvedOfferingPrice(offering);
   const displayPrice = catalogDisplayPrice(priced.currency, priced.amount, offering.code);
   const inclusions = offering.includes?.length ? offering.includes : DEFAULT_INCLUSIONS;
-  const scheduleOptions = scheduleOptionsFor(offering);
+  const scheduleOptions = scheduleOptionsFor(offering).map((option) => ({
+    ...option,
+    label: formatScheduleLabelForGeo(option.label, geo),
+  }));
   const schedulePrompt = schedulePromptFor(offering);
   const extras = getOfferPageExtras(offering.code, offering.certificationName);
   const durationChipLabel = offering.durationLabel
