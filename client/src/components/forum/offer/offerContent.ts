@@ -9,12 +9,19 @@ export const OFFER_MUTED = "#5b6b7c";
 
 export const SSM_OFFER_CODE = "safe-scrum-master-certification-training";
 export const MENTORSHIP_OFFER_CODE = "course-agile-fundamentals";
+export const MENTORSHIP_CANONICAL_CODE = "scrum-master-mentorship-masterclass";
 
 export type FaqItem = { question: string; answer: string };
 export type FaqGroup = { title: string; items: FaqItem[] };
 export type CurriculumModule = { title: string; summary: string; bullets?: string[] };
 export type ExamDomain = { domain: string; topics: string[] };
 export type KeyBenefit = { title: string; detail: string };
+export type MentorshipBenefit = {
+  title: string;
+  detail: string;
+  images: Array<{ src: string; alt: string }>;
+  note?: string;
+};
 export type DemandCopy = {
   salary: { min: string; max: string; avg: string };
   employers: string[];
@@ -38,7 +45,12 @@ export type OfferPageExtras = {
   overviewBody: string;
   overviewPracticeTitle?: string;
   overviewPracticeBody?: string;
+  overviewExpectationsTitle?: string;
+  overviewExpectationsBody?: string;
   overviewStats: Array<{ num: string; label: string }>;
+  benefits?: MentorshipBenefit[];
+  benefitsTitle?: string;
+  benefitsLead?: string;
   demand?: DemandCopy;
   videoUrl?: string;
   videoThumb?: string;
@@ -362,10 +374,90 @@ const MENTORSHIP_EXTRAS: OfferPageExtras = {
   overviewPracticeTitle: "What every session builds",
   overviewPracticeBody:
     "Every sprint event performed live in Jira on your system, coaching conversations and roleplays, boards/JQL/dashboards, user-story workshops, advanced quality/risk/maturity topics, and situational interview practice — plus an option to rejoin the next batch free.",
+  overviewExpectationsTitle: "What you can expect",
+  overviewExpectationsBody:
+    "In-depth Jira core features; comprehensive Agile, Scrum, and Kanban; practical project, sprint, and backlog management; user-story writing and splitting workshops; collaboration techniques; reusable templates; and case-based practice. This is a non-certification course, with support to prepare for PSM or other certifications after training.",
   overviewStats: [
     { num: "3 weeks", label: "AI-enabled SM/PO mentorship · weekday cohorts" },
     { num: "1.5 hrs", label: "Live class every weekday (Mon–Fri)" },
     { num: "4–6", label: "Small cohort size for personal attention" },
+  ],
+  benefitsTitle: "Why this mentorship works",
+  benefitsLead:
+    "Build practical role knowledge, certification readiness, and job-search confidence through live practice and continued support.",
+  benefits: [
+    {
+      title: "Correct, complete role knowledge",
+      detail:
+        "Learn the practical foundations and situational thinking expected of Scrum Masters and Agile Project Managers.",
+      images: [
+        {
+          src: "/mentorship-benefits/role-knowledge.png",
+          alt: "Two heads with interconnected gears representing shared practical knowledge",
+        },
+      ],
+    },
+    {
+      title: "Certification preparation and exam support",
+      detail:
+        "Strengthen your Scrum knowledge and prepare for PSM I with guided review and exam-oriented support.",
+      note:
+        "Outcomes depend on participation, preparation, and exam eligibility; certification is taken separately.",
+      images: [
+        {
+          src: "/mentorship-benefits/exam-support-badge.png",
+          alt: "Certification exam preparation and support badge",
+        },
+        {
+          src: "/mentorship-benefits/psm-i-logo.png",
+          alt: "Professional Scrum Master I logo",
+        },
+      ],
+    },
+    {
+      title: "Handholding and job support",
+      detail:
+        "Get mentor guidance, query support, and practical job-search help as you work toward your next role.",
+      images: [
+        {
+          src: "/mentorship-benefits/handholding-job-support.png",
+          alt: "Handshake with rising arrow representing mentorship and career support",
+        },
+      ],
+    },
+    {
+      title: "Hands-on live Jira project and recordings",
+      detail:
+        "Practice project setup, backlogs, boards, sprint events, JQL, and dashboards on your own system, with recordings to revisit.",
+      images: [
+        {
+          src: "/mentorship-benefits/live-jira-project.png",
+          alt: "Live Jira project board with sprint work in progress",
+        },
+      ],
+    },
+    {
+      title: "Rejoin live sessions and the inner circle",
+      detail:
+        "Rejoin a future live batch at no extra cost and continue learning with the alumni inner-circle community.",
+      images: [
+        {
+          src: "/mentorship-benefits/rejoin-live-sessions.png",
+          alt: "Interactive online class with learners and an instructor",
+        },
+      ],
+    },
+    {
+      title: "Winning resume and relevant job leads",
+      detail:
+        "Shape a clear, role-focused resume and receive suitable job leads shared through the mentorship network when available.",
+      images: [
+        {
+          src: "/mentorship-benefits/winning-resume.png",
+          alt: "Resume examples with a highlighted hired resume",
+        },
+      ],
+    },
   ],
   learnLead:
     "End-to-end knowledge to clear Scrum Master or Agile PM interviews — and prepare for PSM after training.",
@@ -633,7 +725,7 @@ const SAFE_CERT_CODES = new Set([
 
 export function getOfferPageExtras(code: string, certificationName?: string): OfferPageExtras | null {
   if (code === SSM_OFFER_CODE) return SSM_EXTRAS;
-  if (code === MENTORSHIP_OFFER_CODE) return MENTORSHIP_EXTRAS;
+  if (code === MENTORSHIP_OFFER_CODE || code === MENTORSHIP_CANONICAL_CODE) return MENTORSHIP_EXTRAS;
   if (SAFE_CERT_CODES.has(code)) {
     return genericCertExtras(certificationName ?? "SAFe® certification");
   }

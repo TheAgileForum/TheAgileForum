@@ -177,6 +177,7 @@ export function OfferDetailView({
     );
   const jumpLinks = [
     { href: "#overview", label: "Overview" },
+    extras.benefits?.length ? { href: "#benefits", label: "Benefits" } : null,
     extras.demand ? { href: "#demand", label: "Demand growth" } : null,
     { href: "#learn", label: "What you'll learn" },
     extras.curriculum.length ? { href: "#curriculum", label: "Curriculum" } : null,
@@ -556,6 +557,14 @@ export function OfferDetailView({
                 </Typography>
               </>
             ) : null}
+            {extras.overviewExpectationsTitle || extras.overviewExpectationsBody ? (
+              <>
+                <Typography sx={{ fontWeight: 600, mt: 2.25, mb: 0.75 }}>
+                  {extras.overviewExpectationsTitle ?? "What you can expect"}
+                </Typography>
+                <Typography sx={{ color: OFFER_MUTED }}>{extras.overviewExpectationsBody}</Typography>
+              </>
+            ) : null}
           </Box>
           <Stack spacing={1.5}>
             {extras.overviewStats.map((stat) => (
@@ -584,6 +593,90 @@ export function OfferDetailView({
           </Stack>
         </Box>
       </Section>
+
+      {/* Mentorship benefits */}
+      {extras.benefits?.length ? (
+        <Section id="benefits">
+          <SectionHead
+            eyebrow="Mentorship benefits"
+            title={extras.benefitsTitle ?? "Why this mentorship works"}
+            lead={extras.benefitsLead}
+          />
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(3, minmax(0, 1fr))" },
+              gap: 2.25,
+            }}
+          >
+            {extras.benefits.map((benefit) => (
+              <Box
+                key={benefit.title}
+                component="article"
+                sx={{
+                  minWidth: 0,
+                  overflow: "hidden",
+                  display: "flex",
+                  flexDirection: "column",
+                  bgcolor: "#fff",
+                  border: "1px solid rgba(15,28,46,0.1)",
+                  borderRadius: "16px",
+                  boxShadow: "0 8px 26px rgba(10,22,40,0.06)",
+                }}
+              >
+                <Box
+                  sx={{
+                    height: { xs: 164, sm: 180 },
+                    p: 2.5,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 2,
+                    background:
+                      "radial-gradient(circle at 50% 10%, rgba(15,159,143,0.12), transparent 55%), linear-gradient(145deg, #f9fbfc, #e8eef4)",
+                    borderBottom: "1px solid rgba(15,28,46,0.1)",
+                  }}
+                >
+                  {benefit.images.map((image) => (
+                    <Box
+                      key={image.src}
+                      component="img"
+                      src={image.src}
+                      alt={image.alt}
+                      loading="lazy"
+                      sx={{
+                        width: benefit.images.length > 1 ? "calc(50% - 8px)" : "100%",
+                        maxWidth: benefit.images.length > 1 ? 128 : "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                      }}
+                    />
+                  ))}
+                </Box>
+                <Box sx={{ p: 2.5, display: "flex", flex: 1, flexDirection: "column" }}>
+                  <Typography component="h3" sx={{ fontWeight: 700, fontSize: "1rem", lineHeight: 1.35, mb: 1 }}>
+                    {benefit.title}
+                  </Typography>
+                  <Typography sx={{ color: OFFER_MUTED, fontSize: "0.86rem" }}>{benefit.detail}</Typography>
+                  {benefit.note ? (
+                    <Typography
+                      sx={{
+                        color: OFFER_ACCENT_DEEP,
+                        fontSize: "0.72rem",
+                        mt: 1.5,
+                        pt: 1.5,
+                        borderTop: "1px solid rgba(15,28,46,0.1)",
+                      }}
+                    >
+                      {benefit.note}
+                    </Typography>
+                  ) : null}
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        </Section>
+      ) : null}
 
       {/* Demand growth */}
       {extras.demand ? (
