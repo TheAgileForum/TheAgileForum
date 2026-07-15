@@ -410,7 +410,7 @@ export function OfferDetailView({
                 {priceLabel}
               </Typography>
               <Typography sx={{ color: OFFER_MUTED, fontSize: "0.85rem", mt: 0.5, mb: 1 }}>
-                {scheduleRequired ? "Schedule required" : "Ready to enroll"}
+                {scheduleRequired ? "Select Schedule" : "Ready to enroll"}
                 {offering.scheduleLabel ? ` · ${offering.scheduleLabel}` : ""}
               </Typography>
 
@@ -433,7 +433,7 @@ export function OfferDetailView({
                     onClick={() => scrollTo("schedule")}
                     sx={{ fontWeight: 700 }}
                   >
-                    Select schedule
+                    Select Schedule
                   </Button>
                 ) : null}
                 <Button
@@ -1374,7 +1374,7 @@ export function OfferDetailView({
                 onClick={() => scrollTo("schedule")}
                 sx={{ fontWeight: 700, bgcolor: OFFER_ACCENT, "&:hover": { bgcolor: OFFER_ACCENT_DEEP } }}
               >
-                Select schedule
+                Select Schedule
               </Button>
             ) : (
               <Button
@@ -1435,7 +1435,7 @@ export function OfferDetailView({
       </Section>
 
       <StickyMobileCta
-        label={scheduleRequired && !scheduleRef ? "Select schedule" : "Enroll now"}
+        label={scheduleRequired && !scheduleRef ? "Select Schedule" : "Enroll now"}
         disabled={adding}
         onClick={() => {
           if (scheduleRequired && !scheduleRef) {

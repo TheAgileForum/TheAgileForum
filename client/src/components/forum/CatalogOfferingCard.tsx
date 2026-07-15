@@ -392,7 +392,7 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
               variant="caption"
               sx={{ display: "block", mt: 1, mb: 1.75, color: "#94a3b8", fontSize: "0.72rem" }}
             >
-              Schedule required at checkout
+              Select Schedule
             </Typography>
           ) : (
             <Box sx={{ mb: 1.75 }} />
@@ -433,7 +433,7 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
                 },
               }}
             >
-              {offering.scheduleBound ? "Select schedule" : "Add to cart"}
+              {offering.scheduleBound ? "Select Schedule" : "Add to cart"}
             </Button>
           </Stack>
         </Box>
