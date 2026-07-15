@@ -464,7 +464,9 @@ export async function getOfferingDetail(code: string, geo?: string, currency?: s
     offering: CatalogOffering;
     priceQuote: { amount: string; currency: string; installmentPlans?: PriceQuote["installmentPlans"] };
     currencyContext: CurrencyContextResponse;
-  }>(`/api/v1/catalog/offerings/${encodeURIComponent(code)}${pricingQuery(geo, currency)}`);
+  }>(`/api/v1/catalog/offerings/${encodeURIComponent(code)}${pricingQuery(geo, currency)}`, {
+    timeoutMs: catalogFetchTimeoutMs(),
+  });
 }
 
 export async function listCatalogCategory(

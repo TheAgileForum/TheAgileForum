@@ -73,9 +73,16 @@ function SectionShell({ children }: { children: ReactNode }) {
       component="section"
       id="mentor-coach"
       aria-labelledby="mentor-coach-heading"
-      sx={{ bgcolor: "#fff", py: { xs: 7, md: 10 }, px: { xs: 2.5, md: 6 } }}
+      sx={{
+        bgcolor: "#fff",
+        pt: { xs: 7, md: 10 },
+        // Extra bottom space so sticky mobile CTA does not cover last lines
+        pb: { xs: "calc(7rem + env(safe-area-inset-bottom))", md: 10 },
+        px: { xs: 2.5, md: 6 },
+        overflow: "visible",
+      }}
     >
-      <Box sx={{ maxWidth: 1100, mx: "auto" }}>{children}</Box>
+      <Box sx={{ maxWidth: 1100, mx: "auto", minWidth: 0 }}>{children}</Box>
     </Box>
   );
 }
@@ -88,17 +95,53 @@ export function MentorCoachSection() {
 
   return (
     <SectionShell>
+      {/*
+        Mobile order: heading → portrait → bio.
+        Desktop: portrait left, heading+bio right (grid column placement).
+      */}
       <Box
         sx={{
           display: "grid",
-          gap: { xs: 5, md: 6 },
+          gap: { xs: 3.5, md: 6 },
           alignItems: { md: "start" },
           gridTemplateColumns: { xs: "1fr", md: "minmax(260px, 0.9fr) 1.1fr" },
+          gridTemplateRows: { md: "auto auto" },
         }}
       >
-        {/* Left — portrait + callout + CTA */}
-        <Box sx={{ maxWidth: { xs: 360, md: "none" }, mx: { xs: "auto", md: 0 } }}>
-          <Box sx={{ position: "relative", pb: { xs: 10, sm: 11 } }}>
+        <Typography
+          id="mentor-coach-heading"
+          component="h2"
+          sx={{
+            m: 0,
+            mb: { xs: 0, md: 2 },
+            gridColumn: { xs: "1", md: "2" },
+            gridRow: { md: "1" },
+            order: { xs: 1, md: 0 },
+            fontFamily: '"Sora", system-ui, sans-serif',
+            fontWeight: 800,
+            fontSize: { xs: "1.5rem", sm: "1.65rem", md: "2rem" },
+            lineHeight: 1.25,
+            color: ROYAL_BLUE,
+            textWrap: "balance",
+            overflowWrap: "anywhere",
+          }}
+        >
+          Looking for a Mentor &amp; Coach ?
+        </Typography>
+
+        {/* Portrait + callout + CTA */}
+        <Box
+          sx={{
+            maxWidth: { xs: 360, md: "none" },
+            mx: { xs: "auto", md: 0 },
+            width: "100%",
+            gridColumn: { xs: "1", md: "1" },
+            gridRow: { md: "1 / span 2" },
+            order: { xs: 2, md: 0 },
+            overflow: "visible",
+          }}
+        >
+          <Box sx={{ position: "relative", pb: { xs: 11, sm: 12 }, overflow: "visible" }}>
             <Box
               component="img"
               src={MENTOR_PORTRAIT_URL}
@@ -111,6 +154,7 @@ export function MentorCoachSection() {
                 mx: "auto",
                 aspectRatio: "463 / 600",
                 objectFit: "cover",
+                objectPosition: "center top",
                 borderRadius: "50%",
                 boxShadow: "0 20px 48px rgba(26, 74, 122, 0.22)",
               }}
@@ -125,19 +169,21 @@ export function MentorCoachSection() {
               sx={{
                 position: "absolute",
                 left: "50%",
-                bottom: { xs: 52, sm: 56 },
+                bottom: { xs: 48, sm: 52 },
                 transform: "translateX(-50%)",
-                width: { xs: "92%", sm: "88%" },
+                width: { xs: "min(100%, 340px)", sm: "88%" },
                 maxWidth: 380,
                 bgcolor: ROYAL_BLUE,
                 color: "#fff",
                 textDecoration: "none",
                 borderRadius: 3,
-                px: 2.5,
-                py: 2,
+                px: { xs: 2, sm: 2.5 },
+                py: { xs: 1.75, sm: 2 },
                 textAlign: "center",
                 boxShadow: "0 14px 36px rgba(26, 74, 122, 0.35)",
                 transition: "transform 0.2s, box-shadow 0.2s",
+                overflow: "visible",
+                zIndex: 1,
                 "&:hover": {
                   transform: "translateX(-50%) translateY(-2px)",
                   boxShadow: "0 18px 42px rgba(26, 74, 122, 0.42)",
@@ -148,9 +194,10 @@ export function MentorCoachSection() {
                 sx={{
                   m: 0,
                   fontWeight: 700,
-                  fontSize: { xs: "0.82rem", sm: "0.9rem" },
+                  fontSize: { xs: "0.8rem", sm: "0.9rem" },
                   lineHeight: 1.45,
                   textWrap: "balance",
+                  overflowWrap: "anywhere",
                 }}
               >
                 Connect With me for a FREE Career Guidance &amp; strategy session for landing a high paying Job!
@@ -185,24 +232,16 @@ export function MentorCoachSection() {
           </Button>
         </Box>
 
-        {/* Right — bio */}
-        <Box>
-          <Typography
-            id="mentor-coach-heading"
-            component="h2"
-            sx={{
-              m: 0,
-              mb: 2,
-              fontFamily: '"Sora", system-ui, sans-serif',
-              fontWeight: 800,
-              fontSize: { xs: "1.65rem", md: "2rem" },
-              lineHeight: 1.2,
-              color: ROYAL_BLUE,
-            }}
-          >
-            Looking for a Mentor &amp; Coach ?
-          </Typography>
-
+        {/* Bio body (heading is above on mobile / grid row 1 on desktop) */}
+        <Box
+          sx={{
+            gridColumn: { xs: "1", md: "2" },
+            gridRow: { md: "2" },
+            order: { xs: 3, md: 0 },
+            minWidth: 0,
+            overflow: "visible",
+          }}
+        >
           <Stack direction="row" spacing={0.75} sx={{ mb: 2.5 }}>
             {SOCIAL_LINKS.map(({ label, href, Icon }) => (
               <IconButton
@@ -232,7 +271,7 @@ export function MentorCoachSection() {
               sx={{
                 fontFamily: '"Fraunces", Georgia, serif',
                 fontStyle: "italic",
-                fontSize: { xs: "1.5rem", md: "1.75rem" },
+                fontSize: { xs: "1.35rem", md: "1.75rem" },
                 color: ROYAL_BLUE,
                 mr: 0.75,
               }}
@@ -244,15 +283,25 @@ export function MentorCoachSection() {
               sx={{
                 fontFamily: '"Sora", system-ui, sans-serif',
                 fontWeight: 600,
-                fontSize: { xs: "1.15rem", md: "1.3rem" },
+                fontSize: { xs: "1.05rem", md: "1.3rem" },
                 color: LIGHT_BLUE,
+                overflowWrap: "anywhere",
               }}
             >
               I&apos;m Dhirender Verma
             </Box>
           </Typography>
 
-          <Typography sx={{ m: 0, mb: 3, fontSize: "0.95rem", color: "text.secondary", lineHeight: 1.65 }}>
+          <Typography
+            sx={{
+              m: 0,
+              mb: 3,
+              fontSize: "0.95rem",
+              color: "text.secondary",
+              lineHeight: 1.65,
+              overflowWrap: "anywhere",
+            }}
+          >
             Enterprise Agile Coach, Large Scale Agile Transformation Consultant, SPC - SAFe Authorized Trainer &amp;
             Speaker, 10+ yrs as Agile Program/Project Manager, RTE, Scrum Master, Agilist, Agile, Scrum, kanban, SAFe
             Expert.

@@ -1,4 +1,5 @@
 import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -11,6 +12,8 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
 import { Link as RouterLink, useLocation, useNavigate, useParams } from "react-router-dom";
+import { OfferDetailView } from "../../components/forum/offer/OfferDetailView";
+import { getOfferPageExtras } from "../../components/forum/offer/offerContent";
 import { EmiAffordabilityModule } from "../../components/forum/EmiAffordabilityModule";
 import { OfferTrustBlock } from "../../components/forum/OfferTrustBlock";
 import { RoleBasedUpsellRail } from "../../components/forum/RoleBasedUpsellRail";
@@ -66,6 +69,7 @@ export function OfferPage() {
   const [offering, setOffering] = useState<CatalogOffering | null>(null);
   const [scheduleRef, setScheduleRef] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
 
@@ -78,12 +82,22 @@ export function OfferPage() {
     if (!code) return;
     setCommerceJourneyOrigin(catalogFrom ? "catalog" : "guided_path");
     setLoading(true);
+    setLoadError(null);
     void getOfferingDetail(code, geo, currency)
       .then((res) => {
         setOffering(res.offering);
         trackEvent("offer_view", { code: res.offering.code });
       })
-      .catch(() => setOffering(null))
+      .catch((err) => {
+        setOffering(null);
+        if (!(err instanceof ApiRequestError && err.status === 404)) {
+          setLoadError(
+            err instanceof ApiRequestError
+              ? err.message
+              : "Could not load this offer. Please try again.",
+          );
+        }
+      })
       .finally(() => setLoading(false));
   }, [code, catalogFrom, geo, currency]);
 
@@ -131,6 +145,13 @@ export function OfferPage() {
   }
 
   if (loading) return <Typography>Loading offer…</Typography>;
+  if (loadError) {
+    return (
+      <Alert severity="warning">
+        {loadError} <Link href={location.pathname}>Try again</Link>
+      </Alert>
+    );
+  }
   if (!offering) {
     return (
       <Alert severity="error">
@@ -143,6 +164,50 @@ export function OfferPage() {
   const priceLabel = formatPrice(priced.currency, priced.amount);
   const inclusions = offering.includes?.length ? offering.includes : DEFAULT_INCLUSIONS;
   const scheduleOptions = scheduleOptionsFor(offering);
+  const extras = getOfferPageExtras(offering.code, offering.certificationName);
+  const durationChipLabel = offering.durationLabel
+    ? offering.durationLabel
+    : offering.durationHours
+      ? `${offering.durationHours} hrs`
+      : null;
+  const showDurationChip =
+    Boolean(durationChipLabel) &&
+    !(
+      offering.certificationName &&
+      durationChipLabel &&
+      offering.certificationName.toLowerCase().includes(durationChipLabel.toLowerCase())
+    );
+
+  if (extras) {
+    return (
+      <>
+        <OfferDetailView
+          offering={offering}
+          extras={extras}
+          catalogLink={catalogLink}
+          priceLabel={priceLabel}
+          inclusions={inclusions}
+          scheduleOptions={scheduleOptions}
+          scheduleRef={scheduleRef}
+          onScheduleChange={setScheduleRef}
+          onEnroll={() => void handleAddToCart()}
+          onCheckout={proceedToCheckout}
+          adding={adding}
+          error={error}
+          userLoggedIn={Boolean(user)}
+        />
+        <Box sx={{ maxWidth: 1120, mx: "auto", px: { xs: 2.5, sm: 3 }, py: 3 }}>
+          <RoleBasedUpsellRail
+            targetRole={upsellRole}
+            context="detail"
+            offerId={offering.code}
+            gapTags={upsellGaps}
+            onAddOffering={(c, scheduleRef, label) => handleAddToCartForCode(c, scheduleRef, label)}
+          />
+        </Box>
+      </>
+    );
+  }
 
   return (
     <Stack spacing={2}>
@@ -161,10 +226,8 @@ export function OfferPage() {
         {offering.certificationName ? (
           <Chip label={offering.certificationName} size="small" color="primary" variant="outlined" />
         ) : null}
-        {offering.durationLabel ? (
-          <Chip label={offering.durationLabel} size="small" variant="outlined" />
-        ) : offering.durationHours ? (
-          <Chip label={`${offering.durationHours} hrs`} size="small" variant="outlined" />
+        {showDurationChip && durationChipLabel ? (
+          <Chip label={durationChipLabel} size="small" variant="outlined" />
         ) : null}
         {offering.scheduleBound ? <Chip label="Schedule required" size="small" color="info" variant="outlined" /> : null}
       </Stack>

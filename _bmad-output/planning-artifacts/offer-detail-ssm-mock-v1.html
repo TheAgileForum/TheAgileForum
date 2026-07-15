@@ -1,0 +1,2062 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Empowered SAFe® 6.0 Scrum Master — Offer Detail Mock | The Agile Forum</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0a1628;
+      --ink-soft: #12233a;
+      --fog: #e8eef4;
+      --paper: #f3f6f9;
+      --text: #0f1c2e;
+      --muted: #5b6b7c;
+      --line: rgba(15, 28, 46, 0.12);
+      --accent: #0f9f8f;
+      --accent-deep: #0b7a6e;
+      --accent-soft: rgba(15, 159, 143, 0.12);
+      --accent-glow: rgba(15, 159, 143, 0.28);
+      --white: #ffffff;
+      --warn: #c47a1a;
+      --radius: 14px;
+      --nav-h: 72px;
+      --sticky-cta-h: 72px;
+      --shadow: 0 12px 40px rgba(10, 22, 40, 0.12);
+      --max: 1120px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Sora", system-ui, sans-serif;
+      color: var(--text);
+      background: var(--paper);
+      line-height: 1.55;
+      padding-bottom: calc(var(--sticky-cta-h) + 12px);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; border: 0; }
+    img { max-width: 100%; display: block; }
+    ul { margin: 0; padding: 0; list-style: none; }
+
+    .eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--accent-deep);
+    }
+    .display {
+      font-family: "Fraunces", Georgia, serif;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+    .display em {
+      font-style: italic;
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .muted { color: var(--muted); }
+    .wrap {
+      width: min(var(--max), calc(100% - 40px));
+      margin-inline: auto;
+    }
+
+    /* —— Mock chrome —— */
+    .mock-bar {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: #101820;
+      color: #c5d0db;
+      font-size: 0.78rem;
+      padding: 10px 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .mock-bar strong { color: #fff; }
+    .mock-bar .tag {
+      display: inline-flex;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 159, 143, 0.18);
+      color: #7ee0d4;
+      font-size: 0.68rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* —— Nav —— */
+    .site-nav {
+      background: var(--ink);
+      color: rgba(255,255,255,0.82);
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .site-nav .inner {
+      width: min(var(--max), calc(100% - 40px));
+      margin-inline: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .logo img { height: 36px; width: auto; }
+    .nav-links {
+      display: flex;
+      gap: 22px;
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+    .nav-links a:hover { color: #fff; }
+    .nav-cta {
+      background: var(--accent);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    .nav-cta:hover { background: var(--accent-deep); }
+
+    /* —— Hero —— */
+    .hero {
+      position: relative;
+      background:
+        radial-gradient(ellipse 80% 60% at 85% 20%, rgba(15, 159, 143, 0.22), transparent 55%),
+        radial-gradient(ellipse 50% 40% at 10% 80%, rgba(15, 159, 143, 0.1), transparent 50%),
+        linear-gradient(165deg, #071018 0%, var(--ink) 45%, var(--ink-soft) 100%);
+      color: #e8eef4;
+      padding: 48px 0 56px;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,0.45), transparent 85%);
+      pointer-events: none;
+    }
+    .hero-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.35fr 0.9fr;
+      gap: 36px;
+      align-items: start;
+    }
+    .crumbs {
+      font-size: 0.8rem;
+      color: rgba(232, 238, 244, 0.55);
+      margin-bottom: 18px;
+    }
+    .crumbs a:hover { color: #7ee0d4; }
+    .hero h1 {
+      font-size: clamp(1.75rem, 3.4vw, 2.45rem);
+      margin: 10px 0 10px;
+      color: #fff;
+      max-width: 22ch;
+    }
+    .rating-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 0 0 16px;
+    }
+    .stars {
+      display: inline-flex;
+      gap: 3px;
+      color: #f5b942;
+      font-size: 1.05rem;
+      letter-spacing: 0.02em;
+      line-height: 1;
+    }
+    .rating-score {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #fff;
+    }
+    .rating-meta {
+      font-size: 0.82rem;
+      color: rgba(232, 238, 244, 0.62);
+    }
+    .hero-lead {
+      font-size: 1rem;
+      color: rgba(232, 238, 244, 0.78);
+      max-width: 52ch;
+      margin: 0 0 22px;
+    }
+    .benefit-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .benefit-pills li {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.82rem;
+      color: rgba(232, 238, 244, 0.9);
+    }
+    .benefit-pills li::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+      flex-shrink: 0;
+    }
+    .key-benefits {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .key-benefits article {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .key-benefits strong {
+      display: block;
+      font-size: 0.88rem;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .key-benefits span {
+      font-size: 0.78rem;
+      color: rgba(232, 238, 244, 0.62);
+    }
+
+    /* Pricing card (hero sidebar) */
+    .price-card {
+      background: var(--white);
+      color: var(--text);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: calc(var(--nav-h) + 28px);
+    }
+    .price-card .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      background: var(--fog);
+      color: var(--ink-soft);
+    }
+    .chip.teal {
+      background: var(--accent-soft);
+      color: var(--accent-deep);
+    }
+    .price-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .price-amount {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin: 6px 0 4px;
+      color: var(--ink);
+    }
+    .price-sub {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .emi-note {
+      background: linear-gradient(135deg, #f0faf8, #eef4f8);
+      border: 1px solid rgba(15, 159, 143, 0.22);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.86rem;
+      margin-bottom: 16px;
+    }
+    .emi-note strong { color: var(--accent-deep); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 13px 18px;
+      border-radius: 11px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 8px 20px var(--accent-glow);
+    }
+    .btn-primary:hover { background: var(--accent-deep); }
+    .btn-secondary {
+      background: var(--ink);
+      color: #fff;
+      margin-top: 10px;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink-soft);
+      border: 1px solid var(--line);
+      margin-top: 10px;
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent-deep); }
+    .includes-mini {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+    .includes-mini h3 {
+      margin: 0 0 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .includes-mini li {
+      position: relative;
+      padding-left: 20px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .includes-mini li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
+    .trust-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      margin-top: 14px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* —— Section chrome —— */
+    section {
+      padding: 56px 0;
+    }
+    section.alt {
+      background: var(--white);
+    }
+    .section-head {
+      max-width: 640px;
+      margin-bottom: 28px;
+    }
+    .section-head h2 {
+      font-size: clamp(1.45rem, 2.5vw, 1.9rem);
+      margin: 8px 0 10px;
+    }
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    /* Jump nav */
+    .jump-nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 41px;
+      z-index: 90;
+    }
+    .jump-nav .inner {
+      width: min(var(--max), calc(100% - 40px));
+      margin-inline: auto;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 12px 0;
+      scrollbar-width: none;
+    }
+    .jump-nav .inner::-webkit-scrollbar { display: none; }
+    .jump-nav a {
+      flex: 0 0 auto;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--muted);
+      background: transparent;
+      white-space: nowrap;
+    }
+    .jump-nav a:hover,
+    .jump-nav a.is-active {
+      background: var(--accent-soft);
+      color: var(--accent-deep);
+    }
+
+    /* Overview split */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 36px;
+      align-items: start;
+    }
+    .prose p { margin: 0 0 14px; color: var(--muted); }
+    .prose h3 {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.15rem;
+      margin: 22px 0 10px;
+      color: var(--ink);
+    }
+    .stats {
+      display: grid;
+      gap: 12px;
+    }
+    .stat {
+      background: linear-gradient(145deg, var(--ink) 0%, var(--ink-soft) 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+    .stat .num {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.7rem;
+      font-weight: 600;
+      color: #7ee0d4;
+    }
+    .stat .lbl {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.7);
+      margin-top: 4px;
+    }
+
+    /* Learn outcomes */
+    .learn-video {
+      margin: 0 0 28px;
+      max-width: 720px;
+    }
+    .learn-video .video-caption {
+      margin: 0 0 12px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--ink-soft);
+    }
+    .learn-video .video-link {
+      display: block;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: var(--ink);
+      box-shadow: 0 10px 28px rgba(10, 22, 40, 0.1);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .learn-video .video-link:hover {
+      border-color: rgba(15, 159, 143, 0.45);
+      box-shadow: 0 12px 32px rgba(15, 159, 143, 0.18);
+    }
+    .learn-video .video-link:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+    }
+    .learn-video img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+    }
+    .learn-video .play-badge {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, transparent 40%, rgba(10, 22, 40, 0.45));
+      pointer-events: none;
+    }
+    .learn-video .play-badge span {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 1.35rem;
+      box-shadow: 0 8px 24px var(--accent-glow);
+      padding-left: 4px;
+    }
+    .outcome-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .outcome {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .outcome:hover {
+      border-color: rgba(15, 159, 143, 0.4);
+      box-shadow: 0 8px 24px rgba(10, 22, 40, 0.06);
+    }
+    .outcome .icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      color: var(--accent-deep);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+    }
+    .outcome h3 {
+      margin: 0 0 8px;
+      font-size: 0.98rem;
+    }
+    .outcome p {
+      margin: 0;
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    /* Curriculum accordion */
+    .accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .acc-item {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .acc-item[open] {
+      border-color: rgba(15, 159, 143, 0.35);
+      box-shadow: 0 6px 20px rgba(10, 22, 40, 0.05);
+    }
+    .acc-item summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .acc-item summary::-webkit-details-marker { display: none; }
+    .acc-item summary .mod {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .acc-item summary .mod-n {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--fog);
+      color: var(--ink-soft);
+      display: grid;
+      place-items: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .acc-item[open] summary .mod-n {
+      background: var(--accent);
+      color: #fff;
+    }
+    .acc-item summary .chev {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--fog);
+      display: grid;
+      place-items: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+    .acc-item[open] summary .chev { transform: rotate(180deg); background: var(--accent-soft); color: var(--accent-deep); }
+    .acc-body {
+      padding: 0 18px 18px 62px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .acc-body p { margin: 0 0 10px; }
+    .acc-body ul { margin-top: 8px; }
+    .acc-body li {
+      position: relative;
+      padding-left: 16px;
+      margin-bottom: 6px;
+      font-size: 0.86rem;
+    }
+    .acc-body li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    /* Schedule / batches */
+    .batch-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .batch {
+      background: var(--white);
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: grid;
+      gap: 12px;
+      transition: border-color 0.2s ease;
+    }
+    .batch:hover,
+    .batch.is-selected {
+      border-color: var(--accent);
+    }
+    .batch.is-selected {
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .batch-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .batch-date {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .batch-meta {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .batch-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .batch-actions .btn {
+      width: auto;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      flex: 1;
+      min-width: 120px;
+    }
+    .seats {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--warn);
+    }
+
+    /* Who it's for */
+    .audience-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    .audience {
+      background: var(--fog);
+      border-radius: var(--radius);
+      padding: 20px 16px;
+      text-align: center;
+    }
+    .audience .role {
+      font-weight: 600;
+      font-size: 0.92rem;
+      margin-bottom: 6px;
+      color: var(--ink);
+    }
+    .audience p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* Includes full */
+    .include-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px 28px;
+    }
+    .include-grid li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.92rem;
+    }
+    .include-grid .check {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+
+    /* Instructors / mentor */
+    .mentor-card {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 24px;
+      align-items: center;
+      background: linear-gradient(120deg, var(--ink), var(--ink-soft));
+      color: #e8eef4;
+      border-radius: 18px;
+      padding: 28px;
+    }
+    .mentor-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 30%, #7ee0d4, transparent 50%),
+        linear-gradient(145deg, var(--accent), var(--ink));
+      border: 3px solid rgba(255,255,255,0.2);
+    }
+    .mentor-card h3 {
+      font-family: "Fraunces", Georgia, serif;
+      margin: 0 0 6px;
+      font-size: 1.25rem;
+      color: #fff;
+    }
+    .mentor-card p {
+      margin: 0 0 14px;
+      color: rgba(232, 238, 244, 0.72);
+      font-size: 0.92rem;
+      max-width: 52ch;
+    }
+    .mentor-card .btn {
+      width: auto;
+      display: inline-flex;
+      background: var(--accent);
+      color: #fff;
+      padding: 11px 18px;
+    }
+
+    /* FAQ */
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 760px;
+    }
+    .faq-list .acc-body { padding-left: 18px; }
+
+    /* Demand growth */
+    .demand-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .demand-card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(10, 22, 40, 0.05);
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+    }
+    .demand-card h3 {
+      margin: 0 0 14px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .salary-chart {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .salary-bars {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      align-items: end;
+      height: 120px;
+      padding: 0 4px;
+    }
+    .salary-bar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .salary-bar .val {
+      font-family: "Fraunces", Georgia, serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--ink);
+    }
+    .salary-bar .bar {
+      width: 100%;
+      max-width: 48px;
+      border-radius: 8px 8px 4px 4px;
+      background: linear-gradient(180deg, var(--accent) 0%, var(--accent-deep) 100%);
+    }
+    .salary-bar.min .bar { height: 42%; }
+    .salary-bar.max .bar { height: 92%; }
+    .salary-bar.avg .bar { height: 58%; background: linear-gradient(180deg, #7ee0d4 0%, var(--accent) 100%); }
+    .salary-bar .lbl {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .logo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      flex: 1;
+      align-content: center;
+    }
+    .logo-pill {
+      display: grid;
+      place-items: center;
+      min-height: 42px;
+      padding: 8px 6px;
+      border-radius: 10px;
+      background: var(--fog);
+      border: 1px solid var(--line);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--ink-soft);
+      text-align: center;
+      line-height: 1.2;
+    }
+    .jobs-visual {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 10px;
+      position: relative;
+      padding-top: 8px;
+    }
+    .jobs-visual .avatars {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .jobs-visual .av {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #c5d0db;
+    }
+    .jobs-visual .av.hl {
+      background: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+      position: relative;
+    }
+    .jobs-visual .av.hl::after {
+      content: "⌕";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .jobs-arch {
+      width: 140px;
+      height: 70px;
+      border: 10px solid var(--accent-soft);
+      border-bottom: 0;
+      border-radius: 140px 140px 0 0;
+      position: relative;
+      margin-bottom: -8px;
+    }
+    .jobs-num {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .jobs-sub {
+      font-size: 0.86rem;
+      color: var(--muted);
+      max-width: 22ch;
+    }
+    .jobs-sub strong { color: var(--ink); }
+    .demand-copy {
+      font-size: 0.92rem;
+      color: var(--muted);
+      max-width: 920px;
+      line-height: 1.65;
+    }
+    .demand-copy p { margin: 0 0 10px; }
+    .demand-copy p:last-child { margin-bottom: 0; }
+
+    /* Certification look */
+    .cert-look {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 36px;
+      align-items: center;
+    }
+    .cert-frame {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+    .cert-frame img {
+      width: 100%;
+      border-radius: 12px;
+      background: var(--fog);
+      aspect-ratio: 1;
+      object-fit: contain;
+    }
+    .cert-look .prose h3 {
+      margin-top: 0;
+    }
+    .cert-look .checklist li {
+      position: relative;
+      padding-left: 22px;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    .cert-look .checklist li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* FAQ groups */
+    .faq-groups {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    .faq-group h3 {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.15rem;
+      margin: 0 0 12px;
+      color: var(--ink);
+    }
+
+    /* Exam guidelines table */
+    .exam-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--white);
+    }
+    .exam-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      min-width: 560px;
+    }
+    .exam-table th,
+    .exam-table td {
+      padding: 14px 16px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+    }
+    .exam-table th {
+      background: var(--ink);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .exam-table tr:last-child td { border-bottom: 0; }
+    .exam-table td:first-child {
+      font-weight: 600;
+      color: var(--ink);
+      width: 34%;
+      background: rgba(15, 159, 143, 0.04);
+    }
+    .exam-table ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .exam-table li {
+      position: relative;
+      padding-left: 14px;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+    .exam-table li:last-child { margin-bottom: 0; }
+    .exam-table li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .exam-footnote {
+      margin-top: 14px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .exam-footnote a {
+      color: var(--accent-deep);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    /* Corporate CTA */
+    .corp-cta {
+      background: var(--fog);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 22px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .corp-cta p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--ink-soft);
+      font-weight: 500;
+      max-width: 48ch;
+    }
+    .corp-cta .btn {
+      width: auto;
+      min-width: 160px;
+    }
+
+    /* Final CTA */
+    .final-cta {
+      background:
+        radial-gradient(ellipse 60% 80% at 90% 50%, rgba(15, 159, 143, 0.25), transparent 55%),
+        linear-gradient(135deg, var(--ink) 0%, var(--ink-soft) 100%);
+      color: #fff;
+      border-radius: 20px;
+      padding: clamp(28px, 5vw, 48px);
+      display: grid;
+      grid-template-columns: 1.4fr auto;
+      gap: 24px;
+      align-items: center;
+    }
+    .final-cta h2 {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      margin: 0 0 8px;
+    }
+    .final-cta p {
+      margin: 0;
+      color: rgba(232, 238, 244, 0.72);
+      max-width: 46ch;
+    }
+    .final-cta .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 220px;
+    }
+    .final-cta .btn-primary { box-shadow: none; }
+
+    /* Sticky mobile CTA */
+    .sticky-cta {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 150;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--line);
+      padding: 12px 16px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 -8px 24px rgba(10, 22, 40, 0.08);
+    }
+    .sticky-cta .price {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+    .sticky-cta .emi {
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    .sticky-cta .btn {
+      width: auto;
+      padding: 12px 20px;
+      white-space: nowrap;
+    }
+
+    /* Design notes */
+    .design-notes {
+      background: #101820;
+      color: #c5d0db;
+      padding: 48px 0 64px;
+      font-size: 0.88rem;
+    }
+    .design-notes h2 {
+      font-family: "Fraunces", Georgia, serif;
+      color: #fff;
+      font-size: 1.2rem;
+      margin: 0 0 16px;
+    }
+    .design-notes .cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+    .design-notes h3 {
+      color: #7ee0d4;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin: 0 0 10px;
+    }
+    .design-notes li {
+      margin-bottom: 8px;
+      padding-left: 14px;
+      position: relative;
+    }
+    .design-notes li::before {
+      content: "·";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    footer.site-foot {
+      background: var(--ink);
+      color: rgba(255,255,255,0.55);
+      padding: 24px 0 100px;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    /* Responsive */
+    @media (max-width: 960px) {
+      .hero-grid,
+      .two-col,
+      .final-cta,
+      .cert-look {
+        grid-template-columns: 1fr;
+      }
+      .price-card { position: static; }
+      .outcome-grid { grid-template-columns: 1fr 1fr; }
+      .audience-grid { grid-template-columns: 1fr 1fr; }
+      .batch-grid { grid-template-columns: 1fr; }
+      .demand-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .sticky-cta { display: flex; }
+      .design-notes .cols { grid-template-columns: 1fr; }
+      .acc-body { padding-left: 18px; }
+      .mentor-card { grid-template-columns: 1fr; text-align: left; }
+    }
+    @media (max-width: 640px) {
+      .outcome-grid,
+      .include-grid,
+      .key-benefits,
+      .audience-grid { grid-template-columns: 1fr; }
+      .hero { padding: 36px 0 40px; }
+      section { padding: 40px 0; }
+      .jump-nav { top: 0; }
+      .logo-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .btn:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mock-bar">
+    <div><strong>UX mock v1.1</strong> — Offer detail redesign (SSM) · HTML only, not wired to React</div>
+    <span class="tag">The Agile Forum · ink / teal</span>
+  </div>
+
+  <header class="site-nav">
+    <div class="inner">
+      <a class="logo" href="#" aria-label="The Agile Forum">
+        <img src="assets/logo-the-agile-forum.png" alt="The Agile Forum" width="160" height="36" />
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#">Trainings</a>
+        <a href="#">Certifications</a>
+        <a href="#">Services</a>
+        <a href="#">Assessment</a>
+      </nav>
+      <a class="nav-cta" href="#enroll">Enroll</a>
+    </div>
+  </header>
+
+  <!-- HERO + PRICING -->
+  <header class="hero" id="top">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="crumbs">
+          <a href="#">Certifications</a> / SAFe® Scrum Master
+        </p>
+        <p class="eyebrow" style="color:#7ee0d4;">Scaled Agile · Live weekend workshop</p>
+        <h1 class="display">AI Empowered SAFe® 6.0 <em>Scrum Master</em> Certification Training</h1>
+        <div class="rating-row" aria-label="Course rating 4.9 out of 5">
+          <span class="stars" aria-hidden="true">★★★★★</span>
+          <span class="rating-score">4.9</span>
+          <span class="rating-meta">Average learner rating · live workshop cohorts</span>
+        </div>
+        <p class="hero-lead">
+          Become a SAFe Scrum Master in 2 days (16 hrs). Learn SAFe roles and artifacts, PI planning simulation,
+          Program Board, dependency management, flow accelerators, and real-life SAFe implementation — with interview guidance.
+        </p>
+        <ul class="benefit-pills" aria-label="Highlights">
+          <li>16 hrs live training</li>
+          <li>PI planning simulation</li>
+          <li>Exam prep dumps</li>
+          <li>100% past-batch exam success</li>
+        </ul>
+        <div class="key-benefits">
+          <article>
+            <strong>Facilitate at ART scale</strong>
+            <span>Team + program events, not just team Scrum</span>
+          </article>
+          <article>
+            <strong>Dependencies &amp; flow</strong>
+            <span>Program Board and flow accelerators in practice</span>
+          </article>
+          <article>
+            <strong>AI-aware coaching</strong>
+            <span>Prompts and workflows that augment the SM role</span>
+          </article>
+          <article>
+            <strong>Career-ready</strong>
+            <span>Interview guidance alongside certification prep</span>
+          </article>
+        </div>
+      </div>
+
+      <aside class="price-card" id="enroll" aria-labelledby="price-heading">
+        <div class="badge-row">
+          <span class="chip teal">Certification</span>
+          <span class="chip">SAFe® Scrum Master</span>
+          <span class="chip">16 hrs</span>
+        </div>
+        <p class="price-label" id="price-heading">Investment (India)</p>
+        <div class="price-amount">₹33,999</div>
+        <p class="price-sub">Schedule required · Next batch 11–12 Jul 2026</p>
+        <div class="emi-note">
+          <strong>EMI from ₹5,667/mo</strong> · 6 months preview<br />
+          <span class="muted" style="font-size:0.8rem;">Or book a mentor call before you enroll</span>
+        </div>
+        <a class="btn btn-primary" href="#schedule">Select schedule</a>
+        <a class="btn btn-secondary" href="#schedule">Enroll now</a>
+        <a class="btn btn-ghost" href="#brochure">Download Course Content &amp; Brochure</a>
+        <a class="btn btn-ghost" href="#mentor">Book mentor</a>
+        <div class="includes-mini">
+          <h3>What's included</h3>
+          <ul>
+            <li>2-day (16 hr) Saturday–Sunday live training</li>
+            <li>PI planning full-event simulation</li>
+            <li>Exam preparation dumps</li>
+            <li>Real-life SAFe implementation examples</li>
+            <li>Interview guidance</li>
+          </ul>
+        </div>
+        <div class="trust-row">
+          <span>Secure checkout</span>
+          <span>·</span>
+          <span>SPC-led delivery</span>
+        </div>
+      </aside>
+    </div>
+  </header>
+
+  <nav class="jump-nav" aria-label="On this page">
+    <div class="inner">
+      <a href="#overview">Overview</a>
+      <a href="#demand">Demand growth</a>
+      <a href="#learn">What you'll learn</a>
+      <a href="#curriculum">Curriculum</a>
+      <a href="#schedule">Schedule</a>
+      <a href="#cert-look">Certification</a>
+      <a href="#audience">Who it's for</a>
+      <a href="#includes">Includes</a>
+      <a href="#faq">FAQ</a>
+      <a href="#exam-guidelines">Exam guidelines</a>
+    </div>
+  </nav>
+
+  <!-- OVERVIEW -->
+  <section class="alt" id="overview">
+    <div class="wrap two-col">
+      <div>
+        <div class="section-head">
+          <p class="eyebrow">Course overview</p>
+          <h2 class="display">Serve the team — and the train</h2>
+          <p>
+            A SAFe Scrum Master is a servant-leader who helps Agile teams succeed inside an Agile Release Train.
+            This workshop goes beyond team Scrum: you practice program-level facilitation, PI planning, and
+            continuous improvement at scale.
+          </p>
+        </div>
+        <div class="prose">
+          <h3>Key responsibilities you'll practice</h3>
+          <p>Team and program facilitation (including PI Planning), coaching with powerful questions, cross-team dependency management, flow and quality practices, and preparing for Inspect &amp; Adapt.</p>
+          <h3>What makes this cohort different</h3>
+          <p>
+            The Agile Forum pairs official-style SSM curriculum depth with mentor-led labs, interview readiness,
+            and an honest path — certify with confidence, then keep growing in community.
+          </p>
+        </div>
+      </div>
+      <div class="stats" aria-label="Program facts">
+        <div class="stat">
+          <div class="num">2 days</div>
+          <div class="lbl">Live weekend workshop · 16 hours</div>
+        </div>
+        <div class="stat">
+          <div class="num" style="font-size:clamp(1.15rem,2.2vw,1.45rem);">PI simulation</div>
+          <div class="lbl">Full Planning Interval event practice</div>
+        </div>
+        <div class="stat">
+          <div class="num">100%</div>
+          <div class="lbl">Past-batch exam success rate (claimed)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SIGNIFICANT DEMAND GROWTH -->
+  <section id="demand">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Career signal</p>
+        <h2 class="display">Significant Demand Growth</h2>
+        <p>Scrum Master talent stays in demand as enterprises scale Agile — salary, employers, and openings at a glance.</p>
+      </div>
+      <div class="demand-grid">
+        <article class="demand-card" aria-labelledby="salary-heading">
+          <h3 id="salary-heading">Annual Salary</h3>
+          <div class="salary-chart">
+            <div class="salary-bars" role="img" aria-label="Salary range from 96 thousand minimum to 209 thousand maximum, average 125 thousand">
+              <div class="salary-bar min">
+                <span class="val">$96k</span>
+                <span class="bar" aria-hidden="true"></span>
+                <span class="lbl">Min</span>
+              </div>
+              <div class="salary-bar max">
+                <span class="val">$209k</span>
+                <span class="bar" aria-hidden="true"></span>
+                <span class="lbl">Max</span>
+              </div>
+              <div class="salary-bar avg">
+                <span class="val">$125k</span>
+                <span class="bar" aria-hidden="true"></span>
+                <span class="lbl">Average</span>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article class="demand-card" aria-labelledby="hiring-heading">
+          <h3 id="hiring-heading">Hiring Companies</h3>
+          <div class="logo-grid" aria-label="Example hiring companies">
+            <span class="logo-pill">Deloitte</span>
+            <span class="logo-pill">Infosys</span>
+            <span class="logo-pill">Bank of America</span>
+            <span class="logo-pill">IBM</span>
+            <span class="logo-pill">Accenture</span>
+            <span class="logo-pill">Fidelity</span>
+            <span class="logo-pill">General Dynamics</span>
+            <span class="logo-pill">Cognizant</span>
+            <span class="logo-pill">Northern Trust</span>
+          </div>
+        </article>
+        <article class="demand-card" aria-labelledby="jobs-heading">
+          <h3 id="jobs-heading">Available Jobs</h3>
+          <div class="jobs-visual">
+            <div class="avatars" aria-hidden="true">
+              <span class="av"></span>
+              <span class="av"></span>
+              <span class="av hl"></span>
+              <span class="av"></span>
+              <span class="av"></span>
+            </div>
+            <div class="jobs-arch" aria-hidden="true"></div>
+            <div class="jobs-num">82,000+</div>
+            <p class="jobs-sub">Openings for <strong>Scrum Master</strong> around the world</p>
+          </div>
+        </article>
+      </div>
+      <div class="demand-copy">
+        <p>SAFe Scrum Master demand continues to grow as enterprises scale Agile transformations.</p>
+        <p>The U.S. Bureau of Labor Statistics projects employment of project management specialists to grow 6% from 2024 to 2034, faster than the average for all occupations.</p>
+        <p>Research by McKinsey shows that 93% of Agile organisations reported better customer satisfaction and operational performance.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT YOU'LL LEARN -->
+  <section class="alt" id="learn">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Outcomes</p>
+        <h2 class="display">What you'll learn</h2>
+        <p>Drawn from our catalog learning outcomes — skills you can use on Monday after the workshop.</p>
+      </div>
+      <figure class="learn-video">
+        <p class="video-caption">Watch the SAFe Scrum Master video to learn more about the course</p>
+        <a
+          class="video-link"
+          href="https://play.vidyard.com/pJuZAbaUT43BrFZh81RvTe"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Watch the SAFe Scrum Master video to learn more about the course"
+        >
+          <img
+            src="https://play.vidyard.com/pJuZAbaUT43BrFZh81RvTe.jpg"
+            alt="SAFe Scrum Master course overview video thumbnail"
+            width="1280"
+            height="720"
+            loading="lazy"
+          />
+          <div class="play-badge" aria-hidden="true"><span>▶</span></div>
+        </a>
+      </figure>
+      <div class="outcome-grid">
+        <article class="outcome">
+          <div class="icon">01</div>
+          <h3>Facilitate SSM responsibilities</h3>
+          <p>Lead team events and coach Agile teams with clarity and confidence.</p>
+        </article>
+        <article class="outcome">
+          <div class="icon">02</div>
+          <h3>Handle train-level dependencies</h3>
+          <p>Surface and manage dependencies across teams and ARTs.</p>
+        </article>
+        <article class="outcome">
+          <div class="icon">03</div>
+          <h3>Run PI planning &amp; Program Board</h3>
+          <p>Draft plans, facilitate planning, and visualize commitments on the board.</p>
+        </article>
+        <article class="outcome">
+          <div class="icon">04</div>
+          <h3>Apply principles &amp; flow</h3>
+          <p>Use SAFe principles, values, and flow accelerators in delivery conversations.</p>
+        </article>
+        <article class="outcome">
+          <div class="icon">05</div>
+          <h3>Support demo &amp; quality</h3>
+          <p>Champion system demo habits and built-in quality practices.</p>
+        </article>
+        <article class="outcome">
+          <div class="icon">06</div>
+          <h3>Bring AI into the SM toolkit</h3>
+          <p>Identify useful AI patterns for prompts, risk review, and workflow augmentation.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- CURRICULUM -->
+  <section id="curriculum">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Curriculum</p>
+        <h2 class="display">Modules that mirror how ARTs really work</h2>
+        <p>Seven modules — from Scrum-in-SAFe foundations through PI planning, iteration execution, and AI for Scrum Masters.</p>
+      </div>
+      <div class="accordion">
+        <details class="acc-item" open>
+          <summary>
+            <span class="mod"><span class="mod-n">1</span> Introducing Scrum in SAFe</span>
+            <span class="chev" aria-hidden="true">▼</span>
+          </summary>
+          <div class="acc-body">
+            <p>Essential Agile concepts, Scrum basics, and the Agile team's role in a SAFe enterprise.</p>
+            <ul>
+              <li>Basic Agile development concepts</li>
+              <li>Scrum basics</li>
+              <li>The Agile team in a SAFe enterprise</li>
+            </ul>
+          </div>
+        </details>
+        <details class="acc-item">
+          <summary>
+            <span class="mod"><span class="mod-n">2</span> Characterizing the Scrum Master role</span>
+            <span class="chev" aria-hidden="true">▼</span>
+          </summary>
+          <div class="acc-body">
+            <p>Responsibilities, effective characteristics, high-performing teams, coaching, collaboration, and conflict resolution.</p>
+            <ul>
+              <li>Responsibilities of the Scrum Master</li>
+              <li>Team events &amp; coaching with powerful questions</li>
+              <li>Collaborate with other teams · resolve conflicts</li>
+            </ul>
+          </div>
+        </details>
+        <details class="acc-item">
+          <summary>
+            <span class="mod"><span class="mod-n">3</span> Experiencing PI Planning</span>
+            <span class="chev" aria-hidden="true">▼</span>
+          </summary>
+          <div class="acc-body">
+            <p>From PI planning basics to draft plans, business value, final plan review, and facilitating the event.</p>
+            <ul>
+              <li>PI planning basics &amp; drafting plans</li>
+              <li>Final plans, business value &amp; PI objectives</li>
+              <li>Facilitating PI planning</li>
+            </ul>
+          </div>
+        </details>
+        <details class="acc-item">
+          <summary>
+            <span class="mod"><span class="mod-n">4</span> Facilitating iteration execution</span>
+            <span class="chev" aria-hidden="true">▼</span>
+          </summary>
+          <div class="acc-body">
+            <p>Plan and track iterations, refine the backlog, facilitate reviews and relentless improvement, support DevOps and Release on Demand.</p>
+          </div>
+        </details>
+        <details class="acc-item">
+          <summary>
+            <span class="mod"><span class="mod-n">5</span> Finishing the Planning Interval</span>
+            <span class="chev" aria-hidden="true">▼</span>
+          </summary>
+          <div class="acc-body">
+            <p>Coach the IP iteration and prepare the team for Inspect &amp; Adapt.</p>
+          </div>
+        </details>
+        <details class="acc-item">
+          <summary>
+            <span class="mod"><span class="mod-n">6</span> AI for Scrum Masters</span>
+            <span class="chev" aria-hidden="true">▼</span>
+          </summary>
+          <div class="acc-body">
+            <p>Foundations and prompting, responsible AI, and building an AI-augmented Scrum Master workflow.</p>
+          </div>
+        </details>
+        <details class="acc-item">
+          <summary>
+            <span class="mod"><span class="mod-n">7</span> Practicing SAFe</span>
+            <span class="chev" aria-hidden="true">▼</span>
+          </summary>
+          <div class="acc-body">
+            <p>Practical applications and exercises that tie the learning back to your real delivery context.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCHEDULE -->
+  <section class="alt" id="schedule">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Upcoming batches</p>
+        <h2 class="display">Pick a schedule that fits</h2>
+        <p>Schedule is attached to your cart line before checkout — same as today's OfferPage flow.</p>
+      </div>
+      <div class="batch-grid">
+        <article class="batch is-selected" data-batch="batch-11-12-jul-2026-ssm">
+          <div class="batch-top">
+            <div>
+              <div class="batch-date">11–12 Jul 2026</div>
+              <div class="batch-meta">Weekend · Sat–Sun · 2 sessions · Live virtual</div>
+            </div>
+            <span class="chip teal">Next cohort</span>
+          </div>
+          <p class="batch-meta">2-day weekend workshop · IST-friendly hours · Live mentor-led</p>
+          <p class="seats">Limited seats · Select to continue</p>
+          <div class="batch-actions">
+            <button type="button" class="btn btn-primary select-batch">Select this schedule</button>
+            <a class="btn btn-ghost" href="#enroll" style="margin-top:0;">Enroll</a>
+          </div>
+        </article>
+        <article class="batch" data-batch="batch-aug-2026-ssm">
+          <div class="batch-top">
+            <div>
+              <div class="batch-date">1–2 Aug 2026</div>
+              <div class="batch-meta">Weekend · Sat–Sun · 2 sessions · Live virtual</div>
+            </div>
+            <span class="chip">Open</span>
+          </div>
+          <p class="batch-meta">Same 16-hour SSM path · Ideal if July fills up</p>
+          <p class="seats" style="color:var(--muted);">Seats available</p>
+          <div class="batch-actions">
+            <button type="button" class="btn btn-secondary select-batch">Select this schedule</button>
+            <a class="btn btn-ghost" href="#enroll" style="margin-top:0;">Enroll</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- CERTIFICATION LOOK -->
+  <section id="cert-look">
+    <div class="wrap cert-look">
+      <div class="cert-frame">
+        <img
+          src="https://cdn.slidesharecdn.com/ss_thumbnails/certifiedai-empoweredsafe6scrummaster-260125200443-dd4f46ef-thumbnail.jpg?width=640&amp;height=640&amp;fit=bounds"
+          alt="AI-Empowered SAFe 6 Scrum Master certification sample"
+          width="640"
+          height="640"
+          loading="lazy"
+        />
+      </div>
+      <div>
+        <div class="section-head" style="margin-bottom:18px;">
+          <p class="eyebrow">Your credential</p>
+          <h2 class="display">How your AI-Empowered SAFe Scrum Master Certification looks like</h2>
+          <p>Industry-recognized credential after you pass the official exam — shareable badge and proof of role-ready facilitation skills.</p>
+        </div>
+        <div class="prose">
+          <ul class="checklist">
+            <li>AI-Empowered SAFe® Scrum Master digital credential</li>
+            <li>Shareable badge for LinkedIn and professional profiles</li>
+            <li>Signals enterprise-scale facilitation and Lean-Agile coaching ability</li>
+            <li>Aligned with Scaled Agile’s official SSM exam path</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section class="alt" id="audience">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Audience</p>
+        <h2 class="display">Who should attend</h2>
+        <p>Built for people stepping into — or leveling up — the Scrum Master role inside SAFe.</p>
+      </div>
+      <div class="audience-grid">
+        <article class="audience">
+          <div class="role">Scrum Masters</div>
+          <p>Moving from team Scrum into ART / program facilitation</p>
+        </article>
+        <article class="audience">
+          <div class="role">Team leads &amp; coaches</div>
+          <p>Supporting multiple teams and dependency talks</p>
+        </article>
+        <article class="audience">
+          <div class="role">Aspiring SMs</div>
+          <p>Career switchers preparing for SSM exam + interviews</p>
+        </article>
+        <article class="audience">
+          <div class="role">Agile contributors</div>
+          <p>BAs, QAs, and engineers facilitating change at scale</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- INCLUDES -->
+  <section class="alt" id="includes">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">What's in the box</p>
+        <h2 class="display">Everything in your enrollment</h2>
+        <p>From our SAFe SSM seed catalog — transparent, no plan-matrix maze.</p>
+      </div>
+      <ul class="include-grid">
+        <li><span class="check">✓</span> 2-day (16 hr) Saturday–Sunday live training</li>
+        <li><span class="check">✓</span> PI planning full-event simulation</li>
+        <li><span class="check">✓</span> Exam preparation dumps</li>
+        <li><span class="check">✓</span> Real-life SAFe implementation examples</li>
+        <li><span class="check">✓</span> Interview guidance</li>
+        <li><span class="check">✓</span> 100% past-batch exam success rate</li>
+      </ul>
+      <div class="corp-cta" id="brochure">
+        <p><strong>Download Course Content &amp; Brochure</strong> — module outline, outcomes, and cohort details in one PDF-ready pack.</p>
+        <a class="btn btn-secondary" href="#">Download brochure</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENTOR -->
+  <section id="mentor">
+    <div class="wrap">
+      <div class="mentor-card">
+        <div class="mentor-avatar" aria-hidden="true"></div>
+        <div>
+          <p class="eyebrow" style="color:#7ee0d4;">Mentor-first, not brochure-first</p>
+          <h3>Talk to a mentor before you commit</h3>
+          <p>
+            Not sure if SSM is the right next step? Book a short mentor conversation — role fit, cohort timing,
+            and whether mock interview add-ons help your goal.
+          </p>
+          <a class="btn" href="#">Book mentor call</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="alt" id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">FAQ</p>
+        <h2 class="display">Common questions</h2>
+        <p>Clear answers adapted for The Agile Forum — training logistics plus official SSM exam basics.</p>
+      </div>
+      <div class="faq-groups">
+        <div class="faq-group">
+          <h3>Pre-requisites</h3>
+          <div class="faq-list accordion">
+            <details class="acc-item" open>
+              <summary>
+                <span class="mod">Are there any prerequisites for this course?</span>
+                <span class="chev" aria-hidden="true">▼</span>
+              </summary>
+              <div class="acc-body">
+                <p>No prerequisites required. Anyone interested in facilitating Agile teams in a SAFe enterprise can enroll.</p>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="faq-group">
+          <h3>SSM Exam FAQs</h3>
+          <div class="faq-list accordion">
+            <details class="acc-item" open>
+              <summary>
+                <span class="mod">What is the format of the SAFe Scrum Master exam?</span>
+                <span class="chev" aria-hidden="true">▼</span>
+              </summary>
+              <div class="acc-body">
+                <p>The exam is <strong>90 minutes</strong> with <strong>45 questions</strong> (timed, multiple-choice). You receive a coaching report after the attempt.</p>
+              </div>
+            </details>
+            <details class="acc-item">
+              <summary>
+                <span class="mod">What is the passing score?</span>
+                <span class="chev" aria-hidden="true">▼</span>
+              </summary>
+              <div class="acc-body">
+                <p><strong>73%</strong> is required to pass.</p>
+              </div>
+            </details>
+            <details class="acc-item">
+              <summary>
+                <span class="mod">When do I get certified?</span>
+                <span class="chev" aria-hidden="true">▼</span>
+              </summary>
+              <div class="acc-body">
+                <p>You receive <strong>accreditation upon passing the exam</strong> — your AI-Empowered SAFe Scrum Master certification and digital badge follow Scaled Agile’s process.</p>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="faq-group">
+          <h3>Training &amp; enrollment FAQs</h3>
+          <div class="faq-list accordion">
+            <details class="acc-item" open>
+              <summary>
+                <span class="mod">How long is the training?</span>
+                <span class="chev" aria-hidden="true">▼</span>
+              </summary>
+              <div class="acc-body">
+                <p>Two live weekend days — 16 hours total. After training, you prepare for and take the SAFe® Scrum Master exam through Scaled Agile.</p>
+              </div>
+            </details>
+            <details class="acc-item">
+              <summary>
+                <span class="mod">What does enrollment include?</span>
+                <span class="chev" aria-hidden="true">▼</span>
+              </summary>
+              <div class="acc-body">
+                <p>Live training, PI planning full-event simulation, exam prep materials, implementation examples, and interview guidance as listed above. Exam and membership details are confirmed at enrollment for your region.</p>
+              </div>
+            </details>
+            <details class="acc-item">
+              <summary>
+                <span class="mod">Do I need a schedule before checkout?</span>
+                <span class="chev" aria-hidden="true">▼</span>
+              </summary>
+              <div class="acc-body">
+                <p>Yes. This offering is schedule-bound — select a cohort so your cart line carries the right batch.</p>
+              </div>
+            </details>
+            <details class="acc-item">
+              <summary>
+                <span class="mod">Who teaches the sessions?</span>
+                <span class="chev" aria-hidden="true">▼</span>
+              </summary>
+              <div class="acc-body">
+                <p>Experienced SAFe practitioners / SPCs who emphasize applied facilitation, not slide read-throughs.</p>
+              </div>
+            </details>
+            <details class="acc-item">
+              <summary>
+                <span class="mod">Can I change my batch?</span>
+                <span class="chev" aria-hidden="true">▼</span>
+              </summary>
+              <div class="acc-body">
+                <p>Contact support before your cohort starts. We'll help move you to the next open weekend when seats allow.</p>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXAM GUIDELINES -->
+  <section id="exam-guidelines">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Official exam</p>
+        <h2 class="display">Exam guidelines</h2>
+        <p>Domain weighting from Scaled Agile’s SAFe Scrum Master certification page — use this with your workshop notes and practice exam.</p>
+      </div>
+      <div class="exam-table-wrap">
+        <table class="exam-table">
+          <thead>
+            <tr>
+              <th scope="col">Domain</th>
+              <th scope="col">Topics</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Introducing Scrum in SAFe® (22–28%)</td>
+              <td>
+                <ul>
+                  <li>Basic Agile and Scrum development concepts</li>
+                  <li>Basic Scrum Framework concepts</li>
+                  <li>Agile Scrum Teams in a SAFe Enterprise</li>
+                  <li>High-performing team characteristics</li>
+                  <li>Team events overview</li>
+                  <li>DevOps and Release on Demand</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>Defining the Scrum Master / Team Coach role (26–30%)</td>
+              <td>
+                <ul>
+                  <li>Scrum Master / Team Coach characteristics</li>
+                  <li>Scrum Master / Team Coach responsibilities</li>
+                  <li>Agile team coaching</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>Supporting Team Events (17–21%)</td>
+              <td>
+                <ul>
+                  <li>Iteration planning</li>
+                  <li>Team sync</li>
+                  <li>Backlog refinement</li>
+                  <li>Iteration review</li>
+                  <li>Iteration retrospective</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>Supporting ART Events (25–29%)</td>
+              <td>
+                <ul>
+                  <li>PI Planning</li>
+                  <li>IP Iteration</li>
+                  <li>Inspect and Adapt event</li>
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="exam-footnote">
+        Maintaining your credential: earn a minimum of 24 Continuing Education Units (CEUs) within your two-year certification cycle (about 12 CEUs annually).
+        Source:
+        <a href="https://scaledagile.com/certification/scrum-master/" target="_blank" rel="noopener noreferrer">scaledagile.com/certification/scrum-master</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="alt" style="padding-bottom: 64px;">
+    <div class="wrap">
+      <div class="final-cta">
+        <div>
+          <h2>Ready to facilitate at scale?</h2>
+          <p>Select your July or August weekend, enroll at ₹33,999, or book a mentor if you want a second opinion first.</p>
+        </div>
+        <div class="actions">
+          <a class="btn btn-primary" href="#schedule">Select schedule</a>
+          <a class="btn btn-ghost" href="#mentor" style="color:#fff;border-color:rgba(255,255,255,0.25);margin-top:0;">Book mentor</a>
+        </div>
+      </div>
+      <div class="corp-cta" style="margin-top:18px; background:var(--white);">
+        <p><strong>Corporate Training or more than 5 people — Contact us</strong> for private cohorts, custom schedules, and volume pricing.</p>
+        <a class="btn btn-primary" href="#">Contact us</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-foot">
+    <div class="wrap">
+      © The Agile Forum · Offer detail mock v1 · SAFe® is a registered trademark of Scaled Agile, Inc.
+    </div>
+  </footer>
+
+  <!-- Sticky CTA (mobile) -->
+  <div class="sticky-cta" role="region" aria-label="Quick enroll">
+    <div>
+      <div class="price">₹33,999</div>
+      <div class="emi">EMI from ₹5,667/mo · 6 mo</div>
+    </div>
+    <a class="btn btn-primary" href="#schedule">Select schedule</a>
+  </div>
+
+  <!-- Design notes (required) -->
+  <aside class="design-notes" id="design-notes">
+    <div class="wrap">
+      <h2>Design notes — Sally (UX)</h2>
+      <div class="cols">
+        <div>
+          <h3>Borrowed from StarAgile (structure)</h3>
+          <ul>
+            <li>Information architecture: hero + rating + benefit bullets, sticky pricing/CTA sidebar, demand-growth cards, curriculum accordion, certification look, upcoming batches, FAQ groups, exam guidelines table, corporate CTA</li>
+            <li>Key-features cluster near the hero; module-by-module course content as expandable sections</li>
+            <li>Schedule cards with enroll actions; mobile sticky price bar</li>
+            <li>Curriculum module titles/topics adapted from public SAFe SSM course patterns (not marketing copy paste)</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Our differentiators</h3>
+          <ul>
+            <li>Brand: ink navy + teal <code>#0f9f8f</code>, Fraunces + Sora — never purple "clone" aesthetics</li>
+            <li>Single clear India price ₹33,999 + EMI preview — no Standard/StarX/StarMax plan matrix clutter</li>
+            <li>Mentor-first CTA path alongside enroll (Forum voice: guidance before hard sell)</li>
+            <li>Copy from our catalog seed (title, summary, includes, outcomes, Jul cohort) — transparent schedule-bound cart flow called out</li>
+            <li>Quieter trust row, calmer density, one job per section</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    (function () {
+      var batches = document.querySelectorAll(".batch");
+      batches.forEach(function (card) {
+        var btn = card.querySelector(".select-batch");
+        if (!btn) return;
+        btn.addEventListener("click", function () {
+          batches.forEach(function (b) { b.classList.remove("is-selected"); });
+          card.classList.add("is-selected");
+          var primary = card.querySelector(".select-batch");
+          batches.forEach(function (b) {
+            var bBtn = b.querySelector(".select-batch");
+            if (!bBtn) return;
+            bBtn.className = "btn select-batch " + (b === card ? "btn-primary" : "btn-secondary");
+            bBtn.textContent = b === card ? "Selected" : "Select this schedule";
+          });
+        });
+      });
+
+      var links = document.querySelectorAll(".jump-nav a");
+      var sections = Array.prototype.map.call(links, function (a) {
+        return document.querySelector(a.getAttribute("href"));
+      });
+      function onScroll() {
+        var y = window.scrollY + 120;
+        var active = 0;
+        sections.forEach(function (sec, i) {
+          if (sec && sec.offsetTop <= y) active = i;
+        });
+        links.forEach(function (a, i) {
+          a.classList.toggle("is-active", i === active);
+        });
+      }
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

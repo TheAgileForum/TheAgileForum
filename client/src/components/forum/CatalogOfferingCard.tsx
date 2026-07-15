@@ -58,10 +58,20 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
   const social = catalogSocialProof(offering);
   const popular = isPopularOffering(offering.code);
 
+  const primaryMeta =
+    offering.certificationName || offering.roleTags.slice(0, 2).map(roleLabel).join(" · ");
+  const durationMeta = offering.durationHours
+    ? `${offering.durationHours} hrs`
+    : offering.durationLabel;
+  // Avoid "7.5 hrs · 7.5 hrs" when duration is already embedded in certificationName/subtitle.
+  const durationAlreadyInMeta =
+    Boolean(durationMeta) &&
+    Boolean(primaryMeta) &&
+    primaryMeta.toLowerCase().includes(durationMeta!.toLowerCase());
   const metaParts = [
-    offering.certificationName || offering.roleTags.slice(0, 2).map(roleLabel).join(" · "),
+    primaryMeta,
     offering.certBody,
-    offering.durationHours ? `${offering.durationHours} hrs` : offering.durationLabel,
+    durationAlreadyInMeta ? undefined : durationMeta,
   ].filter(Boolean);
 
   const features = (offering.includes ?? offering.learningOutcomes ?? []).slice(0, 4);
