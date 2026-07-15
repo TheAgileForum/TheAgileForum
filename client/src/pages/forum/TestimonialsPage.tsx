@@ -1,3 +1,6 @@
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import StarRoundedIcon from "@mui/icons-material/StarRounded";
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
@@ -7,6 +10,8 @@ import { Link as RouterLink } from "react-router-dom";
 
 const INK = "#0a1628";
 const TEAL = "#0f9f8f";
+const LINKEDIN_BLUE = "#0a66c2";
+const STAR = "#f5a623";
 
 type Testimonial = {
   name: string;
@@ -15,6 +20,12 @@ type Testimonial = {
   /** Vimeo or YouTube watch/embed URL from theagileforum.com / Vimeo channels */
   videoUrl?: string;
   company?: string;
+  /** Public profile photo (served from /public/testimonials) for featured cards. */
+  photoUrl?: string;
+  /** Public LinkedIn profile URL — renders a verified badge + profile link. */
+  linkedinUrl?: string;
+  /** Star rating out of 5 (defaults to 5). */
+  rating?: number;
 };
 
 const LINKEDIN_POSTS = [
@@ -86,6 +97,8 @@ const TESTIMONIALS: Testimonial[] = [
   {
     name: "Almas V",
     role: "Scrum Master",
+    linkedinUrl: "https://www.linkedin.com/in/almasvalluru/",
+    rating: 5,
     quote:
       "Any person giving the interview wants is confidence, and this course targets exactly that. I hold an offer currently and got shortlisted for another company's 2nd round. I am very thankful to you and this course. Highly recommended.",
     videoUrl: "https://player.vimeo.com/video/1041809793",
@@ -107,10 +120,12 @@ const TESTIMONIALS: Testimonial[] = [
   },
   {
     name: "Jetinder Singh",
-    role: "Product Manager",
-    company: "Optum Health · USA",
+    role: "",
+    photoUrl: "/testimonials/jetinder-singh.png",
+    linkedinUrl: "https://www.linkedin.com/in/iam-jetinder-singh/",
+    rating: 5,
     quote:
-      "I am Jetinder Singh, working as a Product Manager in the IAM domain with Optum Health. Start of 2024, I attended an exceptional training program led by Dhiren of Agile Forum, focusing on Scrum Master, Agile Methodologies, and SAFe Agile Practices. As a Business Analyst with 16 years of industry experience, I can confidently say that this was the most comprehensive and impactful agile training I've ever participated in. The program stood out for its practical approach, incorporating live projects and real-time examples that bridged the gap between theory and application. Thanks to this training, I feel confident in my ability to lead Agile transformations. It has truly been a career-defining experience.",
+      "Got Product Manager Job--> I am Jetinder Singh, working as a Product Manager in the IAM domain with Optum Health. Start of 2024, I attended an exceptional training program led by Dhiren of Agile Forum, focusing on Scrum Master, Agile Methodologies, and SAFe Agile Practices. As a Business Analyst with 16 years of industry experience, I can confidently say that this was the most comprehensive and impactful agile training I've ever participated in. The program stood out for its practical approach, incorporating live projects and real-time examples that bridged the gap between theory and application. Thanks to this training, I feel confident in my ability to lead Agile transformations. It has truly been a career-defining experience.",
     videoUrl: "https://player.vimeo.com/video/1042882790",
   },
   {
@@ -349,7 +364,204 @@ function VideoEmbed({ url, title }: { url: string; title: string }) {
   );
 }
 
+function getInitials(name: string): string {
+  const words = name.replace(/[^A-Za-z\s]/g, "").trim().split(/\s+/u).filter(Boolean);
+  if (words.length === 0) return "?";
+  const first = words[0][0] ?? "";
+  const last = words.length > 1 ? words[words.length - 1][0] ?? "" : "";
+  return (first + last).toUpperCase();
+}
+
+const AVATAR_COLORS = ["#0f9f8f", "#2563eb", "#7c3aed", "#db2777", "#ea580c", "#0891b2", "#4f46e5"];
+
+function colorForName(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i += 1) hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+  return AVATAR_COLORS[hash % AVATAR_COLORS.length];
+}
+
+function StarRating({ rating = 5 }: { rating?: number }) {
+  const rounded = Math.max(0, Math.min(5, Math.round(rating)));
+  return (
+    <Box
+      role="img"
+      aria-label={`${rounded} out of 5 stars`}
+      sx={{ display: "inline-flex", gap: 0.25 }}
+    >
+      {Array.from({ length: 5 }).map((_, index) => (
+        <StarRoundedIcon
+          key={index}
+          aria-hidden
+          sx={{ fontSize: 22, color: index < rounded ? STAR : "rgba(10,22,40,0.16)" }}
+        />
+      ))}
+    </Box>
+  );
+}
+
+function ProfileAvatar({
+  name,
+  photoUrl,
+  linkedinUrl,
+  size,
+}: {
+  name: string;
+  photoUrl?: string;
+  linkedinUrl?: string;
+  size: number;
+}) {
+  const badgeSize = Math.round(size * 0.32);
+  return (
+    <Box sx={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
+      <Avatar
+        src={photoUrl}
+        alt={photoUrl ? name : undefined}
+        sx={{
+          width: size,
+          height: size,
+          fontSize: size * 0.36,
+          fontWeight: 600,
+          bgcolor: colorForName(name),
+          color: "#fff",
+          border: "4px solid #fff",
+          boxShadow: "0 8px 20px rgba(10,22,40,0.18)",
+        }}
+      >
+        {getInitials(name)}
+      </Avatar>
+      {linkedinUrl ? (
+        <Box
+          component="a"
+          href={linkedinUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${name} on LinkedIn`}
+          sx={{
+            position: "absolute",
+            right: -2,
+            bottom: -2,
+            width: badgeSize,
+            height: badgeSize,
+            borderRadius: "50%",
+            bgcolor: LINKEDIN_BLUE,
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            border: "3px solid #fff",
+            boxShadow: "0 2px 6px rgba(10,22,40,0.25)",
+            transition: "transform .2s ease",
+            "&:hover": { transform: "scale(1.08)" },
+          }}
+        >
+          <LinkedInIcon sx={{ fontSize: badgeSize * 0.62 }} />
+        </Box>
+      ) : null}
+    </Box>
+  );
+}
+
+function TestimonialCard({ item, featured = false }: { item: Testimonial; featured?: boolean }) {
+  const accent = item.linkedinUrl ? LINKEDIN_BLUE : TEAL;
+  const avatarSize = featured ? 104 : 60;
+  return (
+    <Box
+      component="article"
+      sx={{
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        gap: 1.5,
+        bgcolor: "#fff",
+        borderRadius: "16px",
+        border: "1px solid rgba(10,22,40,0.08)",
+        boxShadow: featured
+          ? "0 18px 48px rgba(10,22,40,0.12)"
+          : "0 8px 24px rgba(10,22,40,0.06)",
+        p: featured ? { xs: 3, sm: 4 } : 2.75,
+        pb: featured ? { xs: 3.5, sm: 4 } : 3,
+        overflow: "hidden",
+        transition: "transform .3s ease, box-shadow .3s ease",
+        "&:hover": {
+          transform: "translateY(-5px)",
+          boxShadow: "0 24px 56px rgba(10,22,40,0.14)",
+        },
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "center", sm: "flex-start" },
+          textAlign: { xs: "center", sm: "left" },
+          gap: { xs: 1.5, sm: 2.25 },
+        }}
+      >
+        <ProfileAvatar
+          name={item.name}
+          photoUrl={item.photoUrl}
+          linkedinUrl={item.linkedinUrl}
+          size={avatarSize}
+        />
+        <Box sx={{ minWidth: 0 }}>
+          <Typography
+            sx={{
+              color: INK,
+              fontWeight: 700,
+              fontSize: featured ? { xs: "1.4rem", sm: "1.6rem" } : "1.05rem",
+              lineHeight: 1.2,
+            }}
+          >
+            {item.name}
+          </Typography>
+          {item.role ? (
+            <Typography sx={{ color: "#475569", fontSize: featured ? "1rem" : "0.9rem", mt: 0.35 }}>
+              {item.role}
+            </Typography>
+          ) : null}
+          {item.company ? (
+            <Typography sx={{ color: "#8b94a3", fontSize: featured ? "0.9rem" : "0.82rem", mt: 0.2 }}>
+              {item.company}
+            </Typography>
+          ) : null}
+          <Box sx={{ mt: 1 }}>
+            <StarRating rating={item.rating} />
+          </Box>
+        </Box>
+      </Box>
+
+      <Typography
+        sx={{
+          color: "#374151",
+          fontSize: featured ? { xs: "1rem", sm: "1.08rem" } : "0.95rem",
+          lineHeight: 1.8,
+          fontStyle: "italic",
+        }}
+      >
+        &ldquo;{item.quote}&rdquo;
+      </Typography>
+
+      {item.videoUrl ? (
+        <VideoEmbed url={item.videoUrl} title={`${item.name} success story`} />
+      ) : null}
+
+      <Box
+        sx={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 6,
+          bgcolor: accent,
+        }}
+      />
+    </Box>
+  );
+}
+
 export function TestimonialsPage() {
+  const featured = TESTIMONIALS.find((item) => item.linkedinUrl);
+  const rest = TESTIMONIALS.filter((item) => item !== featured);
   return (
     <Stack spacing={3} sx={{ py: { xs: 1, sm: 2 } }}>
       <Box
@@ -671,53 +883,21 @@ export function TestimonialsPage() {
           </Link>
           . Video embeds matched by name on Vimeo where available.
         </Typography>
+        {featured ? (
+          <Box sx={{ mb: 2.5 }}>
+            <TestimonialCard item={featured} featured />
+          </Box>
+        ) : null}
         <Box
           sx={{
             display: "grid",
             gap: 2.5,
             gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+            alignItems: "start",
           }}
         >
-          {TESTIMONIALS.map((item) => (
-            <Box
-              key={item.name}
-              component="article"
-              sx={{
-                border: "1px solid rgba(10,22,40,0.1)",
-                borderLeft: `3px solid ${TEAL}`,
-                bgcolor: "rgba(15,159,143,0.04)",
-                px: 2.5,
-                py: 2.25,
-                display: "flex",
-                flexDirection: "column",
-                gap: 1.25,
-              }}
-            >
-              <Typography
-                sx={{
-                  color: INK,
-                  fontFamily: '"Fraunces", Georgia, serif',
-                  fontSize: "1.05rem",
-                  fontWeight: 500,
-                  lineHeight: 1.55,
-                  fontStyle: "italic",
-                }}
-              >
-                &ldquo;{item.quote}&rdquo;
-              </Typography>
-              <Box sx={{ mt: "auto", pt: 0.5 }}>
-                <Typography sx={{ color: INK, fontWeight: 600, fontSize: "0.9rem" }}>
-                  {item.name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {item.role}
-                  {item.company ? ` · ${item.company}` : ""}
-                </Typography>
-              </Box>
-              {item.videoUrl ? (
-                <VideoEmbed url={item.videoUrl} title={`${item.name} success story`} />
-              ) : null}
-            </Box>
+          {rest.map((item) => (
+            <TestimonialCard key={item.name} item={item} />
           ))}
         </Box>
       </Box>
