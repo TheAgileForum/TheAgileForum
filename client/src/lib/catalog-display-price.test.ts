@@ -18,8 +18,9 @@ describe("catalogDisplayPrice", () => {
     expect(result.saleFormatted).toBe("₹29,990");
     expect(result.mrpFormatted).toBe("₹60,000");
     expect(result.discountPercent).toBe(50);
-    expect(result.discountLabel).toContain("50% off");
-    expect(result.discountLabel).toContain("Lowest Price Guarantee");
+    expect(result.discountLabel).toBe(
+      "50% off this week | Lowest Price Guarantee",
+    );
   });
 
   it("keeps default ~30% for mentorship course in non-INR currencies", () => {
@@ -28,6 +29,7 @@ describe("catalogDisplayPrice", () => {
       "499",
       "course-agile-fundamentals",
     );
+    expect(result.saleFormatted).toBe("$499");
     expect(result.discountPercent).toBe(30);
     expect(result.mrpFormatted).not.toBe("₹60,000");
   });
