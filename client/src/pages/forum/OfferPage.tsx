@@ -286,6 +286,12 @@ export function OfferPage() {
           <Typography variant="overline" color="text.secondary" sx={{ letterSpacing: "0.08em" }}>
             Investment
           </Typography>
+          <EmiAffordabilityModule
+            amount={priced.amount}
+            currency={priced.currency}
+            offerId={offering.code}
+            installmentPlans={offering.priceQuote?.installmentPlans}
+          />
           <Typography
             component="div"
             sx={{
@@ -293,7 +299,7 @@ export function OfferPage() {
               alignItems: "baseline",
               flexWrap: "wrap",
               gap: 1,
-              mt: 0.5,
+              mt: 0.75,
             }}
           >
             {displayPrice.mrpFormatted ? (
@@ -337,12 +343,6 @@ export function OfferPage() {
             Price shown matches checkout total for this session currency.
             {offering.scheduleLabel ? ` · ${offering.scheduleLabel}` : ""}
           </Typography>
-          <EmiAffordabilityModule
-            amount={priced.amount}
-            currency={priced.currency}
-            offerId={offering.code}
-            installmentPlans={offering.priceQuote?.installmentPlans}
-          />
         </CardContent>
       </Card>
 
