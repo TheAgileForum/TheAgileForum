@@ -334,7 +334,17 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
         )}
 
         <Box sx={{ mt: "auto" }}>
-          <Stack spacing={0.75} sx={{ mb: 1.25 }}>
+          <EmiAffordabilityModule
+            amount={priced.amount}
+            currency={priced.currency}
+            offerId={offering.code}
+            installmentPlans={offering.priceQuote?.installmentPlans}
+            compact
+            variant="info"
+            icon={<CreditCardOutlinedIcon sx={{ fontSize: 16, opacity: 0.8 }} />}
+          />
+
+          <Stack spacing={0.75} sx={{ mb: 1.25, mt: 0.75 }}>
             <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: "baseline", flexWrap: "wrap" }}>
               {displayPrice.mrpFormatted ? (
                 <Typography
@@ -377,16 +387,6 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
               </Box>
             ) : null}
           </Stack>
-
-          <EmiAffordabilityModule
-            amount={priced.amount}
-            currency={priced.currency}
-            offerId={offering.code}
-            installmentPlans={offering.priceQuote?.installmentPlans}
-            compact
-            variant="info"
-            icon={<CreditCardOutlinedIcon sx={{ fontSize: 16, opacity: 0.8 }} />}
-          />
 
           {offering.scheduleBound ? (
             <Typography

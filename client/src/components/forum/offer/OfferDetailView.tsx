@@ -425,12 +425,18 @@ export function OfferDetailView({
               >
                 Investment
               </Typography>
+              <EmiAffordabilityModule
+                amount={offering.priceQuote?.amount ?? offering.defaultUnitPrice}
+                currency={offering.priceQuote?.currency ?? offering.currency}
+                offerId={offering.code}
+                installmentPlans={offering.priceQuote?.installmentPlans}
+              />
               <Stack
                 direction="row"
                 spacing={1}
                 useFlexGap
                 aria-label={`Price: ${displayPrice.saleFormatted}`}
-                sx={{ alignItems: "baseline", flexWrap: "wrap", mt: 0.5 }}
+                sx={{ alignItems: "baseline", flexWrap: "wrap", mt: 0.75 }}
               >
                 {displayPrice.mrpFormatted ? (
                   <Typography
@@ -492,12 +498,6 @@ export function OfferDetailView({
                 </Typography>
               )}
 
-              <EmiAffordabilityModule
-                amount={offering.priceQuote?.amount ?? offering.defaultUnitPrice}
-                currency={offering.priceQuote?.currency ?? offering.currency}
-                offerId={offering.code}
-                installmentPlans={offering.priceQuote?.installmentPlans}
-              />
               <Typography sx={{ color: OFFER_MUTED, fontSize: "0.8rem", mt: 0.75, mb: 2 }}>
                 Or book a mentor call before you enroll
               </Typography>
