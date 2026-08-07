@@ -259,7 +259,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
           {facets?.priceRange
             ? ` · Price ${facets.priceRange.min}–${facets.priceRange.max}`
             : ""}{" "}
-          · Session: {currency} (FR-178)
+          · Session: {currency}
         </Typography>
       </Box>
 

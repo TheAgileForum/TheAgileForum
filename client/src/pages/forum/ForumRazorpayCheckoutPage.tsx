@@ -231,7 +231,7 @@ export function ForumRazorpayCheckoutPage() {
       </Typography>
       <Typography color="text.secondary">
         Complete payment in the Razorpay window. Sandbox test cards and EMI options are available
-        when your Razorpay test account has EMI enabled (FR-170).
+        when your Razorpay test account has EMI enabled.
       </Typography>
       {loading || busy ? <LinearProgress /> : null}
       {error ? <Alert severity="error">{error}</Alert> : null}

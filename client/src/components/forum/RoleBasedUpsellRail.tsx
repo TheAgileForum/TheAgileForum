@@ -140,7 +140,7 @@ export function RoleBasedUpsellRail({
           ))}
         </Stack>
         <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1 }}>
-          Role-based suggestions · Session {currency} · No discount marketing (FR-181)
+          Suggested for your role · Prices in {currency}
         </Typography>
       </CardContent>
     </Card>
