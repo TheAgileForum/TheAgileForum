@@ -194,29 +194,34 @@ function OrderCard({ order }: { order: LearnerOrder }) {
             View offering
           </Button>
           {order.status.toLowerCase() === "paid" && orderIncludesMockInterview(order) ? (
-            <Button
-              size="small"
-              variant="outlined"
-              href={MOCK_INTERVIEW_BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() =>
-                trackEvent("mock_interview_book_slot_clicked", {
-                  orderId: order.id,
-                  orderNumber: order.orderNumber,
-                })
-              }
-              sx={{
-                color: BOOK_SLOT_OCHRE,
-                borderColor: BOOK_SLOT_OCHRE,
-                "&:hover": {
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: "wrap" }}>
+              <Typography variant="caption" color="text.secondary" component="span">
+                Next action
+              </Typography>
+              <Button
+                size="small"
+                variant="outlined"
+                href={MOCK_INTERVIEW_BOOKING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() =>
+                  trackEvent("mock_interview_book_slot_clicked", {
+                    orderId: order.id,
+                    orderNumber: order.orderNumber,
+                  })
+                }
+                sx={{
+                  color: BOOK_SLOT_OCHRE,
                   borderColor: BOOK_SLOT_OCHRE,
-                  backgroundColor: "rgba(196, 123, 43, 0.08)",
-                },
-              }}
-            >
-              Book Interview Slot
-            </Button>
+                  "&:hover": {
+                    borderColor: BOOK_SLOT_OCHRE,
+                    backgroundColor: "rgba(196, 123, 43, 0.08)",
+                  },
+                }}
+              >
+                Book Interview Slot
+              </Button>
+            </Stack>
           ) : null}
         </Stack>
       </CardContent>
