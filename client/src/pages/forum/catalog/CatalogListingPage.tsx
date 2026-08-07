@@ -11,7 +11,7 @@ import { CatalogFilterBar } from "../../../components/forum/CatalogFilterBar";
 import { CatalogOfferingCard } from "../../../components/forum/CatalogOfferingCard";
 import { useForumCart } from "../../../contexts/ForumCartContext";
 import { usePricing } from "../../../contexts/PricingContext";
-import { ApiRequestError } from "../../../lib/api";
+import { ApiRequestError, CATALOG_TIMEOUT_MESSAGE } from "../../../lib/api";
 import { trackEvent } from "../../../lib/analytics";
 import {
   fetchCatalogCategoryCached,
@@ -144,9 +144,11 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
     } catch (err) {
       if (requestId !== requestIdRef.current) return;
       if (err instanceof ApiRequestError) {
+        const timedOut =
+          err.code === "REQUEST_TIMEOUT" || err.code === "NETWORK_ERROR";
         setError({
-          message: err.message,
-          retryable: err.retryable || err.code === "REQUEST_TIMEOUT" || err.code === "NETWORK_ERROR",
+          message: timedOut ? CATALOG_TIMEOUT_MESSAGE : err.message,
+          retryable: err.retryable || timedOut,
         });
       } else {
         setError({ message: "Could not load catalog.", retryable: true });
