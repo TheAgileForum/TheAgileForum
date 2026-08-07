@@ -57,6 +57,18 @@ export async function saveDiagnosisIntent(
   );
 }
 
+export type ResumeUploadResult = {
+  resumeAssetId: string;
+  validationStatus: string;
+  extractedTextChars?: number;
+  /** Present when server could not extract usable resume text. */
+  extractionWarning?: string;
+};
+
+/**
+ * @deprecated Metadata-only upload stores no file bytes and yields empty resume text.
+ * Prefer {@link uploadResumeFile} (multipart `file`).
+ */
 export async function uploadResumeMetadata(
   sessionId: string,
   body: {
@@ -66,21 +78,44 @@ export async function uploadResumeMetadata(
     checksum?: string;
   },
 ) {
-  return apiFetch<{ resumeAssetId: string; validationStatus: string; extractedTextChars?: number }>(
-    `/api/v1/diagnosis/session/${sessionId}/resume`,
-    { method: "POST", body: JSON.stringify(body) },
-  );
+  return apiFetch<ResumeUploadResult>(`/api/v1/diagnosis/session/${sessionId}/resume`, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 }
 
 /** Upload real resume bytes (PDF/DOCX). Preferred over metadata-only. */
 export async function uploadResumeFile(sessionId: string, file: File) {
   const form = new FormData();
   form.append("file", file);
-  return apiFetch<{
-    resumeAssetId: string;
-    validationStatus: string;
-    extractedTextChars?: number;
-  }>(`/api/v1/diagnosis/session/${sessionId}/resume`, {
+  return apiFetch<ResumeUploadResult>(`/api/v1/diagnosis/session/${sessionId}/resume`, {
+    method: "POST",
+    body: form,
+    timeoutMs: 60_000,
+  });
+}
+
+export type ExtractTextResult = {
+  mimeType: string;
+  method: string;
+  text: string;
+  textPreview: string;
+  textChars: number;
+  pageOrWordCount: number | null;
+  empty: boolean;
+  warnings: string[];
+  sessionId?: string;
+};
+
+/**
+ * Session-optional document text extract (PDF/DOC/DOCX/HTML/TXT/MD).
+ * Use before analyze to preview extract quality; resume upload still persists text.
+ */
+export async function extractDocumentText(file: File, sessionId?: string) {
+  const form = new FormData();
+  form.append("file", file);
+  if (sessionId) form.append("sessionId", sessionId);
+  return apiFetch<ExtractTextResult>(`/api/v1/diagnosis/extract-text`, {
     method: "POST",
     body: form,
     timeoutMs: 60_000,

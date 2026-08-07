@@ -189,7 +189,7 @@ To enable live AI on staging (env only; never commit secrets):
 
 If OpenRouter is down or returns an error while mode is `live`, the API falls back to the stub recommendation, logs `diagnosis.analysis.stub_fallback` (reason + model + status), sets `usedStubFallback: true` (and `fallbackReason`) on the results payload, and the results UI shows a soft note. Hard spend caps are not enforced in Phase 1.
 
-Resume uploads store PDF/DOCX bytes on the API host (`uploads/resumes/`) and extract text for analysis. Virus scanning remains a deferred stub hook.
+Resume uploads store PDF/DOCX bytes on the API host (`uploads/resumes/`) and extract text for analysis via the shared document extractor (`server/src/diagnosis/text-extract/`). Formats: PDF (pdf-parse/PDF.js with fallback), DOCX (mammoth), legacy DOC (word-extractor), plus HTML/TXT/MD on `POST /api/v1/diagnosis/extract-text` (session-optional preview). Diagnosis resume upload persists `extractedText` on `ResumeAsset` and returns `extractedTextChars` / `extractionWarning`. Virus scanning remains a deferred stub hook.
 
 ---
 
