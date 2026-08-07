@@ -47,7 +47,7 @@ export function DiagnosisStep2Page() {
   const { sessionId, setRunId } = useDiagnosis();
   const [tab, setTab] = useState(0);
   const [jdText, setJdText] = useState("");
-  const [targetRole, setTargetRole] = useState(DEFAULT_DIAGNOSIS_TARGET_ROLE);
+  const [targetRole, setTargetRole] = useState<string>(DEFAULT_DIAGNOSIS_TARGET_ROLE);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
