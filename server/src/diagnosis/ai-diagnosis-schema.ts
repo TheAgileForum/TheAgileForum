@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { PrimaryAction, RationaleChip } from "./contracts.js";
 
-export const DIAGNOSIS_PROMPT_VERSION = "diagnosis-ai-v1";
+export const DIAGNOSIS_PROMPT_VERSION = "diagnosis-ai-v2";
 
 /** Catalog offering codes the model may recommend (allowlist). */
 export const DIAGNOSIS_OFFERING_ALLOWLIST = [

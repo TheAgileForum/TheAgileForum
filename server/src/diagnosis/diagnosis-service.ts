@@ -395,6 +395,16 @@ export async function getAnalysisResult(runId: string) {
   const rationale = run.recommendation.rationale as Array<{ label: string; detail: string }>;
   const audit = (run.auditMeta ?? null) as AnalysisAuditMeta | null;
 
+  const resume = await prisma.resumeAsset.findFirst({
+    where: { sessionId: run.sessionId, status: "VALIDATED" },
+    orderBy: { createdAt: "desc" },
+    select: { extractedText: true },
+  });
+  let resumeInputStatus: "available" | "unreadable" | "missing" = "missing";
+  if (resume) {
+    resumeInputStatus = resume.extractedText?.trim() ? "available" : "unreadable";
+  }
+
   return enrichAnalysisPayload({
     targetRole: run.session.targetRole,
     readinessScore: run.gapInsight.readinessScore,
@@ -405,5 +415,6 @@ export async function getAnalysisResult(runId: string) {
     rationale,
     usedStubFallback: Boolean(audit?.usedStubFallback),
     fallbackReason: audit?.fallbackReason,
+    resumeInputStatus,
   });
 }

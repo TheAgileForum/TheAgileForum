@@ -45,7 +45,8 @@ POLICY (must follow):
 - Recommend ONLY offerings from the allowlist below (use offeringCode exactly).
 - Prefer practical mentorship for hands-on / job-ready gaps; mock interview for interview prep; resume service for resume gaps; SAFe/CSM/PSM only when certification is clearly indicated.
 - Be concise, specific, and evidence-based from the resume/JD provided.
-- If resume text is thin or missing, lower confidence and note ambiguity in rationale.
+- If resume text is thin or missing, lower confidence (≤ 0.55) and note ambiguity in rationale.
+- When resume text is missing or marked as not extracted, use rationale label "Resume file" (never "Insufficient Data") and explain that a text-based PDF or DOCX is needed — not a scanned/image PDF.
 
 OUTPUT:
 - Respond with a single JSON object only (no markdown fences, no prose).
@@ -71,7 +72,10 @@ ${allowlist}`;
 }
 
 export function buildDiagnosisUserPrompt(input: DiagnosisPromptInput): string {
-  const resume = truncate(input.resumeText.trim() || "(no resume text extracted)", 12_000);
+  const trimmedResume = input.resumeText.trim();
+  const resume = trimmedResume
+    ? truncate(trimmedResume, 12_000)
+    : "(no resume text extracted — file may be image-based/scanned PDF, unsupported format, or extraction failed; treat as unreadable resume and recommend text-based PDF or DOCX)";
   const jd = input.jdText?.trim()
     ? truncate(input.jdText.trim(), 6_000)
     : "(no job description provided)";

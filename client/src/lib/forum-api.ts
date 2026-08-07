@@ -122,6 +122,9 @@ export type PrimaryAction = {
 
 export type ConfidenceTier = "high" | "medium" | "low";
 
+/** Whether usable resume text was available for the diagnosis. */
+export type ResumeInputStatus = "available" | "unreadable" | "missing";
+
 export type RoadmapMilestone = {
   phase: string;
   title: string;
@@ -147,8 +150,11 @@ export type EscalationOptions = {
 export type AnalysisResult = {
   targetRole: string | null;
   readinessScore: number;
+  /** Plain-language match sentence, e.g. "Your resume is just 30% match to Scrum Master". */
+  matchHeadline?: string;
   summaryPlain: string;
   confidenceTier: ConfidenceTier;
+  resumeInputStatus?: ResumeInputStatus;
   insights: { strengths: string[]; gaps: string[]; confidence: number };
   roadmapPreview: RoadmapMilestone[];
   recommendation: {

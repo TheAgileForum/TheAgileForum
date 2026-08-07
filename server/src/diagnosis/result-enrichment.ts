@@ -3,6 +3,9 @@ import { MENTOR_BOOKING_URL } from "../constants/platform.js";
 
 export type ConfidenceTier = "high" | "medium" | "low";
 
+/** Whether we had usable resume text for the diagnosis. */
+export type ResumeInputStatus = "available" | "unreadable" | "missing";
+
 export type RoadmapMilestone = {
   phase: string;
   title: string;
@@ -25,25 +28,87 @@ export type EscalationOptions = {
   supportHref: string;
 };
 
+export type RationaleChip = {
+  label: string;
+  detail: string;
+};
+
+const UNREADABLE_RESUME_DETAIL =
+  "We couldn't read text from your resume file — try a text-based PDF or DOCX (not a scanned/image PDF).";
+
+const MISSING_RESUME_DETAIL =
+  "No resume was provided, so this estimate is based on your role and other answers only.";
+
 export function confidenceTierFromScore(confidence: number): ConfidenceTier {
   if (confidence >= 0.75) return "high";
   if (confidence >= 0.6) return "medium";
   return "low";
 }
 
+export function buildMatchHeadline(
+  targetRole: string | null,
+  readinessScore: number,
+): string {
+  const role = targetRole ?? "your target role";
+  if (readinessScore < 50) {
+    return `Your resume is just ${readinessScore}% match to ${role}`;
+  }
+  if (readinessScore < 75) {
+    return `Your resume is a ${readinessScore}% match to ${role}`;
+  }
+  return `Your resume is a strong ${readinessScore}% match to ${role}`;
+}
+
 export function buildSummaryPlain(
   targetRole: string | null,
   readinessScore: number,
   tier: ConfidenceTier,
+  resumeInputStatus: ResumeInputStatus = "available",
 ): string {
   const role = targetRole ?? "your target role";
+  const matchLine = buildMatchHeadline(targetRole, readinessScore);
+
+  if (resumeInputStatus === "unreadable") {
+    return `${matchLine}. ${UNREADABLE_RESUME_DETAIL} Re-upload a readable file for a fuller estimate.`;
+  }
+  if (resumeInputStatus === "missing") {
+    return `${matchLine}. ${MISSING_RESUME_DETAIL}`;
+  }
+
   if (tier === "low") {
-    return `Your ${readinessScore}% readiness estimate for ${role} has lower confidence—we recommend validating with a mentor before committing to a full program.`;
+    return `${matchLine}. This estimate has lower certainty—we recommend validating with a mentor before committing to a full program.`;
   }
   if (tier === "medium") {
-    return `You are on track for ${role} with a ${readinessScore}% readiness estimate. Focus on the top gaps in the roadmap below.`;
+    return `${matchLine}. Focus on the top gaps in the roadmap below.`;
   }
-  return `Strong alignment for ${role} at ${readinessScore}% readiness. Your recommended path addresses the highest-impact gaps first.`;
+  return `${matchLine}. Your recommended path addresses the highest-impact gaps first.`;
+}
+
+export function isInsufficientResumeRationale(chip: RationaleChip): boolean {
+  const blob = `${chip.label} ${chip.detail}`.toLowerCase();
+  return (
+    /insufficient\s*data/.test(blob) ||
+    /no resume text/.test(blob) ||
+    /resume text (was |is )?(not |missing|empty|unavailable|provided)/.test(blob) ||
+    /missing resume/.test(blob) ||
+    /without (a )?resume/.test(blob) ||
+    /resume (was |is )?(not )?(provided|uploaded|available)/.test(blob)
+  );
+}
+
+export function sanitizeRationaleForResumeStatus(
+  rationale: RationaleChip[],
+  resumeInputStatus: ResumeInputStatus,
+): RationaleChip[] {
+  if (resumeInputStatus === "available") return rationale;
+
+  const filtered = rationale.filter((chip) => !isInsufficientResumeRationale(chip));
+  const notice: RationaleChip =
+    resumeInputStatus === "unreadable"
+      ? { label: "Resume file", detail: UNREADABLE_RESUME_DETAIL }
+      : { label: "No resume", detail: MISSING_RESUME_DETAIL };
+
+  return [notice, ...filtered].slice(0, 5);
 }
 
 export function buildRoadmapPreview(
@@ -91,7 +156,7 @@ export function buildSecondaryActions(): SecondaryAction[] {
     },
     {
       id: "mentor",
-      label: "Book paid mentor call",
+      label: "Book mentor call",
       href: MENTOR_BOOKING_URL,
       type: "mentor",
     },
@@ -101,13 +166,22 @@ export function buildSecondaryActions(): SecondaryAction[] {
 export function buildEscalation(
   tier: ConfidenceTier,
   targetRole: string | null,
+  resumeInputStatus: ResumeInputStatus = "available",
 ): EscalationOptions | null {
   if (tier !== "low") return null;
   const role = targetRole ?? "this role";
+  let message: string;
+  if (resumeInputStatus === "unreadable") {
+    message = `We couldn't read enough text from your resume to score ${role} confidently. A 30-minute mentor call clarifies your gaps—and you can re-upload a text-based PDF or DOCX for a better match estimate.`;
+  } else if (resumeInputStatus === "missing") {
+    message = `Without a resume, your match estimate for ${role} is limited. A 30-minute mentor call confirms your gaps and saves you from the wrong program.`;
+  } else {
+    message = `Your resume match for ${role} looks incomplete or uncertain. A 30-minute mentor call confirms your gaps and saves you from the wrong program.`;
+  }
   return {
     title: "Validate before you enroll",
-    message: `Resume signals for ${role} were thin or ambiguous. A 30-minute mentor call confirms your gaps and saves you from the wrong program.`,
-    mentorCtaLabel: "Book mentor validation call · from ₹49 / $9",
+    message,
+    mentorCtaLabel: "Book mentor validation call",
     mentorHref: MENTOR_BOOKING_URL,
     supportHref: "mailto:support@theagileforum.com?subject=Diagnosis%20support",
   };
@@ -123,14 +197,24 @@ export function enrichAnalysisPayload(input: {
   rationale: Array<{ label: string; detail: string }>;
   usedStubFallback?: boolean;
   fallbackReason?: string;
+  resumeInputStatus?: ResumeInputStatus;
 }) {
   const confidenceTier = confidenceTierFromScore(input.confidence);
   const usedStubFallback = Boolean(input.usedStubFallback);
+  const resumeInputStatus = input.resumeInputStatus ?? "available";
+  const rationale = sanitizeRationaleForResumeStatus(input.rationale, resumeInputStatus);
   return {
     targetRole: input.targetRole,
     readinessScore: input.readinessScore,
-    summaryPlain: buildSummaryPlain(input.targetRole, input.readinessScore, confidenceTier),
+    matchHeadline: buildMatchHeadline(input.targetRole, input.readinessScore),
+    summaryPlain: buildSummaryPlain(
+      input.targetRole,
+      input.readinessScore,
+      confidenceTier,
+      resumeInputStatus,
+    ),
     confidenceTier,
+    resumeInputStatus,
     insights: {
       strengths: input.strengths,
       gaps: input.gaps,
@@ -139,12 +223,12 @@ export function enrichAnalysisPayload(input: {
     roadmapPreview: buildRoadmapPreview(input.targetRole, input.gaps),
     recommendation: {
       primaryAction: input.primaryAction,
-      rationale: input.rationale,
+      rationale,
     },
-    rationale: input.rationale,
+    rationale,
     primaryAction: input.primaryAction,
     secondaryActions: buildSecondaryActions(),
-    escalation: buildEscalation(confidenceTier, input.targetRole),
+    escalation: buildEscalation(confidenceTier, input.targetRole, resumeInputStatus),
     usedStubFallback,
     ...(usedStubFallback && input.fallbackReason
       ? { fallbackReason: input.fallbackReason }
