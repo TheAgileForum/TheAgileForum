@@ -246,28 +246,22 @@ describe.skipIf(!hasDb)("commerce integration (Sprint 1)", () => {
     expect(complete.status).toBe(200);
     expect(complete.body.order.status).toBe("paid");
 
-    // Enrollment notifications are scheduled after mark-paid (non-blocking confirm path).
-    await vi.waitFor(
-      async () => {
-        const events = await prisma.eventLog.findMany({
-          where: {
-            eventName: {
-              in: [
-                "enrollment.order_confirmed",
-                "notification.enrollment_welcome",
-                "notification.enrollment_delivered",
-              ],
-            },
-          },
-          orderBy: { createdAt: "desc" },
-          take: 10,
-        });
-        expect(events.some((e) => e.eventName === "enrollment.order_confirmed")).toBe(true);
-        expect(events.some((e) => e.eventName === "notification.enrollment_welcome")).toBe(true);
-        expect(events.some((e) => e.eventName === "notification.enrollment_delivered")).toBe(true);
+    const events = await prisma.eventLog.findMany({
+      where: {
+        eventName: {
+          in: [
+            "enrollment.order_confirmed",
+            "notification.enrollment_welcome",
+            "notification.enrollment_delivered",
+          ],
+        },
       },
-      { timeout: 5_000, interval: 50 },
-    );
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    });
+    expect(events.some((e) => e.eventName === "enrollment.order_confirmed")).toBe(true);
+    expect(events.some((e) => e.eventName === "notification.enrollment_welcome")).toBe(true);
+    expect(events.some((e) => e.eventName === "notification.enrollment_delivered")).toBe(true);
   });
 
   it("marks order paid when Stripe checkout.session.completed webhook fires", async () => {
