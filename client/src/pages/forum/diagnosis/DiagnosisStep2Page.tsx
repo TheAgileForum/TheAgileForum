@@ -15,7 +15,12 @@ import { useDiagnosis } from "../../../contexts/DiagnosisContext";
 import { ApiRequestError } from "../../../lib/api";
 import { trackEvent } from "../../../lib/analytics";
 import { DEFAULT_DIAGNOSIS_TARGET_ROLE } from "../../../lib/diagnosis-target-roles";
-import { requestAnalysis, saveJdInput, uploadResumeFile } from "../../../lib/forum-api";
+import {
+  extractDocumentText,
+  requestAnalysis,
+  saveJdInput,
+  uploadResumeFile,
+} from "../../../lib/forum-api";
 
 const ALLOWED_TYPES = [
   "application/pdf",
@@ -23,7 +28,8 @@ const ALLOWED_TYPES = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 const MAX_MB = 5;
-const ACCEPT = ".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+const ACCEPT =
+  ".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
 function draftKey(sessionId: string) {
   return `af_diagnosis_step2_${sessionId}`;
@@ -49,6 +55,12 @@ export function DiagnosisStep2Page() {
   const [jdText, setJdText] = useState("");
   const [targetRole, setTargetRole] = useState<string>(DEFAULT_DIAGNOSIS_TARGET_ROLE);
   const [file, setFile] = useState<File | null>(null);
+  const [extractStatus, setExtractStatus] = useState<{
+    ok: boolean;
+    chars: number;
+    message: string;
+  } | null>(null);
+  const [extracting, setExtracting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
@@ -81,6 +93,62 @@ export function DiagnosisStep2Page() {
     return () => window.clearTimeout(timer);
   }, [sessionId, jdText, targetRole, persistDraft]);
 
+  const onFileSelected = useCallback(
+    (next: File | null) => {
+      setFile(next);
+      setExtractStatus(null);
+      setError(null);
+      if (!next) return;
+      if (!ALLOWED_TYPES.includes(inferResumeMimeType(next))) {
+        setExtractStatus({
+          ok: false,
+          chars: 0,
+          message: "Only PDF, DOC, or DOCX files are supported.",
+        });
+        return;
+      }
+      if (next.size > MAX_MB * 1024 * 1024) {
+        setExtractStatus({
+          ok: false,
+          chars: 0,
+          message: `File must be under ${MAX_MB}MB.`,
+        });
+        return;
+      }
+      setExtracting(true);
+      void extractDocumentText(next, sessionId ?? undefined)
+        .then((result) => {
+          if (result.empty || result.textChars === 0) {
+            const message =
+              result.warnings[0] ??
+              "Couldn't read text from this file — try DOCX or a text-based PDF (not a scanned/image PDF).";
+            setExtractStatus({ ok: false, chars: 0, message });
+            trackEvent("diagnosis_resume_extract_empty", { method: result.method });
+            return;
+          }
+          setExtractStatus({
+            ok: true,
+            chars: result.textChars,
+            message: `Text extracted (${result.textChars.toLocaleString()} chars)`,
+          });
+          trackEvent("diagnosis_resume_extract_ok", {
+            method: result.method,
+            textChars: result.textChars,
+          });
+        })
+        .catch((err) => {
+          const message =
+            err instanceof ApiRequestError
+              ? err.message
+              : "Couldn't read text from this file — try DOCX or a text-based PDF.";
+          setExtractStatus({ ok: false, chars: 0, message });
+          trackEvent("diagnosis_resume_extract_failure", { reason: "api_error" });
+        })
+        .finally(() => setExtracting(false));
+    },
+    [sessionId],
+  );
+
   if (!sessionId) {
     return (
       <Alert severity="warning">
@@ -109,6 +177,18 @@ export function DiagnosisStep2Page() {
       trackEvent("diagnosis_resume_upload_failure", { reason: "oversize" });
       return;
     }
+    if (extracting) {
+      setError("Still reading text from your resume — wait a moment, then try again.");
+      return;
+    }
+    if (extractStatus && !extractStatus.ok) {
+      setError(
+        extractStatus.message ||
+          "Couldn't read text from this file — try DOCX or a text-based PDF.",
+      );
+      trackEvent("diagnosis_resume_upload_failure", { reason: "empty_extract" });
+      return;
+    }
     setSubmitting(true);
     setLoadingMessage("Uploading resume…");
     try {
@@ -117,20 +197,45 @@ export function DiagnosisStep2Page() {
         setError("Session missing.");
         return;
       }
-      await uploadResumeFile(sid, file);
+      const upload = await uploadResumeFile(sid, file);
+      const extractedChars = upload.extractedTextChars ?? 0;
+      if (extractedChars === 0) {
+        setError(
+          upload.extractionWarning ??
+            "Couldn't read text from this file — try DOCX or a text-based PDF (not a scanned/image PDF).",
+        );
+        setExtractStatus({
+          ok: false,
+          chars: 0,
+          message:
+            upload.extractionWarning ??
+            "Couldn't read text from this file — try DOCX or a text-based PDF.",
+        });
+        trackEvent("diagnosis_resume_upload_failure", { reason: "empty_extract" });
+        return;
+      }
+      setExtractStatus({
+        ok: true,
+        chars: extractedChars,
+        message: `Text extracted (${extractedChars.toLocaleString()} chars)`,
+      });
       const trimmedJd = jdText.trim();
       if (trimmedJd) {
         setLoadingMessage("Saving job context…");
         await saveJdInput(sid, { jdText: trimmedJd, targetRole });
       }
       setLoadingMessage("Starting analysis…");
-      trackEvent("diagnosis_resume_upload_success", { hasJd: Boolean(jdText.trim()) });
+      trackEvent("diagnosis_resume_upload_success", {
+        hasJd: Boolean(jdText.trim()),
+        extractedTextChars: extractedChars,
+      });
       const run = await requestAnalysis(sid, "user-initiated");
       setRunId(run.analysisRunId);
       sessionStorage.removeItem(draftKey(sid));
       navigate("/diagnosis/step-3");
     } catch (err) {
-      const message = err instanceof ApiRequestError ? err.message : "Upload or analysis request failed.";
+      const message =
+        err instanceof ApiRequestError ? err.message : "Upload or analysis request failed.";
       setError(message);
       trackEvent("diagnosis_resume_upload_failure", { reason: "api_error" });
     } finally {
@@ -139,13 +244,16 @@ export function DiagnosisStep2Page() {
     }
   }
 
+  const analyzeDisabled =
+    submitting || extracting || Boolean(file && extractStatus && !extractStatus.ok);
+
   return (
-    <Stack spacing={2} aria-busy={submitting}>
+    <Stack spacing={2} aria-busy={submitting || extracting}>
       <DiagnosisStepper activeStep={1} />
       <Typography variant="h5" sx={{ fontWeight: 600 }}>
         Resume &amp; job context
       </Typography>
-      {submitting ? <LinearProgress /> : null}
+      {submitting || extracting ? <LinearProgress /> : null}
       {loadingMessage ? (
         <Alert
           severity="info"
@@ -164,13 +272,23 @@ export function DiagnosisStep2Page() {
         <Tab label="Paste JD (optional)" disabled={submitting} />
       </Tabs>
       {tab === 0 ? (
-        <ResumeDropZone
-          file={file}
-          onFile={setFile}
-          maxMb={MAX_MB}
-          accept={ACCEPT}
-          disabled={submitting}
-        />
+        <Stack spacing={1.5}>
+          <ResumeDropZone
+            file={file}
+            onFile={onFileSelected}
+            maxMb={MAX_MB}
+            accept={ACCEPT}
+            disabled={submitting}
+          />
+          {extracting ? (
+            <Alert severity="info" icon={<CircularProgress size={18} color="inherit" />}>
+              Reading text from your resume…
+            </Alert>
+          ) : null}
+          {extractStatus ? (
+            <Alert severity={extractStatus.ok ? "success" : "warning"}>{extractStatus.message}</Alert>
+          ) : null}
+        </Stack>
       ) : (
         <Stack spacing={2}>
           <TextField
@@ -206,7 +324,7 @@ export function DiagnosisStep2Page() {
       <Button
         variant="contained"
         size="large"
-        disabled={submitting}
+        disabled={analyzeDisabled}
         onClick={() => void onAnalyze()}
         startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : null}
       >

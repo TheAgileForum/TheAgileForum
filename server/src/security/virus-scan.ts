@@ -8,6 +8,11 @@ export type VirusScanResult = {
   detail?: string;
 };
 
-export async function scanResumeBuffer(_buffer: Buffer): Promise<VirusScanResult> {
+export async function scanDocumentBuffer(_buffer: Buffer): Promise<VirusScanResult> {
   return { clean: true, scanner: "stub", detail: "virus scan deferred" };
+}
+
+/** @deprecated Prefer {@link scanDocumentBuffer}. */
+export async function scanResumeBuffer(buffer: Buffer): Promise<VirusScanResult> {
+  return scanDocumentBuffer(buffer);
 }

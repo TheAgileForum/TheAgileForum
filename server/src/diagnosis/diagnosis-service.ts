@@ -162,6 +162,7 @@ export async function registerResumeAsset(
   const validation = validateResumeUpload({
     mimeType: input.mimeType,
     sizeBytes: input.sizeBytes,
+    fileName: input.fileName,
   });
   if (!validation.ok) {
     throw new ApiError({
@@ -175,6 +176,7 @@ export async function registerResumeAsset(
   let storagePath = `local-stub://${session.id}/${input.fileName}`;
   let checksum = input.checksum;
   let extractedText: string | null = null;
+  let extractionWarning: string | undefined;
 
   if (input.buffer && input.buffer.length > 0) {
     const scan = await scanResumeBuffer(input.buffer);
@@ -195,16 +197,32 @@ export async function registerResumeAsset(
     storagePath = stored.storagePath;
     checksum = stored.checksum;
 
-    const extracted = await extractResumeText(input.buffer, input.mimeType);
+    const extracted = await extractResumeText(
+      input.buffer,
+      input.mimeType,
+      input.fileName,
+    );
     extractedText = extracted.text || null;
+    extractionWarning = extracted.warning;
     if (extracted.warning) {
       logError("resume text extraction warning", {
         component: "diagnosis",
         diagnosisSessionId: session.id,
         warning: extracted.warning,
         method: extracted.method,
+        bufferBytes: input.buffer.length,
+        mimeType: input.mimeType,
       });
     }
+  } else {
+    extractionWarning =
+      "Resume file bytes were not uploaded — analysis will lack resume text. Use multipart field `file`.";
+    logError("resume upload without file buffer", {
+      component: "diagnosis",
+      diagnosisSessionId: session.id,
+      fileName: input.fileName,
+      mimeType: input.mimeType,
+    });
   }
 
   const asset = await prisma.resumeAsset.create({
@@ -240,6 +258,7 @@ export async function registerResumeAsset(
     validationStatus: "validated",
     nextStep: nextStepForStatus(updated.status),
     extractedTextChars: extractedText?.length ?? 0,
+    ...(extractionWarning ? { extractionWarning } : {}),
   };
 }
 

@@ -1,67 +1,40 @@
-import mammoth from "mammoth";
-
-const PDF_MIME = "application/pdf";
-const DOC_MIME = "application/msword";
-const DOCX_MIME =
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+import { extractDocumentText } from "./text-extract/index.js";
 
 export type ResumeExtractResult = {
   text: string;
-  method: "pdf-parse" | "mammoth" | "unsupported" | "empty";
+  method:
+    | "pdf-parse"
+    | "pdf-parse-fallback"
+    | "mammoth"
+    | "word-extractor"
+    | "unsupported"
+    | "empty";
   warning?: string;
+  warnings?: string[];
+  pageOrWordCount?: number;
 };
-
-async function extractPdf(buffer: Buffer): Promise<string> {
-  // pdf-parse CJS default export
-  const mod = await import("pdf-parse");
-  const pdfParse = (mod as unknown as { default?: (buf: Buffer) => Promise<{ text: string }> })
-    .default;
-  if (typeof pdfParse !== "function") {
-    // Some bundlers expose the function as the module itself
-    const fn = mod as unknown as (buf: Buffer) => Promise<{ text: string }>;
-    const result = await fn(buffer);
-    return result.text ?? "";
-  }
-  const result = await pdfParse(buffer);
-  return result.text ?? "";
-}
-
-async function extractDocx(buffer: Buffer): Promise<string> {
-  const result = await mammoth.extractRawText({ buffer });
-  return result.value ?? "";
-}
 
 /**
  * Extract plain text from a resume buffer for diagnosis AI input.
- * PDF → pdf-parse; DOCX → mammoth; legacy DOC → unsupported (file still stored).
+ * Delegates to the shared document text extractor (PDF/DOCX/DOC + more).
  */
 export async function extractResumeText(
   buffer: Buffer,
   mimeType: string,
+  fileName?: string,
 ): Promise<ResumeExtractResult> {
-  if (!buffer.length) {
-    return { text: "", method: "empty", warning: "Empty file" };
-  }
+  const result = await extractDocumentText({ buffer, mimeType, fileName });
+  const method =
+    result.method === "cheerio" || result.method === "plain"
+      ? ("unsupported" as const)
+      : result.method;
 
-  try {
-    if (mimeType === PDF_MIME) {
-      const text = (await extractPdf(buffer)).trim();
-      return { text, method: "pdf-parse", ...(text ? {} : { warning: "No text found in PDF" }) };
-    }
-    if (mimeType === DOCX_MIME) {
-      const text = (await extractDocx(buffer)).trim();
-      return { text, method: "mammoth", ...(text ? {} : { warning: "No text found in DOCX" }) };
-    }
-    if (mimeType === DOC_MIME) {
-      return {
-        text: "",
-        method: "unsupported",
-        warning: "Legacy .doc text extraction is not supported; upload PDF or DOCX for AI analysis",
-      };
-    }
-    return { text: "", method: "unsupported", warning: `Unsupported mime type: ${mimeType}` };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return { text: "", method: "empty", warning: `Extraction failed: ${message}` };
-  }
+  const warning = result.warnings[0];
+  return {
+    text: result.text,
+    method,
+    ...(warning ? { warning } : {}),
+    warnings: result.warnings,
+    ...(result.pageOrWordCount != null ? { pageOrWordCount: result.pageOrWordCount } : {}),
+  };
 }

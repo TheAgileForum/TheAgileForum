@@ -19,6 +19,7 @@ import {
   saveDiagnosisIntent,
   saveJdInput,
 } from "../diagnosis/diagnosis-service.js";
+import { extractUploadedDocumentText } from "../diagnosis/extract-text-service.js";
 import { getEnv } from "../config/env.js";
 import { ApiError } from "../errors/api-error.js";
 
@@ -63,6 +64,60 @@ diagnosisRouter.put(
     }
   },
 );
+
+/**
+ * Session-optional text extraction (PDF/DOC/DOCX/HTML/TXT/MD).
+ * Multipart field `file`. Optional form field `sessionId` for correlation only.
+ * Auth: optionalAuth (same as diagnosis resume).
+ */
+diagnosisRouter.post("/extract-text", (req, res, next) => {
+  return resumeMulter.single("file")(req, res, (err) => {
+    if (err) {
+      if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
+        return next(
+          new ApiError({
+            status: 400,
+            code: "FILE_TOO_LARGE",
+            message: `File exceeds max size of ${getEnv().RESUME_UPLOAD_MAX_MB}MB`,
+            retryable: true,
+          }),
+        );
+      }
+      return next(err);
+    }
+    void (async () => {
+      try {
+        const file = req.file;
+        if (!file) {
+          throw new ApiError({
+            status: 400,
+            code: "FILE_REQUIRED",
+            message: "Document file is required (multipart field: file)",
+            retryable: true,
+          });
+        }
+        const mimeType =
+          file.mimetype ||
+          (typeof req.body?.mimeType === "string" ? req.body.mimeType : "") ||
+          "application/octet-stream";
+        const sessionId =
+          typeof req.body?.sessionId === "string" && req.body.sessionId.trim()
+            ? req.body.sessionId.trim()
+            : undefined;
+        const result = await extractUploadedDocumentText({
+          fileName: file.originalname || "document",
+          mimeType,
+          sizeBytes: file.size,
+          buffer: file.buffer,
+          sessionId,
+        });
+        return res.status(200).json(result);
+      } catch (error) {
+        return next(error);
+      }
+    })();
+  });
+});
 
 /**
  * Multipart file upload (preferred): field name `file`.

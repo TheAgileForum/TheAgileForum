@@ -34,6 +34,7 @@
     "@prisma/client": "^6.19.0",
     "@sentry/node": "^10.22.0",
     "bcrypt": "^5.1.1",
+    "cheerio": "^1.2.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -42,6 +43,7 @@
     "multer": "^2.2.0",
     "pdf-parse": "^2.4.5",
     "posthog-node": "^5.13.2",
+    "word-extractor": "^1.0.4",
     "zod": "^3.24.1"
   },
   "devDependencies": {
@@ -52,6 +54,8 @@
     "@types/node": "^22.10.0",
     "@types/pdf-parse": "^1.1.5",
     "@types/supertest": "^6.0.2",
+    "@types/word-extractor": "^1.0.6",
+    "jszip": "^3.10.1",
     "prisma": "^6.19.0",
     "supertest": "^7.0.0",
     "tsx": "^4.19.2",
