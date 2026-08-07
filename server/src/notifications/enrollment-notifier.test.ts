@@ -96,6 +96,13 @@ describe("deliverEnrollmentNotifications", () => {
     expect(learnerCall.html).toContain("Pre-requisite");
     expect(learnerCall.html).toContain("Preparation");
     expect(learnerCall.html).toContain("scrumguides.org");
+    expect(learnerCall.html).toContain("1drv.ms/x/s!Ard0cF-GOR3Esx700Rpz1gJSltbQ");
+    expect(learnerCall.html).toContain("1drv.ms/f/s!Ard0cF-GOR3ErglcUZ4xiPj4khvz");
+    expect(learnerCall.html).toContain("1drv.ms/b/s!Ard0cF-GOR3EsFTyJLlloW1XSeK4");
+    expect(learnerCall.html).toContain("1drv.ms/w/s!Ard0cF-GOR3EswSSNshnSS_0ATtu");
+    expect(learnerCall.html).toContain("1drv.ms/w/s!Ard0cF-GOR3EtX5smsju6ULpjIMV");
+    expect(learnerCall.html).toContain("calendly.com/coach_Dhirender_Verma");
+    expect(learnerCall.html).not.toContain("link forthcoming");
   });
 
   it("sends Mock Interview welcome for slug alias offering codes", async () => {
