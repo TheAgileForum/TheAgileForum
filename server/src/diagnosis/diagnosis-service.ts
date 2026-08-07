@@ -12,6 +12,7 @@ import { storeResumeFile } from "../storage/resume-storage.js";
 import { scheduleAnalysisRun } from "./analysis-runner.js";
 import { upsertSessionJourney } from "./journey-state-service.js";
 import type { PrimaryAction } from "./contracts.js";
+import { parseYearsOfExperience } from "../recommendations/sm-pathway.js";
 import { enrichAnalysisPayload } from "./result-enrichment.js";
 import { extractResumeText } from "./resume-extract.js";
 import { logError } from "../runtime/logger.js";
@@ -424,6 +425,11 @@ export async function getAnalysisResult(runId: string) {
     resumeInputStatus = resume.extractedText?.trim() ? "available" : "unreadable";
   }
 
+  const yearsOfExperience = parseYearsOfExperience(
+    run.session.currentStatus,
+    resume?.extractedText,
+  );
+
   return enrichAnalysisPayload({
     targetRole: run.session.targetRole,
     readinessScore: run.gapInsight.readinessScore,
@@ -435,5 +441,6 @@ export async function getAnalysisResult(runId: string) {
     usedStubFallback: Boolean(audit?.usedStubFallback),
     fallbackReason: audit?.fallbackReason,
     resumeInputStatus,
+    yearsOfExperience,
   });
 }

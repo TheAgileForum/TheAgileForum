@@ -12,6 +12,7 @@ describe("gap detection rubric loader", () => {
     expect(rubric).toMatch(/Quantified impact/i);
     expect(rubric).toMatch(/Role title vs Scrum Master/i);
     expect(rubric).toMatch(/Certification gaps/i);
+    expect(rubric).toMatch(/do \*\*not\*\* recommend POPM or RTE/i);
     expect(rubric).toMatch(/Tool depth/i);
     expect(rubric).toMatch(/ATS keywords/i);
     expect(rubric).toMatch(/JD alignment/i);
@@ -31,6 +32,9 @@ describe("buildDiagnosisSystemPrompt", () => {
     expect(prompt).toContain("GAP DETECTION RUBRIC");
     expect(prompt).toMatch(/No quantified sprint\/delivery outcomes/i);
     expect(prompt).toMatch(/prefer 6–12 grounded gaps/i);
+    expect(prompt).toMatch(/Do NOT recommend.*POPM|safe-product-owner/i);
+    expect(prompt).toMatch(/safe-rte-certification-training \(RTE\)/i);
+    expect(prompt).toMatch(/under 12 years|12\+ years/i);
   });
 });
 

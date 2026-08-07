@@ -200,11 +200,17 @@ export function enrichAnalysisPayload(input: {
   usedStubFallback?: boolean;
   fallbackReason?: string;
   resumeInputStatus?: ResumeInputStatus;
+  /** Parsed total YOE from intent/resume; null when unknown (SM pathway defaults to SAFe SM). */
+  yearsOfExperience?: number | null;
 }) {
   const confidenceTier = confidenceTierFromScore(input.confidence);
   const usedStubFallback = Boolean(input.usedStubFallback);
   const resumeInputStatus = input.resumeInputStatus ?? "available";
   const rationale = sanitizeRationaleForResumeStatus(input.rationale, resumeInputStatus);
+  const yearsOfExperience =
+    typeof input.yearsOfExperience === "number" && Number.isFinite(input.yearsOfExperience)
+      ? input.yearsOfExperience
+      : null;
   return {
     targetRole: input.targetRole,
     readinessScore: input.readinessScore,
@@ -217,6 +223,7 @@ export function enrichAnalysisPayload(input: {
     ),
     confidenceTier,
     resumeInputStatus,
+    yearsOfExperience,
     insights: {
       strengths: input.strengths,
       gaps: input.gaps,
