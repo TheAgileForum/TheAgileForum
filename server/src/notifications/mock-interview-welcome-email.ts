@@ -12,32 +12,48 @@ const MOCK_INTERVIEW_CODE_PREFIX = "service-mock-interview";
 export const MOCK_INTERVIEW_WELCOME_SUBJECT =
   "Welcome — Scrum Master 1:1 Mock Interview";
 
-/** Public URLs that are already known (Scrum Guide + founder OneDrive SAFe Q&A). */
+/**
+ * Founder-supplied public prep URLs (hardcoded defaults so links work without
+ * Render env vars). Per-file env keys still override when set.
+ */
 export const MOCK_INTERVIEW_KNOWN_LINKS = {
+  scrumTopicsXlsx:
+    "https://1drv.ms/x/s!Ard0cF-GOR3Esx700Rpz1gJSltbQ?e=8rjGFo",
   scrumGuidePdf:
     "https://scrumguides.org/docs/scrumguide/v2020/2020-Scrum-Guide-US.pdf",
-  safeInterviewOnedrive:
+  interviewQuestionsFolder:
+    "https://1drv.ms/f/s!Ard0cF-GOR3ErglcUZ4xiPj4khvz?e=yfDwIy",
+  smSituationalPdf:
+    "https://1drv.ms/b/s!Ard0cF-GOR3EsFTyJLlloW1XSeK4?e=Phq0bL",
+  agileScrumQaDocx:
+    "https://1drv.ms/w/s!Ard0cF-GOR3EswSSNshnSS_0ATtu?e=sZ99Z6",
+  safeInterviewDocx:
+    "https://1drv.ms/w/s!Ard0cF-GOR3EtX5smsju6ULpjIMV?e=Wi5EPb",
+  scaledAgileQuestions:
     "https://1drv.ms/w/c/c41d39865f7074b7/IQCiGk4r2uNWS78VOeNvJgq_AR3JIcj8LpsGbrd2zaa_nTE?e=kMBKMM",
+  calendlyBookSessions: "https://calendly.com/coach_Dhirender_Verma",
 } as const;
 
 /**
- * Prep material labels. URLs may come from env overrides or remain unset
- * until the founder supplies public Drive/OneDrive links.
+ * Prep material labels. Defaults come from MOCK_INTERVIEW_KNOWN_LINKS;
+ * env vars override when set.
  *
- * Env vars (optional):
- * - MOCK_INTERVIEW_RESOURCES_FOLDER_URL — shared folder for all prep files
+ * Env vars (optional overrides):
+ * - MOCK_INTERVIEW_RESOURCES_FOLDER_URL — fallback shared folder if a file URL is missing
  * - MOCK_INTERVIEW_RESOURCE_SCRUM_TOPICS_URL
  * - MOCK_INTERVIEW_RESOURCE_INTERVIEW_QUESTIONS_URL
  * - MOCK_INTERVIEW_RESOURCE_SM_SITUATIONAL_URL
  * - MOCK_INTERVIEW_RESOURCE_AGILE_SCRUM_QA_URL
  * - MOCK_INTERVIEW_RESOURCE_SAFE_QA_DOC_URL
+ * - MOCK_INTERVIEW_RESOURCE_SAFE_QA_ONEDRIVE_URL
+ * - MOCK_INTERVIEW_CALENDLY_URL
  */
 export type MockInterviewResource = {
   id: string;
   label: string;
-  /** Env var for a direct file/folder link; empty = founder must supply. */
+  /** Env var for a direct file/folder link override. */
   envKey?: string;
-  /** Hard-coded public URL when known. */
+  /** Hard-coded public URL default. */
   fixedUrl?: string;
 };
 
@@ -46,6 +62,7 @@ export const MOCK_INTERVIEW_RESOURCES: MockInterviewResource[] = [
     id: "scrum-topics",
     label: "Scrum Master Plan -Topics.xlsx",
     envKey: "MOCK_INTERVIEW_RESOURCE_SCRUM_TOPICS_URL",
+    fixedUrl: MOCK_INTERVIEW_KNOWN_LINKS.scrumTopicsXlsx,
   },
   {
     id: "scrum-guide",
@@ -56,26 +73,31 @@ export const MOCK_INTERVIEW_RESOURCES: MockInterviewResource[] = [
     id: "interview-questions",
     label: "Interview Questions",
     envKey: "MOCK_INTERVIEW_RESOURCE_INTERVIEW_QUESTIONS_URL",
+    fixedUrl: MOCK_INTERVIEW_KNOWN_LINKS.interviewQuestionsFolder,
   },
   {
     id: "sm-situational",
     label: "SM Situational Questions.pdf",
     envKey: "MOCK_INTERVIEW_RESOURCE_SM_SITUATIONAL_URL",
+    fixedUrl: MOCK_INTERVIEW_KNOWN_LINKS.smSituationalPdf,
   },
   {
     id: "agile-scrum-qa",
     label: "Agile_Scrum Interview questions_Answers.docx",
     envKey: "MOCK_INTERVIEW_RESOURCE_AGILE_SCRUM_QA_URL",
+    fixedUrl: MOCK_INTERVIEW_KNOWN_LINKS.agileScrumQaDocx,
   },
   {
     id: "safe-qa-doc",
     label: "SAfe Interview Questions.docx",
     envKey: "MOCK_INTERVIEW_RESOURCE_SAFE_QA_DOC_URL",
+    fixedUrl: MOCK_INTERVIEW_KNOWN_LINKS.safeInterviewDocx,
   },
   {
     id: "safe-qa-onedrive",
-    label: "SAFe interview questions (OneDrive)",
-    fixedUrl: MOCK_INTERVIEW_KNOWN_LINKS.safeInterviewOnedrive,
+    label: "Scaled agile questions",
+    envKey: "MOCK_INTERVIEW_RESOURCE_SAFE_QA_ONEDRIVE_URL",
+    fixedUrl: MOCK_INTERVIEW_KNOWN_LINKS.scaledAgileQuestions,
   },
 ];
 
@@ -109,9 +131,11 @@ export function resolveMockInterviewResources(
   const sharedFolder = env.MOCK_INTERVIEW_RESOURCES_FOLDER_URL?.trim() || null;
 
   return MOCK_INTERVIEW_RESOURCES.map((resource) => {
+    // Env override wins over hardcoded default so ops can rotate links without redeploy.
     const direct =
+      (resource.envKey ? env[resource.envKey]?.trim() || null : null) ||
       resource.fixedUrl?.trim() ||
-      (resource.envKey ? env[resource.envKey]?.trim() || null : null);
+      null;
     if (direct) {
       return { id: resource.id, label: resource.label, url: direct, viaFolder: false };
     }
@@ -134,6 +158,15 @@ export function listMissingMockInterviewResourceUrls(
   return resolveMockInterviewResources(env)
     .filter((r) => !r.url)
     .map((r) => r.label);
+}
+
+export function resolveMockInterviewCalendlyUrl(
+  env: NodeJS.ProcessEnv = process.env,
+): string {
+  return (
+    env.MOCK_INTERVIEW_CALENDLY_URL?.trim() ||
+    MOCK_INTERVIEW_KNOWN_LINKS.calendlyBookSessions
+  );
 }
 
 function escapeHtml(text: string): string {
@@ -169,6 +202,7 @@ export function buildMockInterviewWelcomeHtml(input: {
 }): string {
   const resources = resolveMockInterviewResources();
   const byId = Object.fromEntries(resources.map((r) => [r.id, r]));
+  const calendlyUrl = resolveMockInterviewCalendlyUrl();
 
   const link = (id: string) => {
     const r = byId[id];
@@ -183,22 +217,31 @@ export function buildMockInterviewWelcomeHtml(input: {
   <p>Greetings of the day, and hope you are keeping safe and well.</p>
   <p>Congratulations on the enrolment for the <strong>Scrum Master 1:1 Mock Interview</strong>.</p>
 
-  <h2 style="font-size:16px;margin:24px 0 8px;">Pre-requisite</h2>
-  <ul style="padding-left:20px;margin:0 0 16px;">
-    <li>Deep understanding of topics mentioned here: ${link("scrum-topics")}</li>
-    <li>Deep understanding of the Scrum Guide 2020: ${link("scrum-guide")}</li>
-    <li>Practical implementation knowledge of Scrum, Kanban, XP, SAFe, etc.</li>
-    <li>Examples to support the work and experience mentioned in your resume.</li>
-  </ul>
+  <h2 style="font-size:16px;margin:24px 0 8px;">Pre-requisite:-</h2>
+  <ol style="padding-left:20px;margin:0 0 16px;">
+    <li>Deep understanding of topics mentioned here:- ${link("scrum-topics")}</li>
+    <li>Deep understanding of scrum Guide 2020:- ${link("scrum-guide")}</li>
+    <li>Practical implementation knowledge of the scrum, kanban, XP, SAFe etc.</li>
+    <li>Examples to support the work and experience mentioned in the resume.</li>
+  </ol>
 
-  <h2 style="font-size:16px;margin:24px 0 8px;">Preparation</h2>
-  <ul style="padding-left:20px;margin:0 0 16px;">
-    <li>Prepare all topics mentioned in the Pre-requisite section above.</li>
-    <li>Read / re-write answers for all questions and answers in: ${link("interview-questions")}</li>
-    <li>Write all answers to the questions in: ${link("sm-situational")}</li>
-    <li>Read all questions and answers in: ${link("agile-scrum-qa")}</li>
-    <li>Go through SAFe interview questions: ${link("safe-qa-doc")} &amp; ${link("safe-qa-onedrive")}</li>
-  </ul>
+  <h2 style="font-size:16px;margin:24px 0 8px;">Preparation:-</h2>
+  <ol style="padding-left:20px;margin:0 0 16px;">
+    <li>Prepare all topics mentioned in upper Pre-requisite section.</li>
+    <li>Read/re-write Answers of All questions and answers mentioned in : ${link("interview-questions")}</li>
+    <li>Write all answers to the questions present in: ${link("sm-situational")}</li>
+    <li>Read All questions and answers mentioned in : ${link("agile-scrum-qa")}</li>
+    <li>Go through SAFe interview questions:
+      <ul style="margin:8px 0 0;padding-left:20px;">
+        <li>${link("safe-qa-doc")}</li>
+        <li>${link("safe-qa-onedrive")}</li>
+      </ul>
+    </li>
+  </ol>
+
+  <p>Please feel free to reach out to me in case you need any more information from me.</p>
+  <p>After your preparation we will be have 1:1 interview</p>
+  <p>Please Book your sessions via link: <a href="${escapeHtml(calendlyUrl)}">${escapeHtml(calendlyUrl)}</a></p>
 
   <p style="margin-top:24px;color:#444;font-size:14px;">
     Order <strong>${escapeHtml(input.orderNumber)}</strong><br/>
