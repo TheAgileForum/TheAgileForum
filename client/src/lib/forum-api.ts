@@ -688,3 +688,34 @@ export async function completeCheckout(orderId: string, paymentRef?: string) {
     },
   );
 }
+
+export type LearnerOrderItem = {
+  offeringCode: string;
+  title: string;
+  category?: string;
+  quantity: number;
+  unitPrice: string;
+  currency: string;
+};
+
+export type LearnerOrder = {
+  id: string;
+  orderNumber: string;
+  status: string;
+  currency: string;
+  totalAmount: string;
+  createdAt: string;
+  items: LearnerOrderItem[];
+};
+
+export async function listMyOrders() {
+  const res = await apiFetch<{ orders: LearnerOrder[] }>("/api/v1/commerce/orders");
+  return res.orders;
+}
+
+export async function getMyOrder(orderId: string) {
+  const res = await apiFetch<{ order: LearnerOrder }>(
+    `/api/v1/commerce/orders/${encodeURIComponent(orderId)}`,
+  );
+  return res.order;
+}

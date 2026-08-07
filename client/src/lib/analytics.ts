@@ -37,7 +37,8 @@ export type AnalyticsEvent =
   | "installment_option_impression"
   | "cart_line_removed"
   | "upsell_impression"
-  | "upsell_click";
+  | "upsell_click"
+  | "account_orders_viewed";
 
 export function trackEvent(name: AnalyticsEvent, props?: Record<string, string | number | boolean>) {
   if (import.meta.env.DEV) {

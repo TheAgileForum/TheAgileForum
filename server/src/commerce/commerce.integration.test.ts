@@ -246,6 +246,20 @@ describe.skipIf(!hasDb)("commerce integration (Sprint 1)", () => {
     expect(complete.status).toBe(200);
     expect(complete.body.order.status).toBe("paid");
 
+    const cartAfterPay = await regAgent.get("/api/v1/commerce/cart");
+    expect(cartAfterPay.status).toBe(200);
+    expect(cartAfterPay.body.cart.lineCount).toBe(0);
+    expect(cartAfterPay.body.cart.items).toEqual([]);
+
+    const ordersList = await regAgent.get("/api/v1/commerce/orders");
+    expect(ordersList.status).toBe(200);
+    expect(
+      ordersList.body.orders.some(
+        (o: { id: string; status: string }) =>
+          o.id === start.body.orderId && o.status === "paid",
+      ),
+    ).toBe(true);
+
     // Enrollment notifications are scheduled after mark-paid (non-blocking confirm path).
     await vi.waitFor(
       async () => {
