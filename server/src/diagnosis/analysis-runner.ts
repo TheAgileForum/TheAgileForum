@@ -11,6 +11,7 @@ import {
   type AnalysisAuditMeta,
 } from "./ai-analyzer.js";
 import type { DiagnosisRecommendation } from "./ai-diagnosis-schema.js";
+import { upsertSessionJourney } from "./journey-state-service.js";
 
 const STAGE_PROGRESS: Record<AnalysisStage, number> = {
   PARSING: 30,
@@ -145,6 +146,17 @@ async function persistCompletedRun(input: {
       },
     }),
   ]);
+
+  // Keep journey resume in sync so step-4 can restore after leaving to /offers and back.
+  await upsertSessionJourney({
+    sessionId,
+    currentFlow: "diagnosis",
+    currentStep: "step_4",
+    resumePayload: {
+      diagnosisSessionId: sessionId,
+      analysisRunId: runId,
+    },
+  });
 }
 
 export async function processAnalysisRun(runId: string): Promise<void> {

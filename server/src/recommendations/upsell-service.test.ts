@@ -16,10 +16,13 @@ describe("role-based upsell recommendations (FR-181)", () => {
     expect(result.safeCertSkus.length).toBe(1);
     expect(result.safeCertSkus[0]?.code).toBe(SM_SAFE_SCRUM_MASTER_CODE);
     expect(result.safeCertSkus[0]?.scheduleRef).toBeTruthy();
+    expect(result.safeCertSkus[0]?.action).toBe("book");
     expect(result.mockInterviewSkus.length).toBeGreaterThan(0);
     expect(result.mockInterviewSkus[0]?.code).toBe("service-mock-interview-sm");
+    expect(result.mockInterviewSkus[0]?.action).toBe("book");
     expect(result.primaryCta?.offeringCode).toBeTruthy();
     expect(result.items.length).toBeGreaterThan(0);
+    expect(result.items.every((i) => i.action === "book")).toBe(true);
     expect(result.items[0]?.priceQuote.currency).toBe("USD");
   });
 

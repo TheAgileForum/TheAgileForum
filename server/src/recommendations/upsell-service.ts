@@ -88,9 +88,12 @@ function serializeUpsellSku(
   offering: OfferingMeta,
   currencyContext: CurrencyContext,
   relevanceScore: number,
+  /** Diagnosis results rail always links to offer detail (View), never quick-add. */
+  forceView = false,
 ): UpsellSku {
   const quote = quoteOfferingPrice(offering, currencyContext);
   const canQuickAdd =
+    !forceView &&
     offering.kind !== "service" &&
     (!offering.scheduleBound || Boolean(offering.upcomingBatchId));
   return {
@@ -113,12 +116,18 @@ function rankSkus(
   targetRole: string,
   gapTags: string[],
   currencyContext: CurrencyContext,
+  forceView = false,
 ): UpsellSku[] {
   return offerings
     .map((offering) => {
       const roleScore = matchesRole(offering, targetRole) ? 10 : 0;
       const gapScore = gapRelevanceScore(offering, gapTags);
-      return serializeUpsellSku(offering, currencyContext, roleScore + gapScore);
+      return serializeUpsellSku(
+        offering,
+        currencyContext,
+        roleScore + gapScore,
+        forceView,
+      );
     })
     .filter((sku) => sku.relevanceScore > 0)
     .sort((a, b) => b.relevanceScore - a.relevanceScore);
@@ -176,17 +185,22 @@ export function getUpsellRecommendations(input: {
       matchesRole(o, input.targetRole),
   );
 
+  // Diagnosis pathway rail: View (book) for SAFe + Mock — not Add to cart.
+  const forceView = input.context === "diagnosis";
+
   const safeCertSkus = rankSkus(
     safeCertCandidates,
     input.targetRole,
     gapTags,
     currencyContext,
+    forceView,
   );
   const mockInterviewSkus = rankSkus(
     mockInterviewCandidates,
     input.targetRole,
     gapTags,
     currencyContext,
+    forceView,
   );
 
   const rankedItems = [...safeCertSkus, ...mockInterviewSkus]
