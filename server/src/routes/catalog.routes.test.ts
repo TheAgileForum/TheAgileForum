@@ -112,6 +112,17 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
     );
   });
 
+  it("quotes resume service at INR 6999 for India geo", async () => {
+    const res = await request(app()).get(
+      "/api/v1/catalog/offerings/service-power-resume-cover-letter?geo=IN",
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.priceQuote).toMatchObject({
+      amount: "6999.00",
+      currency: "INR",
+    });
+  });
+
   it.each([
     "course-agile-fundamentals",
     "scrum-master-mentorship-masterclass",

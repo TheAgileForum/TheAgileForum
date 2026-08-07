@@ -272,7 +272,7 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
     safeOrgPaymentEligible: false,
     defaultUnitPrice: "150.00",
     currency: "USD",
-    regionalUnitPrices: { INR: "8000.00" },
+    regionalUnitPrices: { INR: "6999.00" },
     roleTags: ["learner", "scrum_master", "product_owner"],
     deliveryMode: "live",
     slug: "new-resume-with-cover-letter-linkedin-upgrade",
