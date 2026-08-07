@@ -1,7 +1,8 @@
 import { z } from "zod";
 import type { PrimaryAction, RationaleChip } from "./contracts.js";
 
-export const DIAGNOSIS_PROMPT_VERSION = "diagnosis-ai-v2";
+/** Bump when gap rubric or system prompt instructions change (audit trail). */
+export const DIAGNOSIS_PROMPT_VERSION = "diagnosis-ai-v3";
 
 /** Catalog offering codes the model may recommend (allowlist). */
 export const DIAGNOSIS_OFFERING_ALLOWLIST = [
@@ -41,7 +42,8 @@ const rationaleChipSchema = z.object({
 export const aiDiagnosisResultSchema = z.object({
   readinessScore: z.coerce.number().min(0).max(100).transform((n) => Math.round(n)),
   strengths: z.array(z.string().min(1).max(200)).min(1).max(8),
-  gaps: z.array(z.string().min(1).max(200)).min(1).max(8),
+  /** Raised to 12 so rubric-driven SM/APM reviews can return more specific chips. */
+  gaps: z.array(z.string().min(1).max(200)).min(1).max(12),
   confidence: z.coerce.number().min(0).max(1),
   primaryAction: primaryActionSchema,
   rationale: z.array(rationaleChipSchema).min(1).max(5),
