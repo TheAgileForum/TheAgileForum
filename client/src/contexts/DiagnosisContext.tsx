@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { wakeApi } from "../lib/api";
 import {
   clearStoredSessionId,
   createDiagnosisSession,
@@ -104,6 +105,8 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
   const prefetchSession = useCallback(
     (campaignId = "home-prefetch") => {
       if (getStoredSessionId() || sessionPromiseRef.current) return;
+      // Kick Render awake before (or while) session create — same pattern as catalog.
+      void wakeApi();
       void startSession(campaignId).catch(() => undefined);
     },
     [startSession],

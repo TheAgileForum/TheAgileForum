@@ -3,6 +3,7 @@ import {
   catalogFetchTimeoutMs,
   CHECKOUT_CONFIRM_TIMEOUT_MS,
   CHECKOUT_START_TIMEOUT_MS,
+  DIAGNOSIS_API_TIMEOUT_MS,
 } from "./api";
 
 const SESSION_KEY = "af_diagnosis_session_id";
@@ -25,7 +26,12 @@ export async function createDiagnosisSession(input?: {
 }) {
   return apiFetch<{ diagnosisSessionId: string; nextStep: string }>(
     "/api/v1/diagnosis/session",
-    { method: "POST", body: JSON.stringify(input ?? {}) },
+    {
+      method: "POST",
+      body: JSON.stringify(input ?? {}),
+      timeoutMs: DIAGNOSIS_API_TIMEOUT_MS,
+      retries: 1,
+    },
   );
 }
 
@@ -42,7 +48,12 @@ export async function saveDiagnosisIntent(
 ) {
   return apiFetch<{ saved: boolean; nextStep: string }>(
     `/api/v1/diagnosis/session/${sessionId}/intent`,
-    { method: "PUT", body: JSON.stringify(body) },
+    {
+      method: "PUT",
+      body: JSON.stringify(body),
+      timeoutMs: DIAGNOSIS_API_TIMEOUT_MS,
+      retries: 1,
+    },
   );
 }
 
@@ -162,7 +173,9 @@ export async function getJourneyState(subjectId: string) {
     currentStep: string;
     resumePayload: Record<string, unknown>;
     updatedAt: string;
-  }>(`/api/v1/journey-state/${subjectId}`);
+  }>(`/api/v1/journey-state/${subjectId}`, {
+    timeoutMs: DIAGNOSIS_API_TIMEOUT_MS,
+  });
 }
 
 export type CatalogOffering = {
