@@ -2,6 +2,7 @@ import {
   DIAGNOSIS_OFFERING_ALLOWLIST,
   DIAGNOSIS_PROMPT_VERSION,
 } from "./ai-diagnosis-schema.js";
+import { loadGapDetectionRubric } from "./load-gap-rubric.js";
 
 export type DiagnosisPromptInput = {
   targetRole: string | null;
@@ -32,10 +33,18 @@ function truncate(text: string, maxChars: number): string {
   return `${text.slice(0, maxChars)}\n…[truncated]`;
 }
 
+/**
+ * Builds the diagnosis system prompt (policy + schema + gap rubric).
+ *
+ * **Founder edit point for gap rules:** `server/src/diagnosis/gap-detection-rubric.md`
+ * (also documented in `.cursor/skills/diagnosis-gap-rubric/SKILL.md`).
+ * Bump `DIAGNOSIS_PROMPT_VERSION` after rubric changes.
+ */
 export function buildDiagnosisSystemPrompt(): string {
   const allowlist = DIAGNOSIS_OFFERING_ALLOWLIST.map(
     (code) => `- ${code}: ${OFFERING_BLURBS[code] ?? code}`,
   ).join("\n");
+  const gapRubric = loadGapDetectionRubric();
 
   return `You are a career-skills diagnosis assistant for The Agile Forum (agile training & mentorship).
 
@@ -47,6 +56,7 @@ POLICY (must follow):
 - Be concise, specific, and evidence-based from the resume/JD provided.
 - If resume text is thin or missing, lower confidence (≤ 0.55) and note ambiguity in rationale.
 - When resume text is missing or marked as not extracted, use rationale label "Resume file" (never "Insufficient Data") and explain that a text-based PDF or DOCX is needed — not a scanned/image PDF.
+- Apply the GAP DETECTION RUBRIC below category-by-category. Return MORE specific gap chips when evidence supports them (prefer 6–12 grounded gaps; do not pad with speculation).
 
 OUTPUT:
 - Respond with a single JSON object only (no markdown fences, no prose).
@@ -54,7 +64,7 @@ OUTPUT:
 {
   "readinessScore": 0-100 integer,
   "strengths": string[1-8],
-  "gaps": string[1-8],
+  "gaps": string[1-12],
   "confidence": 0-1 number,
   "primaryAction": {
     "type": "offer" | "assessment" | "webinar" | "mentor",
@@ -68,7 +78,10 @@ OUTPUT:
 Prompt version: ${DIAGNOSIS_PROMPT_VERSION}
 
 ALLOWLIST:
-${allowlist}`;
+${allowlist}
+
+--- GAP DETECTION RUBRIC (evaluate every category; emit specific chips) ---
+${gapRubric}`;
 }
 
 export function buildDiagnosisUserPrompt(input: DiagnosisPromptInput): string {
@@ -90,5 +103,5 @@ ${resume}
 --- JOB DESCRIPTION ---
 ${jd}
 
-Produce the JSON diagnosis now.`;
+Produce the JSON diagnosis now. Evaluate the gap-detection rubric thoroughly and include every evidence-backed gap chip (up to 12).`;
 }

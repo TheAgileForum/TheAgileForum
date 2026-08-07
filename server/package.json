@@ -10,7 +10,7 @@
     "dev:scheduler": "tsx watch src/runtime/scheduler.ts",
     "dev:runtime": "tsx src/runtime/dev-orchestrator.ts",
     "env:check": "tsx src/config/validate-env.ts",
-    "build": "prisma generate && tsc",
+    "build": "prisma generate && tsc && node scripts/copy-diagnosis-assets.mjs",
     "start": "npx prisma migrate deploy && node dist/index.js",
     "start:worker": "node dist/runtime/worker.js",
     "start:scheduler": "node dist/runtime/scheduler.js",

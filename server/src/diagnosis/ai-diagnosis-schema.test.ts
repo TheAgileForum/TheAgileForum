@@ -82,4 +82,20 @@ ${JSON.stringify({
   it("throws on invalid JSON", () => {
     expect(() => parseAiDiagnosisResult("not-json")).toThrow(/not valid JSON/);
   });
+
+  it("accepts up to 12 specific gap chips", () => {
+    const manyGaps = {
+      ...validPayload,
+      gaps: Array.from({ length: 12 }, (_, i) => `Gap chip ${i + 1}`),
+    };
+    expect(aiDiagnosisResultSchema.safeParse(manyGaps).success).toBe(true);
+  });
+
+  it("rejects more than 12 gaps", () => {
+    const tooMany = {
+      ...validPayload,
+      gaps: Array.from({ length: 13 }, (_, i) => `Gap chip ${i + 1}`),
+    };
+    expect(aiDiagnosisResultSchema.safeParse(tooMany).success).toBe(false);
+  });
 });
