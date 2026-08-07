@@ -89,6 +89,27 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
   });
 
   it.each([
+    "service-power-resume-cover-letter",
+    "power-resume-cover-letter",
+    "new-resume-with-cover-letter-linkedin-upgrade",
+  ])("resolves resume service code or alias %s to the canonical offer", async (code) => {
+    const res = await request(app()).get(
+      `/api/v1/catalog/offerings/${code}?geo=US`,
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.offering).toMatchObject({
+      code: "service-power-resume-cover-letter",
+      slug: "new-resume-with-cover-letter-linkedin-upgrade",
+      title: "New Resume With Cover Letter & Linkedin Upgrade",
+    });
+    expect(res.body.offering.includes).toEqual(
+      expect.arrayContaining([
+        expect.stringMatching(/LinkedIn profile upgrade/i),
+      ]),
+    );
+  });
+
+  it.each([
     "course-agile-fundamentals",
     "scrum-master-mentorship-masterclass",
     "live-project-mentorship-masterclass-for-scrum-master-product-owner",

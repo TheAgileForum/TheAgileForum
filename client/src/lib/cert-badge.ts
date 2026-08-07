@@ -72,6 +72,7 @@ export function resolveCertBadge(offering: {
 
   if (
     code.includes("power-resume") ||
+    code.includes("linkedin-upgrade") ||
     haystack.includes("power resume") ||
     haystack.includes("cover letter")
   ) {
@@ -139,7 +140,7 @@ export function catalogSocialProof(offering: { code: string }): {
       ],
     };
   }
-  if (code.includes("power-resume")) {
+  if (code.includes("power-resume") || code.includes("linkedin-upgrade")) {
     return {
       enrolledLabel: "1.2K+ Enrolled",
       rating: "4.9/5",
