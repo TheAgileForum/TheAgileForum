@@ -126,7 +126,6 @@ function LinkedInPostEmbed({
         ref={frameRef}
         sx={{
           width: "100%",
-          maxWidth: LINKEDIN_EMBED_WIDTH,
           mx: "auto",
           border: "1px solid rgba(10,22,40,0.08)",
           borderRadius: 1,
@@ -489,10 +488,16 @@ export function TestimonialsPage() {
         <Box
           sx={{
             display: "grid",
-            gap: 3,
-            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+            gap: { xs: 2, md: 3 },
+            width: "100%",
+            // Always two columns from tablet up — scale-to-fit keeps embeds readable.
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, minmax(0, 1fr))",
+            },
             alignItems: "start",
           }}
+          data-linkedin-grid="two-col"
         >
           {LINKEDIN_POSTS.map((post) => (
             <LinkedInPostEmbed key={post.urn} urn={post.urn} height={post.height} />
@@ -510,10 +515,15 @@ export function TestimonialsPage() {
         <Box
           sx={{
             display: "grid",
-            gap: 3,
-            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+            gap: { xs: 2, md: 3 },
+            width: "100%",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, minmax(0, 1fr))",
+            },
             alignItems: "start",
           }}
+          data-linkedin-grid="two-col"
         >
           {LINKEDIN_REVIEW_SCREENSHOTS.map((review) => (
             <Box
