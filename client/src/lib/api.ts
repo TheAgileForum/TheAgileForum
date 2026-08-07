@@ -52,6 +52,11 @@ export const CHECKOUT_START_TIMEOUT_MS = 45_000;
  * Must not share the short default budget or catalog-branded copy.
  */
 export const CHECKOUT_CONFIRM_TIMEOUT_MS = 45_000;
+/**
+ * Diagnosis session create / intent / journey — same cold-start budget as checkout.
+ * Default 20s aborts while free-tier Render is still waking (~15–40s).
+ */
+export const DIAGNOSIS_API_TIMEOUT_MS = 45_000;
 
 const RETRYABLE_HTTP_STATUSES = new Set([408, 502, 503, 504]);
 
