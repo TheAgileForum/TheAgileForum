@@ -27,9 +27,13 @@ function roleLabel(tag: string): string {
   return tag.replace(/_/g, " ");
 }
 
-/** Mock interview is live coaching, but should not show the catalog "Live Class" chip. */
+/** Some live offerings should not show the catalog "Live Class" chip. */
 function showDeliveryModeChip(code: string): boolean {
-  return !code.toLowerCase().includes("mock-interview");
+  const normalized = code.toLowerCase();
+  return (
+    !normalized.includes("mock-interview") &&
+    !normalized.includes("power-resume")
+  );
 }
 
 function FeatureCheck() {
