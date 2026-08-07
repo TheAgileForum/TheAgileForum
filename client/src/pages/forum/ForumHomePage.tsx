@@ -42,7 +42,7 @@ const PATHWAYS = [
 ] as const;
 
 const STATS = [
-  { target: 1000, suffix: "+", label: "Learners guided", icon: "learners" },
+  { target: 4000, suffix: "+", label: "Learners guided", icon: "learners" },
   { target: 40, suffix: "+", label: "Countries reached", icon: "globe" },
   { target: 12, suffix: "k+", label: "Assessments done", icon: "check" },
   { target: 6, suffix: "+", label: "Years of trust", icon: "star" },
