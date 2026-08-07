@@ -202,7 +202,9 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
       slug: "live-project-mentorship-masterclass-for-scrum-master-product-owner",
       durationLabel: "3 weeks",
     });
-    expect(res.body.offering.title).toContain("Mentorship Masterclass");
+    expect(res.body.offering.title).toBe(
+      "3+ Week AI-Enabled Scrum Master / Product Owner Mentorship Masterclass (PSM 1 Certification Exam Pre-requisite)",
+    );
     expect(res.body.offering.includes.length).toBeGreaterThan(5);
     expect(res.body.offering.cohortSchedules).toHaveLength(2);
     expect(res.body.priceQuote).toMatchObject({
