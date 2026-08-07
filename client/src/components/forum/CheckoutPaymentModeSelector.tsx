@@ -174,11 +174,7 @@ export function CheckoutPaymentModeSelector({
           }
         }}
       >
-        {isIndiaRazorpay && !installmentAvailable ? (
-          <Typography variant="body2">{INDIA_FULL_PAY_MESSAGE}</Typography>
-        ) : (
-          <FormControlLabel value="full_pay" control={<Radio />} label={fullPayLabel} />
-        )}
+        <FormControlLabel value="full_pay" control={<Radio />} label={fullPayLabel} />
         {installmentAvailable ? (
           <FormControlLabel
             value="installment"
@@ -187,6 +183,12 @@ export function CheckoutPaymentModeSelector({
           />
         ) : null}
       </RadioGroup>
+
+      {isIndiaRazorpay ? (
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          {INDIA_FULL_PAY_MESSAGE}
+        </Typography>
+      ) : null}
 
       {paymentMode === "installment" && installmentAvailable && emiPreview ? (
         <Stack spacing={1.5} sx={{ mt: 1.5, pl: 4 }}>
@@ -225,7 +227,7 @@ export function CheckoutPaymentModeSelector({
         </Stack>
       ) : null}
 
-      {modes.localPaymentMethods.length > 0 ? (
+      {!isIndiaRazorpay && modes.localPaymentMethods.length > 0 ? (
         <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1.5 }}>
           Also available at payment:{" "}
           {modes.localPaymentMethods.map((m) => LOCAL_METHOD_LABELS[m]).join(", ")}
