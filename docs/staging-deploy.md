@@ -173,6 +173,22 @@ LIMIT 10;
 | `spa-direct-api-bundle` note | Informational — redeploy client so `api-base.ts` maps app.staging → api.staging |
 | Catalog timeout / 0 results | Render cold start — retry; see `npm run staging:verify`; confirm CORS allows app origin for direct API |
 | Mixed content | Use `https` for both `APP_PUBLIC_URL` and `API_PUBLIC_URL` in staging |
+| Prisma `P1001` / deploy exit 1 on start | See **§8.1** — almost always Supabase paused or IPv6-only direct host from Render |
+
+### 8.1 Prisma `P1001` on Render (`Can't reach database server at db.*.supabase.co:5432`)
+
+`npm start` runs `prisma migrate deploy` **before** the API boots (`server/package.json`). If Postgres is unreachable, the new deploy exits status 1. Render usually keeps the **previous** healthy instance until the new one succeeds — so `/api/v1/health` may still return `ok` while the latest deploy is marked failed.
+
+**Do not soft-fail migrate** — fix connectivity instead.
+
+1. **Unpause Supabase** — Dashboard → project → if the project is paused (free-tier idle), restore/unpause and wait until DB is healthy.
+2. **Prefer Session pooler for `DATABASE_URL`** — Supabase → **Connect** → **Session pooler** (host like `aws-0-<region>.pooler.supabase.com`, port **6543**, user often `postgres.<project-ref>`). Direct hosts `db.<ref>.supabase.co:5432` are frequently **IPv6-only**; Render egress is typically IPv4, which yields `P1001` even when DNS resolves.
+3. **Set `DIRECT_URL` to Direct connection** — Prisma uses `directUrl` for migrations. Copy **Direct** from Supabase Connect (still `db.<ref>.supabase.co:5432` with `?sslmode=require`). If migrate still fails from Render after unpause, enable Supabase **IPv4 add-on** or use the pooler URL for both only if Prisma migrate is known to work with your pooler mode (Session).
+4. **Confirm SSL** — both URLs should include `?sslmode=require` (or Supabase’s equivalent query params).
+5. **Redeploy** — after env update, Manual Deploy → **Clear build cache & deploy**, or restart so `prisma migrate deploy` can reach the DB.
+6. **Verify** — `curl https://api.staging.theagileforum.com/api/v1/health` → `{"status":"ok"}`, then a catalog or login smoke.
+
+**Quick local check:** `nslookup db.<ref>.supabase.co` — if you only see an **AAAA** (IPv6) record and no **A** (IPv4), Render cannot use that host as `DATABASE_URL` without the pooler or IPv4 add-on.
 
 ---
 
