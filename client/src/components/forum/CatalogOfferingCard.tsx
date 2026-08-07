@@ -27,6 +27,11 @@ function roleLabel(tag: string): string {
   return tag.replace(/_/g, " ");
 }
 
+/** Mock interview is live coaching, but should not show the catalog "Live Class" chip. */
+function showDeliveryModeChip(code: string): boolean {
+  return !code.toLowerCase().includes("mock-interview");
+}
+
 function FeatureCheck() {
   return (
     <Box
@@ -171,21 +176,23 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
             zIndex: 3,
           }}
         >
-          <Chip
-            label={offering.deliveryMode === "live" ? "Live Class" : "Self-paced"}
-            size="small"
-            sx={{
-              height: 22,
-              fontSize: "0.65rem",
-              fontWeight: 600,
-              letterSpacing: "0.03em",
-              bgcolor: "rgba(255,255,255,0.22)",
-              color: "#fff",
-              border: "1px solid rgba(255,255,255,0.3)",
-              backdropFilter: "blur(8px)",
-              "& .MuiChip-label": { px: 1 },
-            }}
-          />
+          {showDeliveryModeChip(offering.code) ? (
+            <Chip
+              label={offering.deliveryMode === "live" ? "Live Class" : "Self-paced"}
+              size="small"
+              sx={{
+                height: 22,
+                fontSize: "0.65rem",
+                fontWeight: 600,
+                letterSpacing: "0.03em",
+                bgcolor: "rgba(255,255,255,0.22)",
+                color: "#fff",
+                border: "1px solid rgba(255,255,255,0.3)",
+                backdropFilter: "blur(8px)",
+                "& .MuiChip-label": { px: 1 },
+              }}
+            />
+          ) : null}
           {offering.upcomingBatchId ? (
             <Chip
               label="Batch open"
