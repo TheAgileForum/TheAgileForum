@@ -36,6 +36,11 @@ export function DiagnosisReadinessSummary({
         ? `Your resume is a ${readinessScore}% match to ${role}`
         : `Your resume is a strong ${readinessScore}% match to ${role}`);
 
+  // Strip a leading match sentence if the API still embeds it in summaryPlain.
+  const supportingPlain = summaryPlain.startsWith(headline)
+    ? summaryPlain.slice(headline.length).replace(/^[.\s]+/, "").trim()
+    : summaryPlain;
+
   return (
     <Card variant="outlined" sx={{ borderColor: confidenceTier === "low" ? "warning.light" : undefined }}>
       <CardContent>
@@ -50,9 +55,11 @@ export function DiagnosisReadinessSummary({
             {headline}
           </Typography>
         </Stack>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, lineHeight: 1.55 }}>
-          {summaryPlain}
-        </Typography>
+        {supportingPlain ? (
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, lineHeight: 1.55 }}>
+            {supportingPlain}
+          </Typography>
+        ) : null}
         <Chip label={tier.label} size="small" color={tier.color} variant={confidenceTier === "high" ? "outlined" : "filled"} />
       </CardContent>
     </Card>
