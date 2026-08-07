@@ -71,7 +71,11 @@ describe.skipIf(!hasDb)("diagnosis integration (IT-01 subset)", () => {
     expect(resultRes.body.roadmapPreview).toHaveLength(3);
     expect(["low", "medium", "high"]).toContain(resultRes.body.confidenceTier);
     expect(resultRes.body.usedStubFallback).toBe(false);
-    expect(resultRes.body.escalation).toMatchObject({ title: expect.any(String) });
+    if (resultRes.body.confidenceTier === "low") {
+      expect(resultRes.body.escalation).toMatchObject({ title: expect.any(String) });
+    } else {
+      expect(resultRes.body.escalation).toBeNull();
+    }
     expect(resultRes.body.secondaryActions.length).toBeGreaterThanOrEqual(3);
 
     const journeyRes = await request(app).get(`/api/v1/journey-state/${sessionId}`);
