@@ -385,6 +385,9 @@ async function markOrderPaid(
     });
 
     if (order.cartId) {
+      // Archive + empty the cart so paid lines cannot reappear via a concurrent
+      // getOrCreateActiveCart reclaim of checkout_in_progress.
+      await tx.cartItem.deleteMany({ where: { cartId: order.cartId } });
       await tx.cart.update({
         where: { id: order.cartId },
         data: { status: "completed" },

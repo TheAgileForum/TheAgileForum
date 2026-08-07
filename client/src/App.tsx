@@ -35,6 +35,7 @@ import { ForumRazorpayStubPage } from "./pages/forum/ForumRazorpayStubPage";
 import { ForumHomePage } from "./pages/forum/ForumHomePage";
 import { CatalogListingPage } from "./pages/forum/catalog/CatalogListingPage";
 import { ForumCartPage } from "./pages/forum/ForumCartPage";
+import { AccountOrdersPage } from "./pages/forum/AccountOrdersPage";
 import { OfferPage } from "./pages/forum/OfferPage";
 import { AboutPage } from "./pages/forum/AboutPage";
 import { PrivacyPage } from "./pages/forum/PrivacyPage";
@@ -114,6 +115,8 @@ function App() {
               <Route path="terms" element={<TermsPage />} />
               <Route path="refund-policy" element={<RefundPolicyPage />} />
               <Route path="cart" element={<ForumCartPage />} />
+              <Route path="account" element={<AccountOrdersPage />} />
+              <Route path="my-orders" element={<Navigate to="/account" replace />} />
               <Route path="diagnosis/step-1" element={<DiagnosisStep1Page />} />
               <Route path="diagnosis/step-2" element={<DiagnosisStep2Page />} />
               <Route path="diagnosis/step-3" element={<DiagnosisStep3Page />} />

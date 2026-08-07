@@ -5,6 +5,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
 import { Link as RouterLink, useLocation, useSearchParams } from "react-router-dom";
+import { useForumCart } from "../../contexts/ForumCartContext";
 import { ApiRequestError } from "../../lib/api";
 import {
   confirmRazorpayCheckout,
@@ -69,6 +70,7 @@ function confirmFailureMessage(err: unknown, provider: "stripe" | "razorpay"): s
 export function ForumCheckoutSuccessPage() {
   const location = useLocation();
   const [params] = useSearchParams();
+  const { refresh: refreshCart } = useForumCart();
   const routeState = location.state as SuccessState | null;
 
   const orderNumber = routeState?.orderNumber ?? params.get("order") ?? undefined;
@@ -106,13 +108,14 @@ export function ForumCheckoutSuccessPage() {
           paymentMode: "full_pay",
           confirmPending: false,
         }));
+        await refreshCart();
       } catch (err) {
         setError(confirmFailureMessage(err, "stripe"));
       } finally {
         setBusy(false);
       }
     })();
-  }, [isStripeReturn, orderId, stripeSessionId]);
+  }, [isStripeReturn, orderId, stripeSessionId, refreshCart]);
 
   useEffect(() => {
     if (!needsRazorpayConfirm || !razorpayConfirm) return;
@@ -130,13 +133,21 @@ export function ForumCheckoutSuccessPage() {
           razorpayConfirm: undefined,
         }));
         setError(null);
+        await refreshCart();
       } catch (err) {
         setError(confirmFailureMessage(err, "razorpay"));
       } finally {
         setBusy(false);
       }
     })();
-  }, [needsRazorpayConfirm, razorpayConfirm]);
+  }, [needsRazorpayConfirm, razorpayConfirm, refreshCart]);
+
+  // Stub / already-confirmed success (no async confirm): still refresh cart badge.
+  useEffect(() => {
+    if (isStripeReturn || needsRazorpayConfirm) return;
+    if (busy) return;
+    void refreshCart();
+  }, [isStripeReturn, needsRazorpayConfirm, busy, refreshCart]);
 
   const modeLabel = paymentModeLabel(state);
   const confirmingCopy = isStripeReturn
@@ -161,9 +172,14 @@ export function ForumCheckoutSuccessPage() {
           Payment method: {modeLabel}
         </Typography>
       ) : null}
-      <Button variant="contained" component={RouterLink} to="/">
-        Back to home
-      </Button>
+      <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
+        <Button variant="contained" component={RouterLink} to="/account">
+          View my orders
+        </Button>
+        <Button variant="outlined" component={RouterLink} to="/">
+          Back to home
+        </Button>
+      </Stack>
     </Stack>
   );
 }

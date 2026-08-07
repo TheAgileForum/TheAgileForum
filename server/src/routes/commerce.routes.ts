@@ -35,6 +35,10 @@ import {
   startCheckout,
 } from "../services/checkout-service.js";
 import {
+  getOrderForUser,
+  listOrdersForUser,
+} from "../services/order-query-service.js";
+import {
   applyCouponToCheckoutSession,
   removeCouponFromCheckoutSession,
 } from "../commerce/coupon-service.js";
@@ -413,6 +417,21 @@ commerceRouter.post(
     return res.json({ order: result.order });
   },
 );
+
+commerceRouter.get("/orders", requireAuth, async (req, res) => {
+  const orders = await listOrdersForUser(req.auth!.userId);
+  return res.json({ orders });
+});
+
+commerceRouter.get("/orders/:orderId", requireAuth, async (req, res) => {
+  const order = await getOrderForUser(req.auth!.userId, req.params.orderId);
+  if (!order) {
+    return res.status(404).json({
+      error: { code: "ORDER_NOT_FOUND", message: "Order not found" },
+    });
+  }
+  return res.json({ order });
+});
 
 commerceRouter.post(
   "/checkout/start",
