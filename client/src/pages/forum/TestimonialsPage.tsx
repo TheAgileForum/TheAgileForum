@@ -3,11 +3,12 @@ import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { useEffect, useRef, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 
 const INK = "#0a1628";
 const TEAL = "#0f9f8f";
-/** LinkedIn's official embed canvas width — keep cards at least this wide. */
+/** LinkedIn embed canvas width - scale down rather than clip when the card is narrower. */
 const LINKEDIN_EMBED_WIDTH = 504;
 
 type Testimonial = {
@@ -89,6 +90,24 @@ function LinkedInPostEmbed({
   // collapsed=0 shows the full post (images + body) instead of a truncated preview.
   const embedSrc = `https://www.linkedin.com/embed/feed/update/${urn}?collapsed=0`;
   const viewHref = `https://www.linkedin.com/feed/update/${urn}`;
+  const frameRef = useRef<HTMLDivElement | null>(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const el = frameRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+
+    const updateScale = () => {
+      const width = el.clientWidth;
+      if (width <= 0) return;
+      setScale(Math.min(1, width / LINKEDIN_EMBED_WIDTH));
+    };
+
+    updateScale();
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <Box
@@ -100,37 +119,49 @@ function LinkedInPostEmbed({
         px: { xs: 1.5, sm: 2 },
         py: 2,
         width: "100%",
-        maxWidth: LINKEDIN_EMBED_WIDTH + 40,
         minWidth: 0,
-        justifySelf: "center",
       }}
     >
       <Box
+        ref={frameRef}
         sx={{
           width: "100%",
           maxWidth: LINKEDIN_EMBED_WIDTH,
           mx: "auto",
-          overflowX: "auto",
-          WebkitOverflowScrolling: "touch",
           border: "1px solid rgba(10,22,40,0.08)",
           borderRadius: 1,
           bgcolor: "#fff",
+          overflow: "hidden",
         }}
       >
         <Box
-          component="iframe"
-          src={embedSrc}
-          title={title}
-          allowFullScreen
-          loading="lazy"
           sx={{
-            display: "block",
-            border: 0,
-            width: LINKEDIN_EMBED_WIDTH,
-            height,
-            maxWidth: "none",
+            width: "100%",
+            height: height * scale,
+            position: "relative",
+            overflow: "hidden",
           }}
-        />
+        >
+          <Box
+            component="iframe"
+            src={embedSrc}
+            title={title}
+            allowFullScreen
+            loading="lazy"
+            sx={{
+              display: "block",
+              border: 0,
+              width: LINKEDIN_EMBED_WIDTH,
+              height,
+              maxWidth: "none",
+              transform: `scale(${scale})`,
+              transformOrigin: "top left",
+              position: "absolute",
+              top: 0,
+              left: 0,
+            }}
+          />
+        </Box>
       </Box>
       <Link
         href={viewHref}
@@ -459,13 +490,11 @@ export function TestimonialsPage() {
           sx={{
             display: "grid",
             gap: 3,
-            // Max 2 columns so each card can fit LinkedIn's 504px embed canvas.
-            gridTemplateColumns: {
-              xs: "1fr",
-              md: "repeat(2, minmax(0, 1fr))",
-            },
+            // One column so LinkedIn's fixed 504px canvas is never clipped.
+            gridTemplateColumns: "1fr",
+            maxWidth: 560,
+            mx: "auto",
             alignItems: "start",
-            justifyItems: "center",
           }}
         >
           {LINKEDIN_POSTS.map((post) => (
@@ -485,12 +514,10 @@ export function TestimonialsPage() {
           sx={{
             display: "grid",
             gap: 3,
-            gridTemplateColumns: {
-              xs: "1fr",
-              md: "repeat(2, minmax(0, 1fr))",
-            },
+            gridTemplateColumns: "1fr",
+            maxWidth: 560,
+            mx: "auto",
             alignItems: "start",
-            justifyItems: "center",
           }}
         >
           {LINKEDIN_REVIEW_SCREENSHOTS.map((review) => (
@@ -506,7 +533,6 @@ export function TestimonialsPage() {
                 px: { xs: 1.5, sm: 2 },
                 py: 2,
                 width: "100%",
-                maxWidth: LINKEDIN_EMBED_WIDTH + 40,
                 minWidth: 0,
               }}
             >
