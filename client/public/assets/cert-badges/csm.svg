@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640" role="img" aria-label="Certified ScrumMaster CSM">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b3d5c"/>
+      <stop offset="55%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#14b8a6"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="640" rx="48" fill="url(#bg)"/>
+  <circle cx="320" cy="250" r="118" fill="none" stroke="#f8fafc" stroke-width="10" opacity="0.95"/>
+  <circle cx="320" cy="250" r="88" fill="none" stroke="#99f6e4" stroke-width="4" opacity="0.7"/>
+  <text x="320" y="268" text-anchor="middle" fill="#f8fafc" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700">CSM</text>
+  <text x="320" y="400" text-anchor="middle" fill="#ecfeff" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="28" font-weight="600" letter-spacing="2">Certified ScrumMaster</text>
+  <text x="320" y="448" text-anchor="middle" fill="#a5f3fc" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="20" letter-spacing="3">SCRUM ALLIANCE PATH</text>
+  <text x="320" y="520" text-anchor="middle" fill="#ccfbf1" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18">The Agile Forum</text>
+</svg>

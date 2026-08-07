@@ -228,7 +228,17 @@ function enrichOfferingFromStub(meta: OfferingMeta): OfferingMeta {
 
 export async function listOfferingsFromCatalog(): Promise<OfferingMeta[]> {
   const fromDb = await queryPublishedOfferings();
-  const base = fromDb ?? stubFallback();
+  // When DB is populated, still surface new stub SKUs that have not been
+  // seeded yet (seedCatalogOfferingsIfEmpty only runs on explicit seed).
+  const base = fromDb
+    ? (() => {
+        const byCode = new Map(fromDb.map((o) => [o.code, o] as const));
+        for (const stub of listStubOfferings()) {
+          if (!byCode.has(stub.code)) byCode.set(stub.code, stub);
+        }
+        return [...byCode.values()];
+      })()
+    : stubFallback();
   return base
     .map(enrichOfferingFromStub)
     .filter((o) => isPublicCatalogOffering(o.code));
