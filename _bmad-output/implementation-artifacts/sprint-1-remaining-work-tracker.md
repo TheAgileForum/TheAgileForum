@@ -211,6 +211,14 @@ Quick reference — detail in `s1-3-ux-implementation-epics-stories-tasks.md`:
 
 ---
 
+## Later sprint backlog (do not pull into Sprint 1–2)
+
+| Item | FRs / Story | Target | Spec |
+|------|-------------|--------|------|
+| Full commercial ops dashboard (customers, orders, resumes/scores, sales mix) | FR-183..188 / Story 10.5 / T10.9–T10.10 | Sprint 3+ | `_bmad-output/planning-artifacts/admin-full-dashboard-requirement.md` |
+
+---
+
 ## How to update this file
 
 When an item ships, check the box, add PR/commit link, and move deferred items to the target sprint section.

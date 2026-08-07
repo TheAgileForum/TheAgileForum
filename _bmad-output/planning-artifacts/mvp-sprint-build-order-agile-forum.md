@@ -154,7 +154,7 @@ Scale conversion and discoverability with governed AI, complete trust surfaces, 
 - Epic 5: `5.1`, `5.2`, `5.3`, `5.4`
 - Epic 6: `6.2`, `6.3`, `6.4`, `6.5`
 - Epic 8: `8.1`, `8.2`, `8.3`, `8.6`
-- Epic 10: `10.1`, `10.2`, `10.3`, `10.4`
+- Epic 10: `10.1`, `10.2`, `10.3`, `10.4`, **`10.5` (full commercial ops dashboard — FR-183..188; see `admin-full-dashboard-requirement.md`)**
 - Epic 11: `11.1`, `11.2`, `11.3`, `11.4`
 - Epic 12: `12.1` + remaining hardening scope in `12.2`, `12.3`
 
@@ -164,6 +164,7 @@ Scale conversion and discoverability with governed AI, complete trust surfaces, 
 - Mock interview templates + role-aware recommendation resolver: `T6.5`, `T6.7`, `T6.8`
 - Trust/footer/social governance + claims workflow: `T8.1..T8.5`, `T8.8`
 - Admin command center/anomaly/approvals/audit: `T10.1..T10.6`
+- **Commercial ops dashboard (customers/orders/resumes/sales): `T10.9`, `T10.10` (Story 10.5 — later in Sprint 3 after commerce+diagnosis stable)**
 - Search diagnostics/schema/keyword map/experiments/reporting: `T11.1..T11.6`
 - Redirect and SEO health tooling: `T12.1`, `T12.2`, `T12.4..T12.6`
 
@@ -182,6 +183,7 @@ Scale conversion and discoverability with governed AI, complete trust surfaces, 
 - Public trust surfaces (community, social proof, footer/legal/compliance) are complete.
 - SEO/GEO command center and keyword-intent pages are operational.
 - Redirect, reliability, and compliance hardening complete for go-live.
+- **Optional Sprint 3 exit stretch:** commercial ops dashboard Story 10.5 (FR-183..188) usable by ops on staging — may slip to Sprint 3.1 if commerce/diagnosis hardening overruns.
 
 ---
 
