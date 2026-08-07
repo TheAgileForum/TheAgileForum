@@ -127,7 +127,8 @@ export async function openRouterChatCompletion(
 
       if (!response.ok) {
         const errObj = parsed.error as { message?: string } | undefined;
-        const message = errObj?.message ?? `OpenRouter HTTP ${response.status}`;
+        const upstream = errObj?.message ?? `OpenRouter HTTP ${response.status}`;
+        const message = `OpenRouter model=${model} HTTP ${response.status}: ${upstream}`;
         const retryable = response.status === 429 || response.status >= 500;
         throw new OpenRouterError(message, { status: response.status, retryable });
       }

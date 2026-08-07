@@ -183,11 +183,11 @@ Diagnosis analysis defaults to **stub** mode (`AI_PROVIDER_MODE=stub`) — deter
 To enable live AI on staging (env only; never commit secrets):
 
 1. Set `OPENROUTER_API_KEY` in the staging API secret store (Render dashboard).
-2. Optionally set `OPENROUTER_MODEL` (default: `google/gemma-4-26b-a4b-it:free`).
+2. Set `OPENROUTER_MODEL` to a working free slug (recommended: `google/gemma-4-26b-a4b-it:free`). Do **not** use `meta-llama/llama-3.3-70b-instruct:free` — OpenRouter returns HTTP 404 ("unavailable for free"), which triggers soft stub fallback.
 3. Set `AI_PROVIDER_MODE=live`.
-4. Redeploy the API.
+4. Redeploy the API (env changes on Render do not apply until the next deploy/restart).
 
-If OpenRouter is down or returns an error while mode is `live`, the API falls back to the stub recommendation and the results UI shows a soft note. Hard spend caps are not enforced in Phase 1.
+If OpenRouter is down or returns an error while mode is `live`, the API falls back to the stub recommendation, logs `diagnosis.analysis.stub_fallback` (reason + model + status), sets `usedStubFallback: true` (and `fallbackReason`) on the results payload, and the results UI shows a soft note. Hard spend caps are not enforced in Phase 1.
 
 Resume uploads store PDF/DOCX bytes on the API host (`uploads/resumes/`) and extract text for analysis. Virus scanning remains a deferred stub hook.
 

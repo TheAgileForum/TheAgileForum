@@ -404,5 +404,6 @@ export async function getAnalysisResult(runId: string) {
     primaryAction,
     rationale,
     usedStubFallback: Boolean(audit?.usedStubFallback),
+    fallbackReason: audit?.fallbackReason,
   });
 }

@@ -23,15 +23,15 @@ describe("ai diagnosis schema", () => {
     expect(aiDiagnosisResultSchema.safeParse(validPayload).success).toBe(true);
   });
 
-  it("rejects unknown offering codes", () => {
-    const bad = {
+  it("accepts unknown offering codes at schema level (normalized later)", () => {
+    const invented = {
       ...validPayload,
       primaryAction: {
         ...validPayload.primaryAction,
         offeringCode: "not-a-real-offer",
       },
     };
-    expect(aiDiagnosisResultSchema.safeParse(bad).success).toBe(false);
+    expect(aiDiagnosisResultSchema.safeParse(invented).success).toBe(true);
   });
 
   it("parses fenced JSON and normalizes offer href", () => {
@@ -49,6 +49,34 @@ ${JSON.stringify({
     const parsed = parseAiDiagnosisResult(raw);
     expect(parsed.primaryAction.href).toBe("/offers/course-agile-fundamentals");
     expect(parsed.readinessScore).toBe(72);
+  });
+
+  it("soft-remaps invented offering codes instead of failing the run", () => {
+    const parsed = parseAiDiagnosisResult(
+      JSON.stringify({
+        ...validPayload,
+        primaryAction: {
+          type: "offer",
+          label: "Mystery course",
+          href: "/offers/whatever",
+          offeringCode: "asmc-101",
+        },
+      }),
+    );
+    expect(parsed.primaryAction.offeringCode).toBe("course-agile-fundamentals");
+    expect(parsed.primaryAction.href).toBe("/offers/course-agile-fundamentals");
+  });
+
+  it("coerces string readinessScore and confidence from free models", () => {
+    const parsed = parseAiDiagnosisResult(
+      JSON.stringify({
+        ...validPayload,
+        readinessScore: "72.4",
+        confidence: "0.8",
+      }),
+    );
+    expect(parsed.readinessScore).toBe(72);
+    expect(parsed.confidence).toBe(0.8);
   });
 
   it("throws on invalid JSON", () => {

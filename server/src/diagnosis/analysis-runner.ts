@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { AnalysisRunStatus, AnalysisStage, DiagnosisSessionStatus } from "@prisma/client";
+import { getEnv } from "../config/env.js";
 import { prisma } from "../db/client.js";
 import { logInfo, logWarn } from "../runtime/logger.js";
 import type { PrimaryAction, RationaleChip } from "./contracts.js";
@@ -83,10 +84,16 @@ export async function resolveAnalysisRecommendation(input: {
     return { recommendation: live.recommendation, audit: live.audit };
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
+    const status =
+      error && typeof error === "object" && "status" in error
+        ? (error as { status?: number }).status
+        : undefined;
     logWarn("diagnosis.analysis.stub_fallback", {
       component: "diagnosis",
       event: "diagnosis.analysis.stub_fallback",
       reason,
+      model: getEnv().OPENROUTER_MODEL,
+      ...(status !== undefined ? { status } : {}),
     });
     return {
       recommendation: buildStubRecommendation(input.targetRole),

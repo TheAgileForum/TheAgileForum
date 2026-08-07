@@ -20,15 +20,13 @@ export const DIAGNOSIS_OFFERING_ALLOWLIST = [
 
 export type DiagnosisOfferingCode = (typeof DIAGNOSIS_OFFERING_ALLOWLIST)[number];
 
-const offeringCodeSchema = z.enum(
-  DIAGNOSIS_OFFERING_ALLOWLIST as unknown as [DiagnosisOfferingCode, ...DiagnosisOfferingCode[]],
-);
-
 const primaryActionSchema = z.object({
   type: z.enum(["offer", "assessment", "webinar", "mentor"]),
   label: z.string().min(1).max(200),
   href: z.string().min(1).max(500),
-  offeringCode: offeringCodeSchema.optional(),
+  // Accept any string here; allowlist is enforced in parseAiDiagnosisResult so
+  // free models inventing codes soft-remap instead of failing the whole run.
+  offeringCode: z.string().min(1).max(120).optional(),
 });
 
 const rationaleChipSchema = z.object({
@@ -38,12 +36,13 @@ const rationaleChipSchema = z.object({
 
 /**
  * Structured AI diagnosis payload — mirrors GapInsight + Recommendation contracts.
+ * Coercions keep free / smaller models from failing the whole run on minor type drift.
  */
 export const aiDiagnosisResultSchema = z.object({
-  readinessScore: z.number().int().min(0).max(100),
+  readinessScore: z.coerce.number().min(0).max(100).transform((n) => Math.round(n)),
   strengths: z.array(z.string().min(1).max(200)).min(1).max(8),
   gaps: z.array(z.string().min(1).max(200)).min(1).max(8),
-  confidence: z.number().min(0).max(1),
+  confidence: z.coerce.number().min(0).max(1),
   primaryAction: primaryActionSchema,
   rationale: z.array(rationaleChipSchema).min(1).max(5),
 });

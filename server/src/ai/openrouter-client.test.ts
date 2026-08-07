@@ -75,8 +75,40 @@ describe("openRouterChatCompletion", () => {
         fetchImpl: fetchImpl as unknown as typeof fetch,
         maxRetries: 2,
       }),
-    ).rejects.toMatchObject({ message: "bad request", retryable: false });
+    ).rejects.toMatchObject({
+      message: expect.stringContaining("bad request"),
+      retryable: false,
+    });
 
     expect(fetchImpl).toHaveBeenCalledOnce();
+  });
+
+  it("includes model and status in 404 unavailable-free errors", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 404,
+      text: async () =>
+        JSON.stringify({
+          error: {
+            message:
+              "This model is unavailable for free. The paid version is available now.",
+          },
+        }),
+    });
+
+    await expect(
+      openRouterChatCompletion({
+        model: "meta-llama/llama-3.3-70b-instruct:free",
+        messages: [{ role: "user", content: "hi" }],
+        fetchImpl: fetchImpl as unknown as typeof fetch,
+        maxRetries: 0,
+      }),
+    ).rejects.toMatchObject({
+      status: 404,
+      retryable: false,
+      message: expect.stringMatching(
+        /model=meta-llama\/llama-3\.3-70b-instruct:free.*HTTP 404.*unavailable for free/i,
+      ),
+    });
   });
 });
