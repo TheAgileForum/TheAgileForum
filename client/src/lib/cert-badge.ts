@@ -3,6 +3,8 @@ export const CERT_BADGE_ASSETS = {
   agilist: "/assets/cert-badges/safe-agilist.png",
   ssm: "/assets/cert-badges/safe-ssm.png",
   popm: "/assets/cert-badges/safe-popm.png",
+  csm: "/assets/cert-badges/csm.svg",
+  rte: "/assets/cert-badges/safe-rte.svg",
   mockInterview: "/assets/offers/mock-interview-series.png",
   powerResume: "/assets/offers/power-resume-cover.png",
 } as const;
@@ -16,6 +18,8 @@ const HERO_GRADIENTS: Record<CertBadgeKey, string> = {
   agilist: "linear-gradient(135deg, #1e3a8a 0%, #0f766e 55%, #0d9488 100%)",
   ssm: "linear-gradient(135deg, #1e40af 0%, #1e3a8a 50%, #312e81 100%)",
   popm: "linear-gradient(135deg, #0f766e 0%, #047857 50%, #065f46 100%)",
+  csm: "linear-gradient(135deg, #0b3d5c 0%, #0f766e 55%, #14b8a6 100%)",
+  rte: "linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #0f766e 100%)",
   mockInterview: "linear-gradient(135deg, #0f172a 0%, #1e3a5f 55%, #0f766e 100%)",
   powerResume: "linear-gradient(135deg, #0f172a 0%, #1e3a5f 55%, #0f766e 100%)",
 };
@@ -79,6 +83,24 @@ export function resolveCertBadge(offering: {
     return coverResult("powerResume");
   }
 
+  // CSM before generic "scrum master" → SSM badge.
+  if (
+    code.includes("csm") ||
+    haystack.includes("certified scrummaster") ||
+    haystack.includes("certified scrum master") ||
+    (haystack.includes("csm") && !haystack.includes("safe"))
+  ) {
+    return badgeResult("csm");
+  }
+
+  if (
+    code.includes("rte") ||
+    haystack.includes("release train engineer") ||
+    haystack.includes("safe-rte")
+  ) {
+    return badgeResult("rte");
+  }
+
   if (
     haystack.includes("popm") ||
     haystack.includes("product owner") ||
@@ -126,6 +148,28 @@ export function catalogSocialProof(offering: { code: string }): {
         { initials: "RK", bg: "linear-gradient(135deg, #6366f1, #8b5cf6)" },
         { initials: "PS", bg: "linear-gradient(135deg, #0ea5e9, #06b6d4)" },
         { initials: "AM", bg: "linear-gradient(135deg, #f59e0b, #ef4444)" },
+      ],
+    };
+  }
+  if (code.includes("csm")) {
+    return {
+      enrolledLabel: "2K+ Enrolled",
+      rating: "4.9/5",
+      avatars: [
+        { initials: "RG", bg: "linear-gradient(135deg, #0f766e, #14b8a6)" },
+        { initials: "SK", bg: "linear-gradient(135deg, #0ea5e9, #06b6d4)" },
+        { initials: "AP", bg: "linear-gradient(135deg, #f59e0b, #ef4444)" },
+      ],
+    };
+  }
+  if (code.includes("rte")) {
+    return {
+      enrolledLabel: "900+ Enrolled",
+      rating: "4.9/5",
+      avatars: [
+        { initials: "DV", bg: "linear-gradient(135deg, #1e3a8a, #312e81)" },
+        { initials: "NK", bg: "linear-gradient(135deg, #0ea5e9, #06b6d4)" },
+        { initials: "ML", bg: "linear-gradient(135deg, #f59e0b, #ef4444)" },
       ],
     };
   }

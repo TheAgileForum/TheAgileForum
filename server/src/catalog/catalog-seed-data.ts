@@ -227,6 +227,106 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
       "Support system demo and quality practices",
     ],
   },
+  /**
+   * CSM® — not on the Jul 2026 founder core catalog (Mentorship/Mock/Resume/SAFe*).
+   * Draft pricing mirrors other 2-day cert workshops in this seed ($549 / INR 33999)
+   * until founder confirms list price and exam/membership packaging.
+   */
+  "csm-certification-training": {
+    code: "csm-certification-training",
+    title: "Certified ScrumMaster® (CSM®) Certification Training",
+    kind: "course",
+    category: "certification",
+    scheduleBound: true,
+    examAccess: "preview_only",
+    safeOrgPaymentEligible: false,
+    defaultUnitPrice: "549.00",
+    currency: "USD",
+    regionalUnitPrices: { INR: "33999.00" },
+    roleTags: ["learner", "scrum_master"],
+    certBody: "scrum alliance",
+    deliveryMode: "live",
+    upcomingBatchId: "batch-csm-tbd",
+    slug: "csm-certification-training",
+    certificationName: "Certified ScrumMaster® (CSM®)",
+    summary:
+      "Become a Certified ScrumMaster® with live instructor-led training on the Scrum framework — accountabilities, events, artifacts, and values — so you can serve a Scrum Team and prepare for the Scrum Alliance CSM® exam path. Exam attempts, membership, and SEU packaging are confirmed at enrollment.",
+    durationHours: 16,
+    scheduleLabel: "2-day live workshop · 16 hours · cohorts on request",
+    cohortSchedules: [
+      {
+        id: "batch-csm-tbd",
+        label: "Next cohort timing confirmed at enrollment (weekend / weekday options)",
+      },
+    ],
+    includes: [
+      "16 hours live instructor-led CSM® pathway training",
+      "Scrum roles, events, artifacts, and values in practice",
+      "Interactive exercises, case discussions, and team simulations",
+      "Exam-oriented review aligned to Scrum Alliance learning objectives",
+      "Practice questions / mock quiz support",
+      "Career guidance for Scrum Master and Agile PM interviews",
+      "Exam fee and Scrum Alliance membership packaging confirmed at enrollment",
+    ],
+    learningOutcomes: [
+      "Explain Agile values/principles and why Scrum is an empirical framework",
+      "Clarify Scrum Master, Product Owner, and Developers accountabilities",
+      "Facilitate Scrum events and protect the Sprint Goal",
+      "Work with Product Backlog, Sprint Backlog, Increment, and Definition of Done",
+      "Apply estimation, velocity, and burndown practices thoughtfully",
+      "Prepare for the CSM® exam format and Scrum Alliance credential path",
+    ],
+  },
+  /**
+   * SAFe® RTE — not on the Jul 2026 founder core catalog list.
+   * Pricing mirrors other SAFe cert workshops in this seed ($549 / INR 33999)
+   * pending founder list-price confirmation (market RTE workshops are often higher).
+   */
+  "safe-rte-certification-training": {
+    code: "safe-rte-certification-training",
+    title: "AI Empowered - SAFe® Release Train Engineer (RTE) Certification",
+    kind: "course",
+    category: "certification",
+    scheduleBound: true,
+    examAccess: "preview_only",
+    safeOrgPaymentEligible: true,
+    defaultUnitPrice: "549.00",
+    currency: "USD",
+    regionalUnitPrices: { INR: "33999.00" },
+    roleTags: ["learner", "scrum_master", "safe_program_consultant"],
+    certBody: "scaled agile",
+    deliveryMode: "live",
+    upcomingBatchId: "batch-rte-tbd",
+    slug: "safe-rte-certification-training",
+    certificationName: "SAFe® Release Train Engineer (RTE)",
+    summary:
+      "Become a SAFe® Release Train Engineer with live SPC-led training (typically 24 hrs). Practice facilitating the ART, PI planning readiness and execution, Inspect & Adapt, and servant leadership at program scale — plus AI-aware RTE workflows and exam preparation.",
+    durationHours: 24,
+    scheduleLabel: "3-day live workshop · 24 hours · cohorts on request",
+    cohortSchedules: [
+      {
+        id: "batch-rte-tbd",
+        label: "Next cohort timing confirmed at enrollment (multi-day live sessions)",
+      },
+    ],
+    includes: [
+      "24 hours live instructor-led SAFe® RTE training",
+      "ART facilitation and PI planning practice",
+      "Inspect & Adapt and relentless improvement workshops",
+      "Exam preparation materials and practice support",
+      "Real-world ART implementation examples",
+      "Interview guidance for RTE / program facilitation roles",
+      "Exam and SAFe Community membership details confirmed at enrollment",
+    ],
+    learningOutcomes: [
+      "Serve as a servant leader for an Agile Release Train",
+      "Apply SAFe principles to continuous value delivery",
+      "Organize and manage value flow through an ART",
+      "Facilitate PI planning readiness, execution, and follow-through",
+      "Drive Inspect & Adapt and relentless improvement",
+      "Build an AI-augmented RTE workflow responsibly",
+    ],
+  },
   "service-mock-interview-sm": {
     code: "service-mock-interview-sm",
     title: "Mock Interview Series with Interview Preparation",

@@ -1362,7 +1362,10 @@ export function OfferDetailView({
           <SectionHead
             eyebrow="Official exam"
             title="Exam guidelines"
-            lead="Domain weighting from Scaled Agile’s SAFe Scrum Master certification page — use this with your workshop notes and practice exam."
+            lead={
+              extras.examGuidelines.lead ??
+              "Use this domain outline with your workshop notes and practice exam."
+            }
           />
           <Box
             sx={{
@@ -1409,7 +1412,7 @@ export function OfferDetailView({
           <Typography sx={{ mt: 2, color: OFFER_MUTED, fontSize: "0.85rem" }}>
             {extras.examGuidelines.footnote} Source:{" "}
             <Link href={extras.examGuidelines.sourceUrl} target="_blank" rel="noopener noreferrer">
-              scaledagile.com/certification/scrum-master
+              {extras.examGuidelines.sourceLabel ?? extras.examGuidelines.sourceUrl.replace(/^https?:\/\//, "")}
             </Link>
           </Typography>
         </Section>

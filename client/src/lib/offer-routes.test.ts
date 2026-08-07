@@ -53,6 +53,12 @@ describe("offer routes", () => {
     expect(offerDetailPath("safe-scrum-master-certification-training")).toBe(
       "/offers/safe-scrum-master-certification-training",
     );
+    expect(offerDetailPath("csm-certification-training")).toBe(
+      "/offers/csm-certification-training",
+    );
+    expect(offerDetailPath("safe-rte-certification-training")).toBe(
+      "/offers/safe-rte-certification-training",
+    );
     expect(resolveOfferRouteCode("unknown-offer")).toBe("unknown-offer");
   });
 });

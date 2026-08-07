@@ -10,6 +10,8 @@ export const OFFER_ACCENT_DEEP = "#0b7a6e";
 export const OFFER_MUTED = "#5b6b7c";
 
 export const SSM_OFFER_CODE = "safe-scrum-master-certification-training";
+export const CSM_OFFER_CODE = "csm-certification-training";
+export const RTE_OFFER_CODE = "safe-rte-certification-training";
 export const MENTORSHIP_CANONICAL_CODE = "scrum-master-mentorship-masterclass";
 export const MOCK_INTERVIEW_OFFER_CODE = "service-mock-interview-sm";
 export const MOCK_INTERVIEW_SLUG = "mock-interview-series-with-interview-preparation";
@@ -79,7 +81,15 @@ export type OfferPageExtras = {
   certNavLabel?: string;
   certBullets?: string[];
   faqGroups: FaqGroup[];
-  examGuidelines?: { domains: ExamDomain[]; footnote: string; sourceUrl: string };
+  examGuidelines?: {
+    domains: ExamDomain[];
+    footnote: string;
+    sourceUrl: string;
+    /** Override default SSM-oriented lead under Exam guidelines. */
+    lead?: string;
+    /** Visible link label for sourceUrl (defaults to hostname path). */
+    sourceLabel?: string;
+  };
   brochureMailto: string;
   brochureCtaLabel?: string;
   corporateMailto: string;
@@ -334,11 +344,559 @@ const SSM_EXTRAS: OfferPageExtras = {
     footnote:
       "Maintaining your credential: earn a minimum of 24 Continuing Education Units (CEUs) within your two-year certification cycle (about 12 CEUs annually).",
     sourceUrl: "https://scaledagile.com/certification/scrum-master/",
+    lead: "Domain weighting from Scaled Agile’s SAFe Scrum Master certification page — use this with your workshop notes and practice exam.",
+    sourceLabel: "scaledagile.com/certification/scrum-master",
   },
   brochureMailto:
     "mailto:contact@theagileforum.com?subject=SSM%20Course%20Content%20%26%20Brochure",
   corporateMailto:
     "mailto:contact@theagileforum.com?subject=Corporate%20SAFe%20SSM%20Training",
+};
+
+/** Certified ScrumMaster® (CSM®) — Scrum Alliance pathway; adapted for TheAgileForum voice. */
+const CSM_EXTRAS: OfferPageExtras = {
+  rating: {
+    score: "4.9",
+    meta: "Average learner rating · live Scrum cohorts",
+  },
+  heroEyebrow: "Scrum Alliance · Live CSM® pathway",
+  kindChip: "Certification",
+  benefitPills: [
+    "16 hrs live training",
+    "Scrum framework mastery",
+    "Exam-oriented review",
+    "Interview guidance",
+  ],
+  keyBenefits: [
+    {
+      title: "Serve the Scrum Team",
+      detail: "Accountabilities, events, and artifacts in practice",
+    },
+    {
+      title: "Empirical delivery",
+      detail: "Transparency, inspection, and adaptation — not waterfall habits",
+    },
+    {
+      title: "Exam-ready path",
+      detail: "Aligned to Scrum Alliance CSM® learning objectives",
+    },
+    {
+      title: "Career context",
+      detail: "How CSM® pairs with job-focused mentorship afterward",
+    },
+  ],
+  overviewTitle: "Start as a Scrum Master who can serve the team",
+  overviewBody:
+    "Certified ScrumMaster® (CSM®) is Scrum Alliance’s foundational credential for people who want to understand Scrum deeply and help a Scrum Team deliver. This live workshop covers Agile foundations, Scrum accountabilities, events, artifacts, and values — with exercises that mirror how real teams work.",
+  overviewPracticeTitle: "What you’ll practice",
+  overviewPracticeBody:
+    "Facilitating Sprint events, clarifying the Scrum Master accountability, refining Product Backlog items with acceptance criteria and Definition of Done, estimating thoughtfully, and coaching collaboration on cross-functional, self-managing teams.",
+  overviewExpectationsTitle: "What to expect after class",
+  overviewExpectationsBody:
+    "After the required course hours, you follow Scrum Alliance’s CSM® exam process (typically 50 multiple-choice questions; passing score 37/50). Exam attempts, membership, and SEU packaging are confirmed at enrollment for your cohort.",
+  overviewStats: [
+    { num: "2 days", label: "Live workshop · typically 16 hours" },
+    { num: "50 Q", label: "CSM® exam format (Scrum Alliance)" },
+    { num: "2 yrs", label: "Credential cycle · renew with SEUs" },
+  ],
+  learnLead: "Core Scrum skills you can apply on your next Sprint.",
+  curriculumTitle: "CSM® pathway curriculum",
+  curriculumLead:
+    "Modules aligned to Scrum Alliance learning objectives — from Agile foundations through Scrum events, artifacts, estimation, and serving the team.",
+  audienceTitle: "Who should attend",
+  audienceLead:
+    "Built for people starting — or strengthening — the Scrum Master path with a recognized Scrum Alliance credential.",
+  certImageUrl: "/assets/cert-badges/csm.svg",
+  certImageAlt: "Certified ScrumMaster CSM pathway badge — The Agile Forum",
+  certSectionEyebrow: "Your credential",
+  certSectionTitle: "How the Certified ScrumMaster® (CSM®) path works",
+  certSectionLead:
+    "Complete the live course, then take the Scrum Alliance CSM® exam. Passing earns your CSM® credential and digital recognition you can share on LinkedIn.",
+  certNavLabel: "Certification",
+  certBullets: [
+    "Certified ScrumMaster® (CSM®) credential via Scrum Alliance after you pass",
+    "Shareable digital recognition for professional profiles",
+    "Signals foundational Scrum Master facilitation and coaching ability",
+    "Exam attempts and membership packaging confirmed at enrollment",
+  ],
+  trustLine: "Live Scrum coaching · The Agile Forum",
+  finalCtaTitle: "Ready for your CSM® pathway?",
+  finalCtaLead:
+    "Select a cohort, enroll, or book a mentor if you want help choosing between CSM®, mentorship, and SAFe® next steps.",
+  brochureCtaLabel: "Download Course Content & Brochure",
+  demand: {
+    salary: { min: "$85k", max: "$160k", avg: "$118k" },
+    employers: [
+      "Accenture",
+      "Infosys",
+      "IBM",
+      "Deloitte",
+      "Cognizant",
+      "TCS",
+      "Capgemini",
+      "Wipro",
+      "Amazon",
+    ],
+    jobsCount: "80,000+",
+    jobsLabel: "Openings referencing Scrum Master around the world",
+    paragraphs: [
+      "CSM® remains one of the most recognized entry credentials for Scrum Master and Agile delivery roles.",
+      "Many employers still list CSM® or equivalent Scrum Master training alongside hands-on delivery experience.",
+      "Pairing certification with live-project practice (our Mentorship Masterclass) is how most TheAgileForum learners become interview-ready.",
+    ],
+  },
+  curriculum: [
+    {
+      title: "Agile foundations & the manifesto",
+      summary:
+        "Why teams adopt Agile, the four values and twelve principles, and how empirical process control differs from defined (waterfall) approaches.",
+      bullets: ["Agile Manifesto values", "12 principles in practice", "Empirical vs defined process"],
+    },
+    {
+      title: "Scrum as a framework",
+      summary:
+        "Lightweight rules that enable complex product work — iterations, feedback loops, and the planning–executing–learning cycle.",
+      bullets: ["Sprint as the heartbeat", "Transparency · inspection · adaptation", "When Scrum fits"],
+    },
+    {
+      title: "Scrum values — C FOR C",
+      summary:
+        "Commitment, Focus, Openness, Respect, and Courage — how values show up in daily team behavior and coaching conversations.",
+    },
+    {
+      title: "Accountabilities: Product Owner, Developers, Scrum Master",
+      summary:
+        "Clarify who owns value, who builds the Increment, and how the Scrum Master serves the team, Product Owner, and organization.",
+      bullets: ["Product Owner & ROI focus", "Cross-functional Developers", "Scrum Master as servant-leader"],
+    },
+    {
+      title: "Events: Sprint Planning, Daily Scrum, Review, Retrospective",
+      summary:
+        "Purpose, timeboxes, and facilitation tips so events create alignment instead of status theater.",
+    },
+    {
+      title: "Artifacts & Definition of Done",
+      summary:
+        "Product Backlog, Sprint Backlog, Increment, acceptance criteria, and a shared Definition of Done that protects quality.",
+      bullets: ["Backlog refinement", "Acceptance criteria", "DoD as a quality agreement"],
+    },
+    {
+      title: "Estimation, velocity & visibility",
+      summary:
+        "Story points vs ideal days, release planning with velocity, and burndown charts that support honest forecasting.",
+    },
+    {
+      title: "Teamworking: self-managing, cross-functional teams",
+      summary:
+        "Working agreements, facilitation techniques, distributed-team patterns, and tools that support collaboration without micromanagement.",
+    },
+    {
+      title: "CSM® exam orientation & next steps",
+      summary:
+        "Exam format overview, study approach, and how TheAgileForum mentorship deepens job-ready skills after the 2-day credential path.",
+    },
+  ],
+  audience: [
+    { role: "Aspiring Scrum Masters", detail: "Career switchers seeking a recognized Scrum credential" },
+    { role: "Team members & leads", detail: "Developers, QAs, and leads facilitating Scrum events" },
+    { role: "Project / delivery managers", detail: "Moving from waterfall habits into servant leadership" },
+    { role: "Product Owners & BAs", detail: "Working fluently with Scrum Teams and events" },
+  ],
+  faqGroups: [
+    {
+      title: "Pre-requisites",
+      items: [
+        {
+          question: "Are there prerequisites for CSM® training?",
+          answer:
+            "No formal prerequisites. Anyone interested in Scrum can enroll. Light familiarity with Agile ideas helps, but the workshop starts from foundations.",
+        },
+        {
+          question: "Do I need experience before the exam?",
+          answer:
+            "You must complete the required live CSM® course hours before Scrum Alliance grants exam access. Prior job experience is helpful but not required to enroll.",
+        },
+      ],
+    },
+    {
+      title: "CSM® exam & certification",
+      items: [
+        {
+          question: "What is the CSM® exam format?",
+          answer:
+            "Typically 50 multiple-choice questions in 60 minutes (open book). Passing score is commonly 37 of 50 (74%). Confirm current details with Scrum Alliance for your attempt window.",
+        },
+        {
+          question: "How many attempts do I get?",
+          answer:
+            "Scrum Alliance commonly includes two exam attempts within 90 days of course completion. Additional attempts may incur a small fee. Exact packaging is confirmed at enrollment.",
+        },
+        {
+          question: "Is the exam fee included?",
+          answer:
+            "Exam attempts and Scrum Alliance membership packaging vary by cohort offer — we confirm what is included before you pay.",
+        },
+        {
+          question: "How long is CSM® valid?",
+          answer:
+            "CSM® is typically valid for two years. Renewal usually requires Scrum Education Units (SEUs) and a renewal fee, or earning another Scrum Alliance credential that renews the cycle.",
+        },
+        {
+          question: "CSM® vs PSM — which should I take?",
+          answer:
+            "CSM® (Scrum Alliance) is course-gated and highly recognized by many employers. PSM (Scrum.org) is exam-first and self-study friendly. Many learners take CSM® for the facilitated course, then deepen practice with our Mentorship Masterclass.",
+        },
+      ],
+    },
+    {
+      title: "Training & enrollment",
+      items: [
+        {
+          question: "How long is the training?",
+          answer:
+            "Live instructor-led training totaling about 16 hours across two days (weekend or weekday cohorts depending on schedule).",
+        },
+        {
+          question: "Is training live or recorded-only?",
+          answer:
+            "Sessions are live and interactive. Recordings may be shared for review when the cohort offers them — confirm for your batch.",
+        },
+        {
+          question: "Who teaches the sessions?",
+          answer:
+            "Experienced Agile coaches from TheAgileForum led by Dhirender Verma (SPC · enterprise Agile coach). Official exam eligibility and any Scrum Alliance trainer requirements for your cohort are confirmed at enrollment.",
+        },
+        {
+          question: "Do I need a schedule before checkout?",
+          answer:
+            "Yes. This offering is schedule-bound — select a cohort so your cart line carries the right batch.",
+        },
+        {
+          question: "What if I want job-ready skills beyond 2 days?",
+          answer:
+            "Most learners pair CSM® with our 3-week Mentorship Masterclass (live JIRA project) and optionally Mock Interview Series — certification alone rarely lands the first Scrum Master role.",
+        },
+      ],
+    },
+  ],
+  examGuidelines: {
+    domains: [
+      {
+        domain: "Agile & Scrum foundations",
+        topics: [
+          "Agile Manifesto values and principles",
+          "Empirical process control",
+          "Scrum as a lightweight framework",
+        ],
+      },
+      {
+        domain: "Scrum accountabilities",
+        topics: ["Product Owner", "Developers", "Scrum Master servant-leadership"],
+      },
+      {
+        domain: "Events & artifacts",
+        topics: [
+          "Sprint Planning, Daily Scrum, Sprint Review, Retrospective",
+          "Product Backlog, Sprint Backlog, Increment",
+          "Definition of Done and acceptance criteria",
+        ],
+      },
+      {
+        domain: "Team practices",
+        topics: [
+          "Self-managing cross-functional teams",
+          "Estimation and forecasting basics",
+          "Working agreements and facilitation",
+        ],
+      },
+    ],
+    footnote:
+      "Maintaining CSM®: earn Scrum Education Units (commonly 20 SEUs) and complete Scrum Alliance renewal within your two-year cycle. Confirm current requirements on scrumalliance.org.",
+    sourceUrl: "https://www.scrumalliance.org/get-certified/scrum-master-track/certified-scrummaster",
+    lead: "Topic areas aligned to the Scrum Alliance Certified ScrumMaster® learning path — use with your workshop notes and practice questions.",
+    sourceLabel: "scrumalliance.org · Certified ScrumMaster®",
+  },
+  brochureMailto:
+    "mailto:contact@theagileforum.com?subject=CSM%20Course%20Content%20%26%20Brochure",
+  corporateMailto:
+    "mailto:contact@theagileforum.com?subject=Corporate%20CSM%20Training",
+  mentorImageUrl: "/assets/offers/mentor-dhirender.png",
+  mentorName: "Dhirender Verma",
+  mentorHeadline: "SPC · Scrum & SAFe mentor · job-focused coaching",
+  mentorBody:
+    "Not sure whether to start with CSM®, Mentorship Masterclass, or SAFe®? Book a short call — we’ll match credential timing to your target role and interview timeline.",
+};
+
+/** AI-Empowered SAFe® Release Train Engineer (RTE). */
+const RTE_EXTRAS: OfferPageExtras = {
+  rating: {
+    score: "4.9",
+    meta: "Average learner rating · live ART facilitation cohorts",
+  },
+  heroEyebrow: "Scaled Agile · AI-Empowered RTE workshop",
+  kindChip: "Certification",
+  benefitPills: [
+    "24 hrs live training",
+    "ART & PI facilitation",
+    "Exam preparation",
+    "AI for RTEs",
+  ],
+  keyBenefits: [
+    {
+      title: "Orchestrate the ART",
+      detail: "Coordinate multiple teams delivering in a shared PI cadence",
+    },
+    {
+      title: "Facilitate PI Planning",
+      detail: "Readiness, execution, objectives, and follow-through",
+    },
+    {
+      title: "Drive improvement",
+      detail: "Inspect & Adapt workshops that create real change",
+    },
+    {
+      title: "AI-aware RTE work",
+      detail: "Responsible prompts and workflows that amplify facilitation",
+    },
+  ],
+  overviewTitle: "Lead the train — not just a single team",
+  overviewBody:
+    "A SAFe® Release Train Engineer (RTE) is a servant leader and coach for the Agile Release Train. This AI-Empowered workshop builds the facilitation, alignment, and continuous-improvement skills you need to run program events and prepare for the Scaled Agile RTE exam.",
+  overviewPracticeTitle: "Key responsibilities you’ll practice",
+  overviewPracticeBody:
+    "Organizing value flow on an ART, facilitating PI planning readiness and execution, coaching Scrum Masters and Product Owners at program scale, running Inspect & Adapt, and applying SAFe principles with an AI-augmented RTE workflow.",
+  overviewExpectationsTitle: "Credential path",
+  overviewExpectationsBody:
+    "Complete the live instructor-led course (typically 24 hours), then take the Scaled Agile RTE exam. First exam attempt and SAFe Community membership packaging are confirmed at enrollment.",
+  overviewStats: [
+    { num: "3 days", label: "Live workshop · typically 24 hours" },
+    { num: "60 Q", label: "RTE exam · 120 minutes (Scaled Agile)" },
+    { num: "ART focus", label: "Program facilitation · not team-only Scrum" },
+  ],
+  learnLead: "Program-level facilitation you can use on your next PI.",
+  curriculumTitle: "SAFe® RTE curriculum",
+  curriculumLead:
+    "Modules aligned to the Scaled Agile RTE learning journey — from the RTE role through PI execution, relentless improvement, and AI for RTEs.",
+  audienceTitle: "Who should attend",
+  audienceLead:
+    "Ideal for experienced Scrum Masters, project/program leads, and Agile coaches stepping into ART facilitation.",
+  certImageUrl: "/assets/cert-badges/safe-rte.svg",
+  certImageAlt: "AI-Empowered SAFe Release Train Engineer certification badge",
+  certSectionEyebrow: "Your credential",
+  certSectionTitle: "How your SAFe® Release Train Engineer Certification looks like",
+  certSectionLead:
+    "Industry-recognized Scaled Agile credential after you pass the official exam — shareable badge and proof of ART-level facilitation skill.",
+  certNavLabel: "Certification",
+  certBullets: [
+    "SAFe® Release Train Engineer digital credential",
+    "Shareable badge for LinkedIn and professional profiles",
+    "Signals program facilitation, PI planning, and Lean-Agile leadership",
+    "Aligned with Scaled Agile’s official RTE exam path",
+  ],
+  trustLine: "SPC-led delivery · The Agile Forum",
+  finalCtaTitle: "Ready to facilitate an Agile Release Train?",
+  finalCtaLead:
+    "Select your schedule, enroll, or book a mentor if you want a second opinion on RTE vs SSM / Leading SAFe first.",
+  brochureCtaLabel: "Download Course Content & Brochure",
+  demand: {
+    salary: { min: "$110k", max: "$180k", avg: "$140k" },
+    employers: [
+      "Accenture",
+      "IBM",
+      "Capgemini",
+      "Deloitte",
+      "Infosys",
+      "Cognizant",
+      "Boeing",
+      "Fidelity",
+      "JPMorgan Chase",
+    ],
+    jobsCount: "10,000+",
+    jobsLabel: "Openings referencing Release Train Engineer / ART facilitation",
+    paragraphs: [
+      "Enterprises scaling SAFe® rely on RTEs to keep ARTs aligned, dependent, and improving every PI.",
+      "RTE demand tracks large-scale Agile transformations in financial services, healthcare, telecom, and government programs.",
+      "Prior SAFe® experience (Leading SAFe, SSM, or POPM) accelerates classroom success — we help you sequence credentials if you’re still early on the path.",
+    ],
+  },
+  curriculum: [
+    {
+      title: "Exploring the RTE role and responsibilities",
+      summary:
+        "Understand the RTE as servant leader and ART coach — decision facilitation, alignment, and value delivery across multiple teams.",
+      bullets: ["RTE in the Lean enterprise", "Facilitation & decision-making", "Leadership for value delivery"],
+    },
+    {
+      title: "Applying SAFe principles",
+      summary:
+        "Apply Scaled Agile Framework principles to drive continuous value across product deliveries at program scale.",
+    },
+    {
+      title: "Organizing the Agile Release Train",
+      summary:
+        "Structure teams, roles, and flow so the ART can deliver predictably without drowning in coordination overhead.",
+    },
+    {
+      title: "Planning a Planning Interval",
+      summary:
+        "Prepare the ART for PI Planning — readiness checklists, pre- and post-planning events, and stakeholder alignment.",
+      bullets: ["PI readiness", "Pre- and post-PI events", "Stakeholder engagement"],
+    },
+    {
+      title: "Executing a Planning Interval",
+      summary:
+        "Lead PI execution — summarize and publish PI objectives, manage risks, and keep delivery visible across the train.",
+    },
+    {
+      title: "Fostering relentless improvement",
+      summary:
+        "Run Inspect & Adapt workshops that surface systemic issues and turn insights into actionable improvement backlogs.",
+    },
+    {
+      title: "Serving the Agile Release Train",
+      summary:
+        "Coach collaboration across Scrum Masters, Product Management, and Business Owners — communication patterns that keep the ART healthy.",
+    },
+    {
+      title: "AI for RTEs",
+      summary:
+        "Foundations and prompting, responsible AI use, and building an AI-augmented RTE workflow for agendas, risk boards, and follow-ups.",
+      bullets: ["AI foundations & prompting", "Responsible AI", "RTE workflow automation"],
+    },
+    {
+      title: "Continuing your learning journey",
+      summary:
+        "Stay current with SAFe practices, community resources, and the path from RTE toward SPC and enterprise coaching roles.",
+    },
+  ],
+  audience: [
+    { role: "Scrum Masters & Team Coaches", detail: "Stepping up from team facilitation to ART orchestration" },
+    { role: "Program / project managers", detail: "Leading multi-team delivery in a SAFe enterprise" },
+    { role: "Agile coaches", detail: "Coaching ARTs through PI cadence and I&A" },
+    { role: "Aspiring RTEs", detail: "Preparing for the Scaled Agile RTE exam and interviews" },
+  ],
+  faqGroups: [
+    {
+      title: "Pre-requisites",
+      items: [
+        {
+          question: "Are there prerequisites for SAFe® RTE training?",
+          answer:
+            "No mandatory prerequisites. Prior Agile experience and an earlier SAFe® certification (Leading SAFe, SSM, or POPM) strongly help. Background as Scrum Master, Product Manager, or program lead is ideal.",
+        },
+        {
+          question: "Can I take the RTE exam without a course?",
+          answer:
+            "No. Scaled Agile requires completion of an authorized instructor-led RTE course before exam eligibility.",
+        },
+      ],
+    },
+    {
+      title: "RTE exam FAQs",
+      items: [
+        {
+          question: "What is the SAFe® RTE exam format?",
+          answer:
+            "Typically 60 multiple-choice / multi-select questions in 120 minutes, online and closed-book (proctored). Confirm current details on scaledagile.com for your attempt.",
+        },
+        {
+          question: "What is the passing score?",
+          answer:
+            "Scaled Agile publishes the current passing percentage with the exam guide; we review the latest threshold during class and prep.",
+        },
+        {
+          question: "Is the first exam attempt included?",
+          answer:
+            "Exam attempt and SAFe Community membership packaging are confirmed at enrollment for your cohort.",
+        },
+        {
+          question: "When do I get certified?",
+          answer:
+            "After you pass the official exam, Scaled Agile issues your SAFe® RTE credential and digital badge.",
+        },
+      ],
+    },
+    {
+      title: "Training & enrollment FAQs",
+      items: [
+        {
+          question: "How long is the training?",
+          answer:
+            "Typically 24 hours of live instructor-led training across three days. Exact cohort hours are listed on the schedule you select.",
+        },
+        {
+          question: "Who teaches the sessions?",
+          answer:
+            "Experienced SAFe practitioners / SPCs from TheAgileForum, emphasizing applied ART facilitation rather than slide read-throughs.",
+        },
+        {
+          question: "Do I need a schedule before checkout?",
+          answer:
+            "Yes. This offering is schedule-bound — select a cohort so your cart line carries the right batch.",
+        },
+        {
+          question: "Should I take SSM or Leading SAFe before RTE?",
+          answer:
+            "Many learners complete Leading SAFe and/or SAFe Scrum Master first. If you’re unsure, book a mentor call and we’ll sequence credentials to your role goals.",
+        },
+        {
+          question: "Can I change my batch?",
+          answer:
+            "Contact support before your cohort starts. We’ll help move you to the next open workshop when seats allow.",
+        },
+      ],
+    },
+  ],
+  examGuidelines: {
+    domains: [
+      {
+        domain: "RTE role & SAFe principles",
+        topics: [
+          "Release Train Engineer responsibilities",
+          "Servant leadership at ART scale",
+          "Applying SAFe principles to value delivery",
+        ],
+      },
+      {
+        domain: "Organizing & planning the ART",
+        topics: [
+          "Organizing the Agile Release Train",
+          "PI Planning readiness",
+          "Pre- and post-PI planning events",
+        ],
+      },
+      {
+        domain: "Executing the PI & improvement",
+        topics: [
+          "Executing a Planning Interval",
+          "Publishing PI objectives",
+          "Inspect & Adapt and relentless improvement",
+        ],
+      },
+      {
+        domain: "Serving the ART",
+        topics: [
+          "Coaching collaboration across roles",
+          "Facilitating program events",
+          "Communication and flow at program scale",
+        ],
+      },
+    ],
+    footnote:
+      "Maintain your SAFe® credential per Scaled Agile’s current renewal tiers and continuing education guidance on scaledagile.com.",
+    sourceUrl: "https://scaledagile.com/certification/release-train-engineer/",
+    lead: "Topic areas aligned to Scaled Agile’s Release Train Engineer certification path — use with your workshop notes and practice exam.",
+    sourceLabel: "scaledagile.com/certification/release-train-engineer",
+  },
+  brochureMailto:
+    "mailto:contact@theagileforum.com?subject=SAFe%20RTE%20Course%20Content%20%26%20Brochure",
+  corporateMailto:
+    "mailto:contact@theagileforum.com?subject=Corporate%20SAFe%20RTE%20Training",
+  mentorImageUrl: "/assets/offers/mentor-dhirender.png",
+  mentorName: "Dhirender Verma",
+  mentorHeadline: "SPC · ART & program facilitation mentor",
+  mentorBody:
+    "Wondering if RTE is the right next credential after SSM or Leading SAFe? Book a short call — role fit, timing, and whether mentorship should come first.",
 };
 
 /** Mentorship / live JIRA masterclass — content aligned to theagileforum.com course page. */
@@ -1122,6 +1680,7 @@ function genericCertExtras(certLabel: string): OfferPageExtras {
 
 const SAFE_CERT_CODES = new Set([
   SSM_OFFER_CODE,
+  RTE_OFFER_CODE,
   "safe-leading-safe",
   "safe-product-owner-product-manager-certification-training",
   "safe-agilist-leading-safe-certification-training",
@@ -1207,6 +1766,8 @@ export function getOfferPageExtras(
   opts?: { currency?: string | null; geo?: string | null },
 ): OfferPageExtras | null {
   if (code === SSM_OFFER_CODE) return SSM_EXTRAS;
+  if (code === CSM_OFFER_CODE) return CSM_EXTRAS;
+  if (code === RTE_OFFER_CODE) return RTE_EXTRAS;
   if (code === MENTORSHIP_OFFER_CODE || code === MENTORSHIP_CANONICAL_CODE) return MENTORSHIP_EXTRAS;
   if (code === MOCK_INTERVIEW_OFFER_CODE || code === MOCK_INTERVIEW_SLUG) {
     return MOCK_INTERVIEW_EXTRAS;
