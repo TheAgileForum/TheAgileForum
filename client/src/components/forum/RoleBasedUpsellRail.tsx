@@ -12,6 +12,7 @@ import { trackEvent } from "../../lib/analytics";
 import { formatPrice } from "../../lib/format-price";
 import { getUpsellRecommendations, type UpsellItem } from "../../lib/forum-api";
 import { offerDetailPath } from "../../lib/offer-routes";
+import { displayOfferingTitle } from "../../lib/offering-display-title";
 
 type RoleBasedUpsellRailProps = {
   targetRole?: string | null;
@@ -73,7 +74,11 @@ export function RoleBasedUpsellRail({
     setAddingCode(item.code);
     trackEvent("upsell_click", { code: item.code, context });
     try {
-      await onAddOffering(item.code, item.scheduleRef ?? undefined, item.title);
+      await onAddOffering(
+        item.code,
+        item.scheduleRef ?? undefined,
+        displayOfferingTitle(item.code, item.title, { currency, geo }),
+      );
     } catch {
       // Error surfaced by ForumCartContext snackbar
     } finally {
@@ -101,7 +106,9 @@ export function RoleBasedUpsellRail({
               sx={{ justifyContent: "space-between", alignItems: "center", gap: 1 }}
             >
               <Stack spacing={0.25}>
-                <Typography variant="body2">{item.title}</Typography>
+                <Typography variant="body2">
+                  {displayOfferingTitle(item.code, item.title, { currency, geo })}
+                </Typography>
                 <Typography variant="caption" color="text.secondary">
                   {formatPrice(item.priceQuote.currency, item.priceQuote.amount)}
                 </Typography>

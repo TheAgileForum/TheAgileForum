@@ -1121,7 +1121,84 @@ const SAFE_CERT_CODES = new Set([
   "safe-agilist-leading-safe-certification-training",
 ]);
 
-export function getOfferPageExtras(code: string, certificationName?: string): OfferPageExtras | null {
+function powerResumeExtrasForRegion(opts?: {
+  currency?: string | null;
+  geo?: string | null;
+}): OfferPageExtras {
+  const currency = (opts?.currency ?? "").trim().toUpperCase();
+  const geo = (opts?.geo ?? "").trim().toUpperCase();
+  const india = currency === "INR" || geo === "IN";
+  if (!india) return POWER_RESUME_EXTRAS;
+
+  return {
+    ...POWER_RESUME_EXTRAS,
+    heroImageAlt: "New Resume with Naukri and LinkedIn Upgrade",
+    benefitPills: [
+      "Delivery within 1 day",
+      "Role-specific keywords",
+      "Resume + Naukri",
+      "LinkedIn upgrade",
+    ],
+    keyBenefits: POWER_RESUME_EXTRAS.keyBenefits.map((b) =>
+      b.title === "Cover letter that matches"
+        ? {
+            title: "Naukri upgrade for opportunities",
+            detail:
+              "Profile refresh that highlights your skills on Naukri to maximize job opportunities with recruiters",
+          }
+        : b,
+    ),
+    overviewTitle: "A resume, Naukri, and LinkedIn profile that open doors",
+    overviewBody:
+      "Get a personalized new resume with the right keywords, achievements, and skills for Scrum, Agile PM, and product roles — plus Naukri and LinkedIn upgrades to maximize job opportunities with skills. Choose from multiple professional formats.",
+    overviewPracticeBody:
+      "Role narrative, measurable achievements, Agile/Scrum terminology aligned to job descriptions, and Naukri + LinkedIn upgrades that surface your skills to maximize job opportunities.",
+    overviewExpectationsBody:
+      "You share your current CV, Naukri/LinkedIn URLs, and target role; we return a polished resume plus Naukri and LinkedIn upgrades you can use immediately for applications — with format options that fit career-transition or experienced-practitioner stories.",
+    overviewStats: [
+      { num: "1 day", label: "Typical delivery after inputs" },
+      { num: "3 assets", label: "Resume + Naukri + LinkedIn" },
+      { num: "Role-fit", label: "Keywords for SM · APM · PO · BA" },
+    ],
+    curriculum: POWER_RESUME_EXTRAS.curriculum.map((m) =>
+      m.title === "Cover letter pairing"
+        ? {
+            title: "Naukri profile upgrade",
+            summary:
+              "Refresh your Naukri profile to maximize job opportunities with skills — headline, summary, and experience language aligned to your target roles.",
+            bullets: [
+              "Skills-forward headline",
+              "Summary and experience polish",
+              "Recruiter-search friendly keywords",
+            ],
+          }
+        : m,
+    ),
+    curriculumTitle: "How the resume + Naukri + LinkedIn service works",
+    curriculumLead:
+      "A focused rewrite path — intake, resume, Naukri upgrade, LinkedIn upgrade, and delivery — without a live class schedule.",
+    certImageAlt: "New Resume with Naukri and LinkedIn Upgrade",
+    certSectionTitle: "Resume, Naukri, and LinkedIn built for Agile hiring",
+    certSectionLead:
+      "Personalized keywords, achievements, and skills — plus Naukri and LinkedIn upgrades to maximize job opportunities — delivered fast so you can apply with confidence.",
+    certBullets: [
+      "Personalized resume tailored to experience and target role",
+      "Naukri upgrade to maximize job opportunities with skills",
+      "LinkedIn upgrade to maximize job opportunities with skills",
+      "Multiple professional format options",
+      "Agile and Scrum terminology aligned to hiring expectations",
+      "Typical delivery within one business day",
+    ],
+    trustLine: "Resume + Naukri + LinkedIn · fast delivery",
+    finalCtaTitle: "Ready for a stronger resume, Naukri, and LinkedIn?",
+  };
+}
+
+export function getOfferPageExtras(
+  code: string,
+  certificationName?: string,
+  opts?: { currency?: string | null; geo?: string | null },
+): OfferPageExtras | null {
   if (code === SSM_OFFER_CODE) return SSM_EXTRAS;
   if (code === MENTORSHIP_OFFER_CODE || code === MENTORSHIP_CANONICAL_CODE) return MENTORSHIP_EXTRAS;
   if (code === MOCK_INTERVIEW_OFFER_CODE || code === MOCK_INTERVIEW_SLUG) {
@@ -1132,7 +1209,7 @@ export function getOfferPageExtras(code: string, certificationName?: string): Of
     code === POWER_RESUME_SLUG ||
     code === POWER_RESUME_LEGACY_SLUG
   ) {
-    return POWER_RESUME_EXTRAS;
+    return powerResumeExtrasForRegion(opts);
   }
   if (SAFE_CERT_CODES.has(code)) {
     return genericCertExtras(certificationName ?? "SAFe® certification");

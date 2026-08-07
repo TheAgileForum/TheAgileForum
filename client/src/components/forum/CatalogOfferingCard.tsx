@@ -6,6 +6,7 @@ import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { Link as RouterLink } from "react-router-dom";
+import { usePricing } from "../../contexts/PricingContext";
 import { catalogDisplayPrice } from "../../lib/catalog-display-price";
 import {
   catalogSocialProof,
@@ -15,6 +16,10 @@ import {
 import type { CatalogOffering } from "../../lib/forum-api";
 import { resolvedOfferingPrice } from "../../lib/format-price";
 import { offerDetailPath } from "../../lib/offer-routes";
+import {
+  displayOfferingIncludes,
+  displayOfferingTitle,
+} from "../../lib/offering-display-title";
 import { EmiAffordabilityModule } from "./EmiAffordabilityModule";
 
 type CatalogOfferingCardProps = {
@@ -59,12 +64,15 @@ function FeatureCheck() {
 }
 
 export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOfferingCardProps) {
+  const { currency, geo } = usePricing();
   const priced = resolvedOfferingPrice(offering);
   const displayPrice = catalogDisplayPrice(
     priced.currency,
     priced.amount,
     offering.code,
   );
+  const regionOpts = { currency, geo };
+  const title = displayOfferingTitle(offering.code, offering.title, regionOpts);
   const badge = resolveCertBadge(offering);
   const coverHero = badge.variant === "cover";
   const social = catalogSocialProof(offering);
@@ -86,7 +94,12 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
     durationAlreadyInMeta ? undefined : durationMeta,
   ].filter(Boolean);
 
-  const features = (offering.includes ?? offering.learningOutcomes ?? []).slice(0, 4);
+  const regionIncludes = displayOfferingIncludes(
+    offering.code,
+    offering.includes,
+    regionOpts,
+  );
+  const features = (regionIncludes ?? offering.learningOutcomes ?? []).slice(0, 4);
 
   return (
     <Box
@@ -264,7 +277,7 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
             mb: 0.5,
           }}
         >
-          {offering.title}
+          {title}
         </Typography>
 
         <Typography
