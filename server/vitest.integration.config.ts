@@ -1,4 +1,4 @@
-import path from "node:path";
+﻿import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { config } from "dotenv";
 import { defineConfig } from "vitest/config";
@@ -12,6 +12,8 @@ export default defineConfig({
     environment: "node",
     include: ["src/**/*.integration.test.ts"],
     globalSetup: ["./src/test-global-setup.ts"],
+    // Each suite seeds via prisma/seed.ts; parallel files race on upsert creates (P2002).
+    fileParallelism: false,
     testTimeout: 60_000,
     hookTimeout: 120_000,
   },
