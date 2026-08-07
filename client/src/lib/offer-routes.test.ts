@@ -62,6 +62,17 @@ describe("offer routes", () => {
     expect(offerDetailPath("psm-ii-certification-training")).toBe(
       "/offers/psm-ii-certification-training",
     );
+    expect(offerDetailPath("psm-i-certification-training")).toBe(
+      "/offers/professional-scrum-master-psm-i-training-crash-course",
+    );
+    expect(
+      resolveOfferRouteCode(
+        "professional-scrum-master-psm-i-training-crash-course",
+      ),
+    ).toBe("psm-i-certification-training");
+    expect(resolveOfferRouteCode("psm-i-certification-training")).toBe(
+      "psm-i-certification-training",
+    );
     expect(resolveOfferRouteCode("unknown-offer")).toBe("unknown-offer");
   });
 });

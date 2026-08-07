@@ -64,12 +64,13 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
         "safe-scrum-master-certification-training",
         "csm-certification-training",
         "safe-rte-certification-training",
+        "psm-i-certification-training",
         "psm-ii-certification-training",
       ]),
     );
     expect(codes).not.toContain("exam-practice-free");
     expect(codes).not.toContain("exam-mock-certification");
-    expect(res.body.offerings).toHaveLength(6);
+    expect(res.body.offerings).toHaveLength(7);
 
     const leading = res.body.offerings.find(
       (o: { code: string }) => o.code === "safe-leading-safe",
@@ -93,12 +94,36 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
     expect(rte?.certificationName).toContain("Release Train Engineer");
     expect(rte?.durationHours).toBe(24);
 
+    const psmI = res.body.offerings.find(
+      (o: { code: string }) => o.code === "psm-i-certification-training",
+    );
+    expect(psmI?.certBody).toBe("scrum.org");
+    expect(psmI?.title).toContain("PSM-I");
+    expect(psmI?.defaultUnitPrice).toBe("149.00");
+    expect(psmI?.durationHours).toBe(8);
+    expect(psmI?.slug).toBe(
+      "professional-scrum-master-psm-i-training-crash-course",
+    );
+
     const psmIi = res.body.offerings.find(
       (o: { code: string }) => o.code === "psm-ii-certification-training",
     );
     expect(psmIi?.certBody).toBe("scrum.org");
     expect(psmIi?.certificationName).toContain("PSM II");
     expect(psmIi?.durationHours).toBe(16);
+  });
+
+  it("resolves PSM I marketing slug alias to canonical offer", async () => {
+    const res = await request(app()).get(
+      "/api/v1/catalog/offerings/professional-scrum-master-psm-i-training-crash-course?geo=IN",
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.offering.code).toBe("psm-i-certification-training");
+    expect(res.body.offering.durationHours).toBe(8);
+    expect(res.body.priceQuote).toMatchObject({
+      amount: "9999.00",
+      currency: "INR",
+    });
   });
 
   it("resolves live-site slug alias for Leading SAFe detail", async () => {
@@ -226,10 +251,26 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
     expect(res.body.currencyContext.currency).toBe("INR");
     expect(res.body.offerings.length).toBeGreaterThan(0);
     expect(res.body.offerings[0].priceQuote.currency).toBe("INR");
-    expect(res.body.offerings.every(
-      (o: { priceQuote: { currency: string; amount: string } }) =>
-        o.priceQuote.currency === "INR" && o.priceQuote.amount === "33999.00",
-    )).toBe(true);
+    expect(
+      res.body.offerings.every(
+        (o: { priceQuote: { currency: string } }) =>
+          o.priceQuote.currency === "INR",
+      ),
+    ).toBe(true);
+    const psmI = res.body.offerings.find(
+      (o: { code: string }) => o.code === "psm-i-certification-training",
+    );
+    expect(psmI?.priceQuote).toMatchObject({
+      amount: "9999.00",
+      currency: "INR",
+    });
+    const psmIi = res.body.offerings.find(
+      (o: { code: string }) => o.code === "psm-ii-certification-training",
+    );
+    expect(psmIi?.priceQuote).toMatchObject({
+      amount: "33999.00",
+      currency: "INR",
+    });
   });
 
   it("GET /offerings/:code returns detail priceQuote (api-contract)", async () => {
