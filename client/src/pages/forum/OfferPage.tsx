@@ -457,7 +457,7 @@ export function OfferPage() {
           disabled={adding || (offering.scheduleBound && !scheduleRef)}
           onClick={() => void handleAddToCart()}
         >
-          Add to cart
+          Add to Cart
         </Button>
         <Button variant="outlined" size="large" component={RouterLink} to="/cart">
           View cart

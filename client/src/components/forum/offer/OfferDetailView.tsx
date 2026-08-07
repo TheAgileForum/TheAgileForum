@@ -494,7 +494,7 @@ export function OfferDetailView({
                 </Box>
               ) : (
                 <Typography sx={{ color: OFFER_MUTED, fontSize: "0.85rem", mt: 0.75, mb: 1 }}>
-                  Ready to enroll
+                  Ready to add to cart
                 </Typography>
               )}
 
@@ -522,7 +522,7 @@ export function OfferDetailView({
                   onClick={() => void onEnroll()}
                   sx={{ fontWeight: 700 }}
                 >
-                  {adding ? "Adding…" : "Enroll now"}
+                  {adding ? "Adding…" : "Add to Cart"}
                 </Button>
                 <Button
                   variant="outlined"
@@ -1053,7 +1053,7 @@ export function OfferDetailView({
                       fontWeight: selected ? 600 : 400,
                     }}
                   >
-                    {selected ? "Selected · Continue to enroll" : "Select to continue"}
+                    {selected ? "Selected · Continue to cart" : "Select to continue"}
                   </Typography>
                   <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
                     <Button
@@ -1069,7 +1069,7 @@ export function OfferDetailView({
                       onClick={() => void onEnroll()}
                       sx={{ fontWeight: 600 }}
                     >
-                      Enroll
+                      Add to Cart
                     </Button>
                   </Stack>
                 </Box>
@@ -1463,7 +1463,7 @@ export function OfferDetailView({
                 onClick={() => void onEnroll()}
                 sx={{ fontWeight: 700, bgcolor: OFFER_ACCENT, "&:hover": { bgcolor: OFFER_ACCENT_DEEP } }}
               >
-                Enroll now
+                Add to Cart
               </Button>
             )}
             <Button
@@ -1515,7 +1515,7 @@ export function OfferDetailView({
       </Section>
 
       <StickyMobileCta
-        label={scheduleRequired && !scheduleRef ? "Select Schedule" : "Enroll now"}
+        label={scheduleRequired && !scheduleRef ? "Select Schedule" : "Add to Cart"}
         disabled={adding}
         onClick={() => {
           if (scheduleRequired && !scheduleRef) {
