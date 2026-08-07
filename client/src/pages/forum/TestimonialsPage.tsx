@@ -7,6 +7,8 @@ import { Link as RouterLink } from "react-router-dom";
 
 const INK = "#0a1628";
 const TEAL = "#0f9f8f";
+/** LinkedIn's official embed canvas width — keep cards at least this wide. */
+const LINKEDIN_EMBED_WIDTH = 504;
 
 type Testimonial = {
   name: string;
@@ -20,27 +22,27 @@ type Testimonial = {
 const LINKEDIN_POSTS = [
   {
     urn: "urn:li:share:7474811272262234114",
-    height: 571,
+    height: 720,
   },
   {
     urn: "urn:li:share:7472005988393361408",
-    height: 659,
+    height: 780,
   },
   {
     urn: "urn:li:share:7471160124468838400",
-    height: 645,
+    height: 780,
   },
   {
     urn: "urn:li:share:7452948586650079232",
-    height: 668,
+    height: 800,
   },
   {
     urn: "urn:li:share:7356391269129965570",
-    height: 583,
+    height: 720,
   },
   {
     urn: "urn:li:ugcPost:7291781558250704896",
-    height: 600,
+    height: 740,
   },
 ] as const;
 
@@ -70,10 +72,85 @@ const LINKEDIN_REVIEW_SCREENSHOTS = [
 const LINKEDIN_REVIEW_EMBEDS = [
   {
     urn: "urn:li:share:7377396042931036160",
-    height: 647,
+    height: 780,
     title: "LinkedIn recommendation embed",
   },
 ] as const;
+
+function LinkedInPostEmbed({
+  urn,
+  height,
+  title = "LinkedIn success post",
+}: {
+  urn: string;
+  height: number;
+  title?: string;
+}) {
+  // collapsed=0 shows the full post (images + body) instead of a truncated preview.
+  const embedSrc = `https://www.linkedin.com/embed/feed/update/${urn}?collapsed=0`;
+  const viewHref = `https://www.linkedin.com/feed/update/${urn}`;
+
+  return (
+    <Box
+      sx={{
+        border: "1px solid rgba(10,22,40,0.1)",
+        borderLeft: `3px solid ${TEAL}`,
+        borderRadius: 1,
+        bgcolor: "rgba(15,159,143,0.04)",
+        px: { xs: 1.5, sm: 2 },
+        py: 2,
+        width: "100%",
+        maxWidth: LINKEDIN_EMBED_WIDTH + 40,
+        minWidth: 0,
+        justifySelf: "center",
+      }}
+    >
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: LINKEDIN_EMBED_WIDTH,
+          mx: "auto",
+          overflowX: "auto",
+          WebkitOverflowScrolling: "touch",
+          border: "1px solid rgba(10,22,40,0.08)",
+          borderRadius: 1,
+          bgcolor: "#fff",
+        }}
+      >
+        <Box
+          component="iframe"
+          src={embedSrc}
+          title={title}
+          allowFullScreen
+          loading="lazy"
+          sx={{
+            display: "block",
+            border: 0,
+            width: LINKEDIN_EMBED_WIDTH,
+            height,
+            maxWidth: "none",
+          }}
+        />
+      </Box>
+      <Link
+        href={viewHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        sx={{
+          display: "inline-block",
+          mt: 1.25,
+          color: TEAL,
+          fontWeight: 600,
+          fontSize: "0.875rem",
+          textDecoration: "none",
+          "&:hover": { textDecoration: "underline" },
+        }}
+      >
+        View on LinkedIn →
+      </Link>
+    </Box>
+  );
+}
 
 const TESTIMONIALS: Testimonial[] = [
   {
@@ -381,71 +458,19 @@ export function TestimonialsPage() {
         <Box
           sx={{
             display: "grid",
-            gap: 2.5,
-            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr", lg: "1fr 1fr 1fr" },
+            gap: 3,
+            // Max 2 columns so each card can fit LinkedIn's 504px embed canvas.
+            gridTemplateColumns: {
+              xs: "1fr",
+              md: "repeat(2, minmax(0, 1fr))",
+            },
             alignItems: "start",
+            justifyItems: "center",
           }}
         >
-          {LINKEDIN_POSTS.map((post) => {
-            const embedSrc = `https://www.linkedin.com/embed/feed/update/${post.urn}?collapsed=1`;
-            const viewHref = `https://www.linkedin.com/feed/update/${post.urn}`;
-            return (
-              <Box
-                key={post.urn}
-                sx={{
-                  border: "1px solid rgba(10,22,40,0.1)",
-                  borderLeft: `3px solid ${TEAL}`,
-                  bgcolor: "rgba(15,159,143,0.04)",
-                  px: { xs: 1.5, sm: 2 },
-                  py: 2,
-                  minWidth: 0,
-                }}
-              >
-                <Box
-                  sx={{
-                    width: "100%",
-                    maxWidth: 504,
-                    mx: "auto",
-                    overflowX: "auto",
-                    WebkitOverflowScrolling: "touch",
-                    border: "1px solid rgba(10,22,40,0.08)",
-                    bgcolor: "#fff",
-                  }}
-                >
-                  <Box
-                    component="iframe"
-                    src={embedSrc}
-                    title="LinkedIn success post"
-                    allowFullScreen
-                    loading="lazy"
-                    sx={{
-                      display: "block",
-                      border: 0,
-                      width: 504,
-                      height: post.height,
-                      maxWidth: "none",
-                    }}
-                  />
-                </Box>
-                <Link
-                  href={viewHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{
-                    display: "inline-block",
-                    mt: 1.25,
-                    color: TEAL,
-                    fontWeight: 600,
-                    fontSize: "0.875rem",
-                    textDecoration: "none",
-                    "&:hover": { textDecoration: "underline" },
-                  }}
-                >
-                  View on LinkedIn →
-                </Link>
-              </Box>
-            );
-          })}
+          {LINKEDIN_POSTS.map((post) => (
+            <LinkedInPostEmbed key={post.urn} urn={post.urn} height={post.height} />
+          ))}
         </Box>
       </Box>
 
@@ -459,9 +484,13 @@ export function TestimonialsPage() {
         <Box
           sx={{
             display: "grid",
-            gap: 2.5,
-            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+            gap: 3,
+            gridTemplateColumns: {
+              xs: "1fr",
+              md: "repeat(2, minmax(0, 1fr))",
+            },
             alignItems: "start",
+            justifyItems: "center",
           }}
         >
           {LINKEDIN_REVIEW_SCREENSHOTS.map((review) => (
@@ -476,7 +505,8 @@ export function TestimonialsPage() {
                 bgcolor: "rgba(15,159,143,0.04)",
                 px: { xs: 1.5, sm: 2 },
                 py: 2,
-                maxWidth: 560,
+                width: "100%",
+                maxWidth: LINKEDIN_EMBED_WIDTH + 40,
                 minWidth: 0,
               }}
             >
@@ -510,67 +540,14 @@ export function TestimonialsPage() {
               </Box>
             </Box>
           ))}
-          {LINKEDIN_REVIEW_EMBEDS.map((post) => {
-            const embedSrc = `https://www.linkedin.com/embed/feed/update/${post.urn}?collapsed=1`;
-            const viewHref = `https://www.linkedin.com/feed/update/${post.urn}`;
-            return (
-              <Box
-                key={post.urn}
-                sx={{
-                  border: "1px solid rgba(10,22,40,0.1)",
-                  borderLeft: `3px solid ${TEAL}`,
-                  borderRadius: 1,
-                  bgcolor: "rgba(15,159,143,0.04)",
-                  px: { xs: 1.5, sm: 2 },
-                  py: 2,
-                  minWidth: 0,
-                }}
-              >
-                <Box
-                  sx={{
-                    width: "100%",
-                    maxWidth: 504,
-                    mx: "auto",
-                    overflowX: "auto",
-                    WebkitOverflowScrolling: "touch",
-                    border: "1px solid rgba(10,22,40,0.08)",
-                    bgcolor: "#fff",
-                  }}
-                >
-                  <Box
-                    component="iframe"
-                    src={embedSrc}
-                    title={post.title}
-                    allowFullScreen
-                    loading="lazy"
-                    sx={{
-                      display: "block",
-                      border: 0,
-                      width: 504,
-                      height: post.height,
-                      maxWidth: "none",
-                    }}
-                  />
-                </Box>
-                <Link
-                  href={viewHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{
-                    display: "inline-block",
-                    mt: 1.25,
-                    color: TEAL,
-                    fontWeight: 600,
-                    fontSize: "0.875rem",
-                    textDecoration: "none",
-                    "&:hover": { textDecoration: "underline" },
-                  }}
-                >
-                  View on LinkedIn →
-                </Link>
-              </Box>
-            );
-          })}
+          {LINKEDIN_REVIEW_EMBEDS.map((post) => (
+            <LinkedInPostEmbed
+              key={post.urn}
+              urn={post.urn}
+              height={post.height}
+              title={post.title}
+            />
+          ))}
         </Box>
       </Box>
 
