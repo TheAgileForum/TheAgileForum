@@ -194,7 +194,7 @@ function OrderCard({ order }: { order: LearnerOrder }) {
             View offering
           </Button>
           {order.status.toLowerCase() === "paid" && orderIncludesMockInterview(order) ? (
-            <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: "wrap" }}>
+            <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", alignItems: "center" }}>
               <Typography variant="caption" color="text.secondary" component="span">
                 Next action
               </Typography>
