@@ -13,6 +13,8 @@ export const OFFERING_CODE_ALIASES: Record<string, string> = {
   "power-resume-cover-letter": "service-power-resume-cover-letter",
   "new-resume-with-cover-letter-linkedin-upgrade":
     "service-power-resume-cover-letter",
+  "professional-scrum-master-psm-i-training-crash-course":
+    "psm-i-certification-training",
 };
 
 /**
@@ -325,6 +327,57 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
       "Facilitate PI planning readiness, execution, and follow-through",
       "Drive Inspect & Adapt and relentless improvement",
       "Build an AI-augmented RTE workflow responsibly",
+    ],
+  },
+  /**
+   * Professional Scrum Master™ I (PSM I) — 1-day crash course.
+   * Founder list price: USD 149 · INR 9,999. Other currencies convert from USD base (FR-178).
+   * Curriculum adapted from industry PSM-I pathways (Agile/Scrum Guide foundation + exam prep).
+   */
+  "psm-i-certification-training": {
+    code: "psm-i-certification-training",
+    title: "Professional Scrum Master (PSM-I) Training Crash Course",
+    kind: "course",
+    category: "certification",
+    scheduleBound: true,
+    examAccess: "preview_only",
+    safeOrgPaymentEligible: false,
+    defaultUnitPrice: "149.00",
+    currency: "USD",
+    regionalUnitPrices: { INR: "9999.00" },
+    roleTags: ["learner", "scrum_master"],
+    certBody: "scrum.org",
+    deliveryMode: "live",
+    upcomingBatchId: "batch-psm-i-tbd",
+    slug: "professional-scrum-master-psm-i-training-crash-course",
+    certificationName: "Professional Scrum Master™ I (PSM I)",
+    summary:
+      "Become a Professional Scrum Master™ I with a focused 1-day (8 hr) live crash course on the Scrum Guide — empiricism, accountabilities, events, artifacts, and values — so you can serve a Scrum Team and prepare for the Scrum.org PSM I assessment. Assessment attempt packaging is confirmed at enrollment.",
+    durationHours: 8,
+    scheduleLabel: "1-day live crash course · 8 hours · cohorts on request",
+    cohortSchedules: [
+      {
+        id: "batch-psm-i-tbd",
+        label: "Next cohort timing confirmed at enrollment (weekend / weekday options)",
+      },
+    ],
+    includes: [
+      "8 hours live instructor-led PSM I crash course",
+      "Scrum Guide foundation: empiricism, pillars, and values",
+      "Scrum accountabilities, events, artifacts, and commitments",
+      "Definition of Done, Product Backlog, and self-managing teams",
+      "Scrum Master as servant-leader and change agent",
+      "Exam-oriented review and practice questions for Scrum.org PSM I",
+      "Career guidance for Scrum Master and Agile PM interviews",
+      "Scrum.org assessment packaging confirmed at enrollment",
+    ],
+    learningOutcomes: [
+      "Explain Agile values/principles and why Scrum is an empirical framework",
+      "Apply Transparency, Inspection, and Adaptation in product work",
+      "Clarify Scrum Master, Product Owner, and Developers accountabilities",
+      "Facilitate Scrum events and protect the Sprint Goal",
+      "Work with Product Backlog, Sprint Backlog, Increment, and Definition of Done",
+      "Prepare for the Scrum.org Professional Scrum Master™ I assessment format",
     ],
   },
   /**

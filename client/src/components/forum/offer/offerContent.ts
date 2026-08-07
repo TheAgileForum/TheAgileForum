@@ -12,6 +12,7 @@ export const OFFER_MUTED = "#5b6b7c";
 export const SSM_OFFER_CODE = "safe-scrum-master-certification-training";
 export const CSM_OFFER_CODE = "csm-certification-training";
 export const RTE_OFFER_CODE = "safe-rte-certification-training";
+export const PSM_I_OFFER_CODE = "psm-i-certification-training";
 export const PSM_II_OFFER_CODE = "psm-ii-certification-training";
 export const MENTORSHIP_CANONICAL_CODE = "scrum-master-mentorship-masterclass";
 export const MOCK_INTERVIEW_OFFER_CODE = "service-mock-interview-sm";
@@ -898,6 +899,309 @@ const RTE_EXTRAS: OfferPageExtras = {
   mentorHeadline: "SPC · ART & program facilitation mentor",
   mentorBody:
     "Wondering if RTE is the right next credential after SSM or Leading SAFe? Book a short call — role fit, timing, and whether mentorship should come first.",
+};
+
+/** Professional Scrum Master™ I (PSM I) — Scrum.org pathway; 1-day crash course. */
+const PSM_I_EXTRAS: OfferPageExtras = {
+  rating: {
+    score: "4.9",
+    meta: "Average learner rating · PSM I crash-course cohorts",
+  },
+  heroEyebrow: "Scrum.org · Live PSM I crash course",
+  kindChip: "Certification",
+  benefitPills: [
+    "1 day · 8 hrs live",
+    "Scrum Guide mastery",
+    "Exam-oriented review",
+    "Lifetime Scrum.org credential",
+  ],
+  keyBenefits: [
+    {
+      title: "Empiricism in practice",
+      detail: "Transparency, Inspection, and Adaptation for real product work",
+    },
+    {
+      title: "Serve the Scrum Team",
+      detail: "Accountabilities, events, artifacts, and commitments — clearly",
+    },
+    {
+      title: "Lead as a true servant-leader",
+      detail: "Self-managing teams, Definition of Done, and change-agent mindset",
+    },
+    {
+      title: "Assessment-ready",
+      detail: "Practice aligned to the Scrum.org Professional Scrum Master™ I assessment",
+    },
+  ],
+  overviewTitle: "Become a Scrum Master who understands Scrum deeply",
+  overviewBody:
+    "Professional Scrum Master™ I (PSM I) from Scrum.org validates that you know the Scrum Guide and can apply empiricism, accountabilities, events, artifacts, and values as a servant-leader. This focused 1-day (8 hour) live crash course compresses Agile foundations through exam orientation so you can serve a Scrum Team and prepare for the Scrum.org assessment.",
+  overviewPracticeTitle: "What you’ll practice",
+  overviewPracticeBody:
+    "Explaining Scrum in a VUCA world, clarifying the three accountabilities, facilitating Sprint events with purpose, protecting the Sprint Goal and Definition of Done, refining Product Backlog items, enabling self-managing teams, and shifting from traditional project control into Scrum Master leadership.",
+  overviewExpectationsTitle: "What to expect after class",
+  overviewExpectationsBody:
+    "You prepare for the Scrum.org Professional Scrum Master™ I assessment (typically 80 questions in 60 minutes; 85% to pass; open-book). Assessment attempt packaging and any password windows are confirmed at enrollment for your cohort. PSM I credentials from Scrum.org do not expire.",
+  overviewStats: [
+    { num: "1 day", label: "Live crash course · 8 hours" },
+    { num: "80 Q", label: "PSM I assessment · 60 minutes (Scrum.org)" },
+    { num: "85%", label: "Passing score · lifetime credential" },
+  ],
+  learnLead: "Foundational Scrum Master skills you can apply on your next Sprint.",
+  curriculumTitle: "PSM I crash-course curriculum",
+  curriculumLead:
+    "Nine focused modules — from empiricism and the Scrum framework through servant leadership and Scrum.org assessment prep.",
+  audienceTitle: "Who should attend",
+  audienceLead:
+    "Built for people starting — or strengthening — the Scrum Master path with a globally recognized Scrum.org credential.",
+  certImageUrl: "/assets/cert-badges/psm-i.svg",
+  certImageAlt: "Professional Scrum Master I PSM I pathway badge — The Agile Forum",
+  certSectionEyebrow: "Your credential",
+  certSectionTitle: "How the Professional Scrum Master™ I (PSM I) path works",
+  certSectionLead:
+    "Complete the live crash course, then take the Scrum.org PSM I assessment. Passing earns a lifetime Professional Scrum Master™ I credential you can share from your Scrum.org profile.",
+  certNavLabel: "Certification",
+  certBullets: [
+    "Professional Scrum Master™ I (PSM I) credential via Scrum.org after you pass",
+    "Lifetime validity — no renewal cycle or continuing-education fee from Scrum.org for PSM I",
+    "Signals foundational Scrum Master facilitation and coaching ability",
+    "Assessment attempt packaging confirmed at enrollment",
+  ],
+  trustLine: "Live Scrum coaching · The Agile Forum",
+  finalCtaTitle: "Ready for your PSM I pathway?",
+  finalCtaLead:
+    "Select a cohort, enroll, or book a mentor if you want help choosing between PSM I, Mentorship Masterclass, CSM®, and SAFe® next steps.",
+  brochureCtaLabel: "Download Course Content & Brochure",
+  demand: {
+    salary: { min: "$85k", max: "$160k", avg: "$118k" },
+    employers: [
+      "Accenture",
+      "Infosys",
+      "IBM",
+      "Deloitte",
+      "Cognizant",
+      "TCS",
+      "Capgemini",
+      "Wipro",
+      "Amazon",
+    ],
+    jobsCount: "80,000+",
+    jobsLabel: "Openings referencing Scrum Master around the world",
+    paragraphs: [
+      "PSM I is widely respected as an assessment-first foundational Scrum Master credential from Scrum.org.",
+      "Many employers list PSM, CSM®, or equivalent Scrum Master training alongside hands-on delivery experience.",
+      "Pairing certification with live-project practice (our Mentorship Masterclass) is how most TheAgileForum learners become interview-ready.",
+    ],
+  },
+  curriculum: [
+    {
+      title: "Introduction to Scrum & empiricism",
+      summary:
+        "Agile and Scrum in a VUCA world — Lean Thinking, empiricism, and why Transparency, Inspection, and Adaptation matter.",
+      bullets: ["Agile need in VUCA", "Empirical process control", "Lean Thinking & Scrum theory"],
+    },
+    {
+      title: "Uncertainty & complexity in product delivery",
+      summary:
+        "How short feedback loops and continuous improvement help teams adapt when product work is complex.",
+      bullets: ["Complexity in product development", "Short feedback loops", "Adapting to change"],
+    },
+    {
+      title: "Scrum framework & principles",
+      summary:
+        "The Scrum Guide in full — pillars, accountabilities, events, artifacts, and commitments (Product Goal, Sprint Goal, Definition of Done).",
+      bullets: ["Three accountabilities", "Five events", "Three artifacts & commitments"],
+    },
+    {
+      title: "Scrum values and their impact on teams",
+      summary:
+        "Commitment, Courage, Focus, Openness, and Respect — how values shape collaboration and how Scrum Masters foster them.",
+    },
+    {
+      title: "Definition of Done & transparency",
+      summary:
+        "How Definition of Done protects quality and transparency — and how it evolves as the team matures.",
+    },
+    {
+      title: "Product Backlog management",
+      summary:
+        "Product Backlog characteristics, effective PBIs, and complementary practices like estimation and velocity — used wisely.",
+      bullets: ["Backlog characteristics", "Writing PBIs", "Estimation & velocity (complementary)"],
+    },
+    {
+      title: "Self-managing teams & interpersonal skills",
+      summary:
+        "What self-management means in Scrum, why it matters, and the interpersonal skills Scrum Masters enable.",
+    },
+    {
+      title: "The Scrum Master as change agent / true leader",
+      summary:
+        "Mindset shifts from traditional project management, leadership behaviours for successful Scrum Masters, and handling organizational resistance.",
+    },
+    {
+      title: "Exam preparation & wrap-up",
+      summary:
+        "PSM I assessment format discussion, practice questions, Q&A, and next steps — including Mentorship Masterclass for job-ready skills.",
+    },
+  ],
+  audience: [
+    {
+      role: "Aspiring Scrum Masters",
+      detail: "Building a solid Scrum Guide foundation before interviews or first SM roles",
+    },
+    {
+      role: "Project / delivery managers",
+      detail: "Shifting from command-and-control habits into servant leadership",
+    },
+    {
+      role: "Team members & Developers",
+      detail: "Understanding Scrum deeply to collaborate better with SM and Product Owner",
+    },
+    {
+      role: "Product Owners & Agile PMs",
+      detail: "Clarifying accountabilities and how empiricism drives value delivery",
+    },
+  ],
+  faqGroups: [
+    {
+      title: "Pre-requisites",
+      items: [
+        {
+          question: "Are there prerequisites for PSM I?",
+          answer:
+            "Scrum.org does not require a prior credential. Familiarity with the Scrum Guide and a willingness to learn empiricism and servant leadership are strongly recommended.",
+        },
+        {
+          question: "Do I need Scrum Master experience first?",
+          answer:
+            "No. PSM I is designed as a foundational assessment. Hands-on experience helps, but the crash course is built for people starting the path as well as those refreshing the Guide.",
+        },
+        {
+          question: "Is training mandatory before the exam?",
+          answer:
+            "Scrum.org does not require a course to take the PSM I assessment. Live training accelerates understanding and exam readiness; assessment packaging for your cohort is confirmed at enrollment.",
+        },
+      ],
+    },
+    {
+      title: "PSM I exam & certification",
+      items: [
+        {
+          question: "What is the PSM I assessment format?",
+          answer:
+            "Typically 80 questions in 60 minutes (multiple-choice, multiple-answer, and true/false), open-book, with an 85% passing score. Confirm current details on scrum.org for your attempt.",
+        },
+        {
+          question: "How does PSM I differ from PSM II?",
+          answer:
+            "PSM I emphasizes foundational Scrum Guide knowledge (commonly 80 questions / 60 minutes). PSM II uses fewer but harder scenario questions focused on advanced servant leadership, coaching, and organizational dynamics.",
+        },
+        {
+          question: "Is the exam fee included?",
+          answer:
+            "Scrum.org assessment packaging varies by cohort offer — we confirm what is included (attempts, passwords, windows) before you pay. Standalone Scrum.org assessment fees are published on scrum.org.",
+        },
+        {
+          question: "Does PSM I expire?",
+          answer:
+            "No. Professional Scrum Master™ I from Scrum.org is a lifetime credential and does not require renewal fees.",
+        },
+        {
+          question: "PSM I vs CSM® — which should I take?",
+          answer:
+            "CSM® (Scrum Alliance) is course-gated and widely recognized. PSM I (Scrum.org) is assessment-first and lifetime. Choose based on employer preference, learning style, and whether you want a course-gated or open assessment path — many learners take one foundational credential then deepen with Mentorship Masterclass.",
+        },
+      ],
+    },
+    {
+      title: "Training & enrollment",
+      items: [
+        {
+          question: "How long is the training?",
+          answer:
+            "Live instructor-led crash course totaling 8 hours in one day (weekend or weekday cohorts depending on schedule).",
+        },
+        {
+          question: "Is training live or recorded-only?",
+          answer:
+            "Sessions are live and interactive — workshops, discussion, and exam-oriented review. Recordings may be shared for review when the cohort offers them — confirm for your batch.",
+        },
+        {
+          question: "Who teaches the sessions?",
+          answer:
+            "Experienced Agile coaches from TheAgileForum led by Dhirender Verma (SPC · enterprise Agile coach). Any Scrum.org Professional Training Network / trainer requirements for your cohort are confirmed at enrollment.",
+        },
+        {
+          question: "Do I need a schedule before checkout?",
+          answer:
+            "Yes. This offering is schedule-bound — select a cohort so your cart line carries the right batch.",
+        },
+        {
+          question: "What if I want job-ready skills beyond 1 day?",
+          answer:
+            "Most learners pair foundational credentials with our 3-week Mentorship Masterclass (live JIRA project) and optionally Mock Interview Series — certification alone rarely lands a Scrum Master role.",
+        },
+      ],
+    },
+  ],
+  examGuidelines: {
+    domains: [
+      {
+        domain: "Understanding and applying the Scrum Framework",
+        topics: [
+          "Empiricism and the Scrum Values",
+          "Scrum accountabilities, events, and artifacts",
+          "Done Increments, Sprint Goals, and Product Goals",
+        ],
+      },
+      {
+        domain: "Developing people and teams",
+        topics: [
+          "Self-managing teams",
+          "Coaching and facilitation basics",
+          "Servant leadership / true leadership",
+        ],
+      },
+      {
+        domain: "Managing products with agility",
+        topics: [
+          "Product Backlog management",
+          "Stakeholder collaboration",
+          "Value-oriented delivery",
+        ],
+      },
+      {
+        domain: "Developing and delivering products professionally",
+        topics: [
+          "Definition of Done and quality",
+          "Managing delivery risk",
+          "Continuous improvement",
+        ],
+      },
+      {
+        domain: "Evolving the Agile organization",
+        topics: [
+          "Organizational impediments",
+          "Scrum Master as change agent",
+          "Supporting broader agility",
+        ],
+      },
+    ],
+    footnote:
+      "PSM I is a lifetime Scrum.org credential. Confirm current assessment rules, languages, and fees on scrum.org before your attempt.",
+    sourceUrl: "https://www.scrum.org/assessments/professional-scrum-master-i-certification",
+    lead: "Competency areas commonly associated with the Scrum.org Professional Scrum Master™ I assessment — use with your crash-course notes and practice questions.",
+    sourceLabel: "scrum.org · Professional Scrum Master I",
+  },
+  brochureMailto:
+    "mailto:contact@theagileforum.com?subject=PSM%20I%20Course%20Content%20%26%20Brochure",
+  corporateMailto:
+    "mailto:contact@theagileforum.com?subject=Corporate%20PSM%20I%20Training",
+  mentorImageUrl: "/assets/offers/mentor-dhirender.png",
+  mentorName: "Dhirender Verma",
+  mentorHeadline: "SPC · Scrum & SAFe mentor · job-focused coaching",
+  mentorBody:
+    "Not sure whether to start with PSM I, Mentorship Masterclass, CSM®, or SAFe®? Book a short call — we’ll match credential timing to your target role and interview timeline.",
 };
 
 /** Professional Scrum Master™ II (PSM II) — Scrum.org pathway; adapted for TheAgileForum voice. */
@@ -2065,6 +2369,7 @@ export function getOfferPageExtras(
 ): OfferPageExtras | null {
   if (code === SSM_OFFER_CODE) return SSM_EXTRAS;
   if (code === CSM_OFFER_CODE) return CSM_EXTRAS;
+  if (code === PSM_I_OFFER_CODE) return PSM_I_EXTRAS;
   if (code === RTE_OFFER_CODE) return RTE_EXTRAS;
   if (code === PSM_II_OFFER_CODE) return PSM_II_EXTRAS;
   if (code === MENTORSHIP_OFFER_CODE || code === MENTORSHIP_CANONICAL_CODE) return MENTORSHIP_EXTRAS;

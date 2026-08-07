@@ -13,9 +13,14 @@ export const POWER_RESUME_LEGACY_ROUTE_SEGMENTS = [
   "power-resume-cover-letter",
 ] as const;
 
+export const PSM_I_OFFER_CODE = "psm-i-certification-training";
+export const PSM_I_PUBLIC_SLUG =
+  "professional-scrum-master-psm-i-training-crash-course";
+
 const PUBLIC_SLUG_BY_OFFERING_CODE: Readonly<Record<string, string>> = {
   [MENTORSHIP_OFFER_CODE]: MENTORSHIP_PUBLIC_SLUG,
   [POWER_RESUME_OFFER_CODE]: POWER_RESUME_PUBLIC_SLUG,
+  [PSM_I_OFFER_CODE]: PSM_I_PUBLIC_SLUG,
 };
 
 const OFFERING_CODE_BY_ROUTE_SEGMENT: Readonly<Record<string, string>> = {
@@ -33,6 +38,8 @@ const OFFERING_CODE_BY_ROUTE_SEGMENT: Readonly<Record<string, string>> = {
       POWER_RESUME_OFFER_CODE,
     ]),
   ),
+  [PSM_I_PUBLIC_SLUG.toLowerCase()]: PSM_I_OFFER_CODE,
+  [PSM_I_OFFER_CODE.toLowerCase()]: PSM_I_OFFER_CODE,
 };
 
 /** Build the public offer-detail path without changing stable commerce IDs. */

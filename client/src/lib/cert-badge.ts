@@ -4,6 +4,7 @@ export const CERT_BADGE_ASSETS = {
   ssm: "/assets/cert-badges/safe-ssm.png",
   popm: "/assets/cert-badges/safe-popm.png",
   csm: "/assets/cert-badges/csm.svg",
+  psmI: "/assets/cert-badges/psm-i.svg",
   psmIi: "/assets/cert-badges/psm-ii.svg",
   rte: "/assets/cert-badges/safe-rte.svg",
   mockInterview: "/assets/offers/mock-interview-series.png",
@@ -20,6 +21,7 @@ const HERO_GRADIENTS: Record<CertBadgeKey, string> = {
   ssm: "linear-gradient(135deg, #1e40af 0%, #1e3a8a 50%, #312e81 100%)",
   popm: "linear-gradient(135deg, #0f766e 0%, #047857 50%, #065f46 100%)",
   csm: "linear-gradient(135deg, #0b3d5c 0%, #0f766e 55%, #14b8a6 100%)",
+  psmI: "linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #0f766e 100%)",
   psmIi: "linear-gradient(135deg, #0c4a6e 0%, #0e7490 50%, #0f766e 100%)",
   rte: "linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #0f766e 100%)",
   mockInterview: "linear-gradient(135deg, #0f172a 0%, #1e3a5f 55%, #0f766e 100%)",
@@ -85,7 +87,8 @@ export function resolveCertBadge(offering: {
     return coverResult("powerResume");
   }
 
-  // CSM / PSM II before generic "scrum master" → SSM (SAFe) badge.
+  // CSM / PSM before generic "scrum master" → SSM (SAFe) badge.
+  // PSM II before PSM I — "psm-ii" contains the substring "psm-i".
   if (
     code.includes("csm") ||
     haystack.includes("certified scrummaster") ||
@@ -104,6 +107,17 @@ export function resolveCertBadge(offering: {
     haystack.includes("professional scrum master ii")
   ) {
     return badgeResult("psmIi");
+  }
+
+  if (
+    code.includes("psm-i") ||
+    code.includes("psmi") ||
+    haystack.includes("psm i") ||
+    haystack.includes("psm-i") ||
+    haystack.includes("professional scrum master™ i") ||
+    haystack.includes("professional scrum master i")
+  ) {
+    return badgeResult("psmI");
   }
 
   if (
@@ -172,6 +186,20 @@ export function catalogSocialProof(offering: { code: string }): {
         { initials: "RG", bg: "linear-gradient(135deg, #0f766e, #14b8a6)" },
         { initials: "SK", bg: "linear-gradient(135deg, #0ea5e9, #06b6d4)" },
         { initials: "AP", bg: "linear-gradient(135deg, #f59e0b, #ef4444)" },
+      ],
+    };
+  }
+  if (
+    (code.includes("psm-i") || code.includes("psmi")) &&
+    !(code.includes("psm-ii") || code.includes("psmii"))
+  ) {
+    return {
+      enrolledLabel: "1.8K+ Enrolled",
+      rating: "4.9/5",
+      avatars: [
+        { initials: "NV", bg: "linear-gradient(135deg, #0284c7, #0ea5e9)" },
+        { initials: "MK", bg: "linear-gradient(135deg, #0f766e, #14b8a6)" },
+        { initials: "JS", bg: "linear-gradient(135deg, #f59e0b, #ef4444)" },
       ],
     };
   }
