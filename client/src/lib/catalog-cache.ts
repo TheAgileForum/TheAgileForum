@@ -13,6 +13,7 @@ import {
 import {
   listCatalogCategory,
   type CatalogListResponse,
+  type CatalogOffering,
 } from "./forum-api";
 
 /** In-memory freshness window for deduped fetches. */
@@ -44,6 +45,25 @@ function storageKey(key: string): string {
 
 function hasOfferings(data: CatalogListResponse | undefined): boolean {
   return Array.isArray(data?.offerings) && data.offerings.length > 0;
+}
+
+/** True when every priced offering matches the requested session currency. */
+export function catalogMatchesCurrency(
+  data: CatalogListResponse,
+  currency: string,
+): boolean {
+  const expected = currency.trim().toUpperCase();
+  if (!expected) return true;
+
+  const contextCurrency = data.currencyContext?.currency?.trim().toUpperCase();
+  if (contextCurrency && contextCurrency !== expected) return false;
+
+  return data.offerings.every((offering: CatalogOffering) => {
+    const quoted = offering.priceQuote?.currency?.trim().toUpperCase();
+    if (quoted) return quoted === expected;
+    const base = offering.currency?.trim().toUpperCase();
+    return !base || base === expected;
+  });
 }
 
 function readPersistedEntry(key: string): CacheEntry | null {
@@ -168,23 +188,31 @@ export async function fetchCatalogCategoryCached(
 ): Promise<CatalogListResponse> {
   const key = catalogCacheKey(categoryPath, searchKey, geo, currency);
   const fresh = readFreshEntry(key);
-  if (fresh) return fresh;
+  if (fresh && catalogMatchesCurrency(fresh, currency)) return fresh;
 
   const pending = inflight.get(key);
   if (pending) return pending;
 
+  // Same geo/currency stale only — never fall back to another currency's prices.
   const stale = readAnyEntry(key);
+  const sameCurrencyStale =
+    stale && catalogMatchesCurrency(stale.data, currency) ? stale : null;
   const query = filtersToApiQuery(parseCatalogFilters(searchKey));
-  const anyPricingStale = peekCatalogCacheAnyPricing(categoryPath, searchKey);
-  const hasFallback = Boolean(stale || anyPricingStale);
+  const hasSameCurrencyFallback = Boolean(sameCurrencyStale);
 
   // Wake Render in parallel with the first uncached load (and quietly on revalidate).
   void wakeApi();
 
   const promise = listCatalogCategory(categoryPath, query, { geo, currency }, {
-    // Uncached: full cold-start budget. Cached: still retry once so a single 5xx doesn't stick.
-    retries: hasFallback ? 1 : 2,
+    // Prefer more retries when we have nothing correct to show for this currency.
+    retries: hasSameCurrencyFallback ? 1 : 2,
   }).then((res) => {
+    if (hasOfferings(res) && !catalogMatchesCurrency(res, currency)) {
+      inflight.delete(key);
+      throw new Error(
+        `Catalog response currency mismatch (expected ${currency})`,
+      );
+    }
     if (hasOfferings(res)) {
       writeCatalogCache(categoryPath, searchKey, geo, currency, res);
     }
@@ -192,8 +220,8 @@ export async function fetchCatalogCategoryCached(
     return res;
   }).catch((err) => {
     inflight.delete(key);
-    if (stale) return stale.data;
-    if (anyPricingStale) return anyPricingStale;
+    // Only reuse cache that already matches the requested currency.
+    if (sameCurrencyStale) return sameCurrencyStale.data;
     throw err;
   });
   inflight.set(key, promise);

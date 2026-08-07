@@ -74,6 +74,13 @@ export function getSessionCurrency(): SessionCurrency {
 
 export function setSessionCurrency(currency: SessionCurrency) {
   sessionStorage.setItem(STORAGE_KEY, currency);
+  // Persist on the app origin too — API Set-Cookie may be on a different subdomain.
+  try {
+    const maxAge = 60 * 60 * 24 * 365;
+    document.cookie = `${SESSION_CURRENCY_COOKIE}=${currency}; path=/; max-age=${maxAge}; SameSite=Lax`;
+  } catch {
+    // Private mode / cookie blocked — sessionStorage still drives this visit.
+  }
 }
 
 export function listSessionCurrencies(): SessionCurrency[] {
