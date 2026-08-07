@@ -35,7 +35,8 @@ export function isPublicCatalogOffering(code: string): boolean {
 export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
   "course-agile-fundamentals": {
     code: "course-agile-fundamentals",
-    title: "3+ Week AI-Enabled Scrum Master / Product Owner Mentorship Masterclass",
+    title:
+      "3+ Week AI-Enabled Scrum Master / Product Owner Mentorship Masterclass (PSM 1 Certification Exam Pre-requisite)",
     kind: "course",
     category: "training",
     scheduleBound: true,

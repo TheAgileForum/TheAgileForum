@@ -57,7 +57,7 @@ describe("catalog repository (FR-182 SSOT)", () => {
     expect(await getOfferingFromCatalog("agile-readiness")).toBeUndefined();
     const titled = await getOfferingFromCatalog("course-agile-fundamentals");
     expect(titled?.title).toBe(
-      "3+ Week AI-Enabled Scrum Master / Product Owner Mentorship Masterclass",
+      "3+ Week AI-Enabled Scrum Master / Product Owner Mentorship Masterclass (PSM 1 Certification Exam Pre-requisite)",
     );
   });
 
