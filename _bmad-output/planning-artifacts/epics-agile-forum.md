@@ -70,7 +70,7 @@ This document translates `prd-agile-forum.md` into implementable MVP epics and s
 | Epic 7  | FR-30..34, FR-79..84, FR-49..51                           |
 | Epic 8  | FR-17..19, FR-23..29, FR-35..41, FR-121..125, FR-144..146 |
 | Epic 9  | FR-52..60, FR-133..135, FR-147..150, FR-154..156          |
-| Epic 10 | FR-65..78, FR-92..95                                      |
+| Epic 10 | FR-65..78, FR-92..95, FR-183..188                          |
 | Epic 11 | FR-96..107                                                |
 | Epic 12 | FR-42..45, FR-46..48, NFR clusters                        |
 
@@ -540,6 +540,22 @@ As an AI operator, I want versioned prompt/policy management and safe experiment
 - Given prompt/policy changes, when submitted, then versioning + review workflow applies.
 - Given experiment rollout, when enabled, then flags and rollback controls are available.
 
+### Story 10.5: Unified Commercial Ops Dashboard (Later Sprint)
+
+As an ops/super-admin, I want one admin-login dashboard for customers, orders, resume/diagnosis artifacts, and sales analytics so I can support learners and track what sold without leaving the app.
+
+**Requirement elaboration:** `_bmad-output/planning-artifacts/admin-full-dashboard-requirement.md`  
+**FRs:** FR-183 .. FR-188  
+**Sprint:** Sprint 3+ (after commerce + diagnosis stability; does not block Sprint 1–2)
+
+**Acceptance Criteria**
+
+- Given admin login, when opening the ops dashboard, then KPI tiles and navigable modules for Customers, Orders, Resumes/Diagnosis, Sales, and Funnel are available.
+- Given customers/orders lists, when filtering/searching, then results paginate and open detail views with linked commerce and diagnosis context.
+- Given resume assets, when opened by admin, then parse status, secure link, and available scores are visible; learner tokens cannot access these APIs.
+- Given paid orders, when viewing sales analytics, then trainings, certifications, and services sold are broken down by SKU/category for the selected range.
+- Given PII-bearing detail views, when accessed, then access is audited.
+
 ---
 
 ## Epic 11: Search Growth Platform (SEO + GEO)
@@ -814,6 +830,8 @@ As ops teams, we need triage queues and decision tooling for interventions/appro
 - T10.4 Build intervention queue (at-risk users, escalations).
 - T10.5 Build audit trail storage/query API.
 - T10.6 Build role-based admin permissions model and tests.
+- T10.9 Build commercial ops dashboard APIs (customers, orders, resumes/diagnosis, sales, funnel) — Story 10.5 / FR-183..188.
+- T10.10 Build ops SPA modules (tables + detail drawers) wired to T10.9 with admin RBAC gates.
 
 ## Epic 11 Technical Layer (Search Growth Platform)
 

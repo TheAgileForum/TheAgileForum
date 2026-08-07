@@ -138,6 +138,12 @@
 
 
 
+### P3 — Later sprint (Sprint 3+)
+
+- [ ] **Full commercial ops dashboard** (FR-183..188 / Story 10.5) — customers, orders, resume parse/links/scores, certs & services sold, funnel KPIs. Spec: `_bmad-output/planning-artifacts/admin-full-dashboard-requirement.md`. Tasks `T10.9`–`T10.10`. Do not start until commerce + diagnosis persistence are stable.
+
+
+
 ### Completed (prior sessions — do not reopen)
 
 - [x] Exam listing access-label contract test (FR-87)

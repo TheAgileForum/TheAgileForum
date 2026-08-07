@@ -142,6 +142,7 @@ Deliver a guided, data-informed career growth platform where every learner can a
 18. Full replacement cutover requirements (redirects, legal, continuity, rollback)
 19. Resume intelligence suggestions funnel (skills + keyword optimization, registration-gated deep report, resume upgrade service offers)
 20. Admin command center baseline (journey monitoring, campaign controls, human-in-the-loop approvals)
+21. Full commercial ops dashboard (customers, orders, resume/diagnosis scores & links, certs/services sold) — **later sprint** (FR-183..188 / Story 10.5)
 21. Search growth foundation (SEO + AI-engine discoverability) including schema, content structures, and indexing observability
 22. Role-specific AI enablement across all courses and services (personalized guidance, recommendations, and outcomes by target role)
 23. Role-specific mock interview services (Scrum Master, Product Owner, Product Manager, RTE, and related pathways) with booking and conversion tracking
@@ -196,6 +197,7 @@ Deliver a guided, data-informed career growth platform where every learner can a
 - **B2 Email + staged WhatsApp:** consented nurture and transactional messaging with unsubscribe parity
 - **B3 Structured social proof system:** reusable outcomes surfaced in post-diagnosis moments
 - **B4 Analytics truth layer:** complete event instrumentation and operator reporting
+- **B5 Full commercial ops dashboard:** admin-login CRM-style views for customers, orders, resumes/diagnosis scores, and sales mix (FR-183..188 / Story 10.5) — after Tier A commerce + diagnosis are stable
 
 ## Full Site Replacement Requirements
 
@@ -548,6 +550,12 @@ These are acceptance-critical requirements for replacing current pages and legac
 ### AI-Native Admin Management and Control Plane
 
 - FR-65: Admin users can access a unified command center for funnel status, journey health, and campaign outcomes.
+- FR-183: Admin users (ops/super-admin) can access a commercial operations dashboard after admin login that consolidates customers, orders, resume/diagnosis artifacts, and sales analytics in one governed UI.
+- FR-184: Admin users can list, search, and open customer profiles showing identity summary, orders, diagnosis sessions, and resume assets without granting learners access to those admin routes.
+- FR-185: Admin users can list and filter orders (status, date, currency, offering category) and open order detail with line items, payment references, and enrollment-related fields.
+- FR-186: Admin users can review resume assets and diagnosis sessions including parse/extraction status, secure resume links, and available fit/skill scores from the learner diagnosis path.
+- FR-187: Admin users can view sales analytics for trainings, certifications, and services sold (units and revenue by SKU/category) for selected date ranges.
+- FR-188: Admin dashboard list/detail APIs enforce role-based admin access (FR-78/FR-180), paginate results, and retain audit trails for PII-bearing customer/order/resume detail views (FR-77).
 - FR-66: System can provide AI-generated anomaly detection and probable-cause insights for conversion or engagement regressions.
 - FR-67: Admin users can configure and approve automation policies with role-based permissions and change logs.
 - FR-68: AI can recommend campaign adjustments (timing, segment, channel, message variant) with confidence indicators before execution.
