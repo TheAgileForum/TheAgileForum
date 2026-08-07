@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { PrimaryAction, RationaleChip } from "./contracts.js";
 
 /** Bump when gap rubric or system prompt instructions change (audit trail). */
-export const DIAGNOSIS_PROMPT_VERSION = "diagnosis-ai-v3";
+export const DIAGNOSIS_PROMPT_VERSION = "diagnosis-ai-v4";
 
 /** Catalog offering codes the model may recommend (allowlist). */
 export const DIAGNOSIS_OFFERING_ALLOWLIST = [

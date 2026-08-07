@@ -38,6 +38,7 @@ function truncate(text: string, maxChars: number): string {
  *
  * **Founder edit point for gap rules:** `server/src/diagnosis/gap-detection-rubric.md`
  * (also documented in `.cursor/skills/diagnosis-gap-rubric/SKILL.md`).
+ * Condensed SM/APM coach reference: `sm-apm-resume-guidelines-condensed.md`.
  * Bump `DIAGNOSIS_PROMPT_VERSION` after rubric changes.
  */
 export function buildDiagnosisSystemPrompt(): string {
