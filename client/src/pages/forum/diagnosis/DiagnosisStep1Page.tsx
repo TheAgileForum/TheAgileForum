@@ -12,12 +12,17 @@ import { useNavigate } from "react-router-dom";
 import { DiagnosisStepper } from "../../../components/forum/DiagnosisStepper";
 import { useDiagnosis } from "../../../contexts/DiagnosisContext";
 import { ApiRequestError, wakeApi } from "../../../lib/api";
+import {
+  DEFAULT_DIAGNOSIS_TARGET_ROLE,
+  DIAGNOSIS_TARGET_ROLES,
+  type DiagnosisTargetRole,
+} from "../../../lib/diagnosis-target-roles";
 import { saveDiagnosisIntent } from "../../../lib/forum-api";
 
 export function DiagnosisStep1Page() {
   const navigate = useNavigate();
   const { sessionId, sessionStarting, startSession, prefetchSession } = useDiagnosis();
-  const [targetRole, setTargetRole] = useState("Scrum Master");
+  const [targetRole, setTargetRole] = useState<DiagnosisTargetRole>(DEFAULT_DIAGNOSIS_TARGET_ROLE);
   const [timeline, setTimeline] = useState("3 months");
   const [currentStatus, setCurrentStatus] = useState("");
   const [consent, setConsent] = useState(false);
@@ -73,11 +78,11 @@ export function DiagnosisStep1Page() {
         select
         label="Target role"
         value={targetRole}
-        onChange={(e) => setTargetRole(e.target.value)}
+        onChange={(e) => setTargetRole(e.target.value as DiagnosisTargetRole)}
         required
         disabled={submitting}
       >
-        {["Scrum Master", "Product Owner", "SAFe Agilist", "Agile Coach"].map((r) => (
+        {DIAGNOSIS_TARGET_ROLES.map((r) => (
           <MenuItem key={r} value={r}>
             {r}
           </MenuItem>
