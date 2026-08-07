@@ -86,7 +86,7 @@ export function ForumCartPage() {
         Your cart · {itemCount} {itemCount === 1 ? "item" : "items"}
       </Typography>
       <Typography variant="body2" color="text.secondary">
-        {user ? "Signed in" : "Guest cart"} · Session currency {currency} · No promo chips (FR-179)
+        {user ? "Signed in" : "Guest cart"} · Prices shown in {currency}
       </Typography>
 
       {error ? <Alert severity="error">{error}</Alert> : null}
