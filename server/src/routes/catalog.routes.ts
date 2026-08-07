@@ -80,12 +80,12 @@ catalogRouter.get("/offerings", async (req, res) => {
   const base = query.category
     ? await listOfferingsByCategoryFromCatalog(query.category)
     : await listOfferingsFromCatalog();
-  const filtered = filterOfferings(base, query);
+  const filtered = filterOfferings(base, query, context);
   const offerings = filtered.map((o) => serializeOffering(o, context));
   return res.json({
     offerings,
     filters: query,
-    facets: buildCatalogFacets(filtered),
+    facets: buildCatalogFacets(filtered, context),
     currencyContext,
   });
 });
@@ -116,8 +116,11 @@ function categoryListing(category: OfferingCategory) {
     req: import("express").Request,
     res: import("express").Response,
   ) => {
+    const { context, currencyContext } = pricingEnvelope(req);
     const cacheKey = catalogListCacheKey({
       category,
+      currency: context.currency,
+      geo: context.geoDetected,
       ...(req.query as Record<string, string | undefined>),
     });
     const cached = readCatalogListCache<Record<string, unknown>>(cacheKey);
@@ -125,7 +128,6 @@ function categoryListing(category: OfferingCategory) {
       return res.json(cached);
     }
 
-    const { context, currencyContext } = pricingEnvelope(req);
     const query = parseCatalogFilterQuery({
       ...(req.query as Record<string, string | undefined>),
       category,
@@ -143,13 +145,13 @@ function categoryListing(category: OfferingCategory) {
       base = base.filter((o) => isPublicCatalogOffering(o.code));
     }
 
-    const filtered = filterOfferings(base, query);
+    const filtered = filterOfferings(base, query, context);
     const offerings = filtered.map((o) => serializeOffering(o, context));
     const payload = {
       category,
       offerings,
       filters: query,
-      facets: buildCatalogFacets(filtered),
+      facets: buildCatalogFacets(filtered, context),
       currencyContext,
     };
     writeCatalogListCache(cacheKey, payload);
