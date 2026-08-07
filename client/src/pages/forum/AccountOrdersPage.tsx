@@ -7,12 +7,17 @@ import LinearProgress from "@mui/material/LinearProgress";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
-import { Link as RouterLink, Navigate, useLocation } from "react-router-dom";
+import { Link as RouterLink, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { ApiRequestError } from "../../lib/api";
 import { trackEvent } from "../../lib/analytics";
 import { formatPrice } from "../../lib/format-price";
-import { listMyOrders, type LearnerOrder } from "../../lib/forum-api";
+import {
+  cancelMyOrder,
+  listMyOrders,
+  resumeMyOrderCheckout,
+  type LearnerOrder,
+} from "../../lib/forum-api";
 
 /** Canonical Mock Interview SKU + public slug alias. */
 const MOCK_INTERVIEW_OFFER_CODE = "service-mock-interview-sm";
@@ -25,7 +30,7 @@ const BOOK_SLOT_OCHRE = "#c47b2b";
 function statusLabel(status: string): { label: string; color: "success" | "warning" | "default" | "info" } {
   const normalized = status.toLowerCase();
   if (normalized === "paid") return { label: "Enrolled / paid", color: "success" };
-  if (normalized === "created" || normalized.includes("pending")) {
+  if (normalized === "created" || normalized.includes("pending") || normalized === "checkout_started") {
     return { label: "Awaiting payment", color: "warning" };
   }
   return { label: status, color: "default" };
@@ -45,12 +50,18 @@ function orderIncludesMockInterview(order: LearnerOrder): boolean {
   return order.items.some((item) => isMockInterviewOfferingCode(item.offeringCode));
 }
 
+function isAbandonedOrder(order: LearnerOrder): boolean {
+  const status = order.status.toLowerCase();
+  return status === "checkout_started" || status === "created";
+}
+
 export function AccountOrdersPage() {
   const { user, loading: authLoading } = useAuth();
   const location = useLocation();
   const [orders, setOrders] = useState<LearnerOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
     if (authLoading || !user) return;
@@ -90,6 +101,11 @@ export function AccountOrdersPage() {
 
       {loading ? <LinearProgress /> : null}
       {error ? <Alert severity="error">{error}</Alert> : null}
+      {actionError ? (
+        <Alert severity="error" onClose={() => setActionError(null)}>
+          {actionError}
+        </Alert>
+      ) : null}
 
       {!loading && orders.length === 0 ? (
         <Alert
@@ -129,7 +145,15 @@ export function AccountOrdersPage() {
             Other orders
           </Typography>
           {other.map((order) => (
-            <OrderCard key={order.id} order={order} />
+            <OrderCard
+              key={order.id}
+              order={order}
+              onDeleted={(orderId) => {
+                setOrders((prev) => prev.filter((o) => o.id !== orderId));
+                setActionError(null);
+              }}
+              onActionError={setActionError}
+            />
           ))}
         </Stack>
       ) : null}
@@ -137,7 +161,16 @@ export function AccountOrdersPage() {
   );
 }
 
-function OrderCard({ order }: { order: LearnerOrder }) {
+function OrderCard({
+  order,
+  onDeleted,
+  onActionError,
+}: {
+  order: LearnerOrder;
+  onDeleted?: (orderId: string) => void;
+  onActionError?: (message: string) => void;
+}) {
+  const navigate = useNavigate();
   const status = statusLabel(order.status);
   const total = formatPrice(order.currency, order.totalAmount);
   const created = new Date(order.createdAt).toLocaleDateString(undefined, {
@@ -145,6 +178,53 @@ function OrderCard({ order }: { order: LearnerOrder }) {
     month: "short",
     day: "numeric",
   });
+  const abandoned = isAbandonedOrder(order);
+  const [busy, setBusy] = useState<"resume" | "delete" | null>(null);
+
+  async function handleContinueCheckout() {
+    setBusy("resume");
+    onActionError?.("");
+    trackEvent("account_order_continue_checkout_clicked", {
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      status: order.status,
+    });
+    try {
+      await resumeMyOrderCheckout(order.id);
+      navigate("/checkout");
+    } catch (err) {
+      onActionError?.(
+        err instanceof ApiRequestError ? err.message : "Could not resume checkout for this order.",
+      );
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function handleDelete() {
+    const confirmed = window.confirm(
+      `Delete order ${order.orderNumber}? You can start a new checkout anytime.`,
+    );
+    if (!confirmed) return;
+
+    setBusy("delete");
+    onActionError?.("");
+    trackEvent("account_order_delete_clicked", {
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      status: order.status,
+    });
+    try {
+      await cancelMyOrder(order.id);
+      onDeleted?.(order.id);
+    } catch (err) {
+      onActionError?.(
+        err instanceof ApiRequestError ? err.message : "Could not delete this order.",
+      );
+    } finally {
+      setBusy(null);
+    }
+  }
 
   return (
     <Card variant="outlined">
@@ -184,7 +264,7 @@ function OrderCard({ order }: { order: LearnerOrder }) {
             </Stack>
           ))}
         </Stack>
-        <Stack direction="row" spacing={1} sx={{ mt: 1.5, flexWrap: "wrap" }}>
+        <Stack direction="row" spacing={1} sx={{ mt: 1.5, flexWrap: "wrap", alignItems: "center" }}>
           <Button
             size="small"
             component={RouterLink}
@@ -193,35 +273,50 @@ function OrderCard({ order }: { order: LearnerOrder }) {
           >
             View offering
           </Button>
-          {order.status.toLowerCase() === "paid" && orderIncludesMockInterview(order) ? (
-            <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", alignItems: "center" }}>
-              <Typography variant="caption" color="text.secondary" component="span">
-                Next action
-              </Typography>
+          {abandoned ? (
+            <>
               <Button
                 size="small"
-                variant="outlined"
-                href={MOCK_INTERVIEW_BOOKING_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() =>
-                  trackEvent("mock_interview_book_slot_clicked", {
-                    orderId: order.id,
-                    orderNumber: order.orderNumber,
-                  })
-                }
-                sx={{
-                  color: BOOK_SLOT_OCHRE,
-                  borderColor: BOOK_SLOT_OCHRE,
-                  "&:hover": {
-                    borderColor: BOOK_SLOT_OCHRE,
-                    backgroundColor: "rgba(196, 123, 43, 0.08)",
-                  },
-                }}
+                variant="contained"
+                disabled={busy !== null}
+                onClick={() => void handleContinueCheckout()}
               >
-                Book Interview Slot
+                {busy === "resume" ? "Opening…" : "Continue Checkout"}
               </Button>
-            </Stack>
+              <Button
+                size="small"
+                color="inherit"
+                disabled={busy !== null}
+                onClick={() => void handleDelete()}
+              >
+                {busy === "delete" ? "Deleting…" : "Delete"}
+              </Button>
+            </>
+          ) : null}
+          {order.status.toLowerCase() === "paid" && orderIncludesMockInterview(order) ? (
+            <Button
+              size="small"
+              variant="outlined"
+              href={MOCK_INTERVIEW_BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() =>
+                trackEvent("mock_interview_book_slot_clicked", {
+                  orderId: order.id,
+                  orderNumber: order.orderNumber,
+                })
+              }
+              sx={{
+                color: BOOK_SLOT_OCHRE,
+                borderColor: BOOK_SLOT_OCHRE,
+                "&:hover": {
+                  borderColor: BOOK_SLOT_OCHRE,
+                  backgroundColor: "rgba(196, 123, 43, 0.08)",
+                },
+              }}
+            >
+              Next Action: Book Interview Slot
+            </Button>
           ) : null}
         </Stack>
       </CardContent>

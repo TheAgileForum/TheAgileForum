@@ -792,3 +792,19 @@ export async function getMyOrder(orderId: string) {
   );
   return res.order;
 }
+
+/** Resume cart for an abandoned (unpaid) order, then navigate to /checkout. */
+export async function resumeMyOrderCheckout(orderId: string) {
+  return apiFetch<{ ok: true; cartId: string }>(
+    `/api/v1/commerce/orders/${encodeURIComponent(orderId)}/resume-checkout`,
+    { method: "POST" },
+  );
+}
+
+/** Soft-cancel an abandoned (unpaid) order owned by the current user. */
+export async function cancelMyOrder(orderId: string) {
+  return apiFetch<{ ok: true; order: { id: string; status: string } }>(
+    `/api/v1/commerce/orders/${encodeURIComponent(orderId)}`,
+    { method: "DELETE" },
+  );
+}
