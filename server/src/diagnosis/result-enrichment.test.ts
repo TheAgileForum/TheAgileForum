@@ -33,6 +33,7 @@ describe("result-enrichment", () => {
     expect(roadmap).toHaveLength(3);
     expect(roadmap[0].status).toBe("current");
     expect(roadmap[0].description).toContain("Prioritization");
+    expect(roadmap.map((m) => m.phase)).toEqual(["Week 1–2", "Week 3–4", "Week 5–7"]);
   });
 
   it("includes escalation only for low confidence without pricing", () => {

@@ -20,7 +20,7 @@ export function RoadmapPreview({ milestones }: RoadmapPreviewProps) {
     <Card variant="outlined">
       <CardContent>
         <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
-          4–8 week roadmap preview
+          3–7 week roadmap preview
         </Typography>
         <Stack spacing={2} component="ol" sx={{ listStyle: "none", m: 0, p: 0 }}>
           {milestones.map((m) => (

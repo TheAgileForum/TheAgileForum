@@ -134,7 +134,7 @@ export function buildRoadmapPreview(
       status: "upcoming",
     },
     {
-      phase: "Week 5–8",
+      phase: "Week 5–7",
       title: "Interview readiness",
       description: "Mock interview bundle + certificate prep milestones.",
       status: "future",

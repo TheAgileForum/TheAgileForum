@@ -105,8 +105,8 @@ export function DiagnosisStep4Page() {
             confidenceTier={result.confidenceTier}
           />
 
-          <Card variant="outlined">
-            <CardContent>
+          <Card variant="outlined" sx={{ overflow: "visible", minWidth: 0 }}>
+            <CardContent sx={{ minWidth: 0, overflow: "visible" }}>
               <SkillGapPanel strengths={result.insights.strengths} gaps={result.insights.gaps} />
             </CardContent>
           </Card>
