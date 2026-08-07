@@ -13,6 +13,8 @@ export const SSM_OFFER_CODE = "safe-scrum-master-certification-training";
 export const MENTORSHIP_CANONICAL_CODE = "scrum-master-mentorship-masterclass";
 export const MOCK_INTERVIEW_OFFER_CODE = "service-mock-interview-sm";
 export const MOCK_INTERVIEW_SLUG = "mock-interview-series-with-interview-preparation";
+export const POWER_RESUME_OFFER_CODE = "service-power-resume-cover-letter";
+export const POWER_RESUME_SLUG = "power-resume-cover-letter";
 
 export type FaqItem = { question: string; answer: string };
 export type FaqGroup = { title: string; items: FaqItem[] };
@@ -840,6 +842,191 @@ const MOCK_INTERVIEW_EXTRAS: OfferPageExtras = {
     "SPC · large-scale transformation consultant · Scrum/XP/SAFe trainer. Not sure mock interviews are your next step? Book a short call — role fit, timing, and whether mentorship or resume support should come first.",
 };
 
+/** Power Resume & Cover Letter — service offer (not schedule-bound). */
+const POWER_RESUME_EXTRAS: OfferPageExtras = {
+  rating: {
+    score: "4.9",
+    meta: "Average learner rating · resume rewrite service",
+  },
+  heroEyebrow: "Career materials · Fast turnaround",
+  heroImageUrl: "/assets/offers/power-resume-cover.png",
+  heroImageAlt: "Power Resume and Cover Letter",
+  kindChip: "Service",
+  benefitPills: [
+    "Delivery within 1 day",
+    "Role-specific keywords",
+    "Resume + cover letter",
+    "Multiple format options",
+  ],
+  keyBenefits: [
+    {
+      title: "Personalized to your target role",
+      detail: "Achievements, skills, and keywords aligned to Scrum Master, Agile PM, and product hiring",
+    },
+    {
+      title: "Cover letter that matches",
+      detail: "A paired letter with role-specific language — not a generic template",
+    },
+    {
+      title: "Recruiter-friendly structure",
+      detail: "Clear formatting so hiring panels scan your impact quickly",
+    },
+    {
+      title: "Fast turnaround",
+      detail: "Typically delivered within one business day after you share your inputs",
+    },
+  ],
+  overviewTitle: "A resume that opens interview doors",
+  overviewBody:
+    "Get a personalized, impactful resume and cover letter with the right keywords, achievements, and skills for Scrum, Agile PM, and product roles. Choose from multiple professional formats.",
+  overviewPracticeTitle: "What we refine",
+  overviewPracticeBody:
+    "Role narrative, measurable achievements, Agile/Scrum terminology aligned to job descriptions, and a cover letter that reinforces your story for applications and referrals.",
+  overviewExpectationsTitle: "What you can expect",
+  overviewExpectationsBody:
+    "You share your current CV and target role; we return a polished resume plus cover letter you can use immediately for applications — with format options that fit career-transition or experienced-practitioner stories.",
+  overviewStats: [
+    { num: "1 day", label: "Typical delivery after inputs" },
+    { num: "2 docs", label: "Resume + matching cover letter" },
+    { num: "Role-fit", label: "Keywords for SM · APM · PO · BA" },
+  ],
+  learnLead:
+    "Present your experience the way Agile hiring managers and recruiters expect — clear impact, precise vocabulary, strong first impression.",
+  curriculum: [
+    {
+      title: "Intake & target-role framing",
+      summary:
+        "We align on your target role, country/market, and career story so the rewrite matches how you want to be hired.",
+      bullets: ["Target role and keywords", "Experience highlights", "Career-switch or progression narrative"],
+    },
+    {
+      title: "Resume rewrite",
+      summary:
+        "Structure achievements, skills, and terminology so recruiters and hiring managers can scan your fit quickly.",
+      bullets: ["Impact-focused bullets", "Agile/Scrum vocabulary", "ATS-friendly clarity"],
+    },
+    {
+      title: "Cover letter pairing",
+      summary:
+        "A short, role-specific letter that reinforces why you are a fit — not a copy-paste template.",
+    },
+    {
+      title: "Format options & delivery",
+      summary:
+        "Choose from multiple professional formats. Typical turnaround is within one business day after intake is complete.",
+    },
+  ],
+  curriculumTitle: "How the Power Resume service works",
+  curriculumLead:
+    "A focused rewrite path — intake, resume, cover letter, and delivery — without a live class schedule.",
+  audience: [
+    {
+      role: "Active job seekers",
+      detail: "Applying now and need a sharper resume before interviews",
+    },
+    {
+      role: "Career switchers",
+      detail: "Moving into Scrum / Agile PM / PO roles and need transferable experience framed well",
+    },
+    {
+      role: "Working practitioners",
+      detail: "Strong delivery experience, but a resume that undersells impact",
+    },
+    {
+      role: "Mentorship or mock-interview learners",
+      detail: "Pairing skills practice with application materials that get callbacks",
+    },
+  ],
+  audienceTitle: "Who benefits most",
+  audienceLead:
+    "Built for people targeting Scrum Master, Agile PM, Product Owner, and related roles — not a generic resume mill.",
+  certImageUrl: "/assets/offers/power-resume-cover.png",
+  certImageAlt: "Power Resume and Cover Letter",
+  certSectionEyebrow: "Application materials",
+  certSectionTitle: "Resume and cover letter built for Agile hiring",
+  certSectionLead:
+    "Personalized keywords, achievements, and skills — delivered fast so you can apply with confidence.",
+  certNavLabel: "Deliverable",
+  certBullets: [
+    "Personalized resume tailored to experience and target role",
+    "Cover letter with role-specific keywords and achievements",
+    "Multiple professional format options",
+    "Agile and Scrum terminology aligned to hiring expectations",
+    "Typical delivery within one business day",
+  ],
+  faqGroups: [
+    {
+      title: "About the service",
+      items: [
+        {
+          question: "What do I receive?",
+          answer:
+            "A personalized resume and a matching cover letter, with role-specific keywords, achievements, and skills for Scrum, Agile PM, and product roles. Multiple format options are available.",
+        },
+        {
+          question: "How fast is delivery?",
+          answer:
+            "Typical turnaround is within one business day after you share your current CV and target role details.",
+        },
+        {
+          question: "Is this a live class?",
+          answer:
+            "No — this is a document rewrite service. Pair it with mentorship or mock interviews if you also want hands-on skills or interview practice.",
+        },
+      ],
+    },
+    {
+      title: "Process & support",
+      items: [
+        {
+          question: "What do I need to provide?",
+          answer:
+            "Your latest CV (PDF preferred), target role, and country/market. Extra context on achievements or career-switch goals helps us personalize further.",
+        },
+        {
+          question: "Which roles is this optimized for?",
+          answer:
+            "Scrum Master, Agile Project Manager, Product Owner, Business Analyst, and related Agile delivery roles.",
+        },
+        {
+          question: "Who reviews the materials?",
+          answer:
+            "Dhirender Verma and The Agile Forum mentoring team — experienced with how Agile hiring managers screen resumes.",
+        },
+      ],
+    },
+    {
+      title: "Enrollment",
+      items: [
+        {
+          question: "Do I need a schedule before checkout?",
+          answer:
+            "No. This service is not schedule-bound — you can enroll and add to cart without selecting a cohort. Delivery timing starts after intake.",
+        },
+        {
+          question: "Can I combine this with mentorship or mock interviews?",
+          answer:
+            "Yes. Many learners pair Power Resume with the Mentorship Masterclass and/or Mock Interview Series when they need both materials and interview polish.",
+        },
+      ],
+    },
+  ],
+  brochureMailto:
+    "mailto:contact@theagileforum.com?subject=Power%20Resume%20%26%20Cover%20Letter%20Details",
+  brochureCtaLabel: "Request service details",
+  corporateMailto:
+    "mailto:contact@theagileforum.com?subject=Corporate%20Power%20Resume%20Service",
+  trustLine: "Resume rewrite · fast delivery",
+  finalCtaTitle: "Ready for a stronger resume?",
+  finalCtaLead:
+    "Enroll at the listed price, or book a mentor call if you want role-fit guidance before you start.",
+  mentorImageUrl: "/assets/offers/mentor-dhirender.png",
+  mentorName: "Dhirender Verma",
+  mentorHeadline: "Materials reviewed with Agile hiring in mind",
+  mentorBody:
+    "SPC · large-scale transformation consultant · Scrum/XP/SAFe trainer. Not sure resume support is your next step? Book a short call — role fit, timing, and whether mentorship or mock interviews should come first.",
+};
+
 /** Slim shared extras for other SAFe certs — shell layout without SSM-only demand/video/exam table. */
 function genericCertExtras(certLabel: string): OfferPageExtras {
   return {
@@ -924,6 +1111,9 @@ export function getOfferPageExtras(code: string, certificationName?: string): Of
   if (code === MENTORSHIP_OFFER_CODE || code === MENTORSHIP_CANONICAL_CODE) return MENTORSHIP_EXTRAS;
   if (code === MOCK_INTERVIEW_OFFER_CODE || code === MOCK_INTERVIEW_SLUG) {
     return MOCK_INTERVIEW_EXTRAS;
+  }
+  if (code === POWER_RESUME_OFFER_CODE || code === POWER_RESUME_SLUG) {
+    return POWER_RESUME_EXTRAS;
   }
   if (SAFE_CERT_CODES.has(code)) {
     return genericCertExtras(certificationName ?? "SAFe® certification");
