@@ -11,6 +11,8 @@ export const OFFER_MUTED = "#5b6b7c";
 
 export const SSM_OFFER_CODE = "safe-scrum-master-certification-training";
 export const MENTORSHIP_CANONICAL_CODE = "scrum-master-mentorship-masterclass";
+export const MOCK_INTERVIEW_OFFER_CODE = "service-mock-interview-sm";
+export const MOCK_INTERVIEW_SLUG = "mock-interview-series-with-interview-preparation";
 
 export type FaqItem = { question: string; answer: string };
 export type FaqGroup = { title: string; items: FaqItem[] };
@@ -645,6 +647,199 @@ const MENTORSHIP_EXTRAS: OfferPageExtras = {
     "SPC · large-scale transformation consultant · Scrum/XP/SAFe trainer. Not sure this is your next step? Book a short call — role fit, cohort timing, and whether mock interviews or SAFe add-ons help your goal.",
 };
 
+/** Mock Interview Series — service offer (not schedule-bound). */
+const MOCK_INTERVIEW_EXTRAS: OfferPageExtras = {
+  rating: {
+    score: "4.9",
+    meta: "Average learner rating · interview prep series",
+  },
+  heroEyebrow: "Interview prep · Live mock series",
+  heroImageUrl: "/assets/offers/mock-interview-series.png",
+  heroImageAlt: "Mock Interview Series with Interview Preparation",
+  kindChip: "Service",
+  benefitPills: [
+    "5 mock interviews · 7.5 hrs",
+    "100+ situational Q&A",
+    "Resume-aware feedback",
+    "SM · APM · PO · BA · Coach",
+  ],
+  keyBenefits: [
+    {
+      title: "100+ situational questions",
+      detail: "Real-world Scrum and Agile PM scenarios with suggested answer patterns",
+    },
+    {
+      title: "Personalized feedback",
+      detail: "Refine answers from your resume and experience — not generic scripts",
+    },
+    {
+      title: "Self-introduction coaching",
+      detail: "Impactful opening and closing statements for live interviews",
+    },
+    {
+      title: "Agile vocabulary under pressure",
+      detail: "Practice how to break down any problem the way interviewers expect",
+    },
+  ],
+  overviewTitle: "Walk into interviews ready — not rehearsed from a script",
+  overviewBody:
+    "Ace your Scrum Master / Agile Project Manager interviews with 100+ situational questions and suggested answers. A series of 5 mock interviews helps you excel at each aspect of the interview process.",
+  overviewPracticeTitle: "What every session builds",
+  overviewPracticeBody:
+    "Situational Q&A discussion tailored to your background, feedback on structure and confidence, self-introduction polish, and practice using precise agile terminology under interview pressure.",
+  overviewExpectationsTitle: "What you can expect",
+  overviewExpectationsBody:
+    "Roles covered include Scrum Master, Agile Project Manager, Product Owner, BA, and Agile Coach. You leave with clearer answer frameworks, stronger delivery, and feedback you can reuse in real interviews.",
+  overviewStats: [
+    { num: "5 sessions", label: "Mock interviews across the interview process" },
+    { num: "7.5 hrs", label: "Focused live interview preparation" },
+    { num: "100+", label: "Situational questions with discussion" },
+  ],
+  learnLead:
+    "Build structured answers for Scrum and Agile PM interviews — grounded in your experience, not memorized lines.",
+  curriculum: [
+    {
+      title: "Interview framing & self-introduction",
+      summary:
+        "Craft an impactful opening and closing so you set the tone before situational questions begin.",
+      bullets: [
+        "Strong open and close statements",
+        "Role narrative for career switchers",
+        "First-impression confidence cues",
+      ],
+    },
+    {
+      title: "Situational Scrum Master questions",
+      summary:
+        "Practice facilitation, impediments, conflict, and servant-leadership scenarios interviewers commonly probe.",
+      bullets: ["Sprint event facilitation", "Impediment handling", "Stakeholder conversations"],
+    },
+    {
+      title: "Agile PM / delivery scenarios",
+      summary:
+        "Walk through delivery, prioritization, and cross-team collaboration questions with structured answer patterns.",
+    },
+    {
+      title: "Resume-aware answer refinement",
+      summary:
+        "Discuss each question against your resume and project experience so answers sound authentic and specific.",
+    },
+    {
+      title: "Vocabulary, problem breakdown & live feedback",
+      summary:
+        "Use precise agile language under pressure and break down complex problems the way hiring panels expect — with personalized feedback each round.",
+    },
+  ],
+  curriculumTitle: "5 mock interviews · full interview-process coverage",
+  curriculumLead:
+    "Each session targets a different part of the interview so you build confidence end-to-end — from introduction through situational depth.",
+  audience: [
+    {
+      role: "Active job seekers",
+      detail: "Interviewing now for Scrum Master / Agile PM roles and want structured practice",
+    },
+    {
+      role: "Career switchers",
+      detail: "Moving into Agile roles and need situational answers tied to transferable experience",
+    },
+    {
+      role: "Working practitioners",
+      detail: "Know the work, but want sharper interview delivery and vocabulary",
+    },
+    {
+      role: "Mentorship alumni",
+      detail: "Completed hands-on training and want interview-specific polish next",
+    },
+  ],
+  audienceTitle: "Who benefits most",
+  audienceLead:
+    "Built for people who want interview confidence for Scrum, Agile PM, PO, BA, and coaching roles — not another slide deck.",
+  certImageUrl: "/assets/offers/mock-interview-series.png",
+  certImageAlt: "Mock Interview Series with Interview Preparation",
+  certSectionEyebrow: "Interview experience",
+  certSectionTitle: "Practice like the interview is already booked",
+  certSectionLead:
+    "Live mock rounds with discussion on each question — so you refine answers from your resume, build confidence, and walk into real interviews prepared.",
+  certNavLabel: "Experience",
+  certBullets: [
+    "5 mock interviews covering the interview process",
+    "100+ situational questions with real-world scenarios",
+    "Feedback tailored to your resume and experience",
+    "Self-introduction coaching for strong open and close",
+    "Roles: Scrum Master · Agile PM · PO · BA · Agile Coach",
+  ],
+  faqGroups: [
+    {
+      title: "About the series",
+      items: [
+        {
+          question: "What is the Mock Interview Series?",
+          answer:
+            "A live interview-preparation series with 5 mock interviews and 100+ situational questions — designed to help you excel at Scrum Master, Agile Project Manager, Product Owner, BA, and Agile Coach interviews.",
+        },
+        {
+          question: "How long is the series?",
+          answer: "About 7.5 hours across 5 mock interview sessions.",
+        },
+        {
+          question: "Is this a certification course?",
+          answer:
+            "No — this is interview preparation. Pair it with mentorship or SAFe certifications if you also need hands-on skills or credentials.",
+        },
+      ],
+    },
+    {
+      title: "Delivery & support",
+      items: [
+        {
+          question: "How are answers personalized?",
+          answer:
+            "Each question is discussed so you refine answers from your resume and prior project experience — not one-size-fits-all scripts.",
+        },
+        {
+          question: "Which roles does this cover?",
+          answer:
+            "Scrum Master, Agile Project Manager, Product Owner, Business Analyst, and Agile Coach interview paths.",
+        },
+        {
+          question: "Who leads the sessions?",
+          answer:
+            "Dhirender Verma — SPC, large-scale transformation consultant, and Scrum/XP/SAFe trainer with deep interview coaching experience.",
+        },
+      ],
+    },
+    {
+      title: "Enrollment",
+      items: [
+        {
+          question: "Do I need a schedule before checkout?",
+          answer:
+            "No. This service is not schedule-bound — you can enroll and add to cart without selecting a cohort. Session timing is coordinated after enrollment.",
+        },
+        {
+          question: "Can I combine this with mentorship or resume support?",
+          answer:
+            "Yes. Many learners pair mock interviews with the Mentorship Masterclass and/or Power Resume support when they need both skills and interview polish.",
+        },
+      ],
+    },
+  ],
+  brochureMailto:
+    "mailto:contact@theagileforum.com?subject=Mock%20Interview%20Series%20Details",
+  brochureCtaLabel: "Request series details",
+  corporateMailto:
+    "mailto:contact@theagileforum.com?subject=Corporate%20Mock%20Interview%20Series",
+  trustLine: "Live interview prep",
+  finalCtaTitle: "Ready to practice for real interviews?",
+  finalCtaLead:
+    "Enroll at the listed price, or book a mentor call if you want role-fit guidance before you start.",
+  mentorImageUrl: "/assets/offers/mentor-dhirender.png",
+  mentorName: "Dhirender Verma",
+  mentorHeadline: "Practice with a mentor who runs real interviews",
+  mentorBody:
+    "SPC · large-scale transformation consultant · Scrum/XP/SAFe trainer. Not sure mock interviews are your next step? Book a short call — role fit, timing, and whether mentorship or resume support should come first.",
+};
+
 /** Slim shared extras for other SAFe certs — shell layout without SSM-only demand/video/exam table. */
 function genericCertExtras(certLabel: string): OfferPageExtras {
   return {
@@ -727,6 +922,9 @@ const SAFE_CERT_CODES = new Set([
 export function getOfferPageExtras(code: string, certificationName?: string): OfferPageExtras | null {
   if (code === SSM_OFFER_CODE) return SSM_EXTRAS;
   if (code === MENTORSHIP_OFFER_CODE || code === MENTORSHIP_CANONICAL_CODE) return MENTORSHIP_EXTRAS;
+  if (code === MOCK_INTERVIEW_OFFER_CODE || code === MOCK_INTERVIEW_SLUG) {
+    return MOCK_INTERVIEW_EXTRAS;
+  }
   if (SAFE_CERT_CODES.has(code)) {
     return genericCertExtras(certificationName ?? "SAFe® certification");
   }
