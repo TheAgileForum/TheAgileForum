@@ -1,4 +1,5 @@
 import { Router } from "express";
+import multer from "multer";
 import { z } from "zod";
 import { optionalAuth } from "../middleware/optional-auth.js";
 import { withBodyValidation } from "../middleware/validation.js";
@@ -18,10 +19,19 @@ import {
   saveDiagnosisIntent,
   saveJdInput,
 } from "../diagnosis/diagnosis-service.js";
+import { getEnv } from "../config/env.js";
+import { ApiError } from "../errors/api-error.js";
 
 export const diagnosisRouter = Router();
 
 diagnosisRouter.use(optionalAuth);
+
+const resumeMulter = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: Math.max(1, (Number(process.env.RESUME_UPLOAD_MAX_MB) || 5) * 1024 * 1024),
+  },
+});
 
 diagnosisRouter.post(
   "/session",
@@ -54,19 +64,69 @@ diagnosisRouter.put(
   },
 );
 
-diagnosisRouter.post(
-  "/session/:sessionId/resume",
-  withBodyValidation(resumeBody),
-  async (req, res, next) => {
-    try {
-      const body = req.body as z.infer<typeof resumeBody>;
-      const result = await registerResumeAsset(req.params.sessionId, body);
-      return res.status(201).json(result);
-    } catch (error) {
-      return next(error);
-    }
-  },
-);
+/**
+ * Multipart file upload (preferred): field name `file`.
+ * Legacy JSON metadata body still accepted when Content-Type is application/json.
+ */
+diagnosisRouter.post("/session/:sessionId/resume", (req, res, next) => {
+  const contentType = req.headers["content-type"] ?? "";
+  if (contentType.includes("multipart/form-data")) {
+    return resumeMulter.single("file")(req, res, (err) => {
+      if (err) {
+        if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
+          return next(
+            new ApiError({
+              status: 400,
+              code: "FILE_TOO_LARGE",
+              message: `Resume exceeds max size of ${getEnv().RESUME_UPLOAD_MAX_MB}MB`,
+              retryable: true,
+            }),
+          );
+        }
+        return next(err);
+      }
+      void (async () => {
+        try {
+          const file = req.file;
+          if (!file) {
+            throw new ApiError({
+              status: 400,
+              code: "RESUME_FILE_REQUIRED",
+              message: "Resume file is required (multipart field: file)",
+              retryable: true,
+            });
+          }
+          const mimeType =
+            file.mimetype ||
+            (typeof req.body?.mimeType === "string" ? req.body.mimeType : "") ||
+            "application/octet-stream";
+          const result = await registerResumeAsset(req.params.sessionId, {
+            fileName: file.originalname || "resume",
+            mimeType,
+            sizeBytes: file.size,
+            buffer: file.buffer,
+          });
+          return res.status(201).json(result);
+        } catch (error) {
+          return next(error);
+        }
+      })();
+    });
+  }
+
+  return withBodyValidation(resumeBody)(req, res, (validationErr) => {
+    if (validationErr) return next(validationErr);
+    void (async () => {
+      try {
+        const body = req.body as z.infer<typeof resumeBody>;
+        const result = await registerResumeAsset(req.params.sessionId, body);
+        return res.status(201).json(result);
+      } catch (error) {
+        return next(error);
+      }
+    })();
+  });
+});
 
 diagnosisRouter.put(
   "/session/:sessionId/jd",

@@ -55,10 +55,25 @@ export async function uploadResumeMetadata(
     checksum?: string;
   },
 ) {
-  return apiFetch<{ resumeAssetId: string; validationStatus: string }>(
+  return apiFetch<{ resumeAssetId: string; validationStatus: string; extractedTextChars?: number }>(
     `/api/v1/diagnosis/session/${sessionId}/resume`,
     { method: "POST", body: JSON.stringify(body) },
   );
+}
+
+/** Upload real resume bytes (PDF/DOCX). Preferred over metadata-only. */
+export async function uploadResumeFile(sessionId: string, file: File) {
+  const form = new FormData();
+  form.append("file", file);
+  return apiFetch<{
+    resumeAssetId: string;
+    validationStatus: string;
+    extractedTextChars?: number;
+  }>(`/api/v1/diagnosis/session/${sessionId}/resume`, {
+    method: "POST",
+    body: form,
+    timeoutMs: 60_000,
+  });
 }
 
 export async function saveJdInput(
@@ -133,6 +148,8 @@ export type AnalysisResult = {
   primaryAction: PrimaryAction;
   secondaryActions: SecondaryAction[];
   escalation: EscalationOptions | null;
+  /** True when live AI failed and deterministic stub was used. */
+  usedStubFallback?: boolean;
 };
 
 export async function getAnalysisResult(runId: string) {
