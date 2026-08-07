@@ -43,7 +43,12 @@ export function DiagnosisActionModule({
 
       <Card variant="outlined" sx={{ bgcolor: "primary.50", borderColor: "primary.light" }}>
         <CardContent>
-          <Typography variant="overline" color="primary.dark">
+          <Typography
+            variant="h6"
+            component="h2"
+            color="primary.dark"
+            sx={{ fontWeight: 700, mb: 0.5 }}
+          >
             Recommended next step
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>

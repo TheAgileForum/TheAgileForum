@@ -343,6 +343,7 @@ export type UpsellRecommendations = {
   items: UpsellItem[];
   safeCertSkus: UpsellItem[];
   mockInterviewSkus: UpsellItem[];
+  resumeSkus?: UpsellItem[];
   primaryCta: { label: string; offeringCode: string } | null;
 };
 
@@ -415,6 +416,8 @@ export async function getUpsellRecommendations(params: {
   currency?: string;
   yearsOfExperience?: number | null;
   experienceHint?: string | null;
+  /** Resume match % — when &lt; 85, API includes New Resume + LinkedIn Upgrade. */
+  readinessScore?: number | null;
 }) {
   const qs = new URLSearchParams({
     target_role: params.targetRole,
@@ -428,6 +431,9 @@ export async function getUpsellRecommendations(params: {
     qs.set("years_of_experience", String(params.yearsOfExperience));
   }
   if (params.experienceHint?.trim()) qs.set("experience_hint", params.experienceHint.trim());
+  if (typeof params.readinessScore === "number" && Number.isFinite(params.readinessScore)) {
+    qs.set("readiness_score", String(params.readinessScore));
+  }
   return apiFetch<UpsellRecommendations>(`/api/v1/recommendations/upsell?${qs.toString()}`);
 }
 

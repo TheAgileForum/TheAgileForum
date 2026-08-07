@@ -194,6 +194,7 @@ export function DiagnosisStep4Page() {
             context="diagnosis"
             gapTags={result.insights.gaps}
             yearsOfExperience={result.yearsOfExperience}
+            readinessScore={result.readinessScore}
             onAddOffering={(code, scheduleRef, label) => addItem(code, scheduleRef, label)}
           />
         </>

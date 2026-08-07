@@ -48,6 +48,10 @@ recommendationsRouter.get("/upsell", (req, res) => {
   const yearsOfExperience = Number.isFinite(yearsParsed) ? yearsParsed : null;
   const experienceHint =
     typeof req.query.experience_hint === "string" ? req.query.experience_hint : undefined;
+  const readinessRaw =
+    typeof req.query.readiness_score === "string" ? req.query.readiness_score : "";
+  const readinessParsed = readinessRaw.trim() ? Number.parseFloat(readinessRaw) : NaN;
+  const readinessScore = Number.isFinite(readinessParsed) ? readinessParsed : null;
 
   const recommendations = getUpsellRecommendations({
     targetRole,
@@ -58,6 +62,7 @@ recommendationsRouter.get("/upsell", (req, res) => {
     geo: pricingInput.geo,
     yearsOfExperience,
     experienceHint,
+    readinessScore,
   });
 
   return res.json(recommendations);
