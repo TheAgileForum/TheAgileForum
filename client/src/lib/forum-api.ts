@@ -1,4 +1,9 @@
-import { apiFetch, catalogFetchTimeoutMs, CHECKOUT_START_TIMEOUT_MS } from "./api";
+import {
+  apiFetch,
+  catalogFetchTimeoutMs,
+  CHECKOUT_CONFIRM_TIMEOUT_MS,
+  CHECKOUT_START_TIMEOUT_MS,
+} from "./api";
 
 const SESSION_KEY = "af_diagnosis_session_id";
 
@@ -634,7 +639,10 @@ export async function startCheckout(
 export async function getRazorpayCheckoutConfig(orderId: string) {
   const res = await apiFetch<{
     config: RazorpayCheckoutConfig & { orderNumber: string };
-  }>(`/api/v1/commerce/razorpay/checkout-config/${orderId}`);
+  }>(`/api/v1/commerce/razorpay/checkout-config/${orderId}`, {
+    timeoutMs: CHECKOUT_CONFIRM_TIMEOUT_MS,
+    retries: 2,
+  });
   return res.config;
 }
 
@@ -650,6 +658,8 @@ export async function confirmRazorpayCheckout(input: {
     {
       method: "POST",
       body: JSON.stringify(input),
+      timeoutMs: CHECKOUT_CONFIRM_TIMEOUT_MS,
+      retries: 2,
     },
   );
 }
@@ -663,6 +673,8 @@ export async function confirmStripeCheckout(input: {
     {
       method: "POST",
       body: JSON.stringify(input),
+      timeoutMs: CHECKOUT_CONFIRM_TIMEOUT_MS,
+      retries: 2,
     },
   );
 }
