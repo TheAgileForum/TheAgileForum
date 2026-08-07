@@ -235,7 +235,13 @@ export function ForumLayout() {
         sx={{
           flex: 1,
           p: fullBleed ? 0 : { xs: 2, sm: 3 },
-          maxWidth: fullBleed ? "none" : wideLayout ? 1100 : 800,
+          maxWidth: fullBleed
+            ? "none"
+            : pathname.startsWith("/testimonials")
+              ? 1200
+              : wideLayout
+                ? 1100
+                : 800,
           mx: "auto",
           width: "100%",
           boxSizing: "border-box",
