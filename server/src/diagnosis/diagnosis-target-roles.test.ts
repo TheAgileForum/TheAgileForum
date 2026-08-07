@@ -2,9 +2,10 @@ import { describe, expect, it } from "vitest";
 import { DIAGNOSIS_TARGET_ROLES, intentBody } from "./contracts.js";
 
 describe("diagnosis target roles", () => {
-  it("exposes exactly the five founder-approved target roles", () => {
+  it("exposes exactly the six founder-approved target roles", () => {
     expect([...DIAGNOSIS_TARGET_ROLES]).toEqual([
       "Scrum Master/Agile Project Manager",
+      "Product Owner/Product Manager",
       "Senior Project Manager(Technical)/Senior Agilist",
       "Delivery Lead /Senior Delivery Manager",
       "Program Manager/RTE",
