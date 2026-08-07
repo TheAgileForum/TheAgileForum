@@ -866,6 +866,11 @@ const POWER_RESUME_EXTRAS: OfferPageExtras = {
       detail: "Achievements, skills, and keywords aligned to Scrum Master, Agile PM, and product hiring",
     },
     {
+      title: "ATS Friendly Resume",
+      detail:
+        "Tried and tested formats which get you hired — structured so applicant tracking systems and recruiters can scan your fit",
+    },
+    {
       title: "Cover letter that matches",
       detail: "A paired letter with role-specific language — not a generic template",
     },
@@ -958,6 +963,7 @@ const POWER_RESUME_EXTRAS: OfferPageExtras = {
   certNavLabel: "Deliverable",
   certBullets: [
     "Personalized resume tailored to experience and target role",
+    "ATS Friendly Resume, with tried and tested formats which get you hired",
     "Cover letter with role-specific keywords and achievements",
     "LinkedIn upgrade to maximize job opportunities with skills",
     "Multiple professional format options",
@@ -1183,6 +1189,7 @@ function powerResumeExtrasForRegion(opts?: {
       "Personalized keywords, achievements, and skills — plus Naukri and LinkedIn upgrades to maximize job opportunities — delivered fast so you can apply with confidence.",
     certBullets: [
       "Personalized resume tailored to experience and target role",
+      "ATS Friendly Resume, with tried and tested formats which get you hired",
       "Naukri upgrade to maximize job opportunities with skills",
       "LinkedIn upgrade to maximize job opportunities with skills",
       "Multiple professional format options",
