@@ -5,7 +5,7 @@ export const INDIA_FULL_PAY_MESSAGE =
 
 export const FULL_PAYMENT_MODE_LABEL = "Full Payment";
 
-export const INSTALLMENT_MODE_LABEL = "Installments";
+export const INSTALLMENT_MODE_LABEL = "Pay in Installments - 3/6/12 Months";
 
 export function isIndiaCheckoutContext(geo: string, currency: string): boolean {
   return geo === "IN" || currency === "INR";
