@@ -34,6 +34,11 @@ import {
   type CatalogOffering,
 } from "../../lib/forum-api";
 import { offerDetailPath, resolveOfferRouteCode } from "../../lib/offer-routes";
+import {
+  displayOfferingIncludes,
+  displayOfferingSummary,
+  displayOfferingTitle,
+} from "../../lib/offering-display-title";
 import { formatScheduleLabelForGeo } from "../../lib/schedule-timezone";
 
 const SCHEDULE_OPTIONS = [
@@ -165,7 +170,7 @@ export function OfferPage() {
       await addItem(
         offering.code,
         offering.scheduleBound ? scheduleRef : undefined,
-        offering.title,
+        displayOfferingTitle(offering.code, offering.title, { currency, geo }),
       );
       trackEvent("catalog_add_to_cart", { code: offering.code, source: "offer_detail" });
     } catch (err) {
@@ -199,15 +204,25 @@ export function OfferPage() {
     );
   }
 
+  const regionOpts = { currency, geo };
+  const displayTitle = displayOfferingTitle(offering.code, offering.title, regionOpts);
+  const offeringForView: CatalogOffering = {
+    ...offering,
+    title: displayTitle,
+    summary: displayOfferingSummary(offering.code, offering.summary, regionOpts),
+    includes: displayOfferingIncludes(offering.code, offering.includes, regionOpts),
+  };
   const priced = resolvedOfferingPrice(offering);
   const displayPrice = catalogDisplayPrice(priced.currency, priced.amount, offering.code);
-  const inclusions = offering.includes?.length ? offering.includes : DEFAULT_INCLUSIONS;
+  const inclusions = offeringForView.includes?.length
+    ? offeringForView.includes
+    : DEFAULT_INCLUSIONS;
   const scheduleOptions = scheduleOptionsFor(offering).map((option) => ({
     ...option,
     label: formatScheduleLabelForGeo(option.label, geo),
   }));
   const schedulePrompt = schedulePromptFor(offering);
-  const extras = getOfferPageExtras(offering.code, offering.certificationName);
+  const extras = getOfferPageExtras(offering.code, offering.certificationName, regionOpts);
   const cardHero = resolveCertBadge(offering);
   const durationChipLabel = offering.durationLabel
     ? offering.durationLabel
@@ -226,7 +241,7 @@ export function OfferPage() {
     return (
       <>
         <OfferDetailView
-          offering={offering}
+          offering={offeringForView}
           extras={extras}
           catalogLink={catalogLink}
           displayPrice={displayPrice}
@@ -260,7 +275,7 @@ export function OfferPage() {
         <Link component={RouterLink} to={catalogLink} underline="hover" color="inherit">
           Catalog
         </Link>
-        <Typography color="text.primary">{offering.title}</Typography>
+        <Typography color="text.primary">{displayTitle}</Typography>
       </Breadcrumbs>
 
       {cardHero.variant === "cover" ? (
@@ -277,7 +292,7 @@ export function OfferPage() {
           <Box
             component="img"
             src={cardHero.src}
-            alt={offering.title}
+            alt={displayTitle}
             sx={{
               width: "100%",
               height: "100%",
@@ -289,7 +304,7 @@ export function OfferPage() {
       ) : null}
 
       <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
-        {offering.title}
+        {displayTitle}
       </Typography>
       <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }}>
         <Chip label={offering.kind} size="small" variant="outlined" />
@@ -302,9 +317,9 @@ export function OfferPage() {
         {offering.scheduleBound ? <Chip label="Select Schedule" size="small" color="info" variant="outlined" /> : null}
       </Stack>
 
-      {offering.summary ? (
+      {offeringForView.summary ? (
         <Typography variant="body1" color="text.secondary">
-          {offering.summary}
+          {offeringForView.summary}
         </Typography>
       ) : null}
 

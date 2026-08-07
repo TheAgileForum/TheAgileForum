@@ -11,6 +11,8 @@ export const OFFERING_CODE_ALIASES: Record<string, string> = {
     "course-agile-fundamentals",
   "mock-interview-series-with-interview-preparation": "service-mock-interview-sm",
   "power-resume-cover-letter": "service-power-resume-cover-letter",
+  "new-resume-with-cover-letter-linkedin-upgrade":
+    "service-power-resume-cover-letter",
 };
 
 /**
@@ -262,7 +264,7 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
   },
   "service-power-resume-cover-letter": {
     code: "service-power-resume-cover-letter",
-    title: "Power Resume & Cover Letter",
+    title: "New Resume With Cover Letter & Linkedin Upgrade",
     kind: "service",
     category: "service",
     scheduleBound: false,
@@ -273,14 +275,15 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
     regionalUnitPrices: { INR: "8000.00" },
     roleTags: ["learner", "scrum_master", "product_owner"],
     deliveryMode: "live",
-    slug: "power-resume-cover-letter",
-    certificationName: "Resume + cover letter",
+    slug: "new-resume-with-cover-letter-linkedin-upgrade",
+    certificationName: "Resume + cover letter + LinkedIn",
     durationLabel: "Within 1 day",
     summary:
-      "Get a personalized, impactful resume and cover letter with the right keywords, achievements, and skills for Scrum, Agile PM, and product roles. Choose from multiple professional formats.",
+      "Get a personalized new resume and cover letter with the right keywords, achievements, and skills for Scrum, Agile PM, and product roles — plus a LinkedIn upgrade to maximize job opportunities with skills. Choose from multiple professional formats.",
     includes: [
       "Personalized resume tailored to your experience and target role",
       "Cover letter with role-specific keywords, achievements, and skills",
+      "LinkedIn profile upgrade to maximize job opportunities with skills",
       "Multiple format options to choose from",
       "Agile and Scrum terminology aligned to hiring expectations",
       "Delivery within one business day",
@@ -289,6 +292,7 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
       "Present achievements and skills in a recruiter-friendly structure",
       "Use keywords that match Scrum Master, PO, and Agile PM job descriptions",
       "Pair a strong cover letter with your resume for applications",
+      "Strengthen your LinkedIn profile to maximize job opportunities with skills",
       "Choose a format that fits your career-transition story",
     ],
   },

@@ -11,6 +11,12 @@ export const OFFER_MUTED = "#5b6b7c";
 
 export const SSM_OFFER_CODE = "safe-scrum-master-certification-training";
 export const MENTORSHIP_CANONICAL_CODE = "scrum-master-mentorship-masterclass";
+export const MOCK_INTERVIEW_OFFER_CODE = "service-mock-interview-sm";
+export const MOCK_INTERVIEW_SLUG = "mock-interview-series-with-interview-preparation";
+export const POWER_RESUME_OFFER_CODE = "service-power-resume-cover-letter";
+export const POWER_RESUME_SLUG = "new-resume-with-cover-letter-linkedin-upgrade";
+/** Legacy public path — keep resolving to the same offer extras. */
+export const POWER_RESUME_LEGACY_SLUG = "power-resume-cover-letter";
 
 export type FaqItem = { question: string; answer: string };
 export type FaqGroup = { title: string; items: FaqItem[] };
@@ -645,6 +651,397 @@ const MENTORSHIP_EXTRAS: OfferPageExtras = {
     "SPC · large-scale transformation consultant · Scrum/XP/SAFe trainer. Not sure this is your next step? Book a short call — role fit, cohort timing, and whether mock interviews or SAFe add-ons help your goal.",
 };
 
+/** Mock Interview Series — service offer (not schedule-bound). */
+const MOCK_INTERVIEW_EXTRAS: OfferPageExtras = {
+  rating: {
+    score: "4.9",
+    meta: "Average learner rating · interview prep series",
+  },
+  heroEyebrow: "Interview prep · Live mock series",
+  heroImageUrl: "/assets/offers/mock-interview-series.png",
+  heroImageAlt: "Mock Interview Series with Interview Preparation",
+  kindChip: "Service",
+  benefitPills: [
+    "5 mock interviews · 7.5 hrs",
+    "100+ situational Q&A",
+    "Resume-aware feedback",
+    "SM · APM · PO · BA · Coach",
+  ],
+  keyBenefits: [
+    {
+      title: "100+ situational questions",
+      detail: "Real-world Scrum and Agile PM scenarios with suggested answer patterns",
+    },
+    {
+      title: "Personalized feedback",
+      detail: "Refine answers from your resume and experience — not generic scripts",
+    },
+    {
+      title: "Self-introduction coaching",
+      detail: "Impactful opening and closing statements for live interviews",
+    },
+    {
+      title: "Agile vocabulary under pressure",
+      detail: "Practice how to break down any problem the way interviewers expect",
+    },
+  ],
+  overviewTitle: "Walk into interviews ready — not rehearsed from a script",
+  overviewBody:
+    "Ace your Scrum Master / Agile Project Manager interviews with 100+ situational questions and suggested answers. A series of 5 mock interviews helps you excel at each aspect of the interview process.",
+  overviewPracticeTitle: "What every session builds",
+  overviewPracticeBody:
+    "Situational Q&A discussion tailored to your background, feedback on structure and confidence, self-introduction polish, and practice using precise agile terminology under interview pressure.",
+  overviewExpectationsTitle: "What you can expect",
+  overviewExpectationsBody:
+    "Roles covered include Scrum Master, Agile Project Manager, Product Owner, BA, and Agile Coach. You leave with clearer answer frameworks, stronger delivery, and feedback you can reuse in real interviews.",
+  overviewStats: [
+    { num: "5 sessions", label: "Mock interviews across the interview process" },
+    { num: "7.5 hrs", label: "Focused live interview preparation" },
+    { num: "100+", label: "Situational questions with discussion" },
+  ],
+  learnLead:
+    "Build structured answers for Scrum and Agile PM interviews — grounded in your experience, not memorized lines.",
+  curriculum: [
+    {
+      title: "Interview framing & self-introduction",
+      summary:
+        "Craft an impactful opening and closing so you set the tone before situational questions begin.",
+      bullets: [
+        "Strong open and close statements",
+        "Role narrative for career switchers",
+        "First-impression confidence cues",
+      ],
+    },
+    {
+      title: "Situational Scrum Master questions",
+      summary:
+        "Practice facilitation, impediments, conflict, and servant-leadership scenarios interviewers commonly probe.",
+      bullets: ["Sprint event facilitation", "Impediment handling", "Stakeholder conversations"],
+    },
+    {
+      title: "Agile PM / delivery scenarios",
+      summary:
+        "Walk through delivery, prioritization, and cross-team collaboration questions with structured answer patterns.",
+    },
+    {
+      title: "Resume-aware answer refinement",
+      summary:
+        "Discuss each question against your resume and project experience so answers sound authentic and specific.",
+    },
+    {
+      title: "Vocabulary, problem breakdown & live feedback",
+      summary:
+        "Use precise agile language under pressure and break down complex problems the way hiring panels expect — with personalized feedback each round.",
+    },
+  ],
+  curriculumTitle: "5 mock interviews · full interview-process coverage",
+  curriculumLead:
+    "Each session targets a different part of the interview so you build confidence end-to-end — from introduction through situational depth.",
+  audience: [
+    {
+      role: "Active job seekers",
+      detail: "Interviewing now for Scrum Master / Agile PM roles and want structured practice",
+    },
+    {
+      role: "Career switchers",
+      detail: "Moving into Agile roles and need situational answers tied to transferable experience",
+    },
+    {
+      role: "Working practitioners",
+      detail: "Know the work, but want sharper interview delivery and vocabulary",
+    },
+    {
+      role: "Mentorship alumni",
+      detail: "Completed hands-on training and want interview-specific polish next",
+    },
+  ],
+  audienceTitle: "Who benefits most",
+  audienceLead:
+    "Built for people who want interview confidence for Scrum, Agile PM, PO, BA, and coaching roles — not another slide deck.",
+  certImageUrl: "/assets/offers/mock-interview-series.png",
+  certImageAlt: "Mock Interview Series with Interview Preparation",
+  certSectionEyebrow: "Interview experience",
+  certSectionTitle: "Practice like the interview is already booked",
+  certSectionLead:
+    "Live mock rounds with discussion on each question — so you refine answers from your resume, build confidence, and walk into real interviews prepared.",
+  certNavLabel: "Experience",
+  certBullets: [
+    "5 mock interviews covering the interview process",
+    "100+ situational questions with real-world scenarios",
+    "Feedback tailored to your resume and experience",
+    "Self-introduction coaching for strong open and close",
+    "Roles: Scrum Master · Agile PM · PO · BA · Agile Coach",
+  ],
+  faqGroups: [
+    {
+      title: "About the series",
+      items: [
+        {
+          question: "What is the Mock Interview Series?",
+          answer:
+            "A live interview-preparation series with 5 mock interviews and 100+ situational questions — designed to help you excel at Scrum Master, Agile Project Manager, Product Owner, BA, and Agile Coach interviews.",
+        },
+        {
+          question: "How long is the series?",
+          answer: "About 7.5 hours across 5 mock interview sessions.",
+        },
+        {
+          question: "Is this a certification course?",
+          answer:
+            "No — this is interview preparation. Pair it with mentorship or SAFe certifications if you also need hands-on skills or credentials.",
+        },
+      ],
+    },
+    {
+      title: "Delivery & support",
+      items: [
+        {
+          question: "How are answers personalized?",
+          answer:
+            "Each question is discussed so you refine answers from your resume and prior project experience — not one-size-fits-all scripts.",
+        },
+        {
+          question: "Which roles does this cover?",
+          answer:
+            "Scrum Master, Agile Project Manager, Product Owner, Business Analyst, and Agile Coach interview paths.",
+        },
+        {
+          question: "Who leads the sessions?",
+          answer:
+            "Dhirender Verma — SPC, large-scale transformation consultant, and Scrum/XP/SAFe trainer with deep interview coaching experience.",
+        },
+      ],
+    },
+    {
+      title: "Enrollment",
+      items: [
+        {
+          question: "Do I need a schedule before checkout?",
+          answer:
+            "No. This service is not schedule-bound — you can enroll and add to cart without selecting a cohort. Session timing is coordinated after enrollment.",
+        },
+        {
+          question: "Can I combine this with mentorship or resume support?",
+          answer:
+            "Yes. Many learners pair mock interviews with the Mentorship Masterclass and/or resume + LinkedIn upgrade support when they need both skills and interview polish.",
+        },
+      ],
+    },
+  ],
+  brochureMailto:
+    "mailto:contact@theagileforum.com?subject=Mock%20Interview%20Series%20Details",
+  brochureCtaLabel: "Request series details",
+  corporateMailto:
+    "mailto:contact@theagileforum.com?subject=Corporate%20Mock%20Interview%20Series",
+  trustLine: "Live interview prep",
+  finalCtaTitle: "Ready to practice for real interviews?",
+  finalCtaLead:
+    "Enroll at the listed price, or book a mentor call if you want role-fit guidance before you start.",
+  mentorImageUrl: "/assets/offers/mentor-dhirender.png",
+  mentorName: "Dhirender Verma",
+  mentorHeadline: "Practice with a mentor who runs real interviews",
+  mentorBody:
+    "SPC · large-scale transformation consultant · Scrum/XP/SAFe trainer. Not sure mock interviews are your next step? Book a short call — role fit, timing, and whether mentorship or resume support should come first.",
+};
+
+/** New Resume With Cover Letter & Linkedin Upgrade — service offer (not schedule-bound). */
+const POWER_RESUME_EXTRAS: OfferPageExtras = {
+  rating: {
+    score: "4.9",
+    meta: "Average learner rating · resume + LinkedIn upgrade",
+  },
+  heroEyebrow: "Career materials · Fast turnaround",
+  heroImageUrl: "/assets/offers/power-resume-cover.png",
+  heroImageAlt: "New Resume With Cover Letter and LinkedIn Upgrade",
+  kindChip: "Service",
+  benefitPills: [
+    "Delivery within 1 day",
+    "Role-specific keywords",
+    "Resume + cover letter",
+    "LinkedIn upgrade",
+  ],
+  keyBenefits: [
+    {
+      title: "Personalized to your target role",
+      detail: "Achievements, skills, and keywords aligned to Scrum Master, Agile PM, and product hiring",
+    },
+    {
+      title: "Cover letter that matches",
+      detail: "A paired letter with role-specific language — not a generic template",
+    },
+    {
+      title: "LinkedIn upgrade for opportunities",
+      detail:
+        "Profile refresh that highlights your skills to maximize job opportunities with recruiters and hiring managers",
+    },
+    {
+      title: "Fast turnaround",
+      detail: "Typically delivered within one business day after you share your inputs",
+    },
+  ],
+  overviewTitle: "A resume and LinkedIn profile that open doors",
+  overviewBody:
+    "Get a personalized new resume and cover letter with the right keywords, achievements, and skills for Scrum, Agile PM, and product roles — plus a LinkedIn upgrade to maximize job opportunities with skills. Choose from multiple professional formats.",
+  overviewPracticeTitle: "What we refine",
+  overviewPracticeBody:
+    "Role narrative, measurable achievements, Agile/Scrum terminology aligned to job descriptions, a cover letter that reinforces your story, and a LinkedIn upgrade that surfaces your skills to maximize job opportunities.",
+  overviewExpectationsTitle: "What you can expect",
+  overviewExpectationsBody:
+    "You share your current CV, LinkedIn URL, and target role; we return a polished resume, cover letter, and LinkedIn upgrade you can use immediately for applications — with format options that fit career-transition or experienced-practitioner stories.",
+  overviewStats: [
+    { num: "1 day", label: "Typical delivery after inputs" },
+    { num: "3 assets", label: "Resume + cover letter + LinkedIn" },
+    { num: "Role-fit", label: "Keywords for SM · APM · PO · BA" },
+  ],
+  learnLead:
+    "Present your experience the way Agile hiring managers and recruiters expect — clear impact, precise vocabulary, strong first impression across resume and LinkedIn.",
+  curriculum: [
+    {
+      title: "Intake & target-role framing",
+      summary:
+        "We align on your target role, country/market, and career story so the rewrite matches how you want to be hired.",
+      bullets: ["Target role and keywords", "Experience highlights", "Career-switch or progression narrative"],
+    },
+    {
+      title: "Resume rewrite",
+      summary:
+        "Structure achievements, skills, and terminology so recruiters and hiring managers can scan your fit quickly.",
+      bullets: ["Impact-focused bullets", "Agile/Scrum vocabulary", "ATS-friendly clarity"],
+    },
+    {
+      title: "Cover letter pairing",
+      summary:
+        "A short, role-specific letter that reinforces why you are a fit — not a copy-paste template.",
+    },
+    {
+      title: "LinkedIn upgrade",
+      summary:
+        "Refresh your LinkedIn profile to maximize job opportunities with skills — headline, about, and experience language aligned to your target roles.",
+      bullets: ["Skills-forward headline", "About and experience polish", "Recruiter-search friendly keywords"],
+    },
+    {
+      title: "Format options & delivery",
+      summary:
+        "Choose from multiple professional formats. Typical turnaround is within one business day after intake is complete.",
+    },
+  ],
+  curriculumTitle: "How the resume + LinkedIn service works",
+  curriculumLead:
+    "A focused rewrite path — intake, resume, cover letter, LinkedIn upgrade, and delivery — without a live class schedule.",
+  audience: [
+    {
+      role: "Active job seekers",
+      detail: "Applying now and need sharper materials before interviews",
+    },
+    {
+      role: "Career switchers",
+      detail: "Moving into Scrum / Agile PM / PO roles and need transferable experience framed well",
+    },
+    {
+      role: "Working practitioners",
+      detail: "Strong delivery experience, but a resume or LinkedIn that undersells impact",
+    },
+    {
+      role: "Mentorship or mock-interview learners",
+      detail: "Pairing skills practice with application materials that get callbacks",
+    },
+  ],
+  audienceTitle: "Who benefits most",
+  audienceLead:
+    "Built for people targeting Scrum Master, Agile PM, Product Owner, and related roles — not a generic resume mill.",
+  certImageUrl: "/assets/offers/power-resume-cover.png",
+  certImageAlt: "New Resume With Cover Letter and LinkedIn Upgrade",
+  certSectionEyebrow: "Application materials",
+  certSectionTitle: "Resume, cover letter, and LinkedIn built for Agile hiring",
+  certSectionLead:
+    "Personalized keywords, achievements, and skills — plus a LinkedIn upgrade to maximize job opportunities — delivered fast so you can apply with confidence.",
+  certNavLabel: "Deliverable",
+  certBullets: [
+    "Personalized resume tailored to experience and target role",
+    "Cover letter with role-specific keywords and achievements",
+    "LinkedIn upgrade to maximize job opportunities with skills",
+    "Multiple professional format options",
+    "Agile and Scrum terminology aligned to hiring expectations",
+    "Typical delivery within one business day",
+  ],
+  faqGroups: [
+    {
+      title: "About the service",
+      items: [
+        {
+          question: "What do I receive?",
+          answer:
+            "A personalized resume, a matching cover letter, and a LinkedIn upgrade to maximize job opportunities with skills — with role-specific keywords, achievements, and skills for Scrum, Agile PM, and product roles. Multiple format options are available.",
+        },
+        {
+          question: "What does the LinkedIn upgrade include?",
+          answer:
+            "A profile refresh focused on maximizing job opportunities with skills — typically headline, About, and experience language aligned to your target Agile roles so recruiters can find and understand your fit faster.",
+        },
+        {
+          question: "How fast is delivery?",
+          answer:
+            "Typical turnaround is within one business day after you share your current CV, LinkedIn URL, and target role details.",
+        },
+        {
+          question: "Is this a live class?",
+          answer:
+            "No — this is a document and profile rewrite service. Pair it with mentorship or mock interviews if you also want hands-on skills or interview practice.",
+        },
+      ],
+    },
+    {
+      title: "Process & support",
+      items: [
+        {
+          question: "What do I need to provide?",
+          answer:
+            "Your latest CV (PDF preferred), LinkedIn profile URL, target role, and country/market. Extra context on achievements or career-switch goals helps us personalize further.",
+        },
+        {
+          question: "Which roles is this optimized for?",
+          answer:
+            "Scrum Master, Agile Project Manager, Product Owner, Business Analyst, and related Agile delivery roles.",
+        },
+        {
+          question: "Who reviews the materials?",
+          answer:
+            "Dhirender Verma and The Agile Forum mentoring team — experienced with how Agile hiring managers screen resumes and LinkedIn profiles.",
+        },
+      ],
+    },
+    {
+      title: "Enrollment",
+      items: [
+        {
+          question: "Do I need a schedule before checkout?",
+          answer:
+            "No. This service is not schedule-bound — you can enroll and add to cart without selecting a cohort. Delivery timing starts after intake.",
+        },
+        {
+          question: "Can I combine this with mentorship or mock interviews?",
+          answer:
+            "Yes. Many learners pair this resume and LinkedIn service with the Mentorship Masterclass and/or Mock Interview Series when they need both materials and interview polish.",
+        },
+      ],
+    },
+  ],
+  brochureMailto:
+    "mailto:contact@theagileforum.com?subject=New%20Resume%20With%20Cover%20Letter%20%26%20LinkedIn%20Upgrade%20Details",
+  brochureCtaLabel: "Request service details",
+  corporateMailto:
+    "mailto:contact@theagileforum.com?subject=Corporate%20Resume%20%26%20LinkedIn%20Upgrade%20Service",
+  trustLine: "Resume + LinkedIn upgrade · fast delivery",
+  finalCtaTitle: "Ready for a stronger resume and LinkedIn?",
+  finalCtaLead:
+    "Enroll at the listed price, or book a mentor call if you want role-fit guidance before you start.",
+  mentorImageUrl: "/assets/offers/mentor-dhirender.png",
+  mentorName: "Dhirender Verma",
+  mentorHeadline: "Materials reviewed with Agile hiring in mind",
+  mentorBody:
+    "SPC · large-scale transformation consultant · Scrum/XP/SAFe trainer. Not sure resume and LinkedIn support is your next step? Book a short call — role fit, timing, and whether mentorship or mock interviews should come first.",
+};
+
 /** Slim shared extras for other SAFe certs — shell layout without SSM-only demand/video/exam table. */
 function genericCertExtras(certLabel: string): OfferPageExtras {
   return {
@@ -724,9 +1121,96 @@ const SAFE_CERT_CODES = new Set([
   "safe-agilist-leading-safe-certification-training",
 ]);
 
-export function getOfferPageExtras(code: string, certificationName?: string): OfferPageExtras | null {
+function powerResumeExtrasForRegion(opts?: {
+  currency?: string | null;
+  geo?: string | null;
+}): OfferPageExtras {
+  const currency = (opts?.currency ?? "").trim().toUpperCase();
+  const geo = (opts?.geo ?? "").trim().toUpperCase();
+  const india = currency === "INR" || geo === "IN";
+  if (!india) return POWER_RESUME_EXTRAS;
+
+  return {
+    ...POWER_RESUME_EXTRAS,
+    heroImageAlt: "New Resume with Naukri and LinkedIn Upgrade",
+    benefitPills: [
+      "Delivery within 1 day",
+      "Role-specific keywords",
+      "Resume + Naukri",
+      "LinkedIn upgrade",
+    ],
+    keyBenefits: POWER_RESUME_EXTRAS.keyBenefits.map((b) =>
+      b.title === "Cover letter that matches"
+        ? {
+            title: "Naukri upgrade for opportunities",
+            detail:
+              "Profile refresh that highlights your skills on Naukri to maximize job opportunities with recruiters",
+          }
+        : b,
+    ),
+    overviewTitle: "A resume, Naukri, and LinkedIn profile that open doors",
+    overviewBody:
+      "Get a personalized new resume with the right keywords, achievements, and skills for Scrum, Agile PM, and product roles — plus Naukri and LinkedIn upgrades to maximize job opportunities with skills. Choose from multiple professional formats.",
+    overviewPracticeBody:
+      "Role narrative, measurable achievements, Agile/Scrum terminology aligned to job descriptions, and Naukri + LinkedIn upgrades that surface your skills to maximize job opportunities.",
+    overviewExpectationsBody:
+      "You share your current CV, Naukri/LinkedIn URLs, and target role; we return a polished resume plus Naukri and LinkedIn upgrades you can use immediately for applications — with format options that fit career-transition or experienced-practitioner stories.",
+    overviewStats: [
+      { num: "1 day", label: "Typical delivery after inputs" },
+      { num: "3 assets", label: "Resume + Naukri + LinkedIn" },
+      { num: "Role-fit", label: "Keywords for SM · APM · PO · BA" },
+    ],
+    curriculum: POWER_RESUME_EXTRAS.curriculum.map((m) =>
+      m.title === "Cover letter pairing"
+        ? {
+            title: "Naukri profile upgrade",
+            summary:
+              "Refresh your Naukri profile to maximize job opportunities with skills — headline, summary, and experience language aligned to your target roles.",
+            bullets: [
+              "Skills-forward headline",
+              "Summary and experience polish",
+              "Recruiter-search friendly keywords",
+            ],
+          }
+        : m,
+    ),
+    curriculumTitle: "How the resume + Naukri + LinkedIn service works",
+    curriculumLead:
+      "A focused rewrite path — intake, resume, Naukri upgrade, LinkedIn upgrade, and delivery — without a live class schedule.",
+    certImageAlt: "New Resume with Naukri and LinkedIn Upgrade",
+    certSectionTitle: "Resume, Naukri, and LinkedIn built for Agile hiring",
+    certSectionLead:
+      "Personalized keywords, achievements, and skills — plus Naukri and LinkedIn upgrades to maximize job opportunities — delivered fast so you can apply with confidence.",
+    certBullets: [
+      "Personalized resume tailored to experience and target role",
+      "Naukri upgrade to maximize job opportunities with skills",
+      "LinkedIn upgrade to maximize job opportunities with skills",
+      "Multiple professional format options",
+      "Agile and Scrum terminology aligned to hiring expectations",
+      "Typical delivery within one business day",
+    ],
+    trustLine: "Resume + Naukri + LinkedIn · fast delivery",
+    finalCtaTitle: "Ready for a stronger resume, Naukri, and LinkedIn?",
+  };
+}
+
+export function getOfferPageExtras(
+  code: string,
+  certificationName?: string,
+  opts?: { currency?: string | null; geo?: string | null },
+): OfferPageExtras | null {
   if (code === SSM_OFFER_CODE) return SSM_EXTRAS;
   if (code === MENTORSHIP_OFFER_CODE || code === MENTORSHIP_CANONICAL_CODE) return MENTORSHIP_EXTRAS;
+  if (code === MOCK_INTERVIEW_OFFER_CODE || code === MOCK_INTERVIEW_SLUG) {
+    return MOCK_INTERVIEW_EXTRAS;
+  }
+  if (
+    code === POWER_RESUME_OFFER_CODE ||
+    code === POWER_RESUME_SLUG ||
+    code === POWER_RESUME_LEGACY_SLUG
+  ) {
+    return powerResumeExtrasForRegion(opts);
+  }
   if (SAFE_CERT_CODES.has(code)) {
     return genericCertExtras(certificationName ?? "SAFe® certification");
   }

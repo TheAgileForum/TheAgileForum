@@ -26,6 +26,7 @@ import {
 import { setCommerceJourneyOrigin } from "../../../lib/commerce-journey";
 import type { CatalogOffering, CatalogFacets } from "../../../lib/forum-api";
 import { offerDetailPath } from "../../../lib/offer-routes";
+import { displayOfferingTitle } from "../../../lib/offering-display-title";
 
 const TITLES: Record<CatalogCategoryPath, string> = {
   trainings: "Trainings",
@@ -224,7 +225,11 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
     setAddingCode(offering.code);
     setError(null);
     trackEvent("catalog_add_to_cart", { code: offering.code, category: categoryPath });
-    void addItem(offering.code, undefined, offering.title).catch(() => {
+    void addItem(
+      offering.code,
+      undefined,
+      displayOfferingTitle(offering.code, offering.title, { currency, geo }),
+    ).catch(() => {
       // Error surfaced by ForumCartContext snackbar
     }).finally(() => setAddingCode(null));
   }
