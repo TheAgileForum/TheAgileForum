@@ -14,6 +14,7 @@ import { ResumeDropZone } from "../../../components/forum/ResumeDropZone";
 import { useDiagnosis } from "../../../contexts/DiagnosisContext";
 import { ApiRequestError } from "../../../lib/api";
 import { trackEvent } from "../../../lib/analytics";
+import { DEFAULT_DIAGNOSIS_TARGET_ROLE } from "../../../lib/diagnosis-target-roles";
 import { requestAnalysis, saveJdInput, uploadResumeFile } from "../../../lib/forum-api";
 
 const ALLOWED_TYPES = [
@@ -46,7 +47,7 @@ export function DiagnosisStep2Page() {
   const { sessionId, setRunId } = useDiagnosis();
   const [tab, setTab] = useState(0);
   const [jdText, setJdText] = useState("");
-  const [targetRole, setTargetRole] = useState("Scrum Master");
+  const [targetRole, setTargetRole] = useState(DEFAULT_DIAGNOSIS_TARGET_ROLE);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -60,7 +61,7 @@ export function DiagnosisStep2Page() {
       if (!raw) return;
       const draft = JSON.parse(raw) as Step2Draft;
       setJdText(draft.jdText ?? "");
-      setTargetRole(draft.targetRole ?? "Scrum Master");
+      setTargetRole(draft.targetRole ?? DEFAULT_DIAGNOSIS_TARGET_ROLE);
     } catch {
       /* ignore corrupt draft */
     }

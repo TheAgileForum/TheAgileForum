@@ -43,7 +43,7 @@ describe("diagnosis API contracts (no DB)", () => {
     const res = await request(createApp())
       .put("/api/v1/diagnosis/session/sess-1/intent")
       .send({
-        targetRole: "Scrum Master",
+        targetRole: "Scrum Master/Agile Project Manager",
         timeline: "3 months",
         currentStatus: "Practitioner",
         consentAck: false,

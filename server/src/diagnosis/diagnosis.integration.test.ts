@@ -29,7 +29,7 @@ describe.skipIf(!hasDb)("diagnosis integration (IT-01 subset)", () => {
     await request(app)
       .put(`/api/v1/diagnosis/session/${sessionId}/intent`)
       .send({
-        targetRole: "Product Owner",
+        targetRole: "Senior Project Manager(Technical)/Senior Agilist",
         timeline: "6 months",
         currentStatus: "Team lead",
         consentAck: true,
@@ -106,7 +106,7 @@ describe.skipIf(!hasDb)("diagnosis integration (IT-01 subset)", () => {
     await request(app)
       .put(`/api/v1/diagnosis/session/${sessionId}/intent`)
       .send({
-        targetRole: "Scrum Master",
+        targetRole: "Scrum Master/Agile Project Manager",
         timeline: "3 months",
         currentStatus: "Developer",
         consentAck: true,
@@ -117,7 +117,7 @@ describe.skipIf(!hasDb)("diagnosis integration (IT-01 subset)", () => {
     const journeyRes = await request(app).get(`/api/v1/journey-state/${sessionId}`);
     expect(journeyRes.status).toBe(200);
     expect(journeyRes.body.currentStep).toBe("step_2");
-    expect(journeyRes.body.resumePayload.targetRole).toBe("Scrum Master");
+    expect(journeyRes.body.resumePayload.targetRole).toBe("Scrum Master/Agile Project Manager");
   });
 
   it("IT-04: rejects unsupported resume mime type", async () => {
@@ -143,7 +143,7 @@ describe.skipIf(!hasDb)("diagnosis integration (IT-01 subset)", () => {
     await request(app)
       .put(`/api/v1/diagnosis/session/${sessionId}/intent`)
       .send({
-        targetRole: "Agile Coach",
+        targetRole: "Agile Coach/ Agile Transformation Lead",
         timeline: "6 months",
         currentStatus: "SM",
         consentAck: true,
