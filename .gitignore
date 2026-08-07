@@ -18,6 +18,10 @@ deploy/staging.client.env
 .DS_Store
 Thumbs.db
 
+# Local resume uploads (diagnosis AI)
+server/uploads/
+uploads/
+
 # IDE
 .idea/
 .vscode/*

@@ -98,7 +98,10 @@ async function apiFetchOnce<T>(
       headers: {
         // Avoid Content-Type on bodyless GETs so cross-origin catalog calls stay
         // "simple" and skip an OPTIONS preflight round-trip.
-        ...(rest.body ? { "Content-Type": "application/json" } : {}),
+        // Do not set JSON Content-Type for FormData — browser must set multipart boundary.
+        ...(rest.body && !(rest.body instanceof FormData)
+          ? { "Content-Type": "application/json" }
+          : {}),
         ...rest.headers,
       },
     });

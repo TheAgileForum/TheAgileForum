@@ -14,7 +14,7 @@ import { ResumeDropZone } from "../../../components/forum/ResumeDropZone";
 import { useDiagnosis } from "../../../contexts/DiagnosisContext";
 import { ApiRequestError } from "../../../lib/api";
 import { trackEvent } from "../../../lib/analytics";
-import { requestAnalysis, saveJdInput, uploadResumeMetadata } from "../../../lib/forum-api";
+import { requestAnalysis, saveJdInput, uploadResumeFile } from "../../../lib/forum-api";
 
 const ALLOWED_TYPES = [
   "application/pdf",
@@ -116,12 +116,7 @@ export function DiagnosisStep2Page() {
         setError("Session missing.");
         return;
       }
-      const mimeType = inferResumeMimeType(file);
-      await uploadResumeMetadata(sid, {
-        fileName: file.name,
-        mimeType,
-        sizeBytes: file.size,
-      });
+      await uploadResumeFile(sid, file);
       const trimmedJd = jdText.trim();
       if (trimmedJd) {
         setLoadingMessage("Saving job context…");

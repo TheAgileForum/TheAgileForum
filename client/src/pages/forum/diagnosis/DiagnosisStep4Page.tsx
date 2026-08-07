@@ -78,6 +78,12 @@ export function DiagnosisStep4Page() {
         <Alert severity="error">{error ?? "Could not load results."}</Alert>
       ) : (
         <>
+          {result.usedStubFallback ? (
+            <Alert severity="info">
+              Quick estimate based on your role — AI analysis temporarily unavailable.
+            </Alert>
+          ) : null}
+
           <DiagnosisReadinessSummary
             targetRole={result.targetRole}
             readinessScore={result.readinessScore}

@@ -70,6 +70,7 @@ describe.skipIf(!hasDb)("diagnosis integration (IT-01 subset)", () => {
     expect(resultRes.body.primaryAction.label).toBeTruthy();
     expect(resultRes.body.roadmapPreview).toHaveLength(3);
     expect(resultRes.body.confidenceTier).toBe("low");
+    expect(resultRes.body.usedStubFallback).toBe(false);
     expect(resultRes.body.escalation).toMatchObject({ title: expect.any(String) });
     expect(resultRes.body.secondaryActions.length).toBeGreaterThanOrEqual(3);
 

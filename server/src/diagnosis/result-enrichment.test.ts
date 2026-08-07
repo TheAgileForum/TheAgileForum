@@ -45,5 +45,6 @@ describe("result-enrichment", () => {
     expect(payload.escalation).not.toBeNull();
     expect(payload.roadmapPreview).toHaveLength(3);
     expect(payload.secondaryActions.length).toBeGreaterThanOrEqual(3);
+    expect(payload.usedStubFallback).toBe(false);
   });
 });
