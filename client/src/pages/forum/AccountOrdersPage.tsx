@@ -14,6 +14,14 @@ import { trackEvent } from "../../lib/analytics";
 import { formatPrice } from "../../lib/format-price";
 import { listMyOrders, type LearnerOrder } from "../../lib/forum-api";
 
+/** Canonical Mock Interview SKU + public slug alias. */
+const MOCK_INTERVIEW_OFFER_CODE = "service-mock-interview-sm";
+const MOCK_INTERVIEW_SLUG = "mock-interview-series-with-interview-preparation";
+const MOCK_INTERVIEW_BOOKING_URL = "https://calendly.com/coach_Dhirender_Verma";
+
+/** Warm ochre for Mock Interview booking CTA (outlined). */
+const BOOK_SLOT_OCHRE = "#c47b2b";
+
 function statusLabel(status: string): { label: string; color: "success" | "warning" | "default" | "info" } {
   const normalized = status.toLowerCase();
   if (normalized === "paid") return { label: "Enrolled / paid", color: "success" };
@@ -21,6 +29,20 @@ function statusLabel(status: string): { label: string; color: "success" | "warni
     return { label: "Awaiting payment", color: "warning" };
   }
   return { label: status, color: "default" };
+}
+
+/** Canonical Mock Interview SKU + known aliases / prefix. */
+function isMockInterviewOfferingCode(code: string): boolean {
+  const normalized = code.trim().toLowerCase();
+  return (
+    normalized === MOCK_INTERVIEW_OFFER_CODE ||
+    normalized === MOCK_INTERVIEW_SLUG ||
+    normalized.startsWith("service-mock-interview")
+  );
+}
+
+function orderIncludesMockInterview(order: LearnerOrder): boolean {
+  return order.items.some((item) => isMockInterviewOfferingCode(item.offeringCode));
 }
 
 export function AccountOrdersPage() {
@@ -162,15 +184,41 @@ function OrderCard({ order }: { order: LearnerOrder }) {
             </Stack>
           ))}
         </Stack>
-        <Button
-          size="small"
-          component={RouterLink}
-          to={`/offers/${order.items[0]?.offeringCode ?? ""}`}
-          sx={{ mt: 1.5 }}
-          disabled={!order.items[0]?.offeringCode}
-        >
-          View offering
-        </Button>
+        <Stack direction="row" spacing={1} sx={{ mt: 1.5, flexWrap: "wrap" }}>
+          <Button
+            size="small"
+            component={RouterLink}
+            to={`/offers/${order.items[0]?.offeringCode ?? ""}`}
+            disabled={!order.items[0]?.offeringCode}
+          >
+            View offering
+          </Button>
+          {order.status.toLowerCase() === "paid" && orderIncludesMockInterview(order) ? (
+            <Button
+              size="small"
+              variant="outlined"
+              href={MOCK_INTERVIEW_BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() =>
+                trackEvent("mock_interview_book_slot_clicked", {
+                  orderId: order.id,
+                  orderNumber: order.orderNumber,
+                })
+              }
+              sx={{
+                color: BOOK_SLOT_OCHRE,
+                borderColor: BOOK_SLOT_OCHRE,
+                "&:hover": {
+                  borderColor: BOOK_SLOT_OCHRE,
+                  backgroundColor: "rgba(196, 123, 43, 0.08)",
+                },
+              }}
+            >
+              Book Interview Slot
+            </Button>
+          ) : null}
+        </Stack>
       </CardContent>
     </Card>
   );
