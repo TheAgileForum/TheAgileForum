@@ -38,11 +38,59 @@ describe("result-enrichment", () => {
 
   it("includes escalation only for low confidence without pricing", () => {
     expect(buildEscalation("high", "PO")).toBeNull();
+    expect(buildEscalation("medium", "PO")).toBeNull();
     const escalation = buildEscalation("low", "PO");
+    expect(escalation?.title).toBe("Validate before you enroll");
     expect(escalation?.mentorCtaLabel).toBe("Book mentor validation call");
     expect(escalation?.mentorCtaLabel).not.toMatch(/₹|\$/);
     expect(escalation?.mentorHref).toBe(TOPMATE_URL);
     expect(escalation?.message).toMatch(/match/i);
+  });
+
+  it("keeps clear low-certainty copy and mentor escalation for weak confidence", () => {
+    const lowSummary = buildSummaryPlain("Scrum Master", 40, "low", "available");
+    expect(lowSummary).toMatch(/lower certainty/i);
+    expect(lowSummary).toMatch(/mentor/i);
+
+    // High/medium summaries must not surface estimate-badge phrasing (UI hides those badges).
+    expect(buildSummaryPlain("Scrum Master", 80, "high")).not.toMatch(/Strong estimate|Moderate estimate/i);
+    expect(buildSummaryPlain("Scrum Master", 65, "medium")).not.toMatch(/Strong estimate|Moderate estimate/i);
+
+    const lowPayload = enrichAnalysisPayload({
+      targetRole: "Scrum Master",
+      readinessScore: 40,
+      confidence: 0.5,
+      strengths: ["Comms"],
+      gaps: ["Facilitation"],
+      primaryAction: {
+        type: "offer",
+        label: "Start program",
+        href: "/offers/course-agile-fundamentals",
+        offeringCode: "course-agile-fundamentals",
+      },
+      rationale: [{ label: "Fit", detail: "Aligned" }],
+    });
+    expect(lowPayload.confidenceTier).toBe("low");
+    expect(lowPayload.summaryPlain).toMatch(/lower certainty/i);
+    expect(lowPayload.escalation).not.toBeNull();
+    expect(lowPayload.escalation?.mentorCtaLabel).toBe("Book mentor validation call");
+
+    const highPayload = enrichAnalysisPayload({
+      targetRole: "Scrum Master",
+      readinessScore: 80,
+      confidence: 0.85,
+      strengths: ["Comms"],
+      gaps: ["SAFe"],
+      primaryAction: {
+        type: "offer",
+        label: "Start program",
+        href: "/offers/course-agile-fundamentals",
+        offeringCode: "course-agile-fundamentals",
+      },
+      rationale: [{ label: "Fit", detail: "Aligned" }],
+    });
+    expect(highPayload.confidenceTier).toBe("high");
+    expect(highPayload.escalation).toBeNull();
   });
 
   it("explains unreadable resume in escalation and summary", () => {

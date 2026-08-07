@@ -5,11 +5,8 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import type { ConfidenceTier } from "../../lib/forum-api";
 
-const TIER_LABEL: Record<ConfidenceTier, { label: string; color: "success" | "info" | "warning" }> = {
-  high: { label: "Strong estimate", color: "success" },
-  medium: { label: "Moderate estimate", color: "info" },
-  low: { label: "Lower certainty — validate with a mentor", color: "warning" },
-};
+/** Shown only for low confidence — high/medium badges are intentionally hidden. */
+export const LOW_CONFIDENCE_BADGE_LABEL = "Lower certainty — validate with a mentor";
 
 type DiagnosisReadinessSummaryProps = {
   targetRole: string | null;
@@ -26,7 +23,6 @@ export function DiagnosisReadinessSummary({
   summaryPlain,
   confidenceTier,
 }: DiagnosisReadinessSummaryProps) {
-  const tier = TIER_LABEL[confidenceTier];
   const role = targetRole ?? "your target role";
   const headline =
     matchHeadline ??
@@ -41,8 +37,10 @@ export function DiagnosisReadinessSummary({
     ? summaryPlain.slice(headline.length).replace(/^[.\s]+/, "").trim()
     : summaryPlain;
 
+  const showLowConfidenceBadge = confidenceTier === "low";
+
   return (
-    <Card variant="outlined" sx={{ borderColor: confidenceTier === "low" ? "warning.light" : undefined }}>
+    <Card variant="outlined" sx={{ borderColor: showLowConfidenceBadge ? "warning.light" : undefined }}>
       <CardContent>
         <Typography variant="overline" color="text.secondary">
           Resume match for {role}
@@ -60,7 +58,9 @@ export function DiagnosisReadinessSummary({
             {supportingPlain}
           </Typography>
         ) : null}
-        <Chip label={tier.label} size="small" color={tier.color} variant={confidenceTier === "high" ? "outlined" : "filled"} />
+        {showLowConfidenceBadge ? (
+          <Chip label={LOW_CONFIDENCE_BADGE_LABEL} size="small" color="warning" variant="filled" />
+        ) : null}
       </CardContent>
     </Card>
   );
