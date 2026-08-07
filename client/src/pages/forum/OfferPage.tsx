@@ -24,6 +24,7 @@ import { ApiRequestError } from "../../lib/api";
 import { trackEvent } from "../../lib/analytics";
 import { PATH_BY_CATEGORY, type CatalogCategoryPath } from "../../lib/catalog-filters";
 import { catalogDisplayPrice } from "../../lib/catalog-display-price";
+import { resolveCertBadge } from "../../lib/cert-badge";
 import { setCommerceJourneyOrigin } from "../../lib/commerce-journey";
 import { resolvedOfferingPrice } from "../../lib/format-price";
 import {
@@ -207,6 +208,7 @@ export function OfferPage() {
   }));
   const schedulePrompt = schedulePromptFor(offering);
   const extras = getOfferPageExtras(offering.code, offering.certificationName);
+  const cardHero = resolveCertBadge(offering);
   const durationChipLabel = offering.durationLabel
     ? offering.durationLabel
     : offering.durationHours
@@ -260,6 +262,31 @@ export function OfferPage() {
         </Link>
         <Typography color="text.primary">{offering.title}</Typography>
       </Breadcrumbs>
+
+      {cardHero.variant === "cover" ? (
+        <Box
+          sx={{
+            position: "relative",
+            borderRadius: 2,
+            overflow: "hidden",
+            aspectRatio: "16 / 9",
+            maxHeight: 320,
+            bgcolor: cardHero.heroGradient,
+          }}
+        >
+          <Box
+            component="img"
+            src={cardHero.src}
+            alt={offering.title}
+            sx={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+        </Box>
+      ) : null}
 
       <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
         {offering.title}
