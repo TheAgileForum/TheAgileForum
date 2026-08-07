@@ -15,6 +15,19 @@ type SkillGapPanelProps = {
   gaps: string[];
 };
 
+/** MUI Chip defaults to nowrap + ellipsis; long gap/strength copy must wrap fully. */
+const wrapChipSx = {
+  height: "auto",
+  maxWidth: "100%",
+  "& .MuiChip-label": {
+    display: "block",
+    whiteSpace: "normal",
+    overflow: "visible",
+    textOverflow: "clip",
+    py: 0.5,
+  },
+} as const;
+
 export function SkillGapPanel({ strengths, gaps }: SkillGapPanelProps) {
   const [view, setView] = useState<"visual" | "table">("visual");
 
@@ -41,20 +54,20 @@ export function SkillGapPanel({ strengths, gaps }: SkillGapPanelProps) {
       </Stack>
 
       {view === "visual" ? (
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-          <Stack spacing={1} sx={{ flex: 1 }}>
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ alignItems: "flex-start" }}>
+          <Stack spacing={1} sx={{ flex: 1, minWidth: 0, width: "100%" }}>
             <Typography variant="subtitle2">Strengths</Typography>
-            <Stack direction="row" useFlexGap spacing={0.5} sx={{ flexWrap: "wrap" }}>
+            <Stack direction="row" useFlexGap spacing={0.5} sx={{ flexWrap: "wrap", maxWidth: "100%" }}>
               {strengths.map((s) => (
-                <Chip key={s} label={s} size="small" color="success" variant="outlined" />
+                <Chip key={s} label={s} size="small" color="success" variant="outlined" sx={wrapChipSx} />
               ))}
             </Stack>
           </Stack>
-          <Stack spacing={1} sx={{ flex: 1 }}>
+          <Stack spacing={1} sx={{ flex: 1, minWidth: 0, width: "100%" }}>
             <Typography variant="subtitle2">Gaps to close</Typography>
-            <Stack direction="row" useFlexGap spacing={0.5} sx={{ flexWrap: "wrap" }}>
+            <Stack direction="row" useFlexGap spacing={0.5} sx={{ flexWrap: "wrap", maxWidth: "100%" }}>
               {gaps.map((g) => (
-                <Chip key={g} label={g} size="small" color="warning" variant="outlined" />
+                <Chip key={g} label={g} size="small" color="warning" variant="outlined" sx={wrapChipSx} />
               ))}
             </Stack>
           </Stack>
