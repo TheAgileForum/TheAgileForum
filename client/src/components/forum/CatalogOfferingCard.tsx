@@ -488,7 +488,7 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
                 },
               }}
             >
-              {offering.scheduleBound ? "Select Schedule" : "Add to cart"}
+              {offering.scheduleBound ? "Select Schedule" : "Add to Cart"}
             </Button>
           </Stack>
         </Box>
