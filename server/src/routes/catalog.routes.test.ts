@@ -105,6 +105,9 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
     expect(res.body.offering.includes).toEqual(
       expect.arrayContaining([
         expect.stringMatching(/LinkedIn profile upgrade/i),
+        expect.stringMatching(
+          /ATS Friendly Resume, with tried and tested formats which get you hired/i,
+        ),
       ]),
     );
   });

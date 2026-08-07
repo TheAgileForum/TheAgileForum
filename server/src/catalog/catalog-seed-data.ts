@@ -282,6 +282,7 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
       "Get a personalized new resume and cover letter with the right keywords, achievements, and skills for Scrum, Agile PM, and product roles — plus a LinkedIn upgrade to maximize job opportunities with skills. Choose from multiple professional formats.",
     includes: [
       "Personalized resume tailored to your experience and target role",
+      "ATS Friendly Resume, with tried and tested formats which get you hired",
       "Cover letter with role-specific keywords, achievements, and skills",
       "LinkedIn profile upgrade to maximize job opportunities with skills",
       "Multiple format options to choose from",
