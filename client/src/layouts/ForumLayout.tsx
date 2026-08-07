@@ -238,7 +238,7 @@ export function ForumLayout() {
           maxWidth: fullBleed
             ? "none"
             : pathname.startsWith("/testimonials")
-              ? 1200
+              ? 1280
               : wideLayout
                 ? 1100
                 : 800,
