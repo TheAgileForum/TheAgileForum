@@ -59,29 +59,31 @@ export function buildMatchHeadline(
   return `Your resume is a strong ${readinessScore}% match to ${role}`;
 }
 
+/**
+ * Supporting copy under the big match %. Does NOT repeat buildMatchHeadline —
+ * the UI already shows that sentence next to the score.
+ * targetRole / readinessScore kept for call-site stability (unused here).
+ */
 export function buildSummaryPlain(
-  targetRole: string | null,
-  readinessScore: number,
+  _targetRole: string | null,
+  _readinessScore: number,
   tier: ConfidenceTier,
   resumeInputStatus: ResumeInputStatus = "available",
 ): string {
-  const role = targetRole ?? "your target role";
-  const matchLine = buildMatchHeadline(targetRole, readinessScore);
-
   if (resumeInputStatus === "unreadable") {
-    return `${matchLine}. ${UNREADABLE_RESUME_DETAIL} Re-upload a readable file for a fuller estimate.`;
+    return `${UNREADABLE_RESUME_DETAIL} Re-upload a readable file for a fuller estimate.`;
   }
   if (resumeInputStatus === "missing") {
-    return `${matchLine}. ${MISSING_RESUME_DETAIL}`;
+    return MISSING_RESUME_DETAIL;
   }
 
   if (tier === "low") {
-    return `${matchLine}. This estimate has lower certainty—we recommend validating with a mentor before committing to a full program.`;
+    return "This estimate has lower certainty—we recommend validating with a mentor before committing to a full program.";
   }
   if (tier === "medium") {
-    return `${matchLine}. Focus on the top gaps in the roadmap below.`;
+    return "Focus on the top gaps in the roadmap below.";
   }
-  return `${matchLine}. Your recommended path addresses the highest-impact gaps first.`;
+  return "Your recommended path addresses the highest-impact gaps first.";
 }
 
 export function isInsufficientResumeRationale(chip: RationaleChip): boolean {

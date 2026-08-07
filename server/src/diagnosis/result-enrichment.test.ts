@@ -49,6 +49,17 @@ describe("result-enrichment", () => {
     expect(escalation?.message).toMatch(/couldn't read/i);
     const summary = buildSummaryPlain("Scrum Master", 30, "low", "unreadable");
     expect(summary).toMatch(/text-based PDF or DOCX/i);
+    expect(summary).not.toMatch(/% match/i);
+  });
+
+  it("does not repeat the match headline in summaryPlain", () => {
+    const headline = buildMatchHeadline("Scrum Master", 35);
+    const summary = buildSummaryPlain("Scrum Master", 35, "high", "available");
+    expect(headline).toContain("35% match");
+    expect(summary).not.toContain("35% match");
+    expect(summary).toMatch(/recommended path/i);
+    expect(buildSummaryPlain("Scrum Master", 35, "medium")).not.toMatch(/% match/i);
+    expect(buildSummaryPlain("Scrum Master", 35, "low")).not.toMatch(/% match/i);
   });
 
   it("sanitizes Insufficient Data rationale when resume was unreadable", () => {
