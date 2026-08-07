@@ -139,6 +139,17 @@ export function catalogSocialProof(offering: { code: string }): {
       ],
     };
   }
+  if (code.includes("power-resume")) {
+    return {
+      enrolledLabel: "1.2K+ Enrolled",
+      rating: "4.9/5",
+      avatars: [
+        { initials: "PR", bg: "linear-gradient(135deg, #6366f1, #8b5cf6)" },
+        { initials: "SK", bg: "linear-gradient(135deg, #0ea5e9, #06b6d4)" },
+        { initials: "ML", bg: "linear-gradient(135deg, #f59e0b, #ef4444)" },
+      ],
+    };
+  }
   if (code.includes("scrum-master") || code.includes("ssm")) {
     return {
       enrolledLabel: "1.2K+ Enrolled",
