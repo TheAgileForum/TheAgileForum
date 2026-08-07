@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { filterOfferings } from "./filter.js";
 import { listOfferings } from "./offerings.js";
+import {
+  quoteOfferingPrice,
+  resolveCurrencyContext,
+} from "../pricing/pricing-service.js";
 
 describe("catalog filter (FR-163)", () => {
   const all = listOfferings();
@@ -27,6 +31,27 @@ describe("catalog filter (FR-163)", () => {
       const price = Number.parseFloat(o.defaultUnitPrice);
       return price >= 50 && price <= 500;
     })).toBe(true);
+  });
+
+  it("filters by session-currency price range (INR)", () => {
+    const context = resolveCurrencyContext({
+      geo: "IN",
+      currencyOverride: "INR",
+    });
+    const result = filterOfferings(
+      all,
+      { category: "training", minPrice: 20_000, maxPrice: 40_000 },
+      context,
+    );
+    expect(result.length).toBeGreaterThan(0);
+    expect(
+      result.every((o) => {
+        const amount = Number.parseFloat(
+          quoteOfferingPrice(o, context).amount,
+        );
+        return amount >= 20_000 && amount <= 40_000;
+      }),
+    ).toBe(true);
   });
 
   it("filters by delivery mode and upcoming batch", () => {

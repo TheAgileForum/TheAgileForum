@@ -25,6 +25,19 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
     expect(res.body.facets).toMatchObject({ roles: expect.any(Array), priceRange: expect.any(Object) });
   });
 
+  it("quotes trainings priceRange in session currency (FR-178)", async () => {
+    const res = await request(app()).get(
+      "/api/v1/catalog/trainings?geo=IN&currency_override=INR",
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.currencyContext.currency).toBe("INR");
+    expect(res.body.facets.priceRange).toEqual({ min: 29990, max: 29990 });
+    expect(res.body.offerings[0].priceQuote).toMatchObject({
+      amount: "29990.00",
+      currency: "INR",
+    });
+  });
+
   it("lists certifications category only", async () => {
     const res = await request(app()).get("/api/v1/catalog/certifications");
     expect(res.body.offerings.every((o: { category: string }) => o.category === "certification")).toBe(true);

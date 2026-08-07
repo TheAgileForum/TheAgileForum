@@ -25,6 +25,7 @@ import {
 } from "../../../lib/catalog-filters";
 import { setCommerceJourneyOrigin } from "../../../lib/commerce-journey";
 import type { CatalogOffering, CatalogFacets } from "../../../lib/forum-api";
+import { formatPrice } from "../../../lib/format-price";
 import { offerDetailPath } from "../../../lib/offer-routes";
 import { displayOfferingTitle } from "../../../lib/offering-display-title";
 
@@ -33,6 +34,19 @@ const TITLES: Record<CatalogCategoryPath, string> = {
   certifications: "Certifications",
   services: "Services",
 };
+
+function formatFacetPriceRange(
+  currency: string,
+  range: { min: number; max: number } | null | undefined,
+): string {
+  if (!range) return "";
+  const minLabel = formatPrice(currency, String(range.min));
+  if (range.min === range.max) {
+    return ` · Price ${minLabel}`;
+  }
+  const maxLabel = formatPrice(currency, String(range.max));
+  return ` · Price ${minLabel}–${maxLabel}`;
+}
 
 const SKELETON_COUNT = 6;
 
@@ -256,10 +270,8 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
         <Typography variant="body2" color="text.secondary">
           Browse self-serve offerings · {resultCountLabel} result
           {offerings.length === 1 ? "" : "s"}
-          {facets?.priceRange
-            ? ` · Price ${facets.priceRange.min}–${facets.priceRange.max}`
-            : ""}{" "}
-          · Session: {currency}
+          {formatFacetPriceRange(currency, facets?.priceRange)} · Session:{" "}
+          {currency}
         </Typography>
       </Box>
 
