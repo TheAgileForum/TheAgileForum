@@ -15,6 +15,9 @@ describe("gap detection rubric loader", () => {
     expect(rubric).toMatch(/Tool depth/i);
     expect(rubric).toMatch(/ATS keywords/i);
     expect(rubric).toMatch(/JD alignment/i);
+    expect(rubric).toMatch(/Professional summary/i);
+    expect(rubric).toMatch(/Experience section structure/i);
+    expect(rubric).toMatch(/AI readiness/i);
   });
 });
 
