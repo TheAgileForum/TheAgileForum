@@ -7,6 +7,8 @@ import {
 } from "./api";
 
 const SESSION_KEY = "af_diagnosis_session_id";
+const RUN_KEY = "af_diagnosis_run_id";
+const RESULT_CACHE_KEY = "af_diagnosis_result_cache";
 
 export function getStoredSessionId(): string | null {
   return sessionStorage.getItem(SESSION_KEY);
@@ -18,6 +20,24 @@ export function storeSessionId(id: string) {
 
 export function clearStoredSessionId() {
   sessionStorage.removeItem(SESSION_KEY);
+  clearStoredRunId();
+  clearCachedAnalysisResult();
+}
+
+export function getStoredRunId(): string | null {
+  return sessionStorage.getItem(RUN_KEY);
+}
+
+export function storeRunId(id: string) {
+  sessionStorage.setItem(RUN_KEY, id);
+}
+
+export function clearStoredRunId() {
+  sessionStorage.removeItem(RUN_KEY);
+}
+
+export function clearCachedAnalysisResult() {
+  sessionStorage.removeItem(RESULT_CACHE_KEY);
 }
 
 export async function createDiagnosisSession(input?: {
@@ -209,7 +229,36 @@ export type AnalysisResult = {
 };
 
 export async function getAnalysisResult(runId: string) {
-  return apiFetch<AnalysisResult>(`/api/v1/diagnosis/runs/${runId}/result`);
+  return apiFetch<AnalysisResult>(`/api/v1/diagnosis/runs/${runId}/result`, {
+    timeoutMs: DIAGNOSIS_API_TIMEOUT_MS,
+    retries: 1,
+  });
+}
+
+type CachedAnalysisResult = {
+  runId: string;
+  result: AnalysisResult;
+};
+
+export function cacheAnalysisResult(runId: string, result: AnalysisResult) {
+  const payload: CachedAnalysisResult = { runId, result };
+  try {
+    sessionStorage.setItem(RESULT_CACHE_KEY, JSON.stringify(payload));
+  } catch {
+    // Quota / private mode — ignore; network refetch remains available.
+  }
+}
+
+export function getCachedAnalysisResult(runId: string): AnalysisResult | null {
+  try {
+    const raw = sessionStorage.getItem(RESULT_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as CachedAnalysisResult;
+    if (parsed?.runId !== runId || !parsed.result) return null;
+    return parsed.result;
+  } catch {
+    return null;
+  }
 }
 
 export async function getJourneyState(subjectId: string) {

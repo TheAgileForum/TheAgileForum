@@ -113,30 +113,48 @@ export function sanitizeRationaleForResumeStatus(
   return [notice, ...filtered].slice(0, 5);
 }
 
+function isSmApmPathway(targetRole: string | null): boolean {
+  if (!targetRole) return false;
+  const n = targetRole.trim().toLowerCase();
+  return n.includes("scrum master") || n.includes("agile project manager");
+}
+
+/**
+ * 3–7 week roadmap preview copy. SM/APM uses founder pathway wording;
+ * other roles share the same milestone shape with role-substituted mastery title.
+ */
 export function buildRoadmapPreview(
   targetRole: string | null,
   gaps: string[],
 ): RoadmapMilestone[] {
   const role = targetRole ?? "Agile professional";
   const topGap = gaps[0] ?? "core agile practices";
-  const secondGap = gaps[1] ?? "stakeholder communication";
+  const smPathway = isSmApmPathway(targetRole);
+  const masteryTitle = smPathway
+    ? "Scrum Master/Agile Project Manager Complete Mastery with Live Practical Project and Sprint Execution"
+    : `${role} Complete Mastery with Live Practical Project and Sprint Execution`;
+  const week1Description = smPathway
+    ? `Close "${topGap}" with live labs and backlog practice. Full end to end industry enablement for Scrum Master/Agile PM role with Scrum, Kanban, Agile Project Management and other 60+ topics covered to clear interviews with 100% confidence. This Live Project training is also a prerequisite for taking the PSM certification exam. Micro-exams also helps you to be fully prepared for the role.`
+    : `Close "${topGap}" with live labs and backlog practice. Full end to end industry enablement for ${role} with hands-on project work and interview-focused practice. Micro-exams also help you prepare for the role.`;
+
   return [
     {
-      phase: "Week 1–2",
-      title: `${role} foundations`,
-      description: `Close "${topGap}" with live labs and backlog practice.`,
+      phase: "Week 1–3",
+      title: masteryTitle,
+      description: week1Description,
       status: "current",
     },
     {
       phase: "Week 3–4",
-      title: "Applied practice",
-      description: `Micro-exam + workshop on ${secondGap}.`,
+      title: "Getting SAFe Certified",
+      description:
+        "Globally recognized SAFe certification helps your resume to be in Top 1% list and also help you to answer all scaling agile related concepts in Interview.",
       status: "upcoming",
     },
     {
       phase: "Week 5–7",
       title: "Interview readiness",
-      description: "Mock interview bundle + certificate prep milestones.",
+      description: "Mock interview bundle.",
       status: "future",
     },
   ];

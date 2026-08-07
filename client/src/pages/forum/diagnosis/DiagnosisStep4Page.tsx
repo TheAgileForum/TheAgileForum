@@ -15,33 +15,72 @@ import { RoleBasedUpsellRail } from "../../../components/forum/RoleBasedUpsellRa
 import { SkillGapPanel } from "../../../components/forum/SkillGapPanel";
 import { useDiagnosis } from "../../../contexts/DiagnosisContext";
 import { useForumCart } from "../../../contexts/ForumCartContext";
+import { ApiRequestError } from "../../../lib/api";
 import { trackEvent } from "../../../lib/analytics";
-import { getAnalysisResult, storeDiagnosisPersonalization, type AnalysisResult } from "../../../lib/forum-api";
+import {
+  cacheAnalysisResult,
+  getAnalysisResult,
+  getCachedAnalysisResult,
+  getStoredRunId,
+  storeDiagnosisPersonalization,
+  type AnalysisResult,
+} from "../../../lib/forum-api";
 import { MENTORSHIP_OFFER_CODE } from "../../../lib/offer-routes";
 
 export function DiagnosisStep4Page() {
   const navigate = useNavigate();
-  const { runId, sessionId } = useDiagnosis();
+  const { runId, sessionId, resumeLoading, setRunId } = useDiagnosis();
   const { addItem } = useForumCart();
+  const effectiveRunId = runId ?? getStoredRunId();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [result, setResult] = useState<AnalysisResult | null>(() => {
+    const id = runId ?? getStoredRunId();
+    return id ? getCachedAnalysisResult(id) : null;
+  });
 
   useEffect(() => {
-    if (!runId) return;
+    if (!runId && effectiveRunId) setRunId(effectiveRunId);
+  }, [runId, effectiveRunId, setRunId]);
+
+  useEffect(() => {
+    if (resumeLoading) return;
+    if (!effectiveRunId) {
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
+    const cached = getCachedAnalysisResult(effectiveRunId);
+    if (cached) {
+      setResult(cached);
+      setError(null);
+      setLoading(false);
+    }
+
     const load = async () => {
       try {
-        const res = await getAnalysisResult(runId);
+        const res = await getAnalysisResult(effectiveRunId);
         if (cancelled) return;
         setResult(res);
+        setError(null);
+        cacheAnalysisResult(effectiveRunId, res);
         storeDiagnosisPersonalization(res.targetRole, res.insights.gaps);
         trackEvent("diagnosis_results_viewed", {
           tier: res.confidenceTier,
           score: res.readinessScore,
         });
-      } catch {
-        if (!cancelled) setError("Results not ready yet.");
+      } catch (err) {
+        if (cancelled) return;
+        // Keep cached results visible when revalidation fails (e.g. after View → /offers → back).
+        if (cached || getCachedAnalysisResult(effectiveRunId)) {
+          setError(null);
+          return;
+        }
+        const notReady =
+          err instanceof ApiRequestError &&
+          (err.status === 409 || err.code === "ANALYSIS_NOT_READY");
+        setError(notReady ? "Results not ready yet." : "Could not load results. Please try again.");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -50,9 +89,13 @@ export function DiagnosisStep4Page() {
     return () => {
       cancelled = true;
     };
-  }, [runId]);
+  }, [effectiveRunId, resumeLoading]);
 
-  if (!sessionId || !runId) {
+  if (resumeLoading) {
+    return <Typography color="text.secondary">Restoring your results…</Typography>;
+  }
+
+  if (!sessionId || !effectiveRunId) {
     return (
       <Alert severity="warning">
         No results available.{" "}
@@ -72,10 +115,34 @@ export function DiagnosisStep4Page() {
         Your diagnosis results
       </Typography>
 
-      {loading ? (
+      {loading && !result ? (
         <Typography color="text.secondary">Loading results…</Typography>
       ) : error || !result ? (
-        <Alert severity="error">{error ?? "Could not load results."}</Alert>
+        <Alert
+          severity="error"
+          action={
+            <Button
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                void getAnalysisResult(effectiveRunId)
+                  .then((res) => {
+                    setResult(res);
+                    cacheAnalysisResult(effectiveRunId, res);
+                    storeDiagnosisPersonalization(res.targetRole, res.insights.gaps);
+                  })
+                  .catch(() => setError("Could not load results. Please try again."))
+                  .finally(() => setLoading(false));
+              }}
+            >
+              Retry
+            </Button>
+          }
+        >
+          {error ?? "Could not load results."}
+        </Alert>
       ) : (
         <>
           {result.usedStubFallback ? (

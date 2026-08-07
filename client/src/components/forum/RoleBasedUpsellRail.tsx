@@ -117,7 +117,7 @@ export function RoleBasedUpsellRail({
                   {formatPrice(item.priceQuote.currency, item.priceQuote.amount)}
                 </Typography>
               </Stack>
-              {item.action === "add" ? (
+              {item.action === "add" && context !== "diagnosis" ? (
                 <Button
                   size="small"
                   variant="outlined"

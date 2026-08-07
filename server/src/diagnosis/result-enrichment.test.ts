@@ -32,8 +32,27 @@ describe("result-enrichment", () => {
     const roadmap = buildRoadmapPreview("Product Owner", ["Prioritization", "Discovery"]);
     expect(roadmap).toHaveLength(3);
     expect(roadmap[0].status).toBe("current");
+    expect(roadmap[0].phase).toBe("Week 1–3");
+    expect(roadmap[0].title).toContain("Complete Mastery");
     expect(roadmap[0].description).toContain("Prioritization");
-    expect(roadmap.map((m) => m.phase)).toEqual(["Week 1–2", "Week 3–4", "Week 5–7"]);
+    expect(roadmap[1].title).toBe("Getting SAFe Certified");
+    expect(roadmap[1].description).toMatch(/recognized SAFe/i);
+    expect(roadmap[2].title).toBe("Interview readiness");
+    expect(roadmap[2].description).toMatch(/Mock interview bundle/i);
+    expect(roadmap.map((m) => m.phase)).toEqual(["Week 1–3", "Week 3–4", "Week 5–7"]);
+  });
+
+  it("uses founder SM/APM mastery copy for Scrum Master pathway", () => {
+    const roadmap = buildRoadmapPreview("Scrum Master/Agile Project Manager", [
+      "Summary lacks Scrum Master/Agile PM specific positioning",
+    ]);
+    expect(roadmap[0].title).toBe(
+      "Scrum Master/Agile Project Manager Complete Mastery with Live Practical Project and Sprint Execution",
+    );
+    expect(roadmap[0].description).toContain("PSM certification");
+    expect(roadmap[0].description).toContain("60+ topics");
+    expect(roadmap[1].description).toMatch(/Top 1%/i);
+    expect(roadmap[1].description).toMatch(/related concepts/i);
   });
 
   it("includes escalation only for low confidence without pricing", () => {
