@@ -27,7 +27,8 @@
     "staging:preflight": "tsx scripts/staging-preflight.ts",
     "staging:verify": "tsx scripts/verify-staging-remote.ts",
     "stripe:verify": "tsx scripts/verify-stripe-key.ts",
-    "resend:verify": "tsx scripts/verify-resend-key.ts"
+    "resend:verify": "tsx scripts/verify-resend-key.ts",
+    "sender:verify": "tsx scripts/verify-sender-key.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",

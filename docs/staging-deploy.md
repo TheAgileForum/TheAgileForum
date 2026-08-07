@@ -72,7 +72,7 @@ curl https://api.staging.theagileforum.com/api/v1/health
 cd server && npm run staging:preflight   # with staging env vars set
 ```
 
-**Email (Render):** set `EMAIL_FROM=DhirenderVerma@theagileforum.com` after verifying `theagileforum.com` (or that mailbox) in Resend. See `docs/resend-setup.md`. Optional Mock Interview prep links: `MOCK_INTERVIEW_RESOURCES_FOLDER_URL` / `MOCK_INTERVIEW_RESOURCE_*_URL`.
+**Email (Render):** set `EMAIL_FROM=DhirenderVerma@theagileforum.com`. For Resend: verify domain and set `RESEND_API_KEY` (`docs/resend-setup.md`). For Sender.net: set `EMAIL_PROVIDER=sender` + `SENDER_API_TOKEN` (`docs/sender-setup.md`). Optional Mock Interview prep links: `MOCK_INTERVIEW_RESOURCES_FOLDER_URL` / `MOCK_INTERVIEW_RESOURCE_*_URL`.
 
 ---
 

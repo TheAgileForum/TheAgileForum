@@ -26,4 +26,15 @@ describe("mapEmailDeliveryFailure", () => {
     );
     expect(err.message).toContain("not verified");
   });
+
+  it("maps Sender auth failure", () => {
+    const err = mapEmailDeliveryFailure(
+      new IntegrationError(
+        "INTEGRATION_PROVIDER_FAILURE",
+        'SENDER_SEND_FAILED:401:{"message":"Unauthorized"}',
+        "email",
+      ),
+    );
+    expect(err.message).toContain("SENDER_API_TOKEN");
+  });
 });

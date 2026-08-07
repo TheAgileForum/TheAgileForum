@@ -42,10 +42,16 @@ services:
         sync: false
       - key: INTEGRATION_PROVIDER_MODE
         value: live
+      - key: EMAIL_PROVIDER
+        value: resend
       - key: RESEND_API_KEY
         sync: false
+      - key: SENDER_API_TOKEN
+        sync: false
       - key: EMAIL_FROM
-        value: notifications@theagileforum.com
+        value: DhirenderVerma@theagileforum.com
+      - key: EMAIL_FROM_NAME
+        value: The Agile Forum
       - key: REQUIRE_EMAIL_VERIFICATION
         value: "true"
       - key: OPS_ENROLLMENT_ALERT_EMAIL

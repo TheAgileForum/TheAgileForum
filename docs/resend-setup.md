@@ -2,19 +2,22 @@
 
 Transactional email for verification, enrollment confirmations, and ops alerts. Uses the Resend REST API via `LiveEmailAdapter` (no SDK dependency).
 
+For Sender.net as an alternative provider, see **`docs/sender-setup.md`**. Set `EMAIL_PROVIDER=resend` (or leave unset with `RESEND_API_KEY`) to keep Resend as the active backend.
+
 ## Environment variables
 
 | Variable | Required | Example | Notes |
 |----------|----------|---------|-------|
-| `RESEND_API_KEY` | For real sends | `re_...` | From [Resend API Keys](https://resend.com/api-keys). Never commit. |
-| `EMAIL_FROM` | When `RESEND_API_KEY` set | `onboarding@resend.dev` (dev) / `DhirenderVerma@theagileforum.com` (staging/prod) | Must be a verified sender in Resend (`theagileforum.com` or that mailbox) |
+| `EMAIL_PROVIDER` | Optional | `resend` | `resend` \| `sender`. Auto: Resend if key set, else Sender if token set, else stub |
+| `RESEND_API_KEY` | For real Resend sends | `re_...` | From [Resend API Keys](https://resend.com/api-keys). Never commit. |
+| `EMAIL_FROM` | When provider credentials set | `onboarding@resend.dev` (dev) / `DhirenderVerma@theagileforum.com` (staging/prod) | Must be a verified sender in Resend (`theagileforum.com` or that mailbox) |
 | `INTEGRATION_PROVIDER_MODE` | Staging/prod | `live` | Stub mode uses `StubEmailAdapter` and never calls Resend |
 | `REQUIRE_EMAIL_VERIFICATION` | Optional | `true` on staging | Blocks login until email verified |
 | `OPS_ENROLLMENT_ALERT_EMAIL` | Optional | `ops@theagileforum.com` | Ops enrollment alert recipient |
 | `MOCK_INTERVIEW_RESOURCES_FOLDER_URL` | Optional | OneDrive/Drive folder URL | Shared prep folder used when per-file links are unset |
 | `MOCK_INTERVIEW_RESOURCE_*_URL` | Optional | Per-file public URLs | Overrides for Topics xlsx, Interview Questions, SM Situational PDF, Agile/Scrum Q&A docx, SAFe Q&A docx |
 
-When `INTEGRATION_PROVIDER_MODE=live` and `RESEND_API_KEY` is **unset**, `LiveEmailAdapter` returns a stub `messageId` (no network call). This keeps local/staging deploys safe until the key is added.
+When `INTEGRATION_PROVIDER_MODE=live` and no matching provider credentials are set, `LiveEmailAdapter` returns a stub `messageId` (no network call). This keeps local/staging deploys safe until keys are added.
 
 ## Local development
 
