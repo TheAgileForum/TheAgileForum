@@ -64,11 +64,12 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
         "safe-scrum-master-certification-training",
         "csm-certification-training",
         "safe-rte-certification-training",
+        "psm-ii-certification-training",
       ]),
     );
     expect(codes).not.toContain("exam-practice-free");
     expect(codes).not.toContain("exam-mock-certification");
-    expect(res.body.offerings).toHaveLength(5);
+    expect(res.body.offerings).toHaveLength(6);
 
     const leading = res.body.offerings.find(
       (o: { code: string }) => o.code === "safe-leading-safe",
@@ -91,6 +92,13 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
     expect(rte?.certBody).toBe("scaled agile");
     expect(rte?.certificationName).toContain("Release Train Engineer");
     expect(rte?.durationHours).toBe(24);
+
+    const psmIi = res.body.offerings.find(
+      (o: { code: string }) => o.code === "psm-ii-certification-training",
+    );
+    expect(psmIi?.certBody).toBe("scrum.org");
+    expect(psmIi?.certificationName).toContain("PSM II");
+    expect(psmIi?.durationHours).toBe(16);
   });
 
   it("resolves live-site slug alias for Leading SAFe detail", async () => {

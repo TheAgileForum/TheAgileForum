@@ -59,6 +59,9 @@ describe("offer routes", () => {
     expect(offerDetailPath("safe-rte-certification-training")).toBe(
       "/offers/safe-rte-certification-training",
     );
+    expect(offerDetailPath("psm-ii-certification-training")).toBe(
+      "/offers/psm-ii-certification-training",
+    );
     expect(resolveOfferRouteCode("unknown-offer")).toBe("unknown-offer");
   });
 });

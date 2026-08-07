@@ -12,6 +12,7 @@ export const OFFER_MUTED = "#5b6b7c";
 export const SSM_OFFER_CODE = "safe-scrum-master-certification-training";
 export const CSM_OFFER_CODE = "csm-certification-training";
 export const RTE_OFFER_CODE = "safe-rte-certification-training";
+export const PSM_II_OFFER_CODE = "psm-ii-certification-training";
 export const MENTORSHIP_CANONICAL_CODE = "scrum-master-mentorship-masterclass";
 export const MOCK_INTERVIEW_OFFER_CODE = "service-mock-interview-sm";
 export const MOCK_INTERVIEW_SLUG = "mock-interview-series-with-interview-preparation";
@@ -899,6 +900,303 @@ const RTE_EXTRAS: OfferPageExtras = {
     "Wondering if RTE is the right next credential after SSM or Leading SAFe? Book a short call — role fit, timing, and whether mentorship should come first.",
 };
 
+/** Professional Scrum Master™ II (PSM II) — Scrum.org pathway; adapted for TheAgileForum voice. */
+const PSM_II_EXTRAS: OfferPageExtras = {
+  rating: {
+    score: "4.9",
+    meta: "Average learner rating · advanced Scrum Master cohorts",
+  },
+  heroEyebrow: "Scrum.org · Live PSM II pathway",
+  kindChip: "Certification",
+  benefitPills: [
+    "16 hrs live training",
+    "Advanced Scrum Master stances",
+    "Exam-oriented review",
+    "Lifetime Scrum.org credential",
+  ],
+  keyBenefits: [
+    {
+      title: "Lead beyond the basics",
+      detail: "Servant leadership, facilitation, coaching, and change-agent stances",
+    },
+    {
+      title: "Handle real complexity",
+      detail: "Team conflict, organizational impediments, and middle-management dynamics",
+    },
+    {
+      title: "Protect empiricism",
+      detail: "Done Increments, Sprint Goals, and measurement that supports transparency",
+    },
+    {
+      title: "Assessment-ready",
+      detail: "Scenario practice aligned to the Scrum.org PSM II assessment",
+    },
+  ],
+  overviewTitle: "Advance as a Scrum Master who can lead through complexity",
+  overviewBody:
+    "Professional Scrum Master™ II (PSM II) from Scrum.org validates that you can apply Scrum as a servant-leader in complex, real-world situations — not only recite the Scrum Guide. This live workshop deepens facilitation, coaching, impediment removal, and organizational change skills so you can serve the team, the Product Owner, and the wider organization.",
+  overviewPracticeTitle: "What you’ll practice",
+  overviewPracticeBody:
+    "Choosing the right Scrum Master stance for the moment, facilitating difficult conversations, removing impediments beyond the team, supporting the Product Owner on value delivery, protecting a Done Increment and a clear Sprint Goal, and using measurement to improve — not to punish.",
+  overviewExpectationsTitle: "What to expect after class",
+  overviewExpectationsBody:
+    "You prepare for the Scrum.org Professional Scrum Master™ II assessment (typically 30 questions in 90 minutes; 85% to pass; open-book, scenario-focused). Assessment attempt packaging and any password windows are confirmed at enrollment for your cohort. PSM II credentials from Scrum.org do not expire.",
+  overviewStats: [
+    { num: "2 days", label: "Live workshop · typically 16 hours" },
+    { num: "30 Q", label: "PSM II assessment · 90 minutes (Scrum.org)" },
+    { num: "85%", label: "Passing score · lifetime credential" },
+  ],
+  learnLead: "Advanced Scrum Master skills for senior delivery and coaching roles.",
+  curriculumTitle: "PSM II pathway curriculum",
+  curriculumLead:
+    "Modules aligned to how effective Scrum Masters serve people, products, and organizations — with scenario practice for the Scrum.org assessment.",
+  audienceTitle: "Who should attend",
+  audienceLead:
+    "Built for practicing Scrum Masters and Agile leaders who already know the framework and want advanced application skill.",
+  certImageUrl: "/assets/cert-badges/psm-ii.svg",
+  certImageAlt: "Professional Scrum Master II PSM II pathway badge — The Agile Forum",
+  certSectionEyebrow: "Your credential",
+  certSectionTitle: "How the Professional Scrum Master™ II (PSM II) path works",
+  certSectionLead:
+    "Complete the live course, then take the Scrum.org PSM II assessment. Passing earns a lifetime Professional Scrum Master™ II credential you can share from your Scrum.org profile.",
+  certNavLabel: "Certification",
+  certBullets: [
+    "Professional Scrum Master™ II (PSM II) credential via Scrum.org after you pass",
+    "Lifetime validity — no renewal cycle or continuing-education fee from Scrum.org for PSM II",
+    "Signals advanced facilitation, coaching, and organizational change ability",
+    "Assessment attempt packaging confirmed at enrollment",
+  ],
+  trustLine: "Live Scrum coaching · The Agile Forum",
+  finalCtaTitle: "Ready for your PSM II pathway?",
+  finalCtaLead:
+    "Select a cohort, enroll, or book a mentor if you want help choosing between PSM II, Mentorship Masterclass, CSM®, and SAFe® next steps.",
+  brochureCtaLabel: "Download Course Content & Brochure",
+  demand: {
+    salary: { min: "$95k", max: "$175k", avg: "$125k" },
+    employers: [
+      "Accenture",
+      "IBM",
+      "Deloitte",
+      "Infosys",
+      "Cognizant",
+      "JPMorgan Chase",
+      "Capgemini",
+      "Amazon",
+      "TCS",
+    ],
+    jobsCount: "50,000+",
+    jobsLabel: "Openings referencing senior Scrum Master / Agile coach skills",
+    paragraphs: [
+      "PSM II is widely respected as an advanced, assessment-first Scrum Master credential from Scrum.org.",
+      "Employers looking for senior Scrum Masters and Agile coaches often want evidence of judgment under complexity — exactly what PSM II emphasizes.",
+      "Pairing the credential with live-project practice (our Mentorship Masterclass) is how many TheAgileForum learners become interview-ready for senior roles.",
+    ],
+  },
+  curriculum: [
+    {
+      title: "Effects of a successful Scrum Master on the organization",
+      summary:
+        "How Scrum Master effectiveness shows up beyond a single team — culture, flow, and sustainable agility.",
+      bullets: ["Organizational impact", "Systemic impediments", "Sustainable change"],
+    },
+    {
+      title: "Complexity & servant leadership",
+      summary:
+        "Leading when outcomes are uncertain — servant leadership that enables self-managing teams without controlling them.",
+    },
+    {
+      title: "Team conflict & removing impediments",
+      summary:
+        "Constructive conflict, difficult conversations, and escalating organizational blockers that the team cannot remove alone.",
+      bullets: ["Conflict facilitation", "Impediment strategies", "Working with management"],
+    },
+    {
+      title: "Facilitation techniques",
+      summary:
+        "Facilitation patterns that create participation, clarity, and decisions — including approaches inspired by Liberating Structures-style workshops.",
+    },
+    {
+      title: "Done Increments & Sprint Goals",
+      summary:
+        "Why a Done Increment and a clear Sprint Goal protect empiricism — and how Scrum Masters coach quality and focus.",
+    },
+    {
+      title: "Refreshing Scrum Events & supporting the Product Owner",
+      summary:
+        "Purpose-driven events (not status theater) and how Scrum Masters help Product Owners maximize value delivery.",
+    },
+    {
+      title: "Measurement, middle management & change agency",
+      summary:
+        "Using metrics for transparency, understanding middle-management challenges, and acting as a change agent for broader agility.",
+      bullets: ["Helpful vs harmful metrics", "Management in Scrum", "Change-agent stance"],
+    },
+    {
+      title: "PSM II assessment orientation & next steps",
+      summary:
+        "Assessment format overview, scenario practice approach, and how Mentorship Masterclass deepens job-ready skills after the workshop.",
+    },
+  ],
+  audience: [
+    {
+      role: "Practicing Scrum Masters",
+      detail: "Typically 1+ year of Scrum experience wanting advanced judgment",
+    },
+    {
+      role: "Agile coaches & mentors",
+      detail: "Deepening Scrum Master stances for team and org coaching",
+    },
+    {
+      role: "Project / delivery managers",
+      detail: "Moving from control habits into servant leadership at scale of influence",
+    },
+    {
+      role: "Team leads & Product Owners",
+      detail: "Understanding advanced Scrum Master responsibilities and collaboration",
+    },
+  ],
+  faqGroups: [
+    {
+      title: "Pre-requisites",
+      items: [
+        {
+          question: "Are there prerequisites for PSM II?",
+          answer:
+            "Scrum.org does not require a prior credential. Strong Scrum Guide knowledge and practical Scrum Master experience (often PSM I–level understanding plus hands-on practice) are strongly recommended.",
+        },
+        {
+          question: "Is PSM I mandatory before PSM II?",
+          answer:
+            "No. PSM I is not mandatory. Many learners take PSM I first because it builds foundational assessment comfort, but you can pursue PSM II when you are ready for scenario-based application questions.",
+        },
+        {
+          question: "Do I need a year of Scrum Master experience?",
+          answer:
+            "It is recommended, not enforced. Candidates with real facilitation and impediment experience typically perform better on scenario questions. Live training helps bridge gaps when experience is uneven.",
+        },
+      ],
+    },
+    {
+      title: "PSM II exam & certification",
+      items: [
+        {
+          question: "What is the PSM II assessment format?",
+          answer:
+            "Typically 30 questions in 90 minutes (multiple-choice, multiple-answer, and true/false), open-book, with an 85% passing score. Questions are predominantly scenario-based. Confirm current details on scrum.org for your attempt.",
+        },
+        {
+          question: "How does PSM II differ from PSM I?",
+          answer:
+            "PSM I emphasizes foundational Scrum knowledge (commonly 80 questions / 60 minutes). PSM II uses fewer but harder scenario questions focused on servant leadership, coaching, facilitation, and organizational dynamics.",
+        },
+        {
+          question: "Is the exam fee included?",
+          answer:
+            "Scrum.org assessment packaging varies by cohort offer — we confirm what is included (attempts, passwords, windows) before you pay. Standalone Scrum.org assessment fees are published on scrum.org.",
+        },
+        {
+          question: "Does PSM II expire?",
+          answer:
+            "No. Professional Scrum Master™ II from Scrum.org is a lifetime credential and does not require renewal fees.",
+        },
+        {
+          question: "PSM II vs CSM® — which should I take?",
+          answer:
+            "CSM® (Scrum Alliance) is course-gated and widely recognized for foundational Scrum Master roles. PSM II (Scrum.org) is an advanced, assessment-first credential emphasizing applied judgment. Many learners use CSM® or Mentorship for foundations, then PSM II to signal senior capability.",
+        },
+      ],
+    },
+    {
+      title: "Training & enrollment",
+      items: [
+        {
+          question: "How long is the training?",
+          answer:
+            "Live instructor-led training totaling about 16 hours across two days (weekend or weekday cohorts depending on schedule).",
+        },
+        {
+          question: "Is training live or recorded-only?",
+          answer:
+            "Sessions are live and interactive — role plays, simulations, and discussion. Recordings may be shared for review when the cohort offers them — confirm for your batch.",
+        },
+        {
+          question: "Who teaches the sessions?",
+          answer:
+            "Experienced Agile coaches from TheAgileForum led by Dhirender Verma (SPC · enterprise Agile coach). Any Scrum.org Professional Training Network / trainer requirements for your cohort are confirmed at enrollment.",
+        },
+        {
+          question: "Do I need a schedule before checkout?",
+          answer:
+            "Yes. This offering is schedule-bound — select a cohort so your cart line carries the right batch.",
+        },
+        {
+          question: "What if I want job-ready skills beyond 2 days?",
+          answer:
+            "Most learners pair advanced credentials with our 3-week Mentorship Masterclass (live JIRA project) and optionally Mock Interview Series — certification alone rarely lands a senior Scrum Master role.",
+        },
+      ],
+    },
+  ],
+  examGuidelines: {
+    domains: [
+      {
+        domain: "Understanding and applying the Scrum Framework",
+        topics: [
+          "Empiricism and Scrum Values in tough situations",
+          "Accountabilities, events, and artifacts under pressure",
+          "Done Increments and Sprint Goals",
+        ],
+      },
+      {
+        domain: "Developing people and teams",
+        topics: [
+          "Self-managing teams",
+          "Facilitation and Liberating Structures-style patterns",
+          "Leadership styles, coaching, and mentoring",
+        ],
+      },
+      {
+        domain: "Managing products with agility",
+        topics: [
+          "Supporting the Product Owner",
+          "Stakeholder engagement",
+          "Successful product delivery",
+        ],
+      },
+      {
+        domain: "Developing and delivering products professionally",
+        topics: [
+          "Definition of Done and quality",
+          "Managing technical and delivery risk",
+          "Continuous improvement of delivery practices",
+        ],
+      },
+      {
+        domain: "Evolving the Agile organization",
+        topics: [
+          "Organizational design and impediments",
+          "Middle management challenges",
+          "Scrum Master as change agent",
+        ],
+      },
+    ],
+    footnote:
+      "PSM II is a lifetime Scrum.org credential. Confirm current assessment rules, languages, and fees on scrum.org before your attempt.",
+    sourceUrl: "https://www.scrum.org/assessments/professional-scrum-master-ii-certification",
+    lead: "Competency areas commonly associated with the Scrum.org Professional Scrum Master™ II assessment — use with your workshop notes and practice scenarios.",
+    sourceLabel: "scrum.org · Professional Scrum Master II",
+  },
+  brochureMailto:
+    "mailto:contact@theagileforum.com?subject=PSM%20II%20Course%20Content%20%26%20Brochure",
+  corporateMailto:
+    "mailto:contact@theagileforum.com?subject=Corporate%20PSM%20II%20Training",
+  mentorImageUrl: "/assets/offers/mentor-dhirender.png",
+  mentorName: "Dhirender Verma",
+  mentorHeadline: "SPC · Scrum & SAFe mentor · job-focused coaching",
+  mentorBody:
+    "Not sure whether to start with PSM II, Mentorship Masterclass, CSM®, or SAFe®? Book a short call — we’ll match credential timing to your target role and interview timeline.",
+};
+
 /** Mentorship / live JIRA masterclass — content aligned to theagileforum.com course page. */
 const MENTORSHIP_EXTRAS: OfferPageExtras = {
   rating: {
@@ -1768,6 +2066,7 @@ export function getOfferPageExtras(
   if (code === SSM_OFFER_CODE) return SSM_EXTRAS;
   if (code === CSM_OFFER_CODE) return CSM_EXTRAS;
   if (code === RTE_OFFER_CODE) return RTE_EXTRAS;
+  if (code === PSM_II_OFFER_CODE) return PSM_II_EXTRAS;
   if (code === MENTORSHIP_OFFER_CODE || code === MENTORSHIP_CANONICAL_CODE) return MENTORSHIP_EXTRAS;
   if (code === MOCK_INTERVIEW_OFFER_CODE || code === MOCK_INTERVIEW_SLUG) {
     return MOCK_INTERVIEW_EXTRAS;
