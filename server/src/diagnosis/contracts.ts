@@ -3,6 +3,7 @@ import { z } from "zod";
 /** Founder-approved Target role options for diagnosis step 1 (exact wording). */
 export const DIAGNOSIS_TARGET_ROLES = [
   "Scrum Master/Agile Project Manager",
+  "Product Owner/Product Manager",
   "Senior Project Manager(Technical)/Senior Agilist",
   "Delivery Lead /Senior Delivery Manager",
   "Program Manager/RTE",
