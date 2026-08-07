@@ -73,12 +73,9 @@ export function SkillGapPanel({ strengths, gaps }: SkillGapPanelProps) {
       </Stack>
 
       {view === "visual" ? (
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={2}
-          sx={{ alignItems: "flex-start", minWidth: 0, width: "100%" }}
-        >
-          <Stack spacing={1} sx={{ flex: 1, minWidth: 0, width: "100%" }}>
+        // Always stack: side-by-side columns clip long gap text on md/sm widths.
+        <Stack direction="column" spacing={2} sx={{ minWidth: 0, width: "100%" }}>
+          <Stack spacing={1} sx={{ minWidth: 0, width: "100%" }}>
             <Typography variant="subtitle2">Strengths</Typography>
             <Stack
               direction="row"
@@ -91,7 +88,7 @@ export function SkillGapPanel({ strengths, gaps }: SkillGapPanelProps) {
               ))}
             </Stack>
           </Stack>
-          <Stack spacing={1} sx={{ flex: 1, minWidth: 0, width: "100%" }}>
+          <Stack spacing={1} sx={{ minWidth: 0, width: "100%" }}>
             <Typography variant="subtitle2">Gaps to close</Typography>
             <Stack
               direction="row"
