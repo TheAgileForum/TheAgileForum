@@ -56,6 +56,7 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
     offering.code,
   );
   const badge = resolveCertBadge(offering);
+  const coverHero = badge.variant === "cover";
   const social = catalogSocialProof(offering);
   const popular = isPopularOffering(offering.code);
 
@@ -101,24 +102,34 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
         sx={{
           position: "relative",
           background: badge.heroGradient,
-          pt: 3,
-          pb: 2.5,
-          minHeight: 148,
+          pt: coverHero ? 0 : 3,
+          pb: coverHero ? 0 : 2.5,
+          minHeight: coverHero ? 168 : 148,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           overflow: "hidden",
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            inset: 0,
-            background: `
+          "&::before": coverHero
+            ? {
+                content: '""',
+                position: "absolute",
+                inset: 0,
+                zIndex: 1,
+                background:
+                  "linear-gradient(180deg, rgba(15,23,42,0.35) 0%, rgba(15,23,42,0.08) 45%, rgba(15,23,42,0.45) 100%)",
+                pointerEvents: "none",
+              }
+            : {
+                content: '""',
+                position: "absolute",
+                inset: 0,
+                background: `
               radial-gradient(ellipse 80% 60% at 20% 100%, rgba(255,255,255,0.12) 0%, transparent 60%),
               radial-gradient(ellipse 50% 40% at 90% 10%, rgba(245,158,11,0.15) 0%, transparent 50%)
             `,
-            pointerEvents: "none",
-          },
+                pointerEvents: "none",
+              },
           "&::after": {
             content: '""',
             position: "absolute",
@@ -128,9 +139,25 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
             height: 24,
             bgcolor: "background.paper",
             borderRadius: "14px 14px 0 0",
+            zIndex: 2,
           },
         }}
       >
+        {coverHero ? (
+          <Box
+            component="img"
+            src={badge.src}
+            alt=""
+            sx={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center",
+            }}
+          />
+        ) : null}
         <Stack
           direction="row"
           spacing={0.75}
@@ -141,7 +168,7 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
             left: 12,
             right: 12,
             flexWrap: "wrap",
-            zIndex: 2,
+            zIndex: 3,
           }}
         >
           <Chip
@@ -192,21 +219,23 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
           ) : null}
         </Stack>
 
-        <Box
-          component="img"
-          src={badge.src}
-          alt=""
-          sx={{
-            position: "relative",
-            zIndex: 1,
-            width: 88,
-            height: "auto",
-            maxHeight: 100,
-            objectFit: "contain",
-            filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.25))",
-            mb: -1,
-          }}
-        />
+        {!coverHero ? (
+          <Box
+            component="img"
+            src={badge.src}
+            alt=""
+            sx={{
+              position: "relative",
+              zIndex: 1,
+              width: 88,
+              height: "auto",
+              maxHeight: 100,
+              objectFit: "contain",
+              filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.25))",
+              mb: -1,
+            }}
+          />
+        ) : null}
       </Box>
 
       {/* Body */}
