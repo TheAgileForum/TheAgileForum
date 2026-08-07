@@ -7,11 +7,15 @@ import { prisma } from "../db/client.js";
 import { ApiError } from "../errors/api-error.js";
 import { publishEvent } from "../events/publisher.js";
 import { validateResumeUpload } from "../security/upload-policy.js";
+import { scanResumeBuffer } from "../security/virus-scan.js";
+import { storeResumeFile } from "../storage/resume-storage.js";
 import { scheduleAnalysisRun } from "./analysis-runner.js";
 import { upsertSessionJourney } from "./journey-state-service.js";
 import type { PrimaryAction } from "./contracts.js";
 import { enrichAnalysisPayload } from "./result-enrichment.js";
+import { extractResumeText } from "./resume-extract.js";
 import { logError } from "../runtime/logger.js";
+import type { AnalysisAuditMeta } from "./ai-analyzer.js";
 
 function nextStepForStatus(status: DiagnosisSessionStatus): string {
   switch (status) {
@@ -150,6 +154,8 @@ export async function registerResumeAsset(
     mimeType: string;
     sizeBytes: number;
     checksum?: string;
+    /** Optional raw bytes — when present, file is stored and text extracted. */
+    buffer?: Buffer;
   },
 ) {
   const session = await getSessionOrThrow(sessionId);
@@ -166,14 +172,50 @@ export async function registerResumeAsset(
     });
   }
 
+  let storagePath = `local-stub://${session.id}/${input.fileName}`;
+  let checksum = input.checksum;
+  let extractedText: string | null = null;
+
+  if (input.buffer && input.buffer.length > 0) {
+    const scan = await scanResumeBuffer(input.buffer);
+    if (!scan.clean) {
+      throw new ApiError({
+        status: 400,
+        code: "RESUME_SCAN_FAILED",
+        message: "Resume failed security scan",
+        retryable: false,
+      });
+    }
+
+    const stored = await storeResumeFile({
+      sessionId: session.id,
+      fileName: input.fileName,
+      buffer: input.buffer,
+    });
+    storagePath = stored.storagePath;
+    checksum = stored.checksum;
+
+    const extracted = await extractResumeText(input.buffer, input.mimeType);
+    extractedText = extracted.text || null;
+    if (extracted.warning) {
+      logError("resume text extraction warning", {
+        component: "diagnosis",
+        diagnosisSessionId: session.id,
+        warning: extracted.warning,
+        method: extracted.method,
+      });
+    }
+  }
+
   const asset = await prisma.resumeAsset.create({
     data: {
       sessionId: session.id,
       fileName: input.fileName,
       mimeType: input.mimeType,
       sizeBytes: input.sizeBytes,
-      checksum: input.checksum,
-      storagePath: `local-stub://${session.id}/${input.fileName}`,
+      checksum,
+      storagePath,
+      extractedText,
       status: ResumeAssetStatus.VALIDATED,
     },
   });
@@ -197,6 +239,7 @@ export async function registerResumeAsset(
     resumeAssetId: asset.id,
     validationStatus: "validated",
     nextStep: nextStepForStatus(updated.status),
+    extractedTextChars: extractedText?.length ?? 0,
   };
 }
 
@@ -350,6 +393,7 @@ export async function getAnalysisResult(runId: string) {
   const gaps = run.gapInsight.gaps as string[];
   const primaryAction = run.recommendation.primaryAction as PrimaryAction;
   const rationale = run.recommendation.rationale as Array<{ label: string; detail: string }>;
+  const audit = (run.auditMeta ?? null) as AnalysisAuditMeta | null;
 
   return enrichAnalysisPayload({
     targetRole: run.session.targetRole,
@@ -359,5 +403,6 @@ export async function getAnalysisResult(runId: string) {
     gaps,
     primaryAction,
     rationale,
+    usedStubFallback: Boolean(audit?.usedStubFallback),
   });
 }

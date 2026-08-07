@@ -174,6 +174,23 @@ LIMIT 10;
 
 ---
 
+## 9. Diagnosis AI (OpenRouter)
+
+Diagnosis analysis defaults to **stub** mode (`AI_PROVIDER_MODE=stub`) — deterministic recommendations without calling OpenRouter.
+
+To enable live AI on staging (env only; never commit secrets):
+
+1. Set `OPENROUTER_API_KEY` in the staging API secret store (Render dashboard).
+2. Optionally set `OPENROUTER_MODEL` (default: `google/gemma-4-26b-a4b-it:free`).
+3. Set `AI_PROVIDER_MODE=live`.
+4. Redeploy the API.
+
+If OpenRouter is down or returns an error while mode is `live`, the API falls back to the stub recommendation and the results UI shows a soft note. Hard spend caps are not enforced in Phase 1.
+
+Resume uploads store PDF/DOCX bytes on the API host (`uploads/resumes/`) and extract text for analysis. Virus scanning remains a deferred stub hook.
+
+---
+
 ## Related docs
 
 - `docs/google-oauth-setup.md`

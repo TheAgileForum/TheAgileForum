@@ -40,6 +40,10 @@ const schema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().default("whsec_stub"),
   INTEGRATION_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),
   INTEGRATION_MAX_RETRIES: z.coerce.number().int().min(0).default(2),
+  /** Diagnosis AI: stub (deterministic) or live (OpenRouter). Default stub. */
+  AI_PROVIDER_MODE: z.enum(["stub", "live"]).default("stub"),
+  OPENROUTER_API_KEY: optionalString,
+  OPENROUTER_MODEL: z.string().default("google/gemma-4-26b-a4b-it:free"),
   SENTRY_DSN: optionalString,
   SENTRY_TRACES_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(0.1),
   POSTHOG_API_KEY: optionalString,
