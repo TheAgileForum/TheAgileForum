@@ -46,5 +46,27 @@ describe("result-enrichment", () => {
     expect(payload.roadmapPreview).toHaveLength(3);
     expect(payload.secondaryActions.length).toBeGreaterThanOrEqual(3);
     expect(payload.usedStubFallback).toBe(false);
+    expect(payload).not.toHaveProperty("fallbackReason");
+  });
+
+  it("surfaces fallbackReason only when usedStubFallback is true", () => {
+    const payload = enrichAnalysisPayload({
+      targetRole: "Scrum Master",
+      readinessScore: 62,
+      confidence: 0.78,
+      strengths: ["Comms"],
+      gaps: ["SAFe"],
+      primaryAction: {
+        type: "offer",
+        label: "Start program",
+        href: "/offers/course-agile-fundamentals",
+        offeringCode: "course-agile-fundamentals",
+      },
+      rationale: [{ label: "Fit", detail: "Aligned" }],
+      usedStubFallback: true,
+      fallbackReason: "OpenRouter model=x HTTP 404: unavailable for free",
+    });
+    expect(payload.usedStubFallback).toBe(true);
+    expect(payload.fallbackReason).toContain("unavailable for free");
   });
 });

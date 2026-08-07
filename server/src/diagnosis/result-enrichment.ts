@@ -122,8 +122,10 @@ export function enrichAnalysisPayload(input: {
   primaryAction: PrimaryAction;
   rationale: Array<{ label: string; detail: string }>;
   usedStubFallback?: boolean;
+  fallbackReason?: string;
 }) {
   const confidenceTier = confidenceTierFromScore(input.confidence);
+  const usedStubFallback = Boolean(input.usedStubFallback);
   return {
     targetRole: input.targetRole,
     readinessScore: input.readinessScore,
@@ -143,6 +145,9 @@ export function enrichAnalysisPayload(input: {
     primaryAction: input.primaryAction,
     secondaryActions: buildSecondaryActions(),
     escalation: buildEscalation(confidenceTier, input.targetRole),
-    usedStubFallback: Boolean(input.usedStubFallback),
+    usedStubFallback,
+    ...(usedStubFallback && input.fallbackReason
+      ? { fallbackReason: input.fallbackReason }
+      : {}),
   };
 }

@@ -161,6 +161,8 @@ export type AnalysisResult = {
   escalation: EscalationOptions | null;
   /** True when live AI failed and deterministic stub was used. */
   usedStubFallback?: boolean;
+  /** Present when usedStubFallback is true — upstream failure summary for ops/debug. */
+  fallbackReason?: string;
 };
 
 export async function getAnalysisResult(runId: string) {

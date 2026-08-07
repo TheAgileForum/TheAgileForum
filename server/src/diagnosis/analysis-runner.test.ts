@@ -37,7 +37,10 @@ describe("resolveAnalysisRecommendation", () => {
 
   it("falls back to stub and marks usedStubFallback when live AI fails", async () => {
     mockShouldUseLive.mockReturnValue(true);
-    mockRunLive.mockRejectedValue(new Error("OpenRouter down"));
+    const err = Object.assign(new Error("OpenRouter model=x HTTP 404: unavailable for free"), {
+      status: 404,
+    });
+    mockRunLive.mockRejectedValue(err);
 
     const result = await resolveAnalysisRecommendation({
       targetRole: "Scrum Master",
@@ -49,8 +52,9 @@ describe("resolveAnalysisRecommendation", () => {
 
     expect(mockRunLive).toHaveBeenCalledOnce();
     expect(result.audit.usedStubFallback).toBe(true);
-    expect(result.audit.fallbackReason).toContain("OpenRouter down");
+    expect(result.audit.fallbackReason).toContain("unavailable for free");
     expect(result.recommendation.primaryAction.offeringCode).toBe("course-agile-fundamentals");
+    expect(result.recommendation.readinessScore).toBe(62);
   });
 
   it("returns live recommendation when OpenRouter succeeds", async () => {
