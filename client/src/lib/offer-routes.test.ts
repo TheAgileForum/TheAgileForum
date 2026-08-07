@@ -3,6 +3,9 @@ import {
   MENTORSHIP_LEGACY_ROUTE_SEGMENTS,
   MENTORSHIP_OFFER_CODE,
   MENTORSHIP_PUBLIC_SLUG,
+  POWER_RESUME_LEGACY_ROUTE_SEGMENTS,
+  POWER_RESUME_OFFER_CODE,
+  POWER_RESUME_PUBLIC_SLUG,
   offerDetailPath,
   resolveOfferRouteCode,
 } from "./offer-routes";
@@ -28,6 +31,21 @@ describe("offer routes", () => {
       expect(resolveOfferRouteCode(routeSegment)).toBe(
         MENTORSHIP_OFFER_CODE,
       );
+    }
+  });
+
+  it("emits the resume public slug without changing its stable code", () => {
+    expect(offerDetailPath(POWER_RESUME_OFFER_CODE)).toBe(
+      `/offers/${POWER_RESUME_PUBLIC_SLUG}`,
+    );
+    expect(resolveOfferRouteCode(POWER_RESUME_PUBLIC_SLUG)).toBe(
+      POWER_RESUME_OFFER_CODE,
+    );
+  });
+
+  it("resolves legacy resume routes to the stable offer code", () => {
+    for (const routeSegment of POWER_RESUME_LEGACY_ROUTE_SEGMENTS) {
+      expect(resolveOfferRouteCode(routeSegment)).toBe(POWER_RESUME_OFFER_CODE);
     }
   });
 

@@ -32,7 +32,8 @@ function showDeliveryModeChip(code: string): boolean {
   const normalized = code.toLowerCase();
   return (
     !normalized.includes("mock-interview") &&
-    !normalized.includes("power-resume")
+    !normalized.includes("power-resume") &&
+    !normalized.includes("linkedin-upgrade")
   );
 }
 
