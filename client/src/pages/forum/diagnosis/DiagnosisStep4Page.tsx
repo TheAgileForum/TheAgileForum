@@ -84,12 +84,25 @@ export function DiagnosisStep4Page() {
             </Alert>
           ) : null}
 
+          {result.resumeInputStatus === "unreadable" ? (
+            <Alert severity="warning">
+              We couldn&apos;t read text from your resume file — try a text-based PDF or DOCX (not a
+              scanned/image PDF). The match % below is a limited estimate until we can read your resume.
+            </Alert>
+          ) : null}
+
+          {result.resumeInputStatus === "missing" ? (
+            <Alert severity="info">
+              No resume was provided, so this estimate is based on your role and other answers only.
+            </Alert>
+          ) : null}
+
           <DiagnosisReadinessSummary
             targetRole={result.targetRole}
             readinessScore={result.readinessScore}
+            matchHeadline={result.matchHeadline}
             summaryPlain={result.summaryPlain}
             confidenceTier={result.confidenceTier}
-            confidenceScore={result.insights.confidence}
           />
 
           <Card variant="outlined">
