@@ -55,7 +55,7 @@ describe("order-query-service", () => {
     const orders = await listOrdersForUser("user-1");
 
     expect(prismaMock.order.findMany).toHaveBeenCalledWith({
-      where: { userId: "user-1" },
+      where: { userId: "user-1", status: { not: "cancelled" } },
       include: { items: true },
       orderBy: { createdAt: "desc" },
     });

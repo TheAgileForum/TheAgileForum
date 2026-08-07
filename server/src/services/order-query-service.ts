@@ -55,7 +55,11 @@ export async function serializeLearnerOrder(
 
 export async function listOrdersForUser(userId: string): Promise<LearnerOrderView[]> {
   const orders = await prisma.order.findMany({
-    where: { userId },
+    where: {
+      userId,
+      // Soft-deleted abandoned checkouts stay in DB but leave My Orders.
+      status: { not: "cancelled" },
+    },
     include: { items: true },
     orderBy: { createdAt: "desc" },
   });
