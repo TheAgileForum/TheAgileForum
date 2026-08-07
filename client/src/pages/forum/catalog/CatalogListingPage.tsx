@@ -16,7 +16,6 @@ import { trackEvent } from "../../../lib/analytics";
 import {
   fetchCatalogCategoryCached,
   peekCatalogCache,
-  peekCatalogCacheAnyPricing,
 } from "../../../lib/catalog-cache";
 import {
   filtersToSearchParams,
@@ -52,10 +51,8 @@ function resolveInitialCache(
   geo: string,
   currency: string,
 ) {
-  return (
-    peekCatalogCache(categoryPath, searchKey, geo, currency) ??
-    peekCatalogCacheAnyPricing(categoryPath, searchKey)
-  );
+  // Exact geo/currency only — never paint another currency's prices under the new session label.
+  return peekCatalogCache(categoryPath, searchKey, geo, currency);
 }
 
 function CatalogListingSkeleton() {
@@ -105,6 +102,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
   const hasLoadedOnceRef = useRef(false);
   const viewedRef = useRef(false);
   const requestIdRef = useRef(0);
+  const pricingKeyRef = useRef({ currency, geo });
 
   const searchKey = searchParams.toString();
   const filters = parseCatalogFilters(searchKey);
@@ -129,6 +127,17 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
     try {
       const res = await fetchCatalogCategoryCached(categoryPath, searchKey, geo, currency);
       if (requestId !== requestIdRef.current) return;
+      const mismatched = res.offerings.some((o) => {
+        const quoted = o.priceQuote?.currency?.toUpperCase();
+        return quoted != null && quoted !== currency.toUpperCase();
+      });
+      if (mismatched) {
+        trackEvent("catalog_currency_mismatch", {
+          category: categoryPath,
+          currency,
+          geo,
+        });
+      }
       setOfferings(res.offerings);
       setFacets(res.facets ?? null);
       hasLoadedOnceRef.current = true;
@@ -166,12 +175,16 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
       setFacets(cached.facets ?? null);
       setLoading(false);
       hasLoadedOnceRef.current = true;
+      setRefreshing(false);
     } else if (!hasLoadedOnceRef.current) {
       setOfferings([]);
       setFacets(null);
       setLoading(true);
+      setRefreshing(false);
+    } else {
+      // Keep previous cards visible while the matching-currency refetch completes.
+      setRefreshing(true);
     }
-    setRefreshing(false);
     setError(null);
   }, [categoryPath, searchKey, geo, currency, pricingReady]);
 
@@ -182,8 +195,18 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
     if (!viewedRef.current) {
       viewedRef.current = true;
       trackEvent("catalog_list_viewed", { category: categoryPath });
+    } else if (
+      pricingKeyRef.current.currency !== currency ||
+      pricingKeyRef.current.geo !== geo
+    ) {
+      trackEvent("catalog_pricing_refetch", {
+        category: categoryPath,
+        currency,
+        geo,
+      });
     }
-  }, [load, categoryPath, pricingReady]);
+    pricingKeyRef.current = { currency, geo };
+  }, [load, categoryPath, pricingReady, currency, geo]);
 
   function applyFilters(next: typeof filters) {
     trackEvent("catalog_filter_applied", { category: categoryPath });
