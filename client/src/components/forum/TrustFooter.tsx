@@ -25,6 +25,7 @@ const CATALOG_LINKS = [
 /** Key offerings (easy deep-links under catalog browse). */
 const FEATURED_LINKS = [
   { label: "CSM® Certification", to: "/offers/csm-certification-training" },
+  { label: "PSM II Certification", to: "/offers/psm-ii-certification-training" },
   { label: "SAFe RTE", to: "/offers/safe-rte-certification-training" },
   { label: "SAFe Scrum Master", to: "/offers/safe-scrum-master-certification-training" },
   { label: "Mentorship program", to: offerDetailPath(MENTORSHIP_OFFER_CODE) },

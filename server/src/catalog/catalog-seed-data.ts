@@ -327,6 +327,56 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
       "Build an AI-augmented RTE workflow responsibly",
     ],
   },
+  /**
+   * Professional Scrum Master™ II (PSM II) — not on the Jul 2026 founder core catalog.
+   * Draft pricing mirrors other 2-day cert workshops in this seed ($549 / INR 33999)
+   * until founder confirms list price and Scrum.org assessment packaging.
+   */
+  "psm-ii-certification-training": {
+    code: "psm-ii-certification-training",
+    title: "Professional Scrum Master™ II (PSM II) Certification Training",
+    kind: "course",
+    category: "certification",
+    scheduleBound: true,
+    examAccess: "preview_only",
+    safeOrgPaymentEligible: false,
+    defaultUnitPrice: "549.00",
+    currency: "USD",
+    regionalUnitPrices: { INR: "33999.00" },
+    roleTags: ["learner", "scrum_master"],
+    certBody: "scrum.org",
+    deliveryMode: "live",
+    upcomingBatchId: "batch-psm-ii-tbd",
+    slug: "psm-ii-certification-training",
+    certificationName: "Professional Scrum Master™ II (PSM II)",
+    summary:
+      "Advance as a Scrum Master with live instructor-led preparation for the Scrum.org Professional Scrum Master™ II (PSM II) assessment — servant leadership, facilitation, coaching, impediment removal, and organizational change in complex real-world scenarios. Assessment attempt packaging is confirmed at enrollment.",
+    durationHours: 16,
+    scheduleLabel: "2-day live workshop · 16 hours · cohorts on request",
+    cohortSchedules: [
+      {
+        id: "batch-psm-ii-tbd",
+        label: "Next cohort timing confirmed at enrollment (weekend / weekday options)",
+      },
+    ],
+    includes: [
+      "16 hours live instructor-led PSM II pathway training",
+      "Servant leadership, facilitation, and coaching practice",
+      "Role plays, simulations, and conflict / impediment scenarios",
+      "Focus on Done Increments, Sprint Goals, and supporting the Product Owner",
+      "Exam-oriented review aligned to Scrum.org PSM II expectations",
+      "Career guidance for senior Scrum Master and Agile coaching roles",
+      "Scrum.org assessment packaging confirmed at enrollment",
+    ],
+    learningOutcomes: [
+      "Apply Scrum Master stances as servant-leader, facilitator, coach, and change agent",
+      "Handle team conflict and remove organizational impediments effectively",
+      "Protect empiricism through Done Increments and clear Sprint Goals",
+      "Support the Product Owner and successful product delivery",
+      "Use measurement thoughtfully to support transparency — not as a weapon",
+      "Prepare for the Scrum.org PSM II assessment format and difficulty",
+    ],
+  },
   "service-mock-interview-sm": {
     code: "service-mock-interview-sm",
     title: "Mock Interview Series with Interview Preparation",
