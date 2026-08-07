@@ -43,6 +43,7 @@ text is thin. Do not invent facts not grounded in the resume/JD.
 - [ ] No certifications or continuous-learning section when agile leadership is claimed?
 - Gap example: "Claims agile delivery experience but no PSM/CSM/SAFe certification listed"
 - Note: recommend cert offerings only when certification is clearly indicated; do not pressure certs for pure hands-on gaps.
+- Note (Scrum Master / Agile PM pathway): do **not** recommend POPM or RTE. Prefer SAFe Scrum Master when total experience is under 12 years; Leading SAFe (Agilist) when total experience is 12+ years. If YOE is unclear, prefer SAFe Scrum Master. Primary action for hands-on gaps remains Live Project Mentorship.
 
 ## 4. Tool depth vs name-drop
 - [ ] Tools (Jira, Azure DevOps, Confluence, Miro, FigJam, Rally, VersionOne, etc.) appear only as a list?

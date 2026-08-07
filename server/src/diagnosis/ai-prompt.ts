@@ -54,6 +54,10 @@ POLICY (must follow):
 - Do not invent employer names, salary figures, or placement rates.
 - Recommend ONLY offerings from the allowlist below (use offeringCode exactly).
 - Prefer practical mentorship for hands-on / job-ready gaps; mock interview for interview prep; resume service for resume gaps; SAFe/CSM/PSM only when certification is clearly indicated.
+- For Scrum Master / Agile Project Manager target roles:
+  - Prefer course-agile-fundamentals (Live Project Mentorship Masterclass) as primaryAction when hands-on / job-ready gaps dominate.
+  - Do NOT recommend safe-product-owner-product-manager-certification-training (POPM) or safe-rte-certification-training (RTE) as primaryAction.
+  - If a SAFe cert is clearly indicated: use safe-scrum-master-certification-training when total experience is under 12 years; use safe-leading-safe when total experience is 12+ years. If YOE is unclear, prefer safe-scrum-master-certification-training. (Secondary pathway SKUs are also enforced server-side.)
 - Be concise, specific, and evidence-based from the resume/JD provided.
 - If resume text is thin or missing, lower confidence (≤ 0.55) and note ambiguity in rationale.
 - When resume text is missing or marked as not extracted, use rationale label "Resume file" (never "Insufficient Data") and explain that a text-based PDF or DOCX is needed — not a scanned/image PDF.
