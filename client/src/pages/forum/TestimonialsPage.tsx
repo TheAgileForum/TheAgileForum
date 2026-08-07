@@ -490,10 +490,7 @@ export function TestimonialsPage() {
           sx={{
             display: "grid",
             gap: 3,
-            // One column so LinkedIn's fixed 504px canvas is never clipped.
-            gridTemplateColumns: "1fr",
-            maxWidth: 560,
-            mx: "auto",
+            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
             alignItems: "start",
           }}
         >
@@ -514,9 +511,7 @@ export function TestimonialsPage() {
           sx={{
             display: "grid",
             gap: 3,
-            gridTemplateColumns: "1fr",
-            maxWidth: 560,
-            mx: "auto",
+            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
             alignItems: "start",
           }}
         >
