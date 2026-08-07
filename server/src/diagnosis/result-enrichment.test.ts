@@ -106,6 +106,26 @@ describe("result-enrichment", () => {
     );
     expect(payload.usedStubFallback).toBe(false);
     expect(payload).not.toHaveProperty("fallbackReason");
+    expect(payload.yearsOfExperience).toBeNull();
+  });
+
+  it("passes through parsed yearsOfExperience when provided", () => {
+    const payload = enrichAnalysisPayload({
+      targetRole: "Scrum Master",
+      readinessScore: 50,
+      confidence: 0.8,
+      strengths: ["Comms"],
+      gaps: ["SAFe"],
+      primaryAction: {
+        type: "offer",
+        label: "Start program",
+        href: "/offers/course-agile-fundamentals",
+        offeringCode: "course-agile-fundamentals",
+      },
+      rationale: [{ label: "Fit", detail: "Aligned" }],
+      yearsOfExperience: 14,
+    });
+    expect(payload.yearsOfExperience).toBe(14);
   });
 
   it("surfaces fallbackReason only when usedStubFallback is true", () => {

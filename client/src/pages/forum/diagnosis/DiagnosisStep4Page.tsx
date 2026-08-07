@@ -126,6 +126,7 @@ export function DiagnosisStep4Page() {
             targetRole={result.targetRole}
             context="diagnosis"
             gapTags={result.insights.gaps}
+            yearsOfExperience={result.yearsOfExperience}
             onAddOffering={(code, scheduleRef, label) => addItem(code, scheduleRef, label)}
           />
         </>

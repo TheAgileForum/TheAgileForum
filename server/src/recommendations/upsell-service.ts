@@ -4,6 +4,13 @@ import {
   resolveCurrencyContext,
   type CurrencyContext,
 } from "../pricing/pricing-service.js";
+import {
+  isScrumMasterPathway,
+  normalizeRoleKey,
+  parseYearsOfExperience,
+  resolveSmSafeOfferingCode,
+  SM_PATHWAY_BLOCKED_CODES,
+} from "./sm-pathway.js";
 
 export const upsellContexts = [
   "diagnosis",
@@ -31,7 +38,7 @@ export type UpsellSku = {
 };
 
 function normalizeRole(targetRole: string): string {
-  return targetRole.trim().toLowerCase().replace(/\s+/g, "_");
+  return normalizeRoleKey(targetRole);
 }
 
 function matchesRole(offering: OfferingMeta, targetRole: string): boolean {
@@ -117,7 +124,12 @@ function rankSkus(
     .sort((a, b) => b.relevanceScore - a.relevanceScore);
 }
 
-/** Role-based SAFe cert + mock interview upsell (FR-181). */
+/**
+ * Role-based SAFe cert + mock interview upsell (FR-181).
+ *
+ * Scrum Master pathway: deterministic filter — never POPM/RTE; exactly one SAFe
+ * cert by YOE (&lt;12 → SAFe SM, ≥12 → Leading SAFe; unknown YOE → SAFe SM).
+ */
 export function getUpsellRecommendations(input: {
   targetRole: string;
   context: UpsellContext;
@@ -125,6 +137,10 @@ export function getUpsellRecommendations(input: {
   gapTags?: string[];
   currency?: string;
   geo?: string;
+  /** Explicit total years of experience when known (diagnosis enrichment). */
+  yearsOfExperience?: number | null;
+  /** Free-text hints (currentStatus / resume snippet) used when YOE not numeric. */
+  experienceHint?: string | null;
 }) {
   const currencyContext = resolveCurrencyContext({
     geo: input.geo ?? "US",
@@ -132,13 +148,26 @@ export function getUpsellRecommendations(input: {
   });
   const gapTags = input.gapTags ?? [];
   const offerings = listOfferings();
+  const smPathway = isScrumMasterPathway(input.targetRole);
 
-  const safeCertCandidates = offerings.filter(
+  let safeCertCandidates = offerings.filter(
     (o) =>
       o.category === "certification" &&
       o.certBody === "scaled agile" &&
       matchesRole(o, input.targetRole),
   );
+
+  if (smPathway) {
+    const yoe =
+      typeof input.yearsOfExperience === "number" && Number.isFinite(input.yearsOfExperience)
+        ? input.yearsOfExperience
+        : parseYearsOfExperience(input.experienceHint);
+    const preferredCode = resolveSmSafeOfferingCode(yoe);
+    // Deterministic: exactly one SAFe cert; never POPM/RTE for SM.
+    safeCertCandidates = offerings.filter(
+      (o) => o.code === preferredCode && !SM_PATHWAY_BLOCKED_CODES.has(o.code),
+    );
+  }
 
   const mockInterviewCandidates = offerings.filter(
     (o) =>

@@ -40,6 +40,14 @@ recommendationsRouter.get("/upsell", (req, res) => {
   }
 
   const pricingInput = parsePricingInputFromRequest(req);
+  const yearsRaw =
+    typeof req.query.years_of_experience === "string"
+      ? req.query.years_of_experience
+      : "";
+  const yearsParsed = yearsRaw.trim() ? Number.parseFloat(yearsRaw) : NaN;
+  const yearsOfExperience = Number.isFinite(yearsParsed) ? yearsParsed : null;
+  const experienceHint =
+    typeof req.query.experience_hint === "string" ? req.query.experience_hint : undefined;
 
   const recommendations = getUpsellRecommendations({
     targetRole,
@@ -48,6 +56,8 @@ recommendationsRouter.get("/upsell", (req, res) => {
     gapTags,
     currency: pricingInput.currencyOverride ?? pricingInput.sessionCurrencyCookie,
     geo: pricingInput.geo,
+    yearsOfExperience,
+    experienceHint,
   });
 
   return res.json(recommendations);

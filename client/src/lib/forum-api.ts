@@ -204,6 +204,8 @@ export type AnalysisResult = {
   usedStubFallback?: boolean;
   /** Present when usedStubFallback is true — upstream failure summary for ops/debug. */
   fallbackReason?: string;
+  /** Parsed total YOE from intent/resume; null when unknown. */
+  yearsOfExperience?: number | null;
 };
 
 export async function getAnalysisResult(runId: string) {
@@ -362,6 +364,8 @@ export async function getUpsellRecommendations(params: {
   gapTags?: string[];
   geo?: string;
   currency?: string;
+  yearsOfExperience?: number | null;
+  experienceHint?: string | null;
 }) {
   const qs = new URLSearchParams({
     target_role: params.targetRole,
@@ -371,6 +375,10 @@ export async function getUpsellRecommendations(params: {
   if (params.gapTags?.length) qs.set("gap_tags", params.gapTags.join(","));
   if (params.geo) qs.set("geo", params.geo);
   if (params.currency) qs.set("currency_override", params.currency);
+  if (typeof params.yearsOfExperience === "number" && Number.isFinite(params.yearsOfExperience)) {
+    qs.set("years_of_experience", String(params.yearsOfExperience));
+  }
+  if (params.experienceHint?.trim()) qs.set("experience_hint", params.experienceHint.trim());
   return apiFetch<UpsellRecommendations>(`/api/v1/recommendations/upsell?${qs.toString()}`);
 }
 

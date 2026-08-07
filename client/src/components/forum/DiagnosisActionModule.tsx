@@ -46,8 +46,11 @@ export function DiagnosisActionModule({
           <Typography variant="overline" color="primary.dark">
             Recommended next step
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
             One primary action keeps your path focused—secondary options are below if you want alternatives.
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            This Live Project training is also a prerequisite for taking the PSM certification exam.
           </Typography>
           <Button
             variant="contained"
@@ -64,7 +67,7 @@ export function DiagnosisActionModule({
 
       <Stack spacing={1}>
         <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: "uppercase" }}>
-          Other ways to advance
+          Further steps
         </Typography>
         <Stack direction={{ xs: "column", sm: "row" }} spacing={1} useFlexGap sx={{ flexWrap: "wrap" }}>
           {secondaryActions.map((action) => (
