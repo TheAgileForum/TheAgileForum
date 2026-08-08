@@ -17,8 +17,8 @@ const CTA_PINK = "#e91e8c";
 const STAT_BADGES = [
   {
     id: "career-advanced",
-    value: "1000+",
-    mobileValue: "1000+",
+    value: "4000+",
+    mobileValue: "4000+",
     label: "Career Advanced",
     shortLabel: "Careers",
     icon: EmojiEventsIcon,

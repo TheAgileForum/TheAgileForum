@@ -34,10 +34,7 @@ export function LowConfidenceEscalation({ escalation }: LowConfidenceEscalationP
           Contact support
         </Button>
       </Stack>
-      <Typography variant="caption" sx={{ mt: 1.5, color: "text.secondary", display: "block" }}>
-        Geo pricing: India ₹49 · USA $9 · Override via session currency when booking opens.
-      </Typography>
-      <Link href={escalation.supportHref} variant="caption" sx={{ display: "block", mt: 0.5 }}>
+      <Link href={escalation.supportHref} variant="caption" sx={{ display: "block", mt: 1.5 }}>
         Prefer email? Write to support
       </Link>
     </Alert>

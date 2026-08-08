@@ -18,8 +18,8 @@ const INK = "#0a1628";
 export const MENTOR_PORTRAIT_URL =
   "https://static.wixstatic.com/media/473f1f_441a2d1dd4324ae2b3a719edf7771b2c~mv2.png/v1/fill/w_520,h_675,al_c,q_85,enc_auto/473f1f_441a2d1dd4324ae2b3a719edf7771b2c~mv2.png";
 
-/** Live Wix homepage CTA — BOOK A 1:1 COACHING CALL */
-export const MENTOR_COACHING_BOOKING_URL = "https://calendly.com/coach_Dhirender_Verma";
+/** Live homepage CTA — BOOK A 1:1 COACHING CALL */
+export const MENTOR_COACHING_BOOKING_URL = "https://topmate.io/coach_dhirender_verma";
 
 const SOCIAL_LINKS = [
   {

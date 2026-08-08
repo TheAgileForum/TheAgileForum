@@ -9,11 +9,15 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { wakeApi } from "../lib/api";
 import {
+  clearStoredRunId,
   clearStoredSessionId,
   createDiagnosisSession,
   getJourneyState,
+  getStoredRunId,
   getStoredSessionId,
+  storeRunId,
   storeSessionId,
 } from "../lib/forum-api";
 
@@ -36,15 +40,24 @@ const DiagnosisContext = createContext<DiagnosisContextValue | null>(null);
 
 export function DiagnosisProvider({ children }: { children: ReactNode }) {
   const [sessionId, setSessionId] = useState<string | null>(() => getStoredSessionId());
-  const [runId, setRunId] = useState<string | null>(null);
+  const [runId, setRunIdState] = useState<string | null>(() => getStoredRunId());
   const [resumeStep, setResumeStep] = useState<string | null>(null);
   const [resumeLoading, setResumeLoading] = useState(() => Boolean(getStoredSessionId()));
   const [sessionStarting, setSessionStarting] = useState(false);
   const sessionPromiseRef = useRef<Promise<string> | null>(null);
 
+  const setRunId = useCallback((next: string | null) => {
+    setRunIdState(next);
+    if (next) storeRunId(next);
+    else clearStoredRunId();
+  }, []);
+
   useEffect(() => {
     const stored = getStoredSessionId();
-    if (!stored) return;
+    if (!stored) {
+      setResumeLoading(false);
+      return;
+    }
 
     const timeoutMs = 15_000;
     const journeyPromise = getJourneyState(stored);
@@ -59,16 +72,20 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
         const payload = state.resumePayload;
         if (payload && typeof payload.analysisRunId === "string") {
           setRunId(payload.analysisRunId);
+        } else {
+          const cachedRun = getStoredRunId();
+          if (cachedRun) setRunId(cachedRun);
         }
       })
       .catch(() => {
-        clearStoredSessionId();
-        setSessionId(null);
-        setResumeStep(null);
-        setRunId(null);
+        // Keep session + runId when journey restore fails (cold start / timeout).
+        // Clearing here caused step-4 "Results not ready" after View → back / refresh.
+        const cachedRun = getStoredRunId();
+        if (cachedRun) setRunId(cachedRun);
+        setSessionId(stored);
       })
       .finally(() => setResumeLoading(false));
-  }, []);
+  }, [setRunId]);
 
   const startSession = useCallback(async (campaignId?: string) => {
     const existing = getStoredSessionId();
@@ -99,11 +116,13 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
       setSessionStarting(false);
       sessionPromiseRef.current = null;
     }
-  }, []);
+  }, [setRunId]);
 
   const prefetchSession = useCallback(
     (campaignId = "home-prefetch") => {
       if (getStoredSessionId() || sessionPromiseRef.current) return;
+      // Kick Render awake before (or while) session create — same pattern as catalog.
+      void wakeApi();
       void startSession(campaignId).catch(() => undefined);
     },
     [startSession],
@@ -115,7 +134,7 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
     setRunId(null);
     setResumeStep(null);
     sessionPromiseRef.current = null;
-  }, []);
+  }, [setRunId]);
 
   const value = useMemo(
     () => ({
@@ -137,6 +156,7 @@ export function DiagnosisProvider({ children }: { children: ReactNode }) {
       sessionStarting,
       startSession,
       prefetchSession,
+      setRunId,
       reset,
     ],
   );

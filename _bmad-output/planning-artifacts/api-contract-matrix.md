@@ -46,6 +46,12 @@
 | AI Coach Chat | `/v1/ai/chat` | POST | N/Y | `context_screen`, `context_payload`, `message` | `reply`, `confidence`, `next_action`, `escalation_available` | N | `ai_chat_asked`, `ai_chat_replied` |
 | AI Feedback | `/v1/ai/messages/{id}/feedback` | POST | Y | `helpful`, `correct`, `comment?` | `captured=true` | Y | `ai_feedback_submitted` |
 | Profile/Prefs Update | `/v1/profile/preferences` | PUT | Y | `role_goal`, `interests[]`, `channels[]`, `consent_flags` | `saved=true`, `effective_from` | Y | `preferences_updated` |
+| Profile Get (Career) | `/v1/profile` | GET | Y | — | `profile`, `target_roles[]`, `credentials[]`, `learning_goals[]` | N | `profile_viewed` |
+| Profile Update (Core) | `/v1/profile` | PUT | Y | display/geo fields | `saved=true` | Y | `profile_updated` |
+| Target Roles Update | `/v1/profile/target-roles` | PUT | Y | `target_roles[]`, `primary_role?` | `saved=true` | Y | `target_roles_updated` |
+| Credentials Upsert | `/v1/profile/credentials` | PUT | Y | `credentials[]` (completed trainings/certs) | `saved=true` | Y | `credentials_updated` |
+| LinkedIn Cred Import Preview | `/v1/profile/credentials/import/linkedin` | POST | Y | (uses linked LinkedIn token) | `proposed[]`, `source=linkedin` | Y | `credentials_import_previewed` |
+| Learning Goals Update | `/v1/profile/learning-goals` | PUT | Y | `goals[]`, `urgency` / per-item urgency | `saved=true` | Y | `learning_goals_updated` |
 
 ---
 

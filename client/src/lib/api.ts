@@ -47,10 +47,26 @@ export function catalogFetchTimeoutMs(): number {
 
 /** Checkout start may hit Render cold start plus Stripe session creation. */
 export const CHECKOUT_START_TIMEOUT_MS = 45_000;
+/**
+ * Payment confirm after gateway success — allow cold start + DB write.
+ * Must not share the short default budget or catalog-branded copy.
+ */
+export const CHECKOUT_CONFIRM_TIMEOUT_MS = 45_000;
+/**
+ * Diagnosis session create / intent / journey — same cold-start budget as checkout.
+ * Default 20s aborts while free-tier Render is still waking (~15–40s).
+ */
+export const DIAGNOSIS_API_TIMEOUT_MS = 45_000;
 
 const RETRYABLE_HTTP_STATUSES = new Set([408, 502, 503, 504]);
 
+/** Generic timeout copy — do not mention catalog (used by all apiFetch callers). */
 const REQUEST_TIMEOUT_MESSAGE =
+  "This is taking longer than usual. Please try again in a moment.";
+const NETWORK_ERROR_MESSAGE =
+  "Network error. Please check your connection and try again.";
+/** Catalog listing may remap timeout/network codes to this user-facing copy. */
+export const CATALOG_TIMEOUT_MESSAGE =
   "Catalog is taking longer than usual. Please try again in a moment.";
 
 function isRetryableApiError(err: unknown): err is ApiRequestError {
@@ -87,7 +103,10 @@ async function apiFetchOnce<T>(
       headers: {
         // Avoid Content-Type on bodyless GETs so cross-origin catalog calls stay
         // "simple" and skip an OPTIONS preflight round-trip.
-        ...(rest.body ? { "Content-Type": "application/json" } : {}),
+        // Do not set JSON Content-Type for FormData — browser must set multipart boundary.
+        ...(rest.body && !(rest.body instanceof FormData)
+          ? { "Content-Type": "application/json" }
+          : {}),
         ...rest.headers,
       },
     });
@@ -124,7 +143,7 @@ async function apiFetchOnce<T>(
     throw new ApiRequestError(0, {
       error: {
         code: "NETWORK_ERROR",
-        message: REQUEST_TIMEOUT_MESSAGE,
+        message: NETWORK_ERROR_MESSAGE,
         retryable: true,
       },
     });

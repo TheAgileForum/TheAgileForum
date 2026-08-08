@@ -8,6 +8,7 @@ import {
 } from "../commerce/checkout-policy.js";
 import { computeSafeOrgReimbursementPricing } from "../commerce/safe-org-reimbursement-pricing.js";
 import { publishEnrollmentNotifications } from "./order-notification-service.js";
+import { logError } from "../runtime/logger.js";
 import type { CommerceJourneyOrigin } from "../commerce/journey-origin.js";
 import type { SessionClaims } from "./auth-service.js";
 import { getOrCreateActiveCart, serializeCart } from "./cart-service.js";
@@ -384,6 +385,9 @@ async function markOrderPaid(
     });
 
     if (order.cartId) {
+      // Archive + empty the cart so paid lines cannot reappear via a concurrent
+      // getOrCreateActiveCart reclaim of checkout_in_progress.
+      await tx.cartItem.deleteMany({ where: { cartId: order.cartId } });
       await tx.cart.update({
         where: { id: order.cartId },
         data: { status: "completed" },
@@ -414,6 +418,23 @@ async function deliverPaidOrderNotifications(
         };
       }),
     ),
+  });
+}
+
+/**
+ * Confirm HTTP responses must not wait on catalog lookups or email/Telegram.
+ * Payment is already durable after markOrderPaid; notifications are best-effort.
+ */
+function schedulePaidOrderNotifications(
+  order: Awaited<ReturnType<typeof markOrderPaid>>,
+) {
+  void deliverPaidOrderNotifications(order).catch((error) => {
+    logError("Paid order notifications failed", {
+      component: "checkout-service",
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      error: error instanceof Error ? error.message : String(error),
+    });
   });
 }
 
@@ -526,7 +547,7 @@ export async function completeOrderFromRazorpayPayment(input: {
 
   const paymentRef = `razorpay:${input.razorpayOrderId}:${input.razorpayPaymentId}`;
   const updated = await markOrderPaid(order, paymentRef);
-  await deliverPaidOrderNotifications(updated);
+  schedulePaidOrderNotifications(updated);
 
   const mode = input.paymentMode ?? "full_pay";
   void trackCheckoutConfirmed({
@@ -593,7 +614,7 @@ export async function completeOrderFromRazorpayWebhook(input: {
 
   const paymentRef = `razorpay:${input.razorpayOrderId}:${input.razorpayPaymentId}`;
   const updated = await markOrderPaid(order, paymentRef);
-  await deliverPaidOrderNotifications(updated);
+  schedulePaidOrderNotifications(updated);
 
   return {
     ok: true as const,
@@ -639,7 +660,7 @@ export async function completeOrderFromStripeWebhook(input: {
 
   const paymentRef = `stripe:${input.stripeSessionId}:${input.stripeEventId}`;
   const updated = await markOrderPaid(order, paymentRef);
-  await deliverPaidOrderNotifications(updated);
+  schedulePaidOrderNotifications(updated);
 
   return {
     ok: true as const,
@@ -741,7 +762,7 @@ export async function completeOrderFromStripePayment(input: {
 
   const paymentRef = `stripe:${input.stripeSessionId}:confirm`;
   const updated = await markOrderPaid(order, paymentRef);
-  await deliverPaidOrderNotifications(updated);
+  schedulePaidOrderNotifications(updated);
 
   void trackCheckoutConfirmed({
     distinctId: input.auth.userId,
@@ -796,7 +817,7 @@ export async function completeCheckout(
     order,
     paymentRef ?? `stub-${order.orderNumber}`,
   );
-  await deliverPaidOrderNotifications(updated);
+  schedulePaidOrderNotifications(updated);
 
   void trackCheckoutConfirmed({
     distinctId: auth.userId,

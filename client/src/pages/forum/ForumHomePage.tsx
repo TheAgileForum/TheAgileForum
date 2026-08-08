@@ -14,35 +14,16 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useDiagnosis } from "../../contexts/DiagnosisContext";
 import { trackEvent } from "../../lib/analytics";
 import { apiUrl } from "../../lib/api-base";
+import { ASSESSMENT_PATHWAYS } from "../../lib/diagnosis-target-roles";
+import { storeDiagnosisPersonalization } from "../../lib/forum-api";
 import { openMentorBooking } from "../../lib/mentor-booking";
 
 const ACCENT = "#0f9f8f";
 const INK = "#0a1628";
 const PAPER = "#f3f6f9";
 
-const PATHWAYS = [
-  {
-    icon: "S",
-    title: "Scrum Master",
-    detail: "Interview-ready facilitation, ceremonies, and stakeholder confidence — built from your current baseline.",
-    link: "Assessment for SM →",
-  },
-  {
-    icon: "P",
-    title: "Product Owner",
-    detail: "Backlog mastery, discovery habits, and delivery partnership for people pivoting into PO.",
-    link: "Assessment for PO →",
-  },
-  {
-    icon: "L",
-    title: "Agile Leader",
-    detail: "RTE and leadership tracks for professionals ready to scale teams, not just run sprints.",
-    link: "Assessment for leadership Roles →",
-  },
-] as const;
-
 const STATS = [
-  { target: 1000, suffix: "+", label: "Learners guided", icon: "learners" },
+  { target: 4000, suffix: "+", label: "Learners guided", icon: "learners" },
   { target: 40, suffix: "+", label: "Countries reached", icon: "globe" },
   { target: 12, suffix: "k+", label: "Assessments done", icon: "check" },
   { target: 6, suffix: "+", label: "Years of trust", icon: "star" },
@@ -731,7 +712,8 @@ export function ForumHomePage() {
               Where are you <em>headed</em>?
             </DisplayHeading>
             <Typography color="text.secondary" sx={{ fontSize: "1.05rem", m: 0 }}>
-              Pick a direction to frame your Assessment. Same flow — sharper context.
+              Pick a direction to frame your Assessment — all six target roles from Step 1.
+              Same flow — sharper context.
             </Typography>
           </Box>
 
@@ -739,17 +721,25 @@ export function ForumHomePage() {
             sx={{
               display: "grid",
               gap: 2,
-              gridTemplateColumns: { md: "repeat(3, 1fr)" },
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(3, 1fr)",
+              },
             }}
           >
-            {PATHWAYS.map((pathway) => (
+            {ASSESSMENT_PATHWAYS.map((pathway) => (
               <Box
-                key={pathway.title}
+                key={pathway.targetRole}
                 component="button"
                 type="button"
                 disabled={starting}
                 onClick={() => {
-                  trackEvent("home_pathway_card_click", { pathway: pathway.title });
+                  trackEvent("home_pathway_card_click", {
+                    pathway: pathway.title,
+                    target_role: pathway.targetRole,
+                  });
+                  storeDiagnosisPersonalization(pathway.targetRole, []);
                   void handleStart(`pathway-${pathway.title}`);
                 }}
                 sx={{
@@ -760,7 +750,7 @@ export function ForumHomePage() {
                   border: "1px solid",
                   borderColor: "divider",
                   p: 3.5,
-                  minHeight: 280,
+                  minHeight: { xs: 220, md: 260 },
                   display: "flex",
                   flexDirection: "column",
                   textAlign: "left",
@@ -789,7 +779,9 @@ export function ForumHomePage() {
                 >
                   {pathway.icon}
                 </Box>
-                <Typography sx={{ fontWeight: 600, fontSize: "1.25rem", mb: 1.25 }}>{pathway.title}</Typography>
+                <Typography sx={{ fontWeight: 600, fontSize: "1.15rem", mb: 1.25, lineHeight: 1.3 }}>
+                  {pathway.title}
+                </Typography>
                 <Typography color="text.secondary" sx={{ fontSize: "0.92rem", flex: 1, m: 0 }}>
                   {pathway.detail}
                 </Typography>

@@ -15,11 +15,22 @@ describe("recommendations routes (FR-181)", () => {
       "/api/v1/recommendations/upsell?target_role=scrum_master&context=diagnosis&geo=US",
     );
     expect(res.status).toBe(200);
-    expect(res.body.safeCertSkus.length).toBeGreaterThan(0);
+    expect(res.body.safeCertSkus.length).toBe(1);
+    expect(res.body.safeCertSkus[0].code).toBe("safe-scrum-master-certification-training");
     expect(res.body.mockInterviewSkus.length).toBeGreaterThan(0);
     expect(res.body.primaryCta).toBeDefined();
     expect(res.body.items[0].priceQuote.currency).toBe("USD");
     expect(res.body.currencyContext.currency).toBe("USD");
+  });
+
+  it("GET /upsell selects Leading SAFe for SM when years_of_experience ≥ 12", async () => {
+    const res = await request(app()).get(
+      "/api/v1/recommendations/upsell?target_role=scrum_master&context=diagnosis&years_of_experience=14&geo=US",
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.safeCertSkus.map((s: { code: string }) => s.code)).toEqual([
+      "safe-leading-safe",
+    ]);
   });
 
   it("GET /upsell accepts gap_tags for diagnosis personalization", async () => {
@@ -28,6 +39,30 @@ describe("recommendations routes (FR-181)", () => {
     );
     expect(res.status).toBe(200);
     expect(res.body.items.length).toBeGreaterThan(0);
+  });
+
+  it("GET /upsell includes resume SKU when readiness_score is below 85", async () => {
+    const res = await request(app()).get(
+      "/api/v1/recommendations/upsell?target_role=scrum_master&context=diagnosis&readiness_score=70&geo=US",
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.resumeSkus.map((s: { code: string }) => s.code)).toEqual([
+      "service-power-resume-cover-letter",
+    ]);
+    expect(res.body.items.some((i: { code: string }) => i.code === "service-power-resume-cover-letter")).toBe(
+      true,
+    );
+  });
+
+  it("GET /upsell omits resume SKU when readiness_score is 85+", async () => {
+    const res = await request(app()).get(
+      "/api/v1/recommendations/upsell?target_role=scrum_master&context=diagnosis&readiness_score=85&geo=US",
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.resumeSkus).toEqual([]);
+    expect(
+      res.body.items.some((i: { code: string }) => i.code === "service-power-resume-cover-letter"),
+    ).toBe(false);
   });
 
   it("rejects missing target_role", async () => {

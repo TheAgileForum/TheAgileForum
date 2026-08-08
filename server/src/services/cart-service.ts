@@ -15,27 +15,43 @@ import type { Request } from "express";
 import { resolveCartCouponTotals } from "../commerce/coupon-service.js";
 
 export async function getOrCreateActiveCart(auth: SessionClaims) {
-  const candidates = await prisma.cart.findMany({
+  const activeCandidates = await prisma.cart.findMany({
     where: {
       userId: auth.userId,
-      status: { in: ["active", "checkout_in_progress"] },
+      status: "active",
     },
     include: { items: true },
     orderBy: { updatedAt: "desc" },
   });
 
-  const withItems = candidates.filter((cart) => cart.items.length > 0);
-  const existing = withItems[0] ?? candidates[0];
+  const activeWithItems = activeCandidates.filter((cart) => cart.items.length > 0);
+  const active = activeWithItems[0] ?? activeCandidates[0];
+  if (active) {
+    return active;
+  }
 
-  if (existing) {
-    if (existing.status === "checkout_in_progress") {
-      return prisma.cart.update({
-        where: { id: existing.id },
-        data: { status: "active" },
+  // Reclaim abandoned checkout carts, but never revive a cart that payment just completed.
+  // Conditional updateMany prevents a race: markOrderPaid sets status=completed while a
+  // concurrent GET /cart would otherwise flip the same row back to active (paid items linger).
+  const inProgress = await prisma.cart.findFirst({
+    where: {
+      userId: auth.userId,
+      status: "checkout_in_progress",
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+
+  if (inProgress) {
+    const reclaimed = await prisma.cart.updateMany({
+      where: { id: inProgress.id, status: "checkout_in_progress" },
+      data: { status: "active" },
+    });
+    if (reclaimed.count > 0) {
+      return prisma.cart.findUniqueOrThrow({
+        where: { id: inProgress.id },
         include: { items: true },
       });
     }
-    return existing;
   }
 
   return prisma.cart.create({

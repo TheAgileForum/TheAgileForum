@@ -110,6 +110,7 @@ Increase activation and repeat engagement through dashboard, assessments, planne
 
 ## In Scope (Stories)
 
+- Epic 1: **`1.4` (learner career profile editor — FR-189..195; see `learner-profile-career-preferences-requirement.md`) — schedule after auth+diagnosis stable; may slip to Sprint 3**
 - Epic 2: `2.3`, `2.4`
 - Epic 3: `3.1`, `3.2`, `3.3`
 - Epic 7: `7.1`, `7.2`, `7.3`, `7.4`
@@ -119,6 +120,7 @@ Increase activation and repeat engagement through dashboard, assessments, planne
 
 ## Mandatory Technical Tasks
 
+- **Learner career profile APIs + Profile SPA (roles, credentials have/want, urgency): `T1.7..T1.9` (Story 1.4)**
 - Planner generation + progress state: `T2.3..T2.5`
 - Dashboard aggregates, charts, bookmarks, exam sessions: `T3.1..T3.5`
 - Webinar schedule/attendance/certificates/feedback: `T7.1..T7.4`
@@ -140,6 +142,7 @@ Increase activation and repeat engagement through dashboard, assessments, planne
 - Dashboard supports bar/radar + accessible summaries and bookmarks.
 - Webinar flow complete: discover/register, attendance code, feedback, certificate issue/download.
 - Always-on and re-engagement campaigns run with preference and fatigue controls.
+- **Stretch:** Story 1.4 career profile editor usable on staging (FR-189..195) — may slip to Sprint 3 if dashboard/webinar overruns.
 
 ---
 
@@ -154,7 +157,7 @@ Scale conversion and discoverability with governed AI, complete trust surfaces, 
 - Epic 5: `5.1`, `5.2`, `5.3`, `5.4`
 - Epic 6: `6.2`, `6.3`, `6.4`, `6.5`
 - Epic 8: `8.1`, `8.2`, `8.3`, `8.6`
-- Epic 10: `10.1`, `10.2`, `10.3`, `10.4`
+- Epic 10: `10.1`, `10.2`, `10.3`, `10.4`, **`10.5` (full commercial ops dashboard — FR-183..188; see `admin-full-dashboard-requirement.md`)**
 - Epic 11: `11.1`, `11.2`, `11.3`, `11.4`
 - Epic 12: `12.1` + remaining hardening scope in `12.2`, `12.3`
 
@@ -164,6 +167,7 @@ Scale conversion and discoverability with governed AI, complete trust surfaces, 
 - Mock interview templates + role-aware recommendation resolver: `T6.5`, `T6.7`, `T6.8`
 - Trust/footer/social governance + claims workflow: `T8.1..T8.5`, `T8.8`
 - Admin command center/anomaly/approvals/audit: `T10.1..T10.6`
+- **Commercial ops dashboard (customers/orders/resumes/sales): `T10.9`, `T10.10` (Story 10.5 — later in Sprint 3 after commerce+diagnosis stable)**
 - Search diagnostics/schema/keyword map/experiments/reporting: `T11.1..T11.6`
 - Redirect and SEO health tooling: `T12.1`, `T12.2`, `T12.4..T12.6`
 
@@ -182,6 +186,7 @@ Scale conversion and discoverability with governed AI, complete trust surfaces, 
 - Public trust surfaces (community, social proof, footer/legal/compliance) are complete.
 - SEO/GEO command center and keyword-intent pages are operational.
 - Redirect, reliability, and compliance hardening complete for go-live.
+- **Optional Sprint 3 exit stretch:** commercial ops dashboard Story 10.5 (FR-183..188) usable by ops on staging — may slip to Sprint 3.1 if commerce/diagnosis hardening overruns.
 
 ---
 

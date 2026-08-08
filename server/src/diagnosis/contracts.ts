@@ -1,12 +1,24 @@
 import { z } from "zod";
 
+/** Founder-approved Target role options for diagnosis step 1 (exact wording). */
+export const DIAGNOSIS_TARGET_ROLES = [
+  "Scrum Master/Agile Project Manager",
+  "Product Owner/Product Manager",
+  "Senior Project Manager(Technical)/Senior Agilist",
+  "Delivery Lead /Senior Delivery Manager",
+  "Program Manager/RTE",
+  "Agile Coach/ Agile Transformation Lead",
+] as const;
+
+export type DiagnosisTargetRole = (typeof DIAGNOSIS_TARGET_ROLES)[number];
+
 export const createSessionBody = z.object({
   roleIntent: z.string().optional(),
   campaignId: z.string().optional(),
 });
 
 export const intentBody = z.object({
-  targetRole: z.string().min(1),
+  targetRole: z.enum(DIAGNOSIS_TARGET_ROLES),
   timeline: z.string().min(1),
   currentStatus: z.string().min(1),
   consentAck: z.literal(true),

@@ -40,6 +40,10 @@ const schema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().default("whsec_stub"),
   INTEGRATION_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),
   INTEGRATION_MAX_RETRIES: z.coerce.number().int().min(0).default(2),
+  /** Diagnosis AI: stub (deterministic) or live (OpenRouter). Default stub. */
+  AI_PROVIDER_MODE: z.enum(["stub", "live"]).default("stub"),
+  OPENROUTER_API_KEY: optionalString,
+  OPENROUTER_MODEL: z.string().default("google/gemma-4-26b-a4b-it:free"),
   SENTRY_DSN: optionalString,
   SENTRY_TRACES_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(0.1),
   POSTHOG_API_KEY: optionalString,
@@ -51,6 +55,22 @@ const schema = z.object({
   RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60000),
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(30),
   RESUME_UPLOAD_MAX_MB: z.coerce.number().positive().default(5),
+  /**
+   * Transactional email backend. When unset, auto-selects:
+   * Resend if RESEND_API_KEY set, else Sender if SENDER_API_TOKEN set, else stub.
+   */
+  EMAIL_PROVIDER: z.preprocess((value) => {
+    if (typeof value === "string" && value.trim() === "") return undefined;
+    return typeof value === "string" ? value.trim().toLowerCase() : value;
+  }, z.enum(["resend", "sender"]).optional()),
+  /** Resend API key (optional — see docs/resend-setup.md) */
+  RESEND_API_KEY: optionalString,
+  /** Sender.net API access token (preferred; SENDER_API_KEY accepted as alias at runtime) */
+  SENDER_API_TOKEN: optionalString,
+  /** Verified From address for Resend/Sender (e.g. DhirenderVerma@theagileforum.com) */
+  EMAIL_FROM: optionalString,
+  /** Display name for Sender.from.name (default: The Agile Forum) */
+  EMAIL_FROM_NAME: optionalString,
 });
 
 export type AppEnv = z.infer<typeof schema>;

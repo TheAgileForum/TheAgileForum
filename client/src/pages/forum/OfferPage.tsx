@@ -24,6 +24,7 @@ import { ApiRequestError } from "../../lib/api";
 import { trackEvent } from "../../lib/analytics";
 import { PATH_BY_CATEGORY, type CatalogCategoryPath } from "../../lib/catalog-filters";
 import { catalogDisplayPrice } from "../../lib/catalog-display-price";
+import { resolveCertBadge } from "../../lib/cert-badge";
 import { setCommerceJourneyOrigin } from "../../lib/commerce-journey";
 import { resolvedOfferingPrice } from "../../lib/format-price";
 import {
@@ -33,6 +34,11 @@ import {
   type CatalogOffering,
 } from "../../lib/forum-api";
 import { offerDetailPath, resolveOfferRouteCode } from "../../lib/offer-routes";
+import {
+  displayOfferingIncludes,
+  displayOfferingSummary,
+  displayOfferingTitle,
+} from "../../lib/offering-display-title";
 import { formatScheduleLabelForGeo } from "../../lib/schedule-timezone";
 
 const SCHEDULE_OPTIONS = [
@@ -164,7 +170,7 @@ export function OfferPage() {
       await addItem(
         offering.code,
         offering.scheduleBound ? scheduleRef : undefined,
-        offering.title,
+        displayOfferingTitle(offering.code, offering.title, { currency, geo }),
       );
       trackEvent("catalog_add_to_cart", { code: offering.code, source: "offer_detail" });
     } catch (err) {
@@ -198,15 +204,26 @@ export function OfferPage() {
     );
   }
 
+  const regionOpts = { currency, geo };
+  const displayTitle = displayOfferingTitle(offering.code, offering.title, regionOpts);
+  const offeringForView: CatalogOffering = {
+    ...offering,
+    title: displayTitle,
+    summary: displayOfferingSummary(offering.code, offering.summary, regionOpts),
+    includes: displayOfferingIncludes(offering.code, offering.includes, regionOpts),
+  };
   const priced = resolvedOfferingPrice(offering);
   const displayPrice = catalogDisplayPrice(priced.currency, priced.amount, offering.code);
-  const inclusions = offering.includes?.length ? offering.includes : DEFAULT_INCLUSIONS;
+  const inclusions = offeringForView.includes?.length
+    ? offeringForView.includes
+    : DEFAULT_INCLUSIONS;
   const scheduleOptions = scheduleOptionsFor(offering).map((option) => ({
     ...option,
     label: formatScheduleLabelForGeo(option.label, geo),
   }));
   const schedulePrompt = schedulePromptFor(offering);
-  const extras = getOfferPageExtras(offering.code, offering.certificationName);
+  const extras = getOfferPageExtras(offering.code, offering.certificationName, regionOpts);
+  const cardHero = resolveCertBadge(offering);
   const durationChipLabel = offering.durationLabel
     ? offering.durationLabel
     : offering.durationHours
@@ -224,7 +241,7 @@ export function OfferPage() {
     return (
       <>
         <OfferDetailView
-          offering={offering}
+          offering={offeringForView}
           extras={extras}
           catalogLink={catalogLink}
           displayPrice={displayPrice}
@@ -258,11 +275,36 @@ export function OfferPage() {
         <Link component={RouterLink} to={catalogLink} underline="hover" color="inherit">
           Catalog
         </Link>
-        <Typography color="text.primary">{offering.title}</Typography>
+        <Typography color="text.primary">{displayTitle}</Typography>
       </Breadcrumbs>
 
+      {cardHero.variant === "cover" ? (
+        <Box
+          sx={{
+            position: "relative",
+            borderRadius: 2,
+            overflow: "hidden",
+            aspectRatio: "16 / 9",
+            maxHeight: 320,
+            bgcolor: cardHero.heroGradient,
+          }}
+        >
+          <Box
+            component="img"
+            src={cardHero.src}
+            alt={displayTitle}
+            sx={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+        </Box>
+      ) : null}
+
       <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
-        {offering.title}
+        {displayTitle}
       </Typography>
       <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }}>
         <Chip label={offering.kind} size="small" variant="outlined" />
@@ -275,9 +317,9 @@ export function OfferPage() {
         {offering.scheduleBound ? <Chip label="Select Schedule" size="small" color="info" variant="outlined" /> : null}
       </Stack>
 
-      {offering.summary ? (
+      {offeringForView.summary ? (
         <Typography variant="body1" color="text.secondary">
-          {offering.summary}
+          {offeringForView.summary}
         </Typography>
       ) : null}
 
@@ -286,6 +328,12 @@ export function OfferPage() {
           <Typography variant="overline" color="text.secondary" sx={{ letterSpacing: "0.08em" }}>
             Investment
           </Typography>
+          <EmiAffordabilityModule
+            amount={priced.amount}
+            currency={priced.currency}
+            offerId={offering.code}
+            installmentPlans={offering.priceQuote?.installmentPlans}
+          />
           <Typography
             component="div"
             sx={{
@@ -293,7 +341,7 @@ export function OfferPage() {
               alignItems: "baseline",
               flexWrap: "wrap",
               gap: 1,
-              mt: 0.5,
+              mt: 0.75,
             }}
           >
             {displayPrice.mrpFormatted ? (
@@ -337,12 +385,6 @@ export function OfferPage() {
             Price shown matches checkout total for this session currency.
             {offering.scheduleLabel ? ` · ${offering.scheduleLabel}` : ""}
           </Typography>
-          <EmiAffordabilityModule
-            amount={priced.amount}
-            currency={priced.currency}
-            offerId={offering.code}
-            installmentPlans={offering.priceQuote?.installmentPlans}
-          />
         </CardContent>
       </Card>
 
@@ -415,7 +457,7 @@ export function OfferPage() {
           disabled={adding || (offering.scheduleBound && !scheduleRef)}
           onClick={() => void handleAddToCart()}
         >
-          Add to cart
+          Add to Cart
         </Button>
         <Button variant="outlined" size="large" component={RouterLink} to="/cart">
           View cart

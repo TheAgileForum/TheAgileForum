@@ -5,9 +5,16 @@ import type {
   TelegramAdapter,
   WebinarAdapter,
 } from "./contracts.js";
+import {
+  getEmailFromName,
+  getResendApiKey,
+  getSenderApiToken,
+  resolveTransactionalEmailProvider,
+} from "./email-provider.js";
 import { executeWithRetry } from "./external-call.js";
 import { mapProviderFailure } from "./errors.js";
 import { sendResendEmail } from "./resend-api.js";
+import { sendSenderEmail } from "./sender-api.js";
 import {
   parseStripeWebhookEvent,
   verifyStripeWebhookSignature,
@@ -50,8 +57,8 @@ export class LiveEmailAdapter implements EmailAdapter {
     subject: string;
     html: string;
   }): Promise<{ messageId: string }> {
-    const apiKey = process.env.RESEND_API_KEY?.trim();
-    if (!apiKey) {
+    const selected = resolveTransactionalEmailProvider();
+    if (selected === "stub") {
       return { messageId: `live_email_stub_${input.to}_${Date.now()}` };
     }
 
@@ -59,11 +66,31 @@ export class LiveEmailAdapter implements EmailAdapter {
     if (!from) {
       throw mapProviderFailure(
         "email",
-        "EMAIL_FROM is required when RESEND_API_KEY is set",
+        `EMAIL_FROM is required when EMAIL_PROVIDER=${selected}`,
       );
     }
 
     const result = await executeWithRetry(async () => {
+      if (selected === "sender") {
+        const apiToken = getSenderApiToken();
+        if (!apiToken) {
+          throw new Error("SENDER_API_TOKEN is required when EMAIL_PROVIDER=sender");
+        }
+        const sent = await sendSenderEmail({
+          apiToken,
+          fromEmail: from,
+          fromName: getEmailFromName(),
+          toEmail: input.to,
+          subject: input.subject,
+          html: input.html,
+        });
+        return { messageId: sent.emailId };
+      }
+
+      const apiKey = getResendApiKey();
+      if (!apiKey) {
+        throw new Error("RESEND_API_KEY is required when EMAIL_PROVIDER=resend");
+      }
       const sent = await sendResendEmail({
         apiKey,
         from,

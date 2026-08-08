@@ -11,12 +11,11 @@ import { CatalogFilterBar } from "../../../components/forum/CatalogFilterBar";
 import { CatalogOfferingCard } from "../../../components/forum/CatalogOfferingCard";
 import { useForumCart } from "../../../contexts/ForumCartContext";
 import { usePricing } from "../../../contexts/PricingContext";
-import { ApiRequestError } from "../../../lib/api";
+import { ApiRequestError, CATALOG_TIMEOUT_MESSAGE } from "../../../lib/api";
 import { trackEvent } from "../../../lib/analytics";
 import {
   fetchCatalogCategoryCached,
   peekCatalogCache,
-  peekCatalogCacheAnyPricing,
 } from "../../../lib/catalog-cache";
 import {
   filtersToSearchParams,
@@ -26,13 +25,28 @@ import {
 } from "../../../lib/catalog-filters";
 import { setCommerceJourneyOrigin } from "../../../lib/commerce-journey";
 import type { CatalogOffering, CatalogFacets } from "../../../lib/forum-api";
+import { formatPrice } from "../../../lib/format-price";
 import { offerDetailPath } from "../../../lib/offer-routes";
+import { displayOfferingTitle } from "../../../lib/offering-display-title";
 
 const TITLES: Record<CatalogCategoryPath, string> = {
   trainings: "Trainings",
   certifications: "Certifications",
   services: "Services",
 };
+
+function formatFacetPriceRange(
+  currency: string,
+  range: { min: number; max: number } | null | undefined,
+): string {
+  if (!range) return "";
+  const minLabel = formatPrice(currency, String(range.min));
+  if (range.min === range.max) {
+    return ` · Price ${minLabel}`;
+  }
+  const maxLabel = formatPrice(currency, String(range.max));
+  return ` · Price ${minLabel}–${maxLabel}`;
+}
 
 const SKELETON_COUNT = 6;
 
@@ -51,10 +65,8 @@ function resolveInitialCache(
   geo: string,
   currency: string,
 ) {
-  return (
-    peekCatalogCache(categoryPath, searchKey, geo, currency) ??
-    peekCatalogCacheAnyPricing(categoryPath, searchKey)
-  );
+  // Exact geo/currency only — never paint another currency's prices under the new session label.
+  return peekCatalogCache(categoryPath, searchKey, geo, currency);
 }
 
 function CatalogListingSkeleton() {
@@ -104,6 +116,7 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
   const hasLoadedOnceRef = useRef(false);
   const viewedRef = useRef(false);
   const requestIdRef = useRef(0);
+  const pricingKeyRef = useRef({ currency, geo });
 
   const searchKey = searchParams.toString();
   const filters = parseCatalogFilters(searchKey);
@@ -128,15 +141,28 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
     try {
       const res = await fetchCatalogCategoryCached(categoryPath, searchKey, geo, currency);
       if (requestId !== requestIdRef.current) return;
+      const mismatched = res.offerings.some((o) => {
+        const quoted = o.priceQuote?.currency?.toUpperCase();
+        return quoted != null && quoted !== currency.toUpperCase();
+      });
+      if (mismatched) {
+        trackEvent("catalog_currency_mismatch", {
+          category: categoryPath,
+          currency,
+          geo,
+        });
+      }
       setOfferings(res.offerings);
       setFacets(res.facets ?? null);
       hasLoadedOnceRef.current = true;
     } catch (err) {
       if (requestId !== requestIdRef.current) return;
       if (err instanceof ApiRequestError) {
+        const timedOut =
+          err.code === "REQUEST_TIMEOUT" || err.code === "NETWORK_ERROR";
         setError({
-          message: err.message,
-          retryable: err.retryable || err.code === "REQUEST_TIMEOUT" || err.code === "NETWORK_ERROR",
+          message: timedOut ? CATALOG_TIMEOUT_MESSAGE : err.message,
+          retryable: err.retryable || timedOut,
         });
       } else {
         setError({ message: "Could not load catalog.", retryable: true });
@@ -165,12 +191,16 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
       setFacets(cached.facets ?? null);
       setLoading(false);
       hasLoadedOnceRef.current = true;
+      setRefreshing(false);
     } else if (!hasLoadedOnceRef.current) {
       setOfferings([]);
       setFacets(null);
       setLoading(true);
+      setRefreshing(false);
+    } else {
+      // Keep previous cards visible while the matching-currency refetch completes.
+      setRefreshing(true);
     }
-    setRefreshing(false);
     setError(null);
   }, [categoryPath, searchKey, geo, currency, pricingReady]);
 
@@ -181,8 +211,18 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
     if (!viewedRef.current) {
       viewedRef.current = true;
       trackEvent("catalog_list_viewed", { category: categoryPath });
+    } else if (
+      pricingKeyRef.current.currency !== currency ||
+      pricingKeyRef.current.geo !== geo
+    ) {
+      trackEvent("catalog_pricing_refetch", {
+        category: categoryPath,
+        currency,
+        geo,
+      });
     }
-  }, [load, categoryPath, pricingReady]);
+    pricingKeyRef.current = { currency, geo };
+  }, [load, categoryPath, pricingReady, currency, geo]);
 
   function applyFilters(next: typeof filters) {
     trackEvent("catalog_filter_applied", { category: categoryPath });
@@ -201,7 +241,11 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
     setAddingCode(offering.code);
     setError(null);
     trackEvent("catalog_add_to_cart", { code: offering.code, category: categoryPath });
-    void addItem(offering.code, undefined, offering.title).catch(() => {
+    void addItem(
+      offering.code,
+      undefined,
+      displayOfferingTitle(offering.code, offering.title, { currency, geo }),
+    ).catch(() => {
       // Error surfaced by ForumCartContext snackbar
     }).finally(() => setAddingCode(null));
   }
@@ -226,10 +270,8 @@ export function CatalogListingPage({ categoryPath }: CatalogListingPageProps) {
         <Typography variant="body2" color="text.secondary">
           Browse self-serve offerings · {resultCountLabel} result
           {offerings.length === 1 ? "" : "s"}
-          {facets?.priceRange
-            ? ` · Price ${facets.priceRange.min}–${facets.priceRange.max}`
-            : ""}{" "}
-          · Session: {currency} (FR-178)
+          {formatFacetPriceRange(currency, facets?.priceRange)} · Session:{" "}
+          {currency}
         </Typography>
       </Box>
 

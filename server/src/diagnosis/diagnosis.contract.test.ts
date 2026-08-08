@@ -43,7 +43,7 @@ describe("diagnosis API contracts (no DB)", () => {
     const res = await request(createApp())
       .put("/api/v1/diagnosis/session/sess-1/intent")
       .send({
-        targetRole: "Scrum Master",
+        targetRole: "Scrum Master/Agile Project Manager",
         timeline: "3 months",
         currentStatus: "Practitioner",
         consentAck: false,
@@ -98,5 +98,26 @@ describe("diagnosis API contracts (no DB)", () => {
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe("UNSUPPORTED_MIME");
     expect(res.body.error.retryable).toBe(true);
+  });
+
+  it("POST /extract-text returns text for HTML without a session", async () => {
+    const html = "<html><body><p>Scrum Master resume</p></body></html>";
+    const res = await request(createApp())
+      .post("/api/v1/diagnosis/extract-text")
+      .attach("file", Buffer.from(html, "utf8"), {
+        filename: "resume.html",
+        contentType: "text/html",
+      });
+    expect(res.status).toBe(200);
+    expect(res.body.empty).toBe(false);
+    expect(res.body.textChars).toBeGreaterThan(0);
+    expect(res.body.text).toContain("Scrum Master");
+    expect(res.body.method).toBe("cheerio");
+  });
+
+  it("POST /extract-text rejects missing file", async () => {
+    const res = await request(createApp()).post("/api/v1/diagnosis/extract-text");
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe("FILE_REQUIRED");
   });
 });

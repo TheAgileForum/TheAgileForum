@@ -1,6 +1,14 @@
-import { apiFetch, catalogFetchTimeoutMs, CHECKOUT_START_TIMEOUT_MS } from "./api";
+import {
+  apiFetch,
+  catalogFetchTimeoutMs,
+  CHECKOUT_CONFIRM_TIMEOUT_MS,
+  CHECKOUT_START_TIMEOUT_MS,
+  DIAGNOSIS_API_TIMEOUT_MS,
+} from "./api";
 
 const SESSION_KEY = "af_diagnosis_session_id";
+const RUN_KEY = "af_diagnosis_run_id";
+const RESULT_CACHE_KEY = "af_diagnosis_result_cache";
 
 export function getStoredSessionId(): string | null {
   return sessionStorage.getItem(SESSION_KEY);
@@ -12,6 +20,24 @@ export function storeSessionId(id: string) {
 
 export function clearStoredSessionId() {
   sessionStorage.removeItem(SESSION_KEY);
+  clearStoredRunId();
+  clearCachedAnalysisResult();
+}
+
+export function getStoredRunId(): string | null {
+  return sessionStorage.getItem(RUN_KEY);
+}
+
+export function storeRunId(id: string) {
+  sessionStorage.setItem(RUN_KEY, id);
+}
+
+export function clearStoredRunId() {
+  sessionStorage.removeItem(RUN_KEY);
+}
+
+export function clearCachedAnalysisResult() {
+  sessionStorage.removeItem(RESULT_CACHE_KEY);
 }
 
 export async function createDiagnosisSession(input?: {
@@ -20,7 +46,12 @@ export async function createDiagnosisSession(input?: {
 }) {
   return apiFetch<{ diagnosisSessionId: string; nextStep: string }>(
     "/api/v1/diagnosis/session",
-    { method: "POST", body: JSON.stringify(input ?? {}) },
+    {
+      method: "POST",
+      body: JSON.stringify(input ?? {}),
+      timeoutMs: DIAGNOSIS_API_TIMEOUT_MS,
+      retries: 1,
+    },
   );
 }
 
@@ -37,10 +68,27 @@ export async function saveDiagnosisIntent(
 ) {
   return apiFetch<{ saved: boolean; nextStep: string }>(
     `/api/v1/diagnosis/session/${sessionId}/intent`,
-    { method: "PUT", body: JSON.stringify(body) },
+    {
+      method: "PUT",
+      body: JSON.stringify(body),
+      timeoutMs: DIAGNOSIS_API_TIMEOUT_MS,
+      retries: 1,
+    },
   );
 }
 
+export type ResumeUploadResult = {
+  resumeAssetId: string;
+  validationStatus: string;
+  extractedTextChars?: number;
+  /** Present when server could not extract usable resume text. */
+  extractionWarning?: string;
+};
+
+/**
+ * @deprecated Metadata-only upload stores no file bytes and yields empty resume text.
+ * Prefer {@link uploadResumeFile} (multipart `file`).
+ */
 export async function uploadResumeMetadata(
   sessionId: string,
   body: {
@@ -50,10 +98,48 @@ export async function uploadResumeMetadata(
     checksum?: string;
   },
 ) {
-  return apiFetch<{ resumeAssetId: string; validationStatus: string }>(
-    `/api/v1/diagnosis/session/${sessionId}/resume`,
-    { method: "POST", body: JSON.stringify(body) },
-  );
+  return apiFetch<ResumeUploadResult>(`/api/v1/diagnosis/session/${sessionId}/resume`, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+/** Upload real resume bytes (PDF/DOCX). Preferred over metadata-only. */
+export async function uploadResumeFile(sessionId: string, file: File) {
+  const form = new FormData();
+  form.append("file", file);
+  return apiFetch<ResumeUploadResult>(`/api/v1/diagnosis/session/${sessionId}/resume`, {
+    method: "POST",
+    body: form,
+    timeoutMs: 60_000,
+  });
+}
+
+export type ExtractTextResult = {
+  mimeType: string;
+  method: string;
+  text: string;
+  textPreview: string;
+  textChars: number;
+  pageOrWordCount: number | null;
+  empty: boolean;
+  warnings: string[];
+  sessionId?: string;
+};
+
+/**
+ * Session-optional document text extract (PDF/DOC/DOCX/HTML/TXT/MD).
+ * Use before analyze to preview extract quality; resume upload still persists text.
+ */
+export async function extractDocumentText(file: File, sessionId?: string) {
+  const form = new FormData();
+  form.append("file", file);
+  if (sessionId) form.append("sessionId", sessionId);
+  return apiFetch<ExtractTextResult>(`/api/v1/diagnosis/extract-text`, {
+    method: "POST",
+    body: form,
+    timeoutMs: 60_000,
+  });
 }
 
 export async function saveJdInput(
@@ -91,6 +177,9 @@ export type PrimaryAction = {
 
 export type ConfidenceTier = "high" | "medium" | "low";
 
+/** Whether usable resume text was available for the diagnosis. */
+export type ResumeInputStatus = "available" | "unreadable" | "missing";
+
 export type RoadmapMilestone = {
   phase: string;
   title: string;
@@ -116,8 +205,11 @@ export type EscalationOptions = {
 export type AnalysisResult = {
   targetRole: string | null;
   readinessScore: number;
+  /** Plain-language match sentence, e.g. "Your resume is just 30% match to Scrum Master". */
+  matchHeadline?: string;
   summaryPlain: string;
   confidenceTier: ConfidenceTier;
+  resumeInputStatus?: ResumeInputStatus;
   insights: { strengths: string[]; gaps: string[]; confidence: number };
   roadmapPreview: RoadmapMilestone[];
   recommendation: {
@@ -128,10 +220,45 @@ export type AnalysisResult = {
   primaryAction: PrimaryAction;
   secondaryActions: SecondaryAction[];
   escalation: EscalationOptions | null;
+  /** True when live AI failed and deterministic stub was used. */
+  usedStubFallback?: boolean;
+  /** Present when usedStubFallback is true — upstream failure summary for ops/debug. */
+  fallbackReason?: string;
+  /** Parsed total YOE from intent/resume; null when unknown. */
+  yearsOfExperience?: number | null;
 };
 
 export async function getAnalysisResult(runId: string) {
-  return apiFetch<AnalysisResult>(`/api/v1/diagnosis/runs/${runId}/result`);
+  return apiFetch<AnalysisResult>(`/api/v1/diagnosis/runs/${runId}/result`, {
+    timeoutMs: DIAGNOSIS_API_TIMEOUT_MS,
+    retries: 1,
+  });
+}
+
+type CachedAnalysisResult = {
+  runId: string;
+  result: AnalysisResult;
+};
+
+export function cacheAnalysisResult(runId: string, result: AnalysisResult) {
+  const payload: CachedAnalysisResult = { runId, result };
+  try {
+    sessionStorage.setItem(RESULT_CACHE_KEY, JSON.stringify(payload));
+  } catch {
+    // Quota / private mode — ignore; network refetch remains available.
+  }
+}
+
+export function getCachedAnalysisResult(runId: string): AnalysisResult | null {
+  try {
+    const raw = sessionStorage.getItem(RESULT_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as CachedAnalysisResult;
+    if (parsed?.runId !== runId || !parsed.result) return null;
+    return parsed.result;
+  } catch {
+    return null;
+  }
 }
 
 export async function getJourneyState(subjectId: string) {
@@ -140,7 +267,9 @@ export async function getJourneyState(subjectId: string) {
     currentStep: string;
     resumePayload: Record<string, unknown>;
     updatedAt: string;
-  }>(`/api/v1/journey-state/${subjectId}`);
+  }>(`/api/v1/journey-state/${subjectId}`, {
+    timeoutMs: DIAGNOSIS_API_TIMEOUT_MS,
+  });
 }
 
 export type CatalogOffering = {
@@ -214,6 +343,7 @@ export type UpsellRecommendations = {
   items: UpsellItem[];
   safeCertSkus: UpsellItem[];
   mockInterviewSkus: UpsellItem[];
+  resumeSkus?: UpsellItem[];
   primaryCta: { label: string; offeringCode: string } | null;
 };
 
@@ -284,6 +414,10 @@ export async function getUpsellRecommendations(params: {
   gapTags?: string[];
   geo?: string;
   currency?: string;
+  yearsOfExperience?: number | null;
+  experienceHint?: string | null;
+  /** Resume match % — when &lt; 85, API includes New Resume + LinkedIn Upgrade. */
+  readinessScore?: number | null;
 }) {
   const qs = new URLSearchParams({
     target_role: params.targetRole,
@@ -293,6 +427,13 @@ export async function getUpsellRecommendations(params: {
   if (params.gapTags?.length) qs.set("gap_tags", params.gapTags.join(","));
   if (params.geo) qs.set("geo", params.geo);
   if (params.currency) qs.set("currency_override", params.currency);
+  if (typeof params.yearsOfExperience === "number" && Number.isFinite(params.yearsOfExperience)) {
+    qs.set("years_of_experience", String(params.yearsOfExperience));
+  }
+  if (params.experienceHint?.trim()) qs.set("experience_hint", params.experienceHint.trim());
+  if (typeof params.readinessScore === "number" && Number.isFinite(params.readinessScore)) {
+    qs.set("readiness_score", String(params.readinessScore));
+  }
   return apiFetch<UpsellRecommendations>(`/api/v1/recommendations/upsell?${qs.toString()}`);
 }
 
@@ -634,7 +775,10 @@ export async function startCheckout(
 export async function getRazorpayCheckoutConfig(orderId: string) {
   const res = await apiFetch<{
     config: RazorpayCheckoutConfig & { orderNumber: string };
-  }>(`/api/v1/commerce/razorpay/checkout-config/${orderId}`);
+  }>(`/api/v1/commerce/razorpay/checkout-config/${orderId}`, {
+    timeoutMs: CHECKOUT_CONFIRM_TIMEOUT_MS,
+    retries: 2,
+  });
   return res.config;
 }
 
@@ -650,6 +794,8 @@ export async function confirmRazorpayCheckout(input: {
     {
       method: "POST",
       body: JSON.stringify(input),
+      timeoutMs: CHECKOUT_CONFIRM_TIMEOUT_MS,
+      retries: 2,
     },
   );
 }
@@ -663,6 +809,8 @@ export async function confirmStripeCheckout(input: {
     {
       method: "POST",
       body: JSON.stringify(input),
+      timeoutMs: CHECKOUT_CONFIRM_TIMEOUT_MS,
+      retries: 2,
     },
   );
 }
@@ -674,5 +822,52 @@ export async function completeCheckout(orderId: string, paymentRef?: string) {
       method: "POST",
       body: JSON.stringify({ orderId, paymentRef: paymentRef ?? "stub-payment" }),
     },
+  );
+}
+
+export type LearnerOrderItem = {
+  offeringCode: string;
+  title: string;
+  category?: string;
+  quantity: number;
+  unitPrice: string;
+  currency: string;
+};
+
+export type LearnerOrder = {
+  id: string;
+  orderNumber: string;
+  status: string;
+  currency: string;
+  totalAmount: string;
+  createdAt: string;
+  items: LearnerOrderItem[];
+};
+
+export async function listMyOrders() {
+  const res = await apiFetch<{ orders: LearnerOrder[] }>("/api/v1/commerce/orders");
+  return res.orders;
+}
+
+export async function getMyOrder(orderId: string) {
+  const res = await apiFetch<{ order: LearnerOrder }>(
+    `/api/v1/commerce/orders/${encodeURIComponent(orderId)}`,
+  );
+  return res.order;
+}
+
+/** Resume cart for an abandoned (unpaid) order, then navigate to /checkout. */
+export async function resumeMyOrderCheckout(orderId: string) {
+  return apiFetch<{ ok: true; cartId: string }>(
+    `/api/v1/commerce/orders/${encodeURIComponent(orderId)}/resume-checkout`,
+    { method: "POST" },
+  );
+}
+
+/** Soft-cancel an abandoned (unpaid) order owned by the current user. */
+export async function cancelMyOrder(orderId: string) {
+  return apiFetch<{ ok: true; order: { id: string; status: string } }>(
+    `/api/v1/commerce/orders/${encodeURIComponent(orderId)}`,
+    { method: "DELETE" },
   );
 }

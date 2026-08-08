@@ -1,3 +1,5 @@
+import type { CurrencyContext } from "../pricing/pricing-service.js";
+import { quoteOfferingPrice } from "../pricing/pricing-service.js";
 import type { OfferingMeta } from "./offerings.js";
 
 export type OfferingCategory = "training" | "certification" | "service";
@@ -17,9 +19,20 @@ function parsePrice(value: string): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+function sessionUnitPrice(
+  offering: OfferingMeta,
+  context?: CurrencyContext,
+): number {
+  if (context) {
+    return parsePrice(quoteOfferingPrice(offering, context).amount);
+  }
+  return parsePrice(offering.defaultUnitPrice);
+}
+
 export function filterOfferings(
   offerings: OfferingMeta[],
   query: CatalogFilterQuery,
+  context?: CurrencyContext,
 ): OfferingMeta[] {
   return offerings.filter((offering) => {
     if (query.category && offering.category !== query.category) {
@@ -31,7 +44,7 @@ export function filterOfferings(
     if (query.certBody && offering.certBody !== query.certBody) {
       return false;
     }
-    const price = parsePrice(offering.defaultUnitPrice);
+    const price = sessionUnitPrice(offering, context);
     if (query.minPrice !== undefined && price < query.minPrice) {
       return false;
     }

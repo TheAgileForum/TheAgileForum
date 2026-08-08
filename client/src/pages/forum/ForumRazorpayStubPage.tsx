@@ -79,7 +79,7 @@ export function ForumRazorpayStubPage() {
       </Typography>
       <Typography color="text.secondary">
         Confirm payment for order {orderNumber ?? orderId}. This stub simulates Razorpay full-pay for
-        India geo (FR-170).
+        India.
       </Typography>
       <Typography variant="body2" sx={{ fontFamily: "monospace", fontSize: 12 }}>
         {paymentRef}

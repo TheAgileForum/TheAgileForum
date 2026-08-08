@@ -3,6 +3,12 @@ import {
   MENTORSHIP_LEGACY_ROUTE_SEGMENTS,
   MENTORSHIP_OFFER_CODE,
   MENTORSHIP_PUBLIC_SLUG,
+  PO_BA_MENTORSHIP_LEGACY_ROUTE_SEGMENTS,
+  PO_BA_MENTORSHIP_OFFER_CODE,
+  PO_BA_MENTORSHIP_PUBLIC_SLUG,
+  POWER_RESUME_LEGACY_ROUTE_SEGMENTS,
+  POWER_RESUME_OFFER_CODE,
+  POWER_RESUME_PUBLIC_SLUG,
   offerDetailPath,
   resolveOfferRouteCode,
 } from "./offer-routes";
@@ -31,9 +37,58 @@ describe("offer routes", () => {
     }
   });
 
+  it("emits the BA/PO mentorship public slug without changing its stable code", () => {
+    expect(offerDetailPath(PO_BA_MENTORSHIP_OFFER_CODE)).toBe(
+      `/offers/${PO_BA_MENTORSHIP_PUBLIC_SLUG}`,
+    );
+    expect(resolveOfferRouteCode(PO_BA_MENTORSHIP_PUBLIC_SLUG)).toBe(
+      PO_BA_MENTORSHIP_OFFER_CODE,
+    );
+    for (const routeSegment of PO_BA_MENTORSHIP_LEGACY_ROUTE_SEGMENTS) {
+      expect(resolveOfferRouteCode(routeSegment)).toBe(
+        PO_BA_MENTORSHIP_OFFER_CODE,
+      );
+    }
+  });
+
+  it("emits the resume public slug without changing its stable code", () => {
+    expect(offerDetailPath(POWER_RESUME_OFFER_CODE)).toBe(
+      `/offers/${POWER_RESUME_PUBLIC_SLUG}`,
+    );
+    expect(resolveOfferRouteCode(POWER_RESUME_PUBLIC_SLUG)).toBe(
+      POWER_RESUME_OFFER_CODE,
+    );
+  });
+
+  it("resolves legacy resume routes to the stable offer code", () => {
+    for (const routeSegment of POWER_RESUME_LEGACY_ROUTE_SEGMENTS) {
+      expect(resolveOfferRouteCode(routeSegment)).toBe(POWER_RESUME_OFFER_CODE);
+    }
+  });
+
   it("preserves routes for offerings without a public alias", () => {
     expect(offerDetailPath("safe-scrum-master-certification-training")).toBe(
       "/offers/safe-scrum-master-certification-training",
+    );
+    expect(offerDetailPath("csm-certification-training")).toBe(
+      "/offers/csm-certification-training",
+    );
+    expect(offerDetailPath("safe-rte-certification-training")).toBe(
+      "/offers/safe-rte-certification-training",
+    );
+    expect(offerDetailPath("psm-ii-certification-training")).toBe(
+      "/offers/psm-ii-certification-training",
+    );
+    expect(offerDetailPath("psm-i-certification-training")).toBe(
+      "/offers/professional-scrum-master-psm-i-training-crash-course",
+    );
+    expect(
+      resolveOfferRouteCode(
+        "professional-scrum-master-psm-i-training-crash-course",
+      ),
+    ).toBe("psm-i-certification-training");
+    expect(resolveOfferRouteCode("psm-i-certification-training")).toBe(
+      "psm-i-certification-training",
     );
     expect(resolveOfferRouteCode("unknown-offer")).toBe("unknown-offer");
   });

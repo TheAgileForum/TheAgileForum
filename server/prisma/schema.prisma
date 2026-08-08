@@ -376,17 +376,18 @@ model DiagnosisSession {
 }
 
 model ResumeAsset {
-  id          String            @id @default(uuid())
-  sessionId   String            @map("session_id")
-  fileName    String            @map("file_name")
-  mimeType    String            @map("mime_type")
-  sizeBytes   Int               @map("size_bytes")
-  checksum    String?
-  storagePath String            @map("storage_path")
-  status      ResumeAssetStatus @default(PENDING)
-  createdAt   DateTime          @default(now()) @map("created_at")
-  updatedAt   DateTime          @updatedAt @map("updated_at")
-  session     DiagnosisSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  id            String            @id @default(uuid())
+  sessionId     String            @map("session_id")
+  fileName      String            @map("file_name")
+  mimeType      String            @map("mime_type")
+  sizeBytes     Int               @map("size_bytes")
+  checksum      String?
+  storagePath   String            @map("storage_path")
+  extractedText String?           @map("extracted_text")
+  status        ResumeAssetStatus @default(PENDING)
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+  session       DiagnosisSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId])
   @@map("resume_assets")
@@ -412,6 +413,8 @@ model AnalysisRun {
   stage        AnalysisStage?
   progressPct  Int               @default(0) @map("progress_pct")
   errorMessage String?           @map("error_message")
+  /// Provider audit: model, prompt version, tokens, latency, usedStubFallback
+  auditMeta    Json?             @map("audit_meta")
   startedAt    DateTime?         @map("started_at")
   completedAt  DateTime?         @map("completed_at")
   createdAt    DateTime          @default(now()) @map("created_at")

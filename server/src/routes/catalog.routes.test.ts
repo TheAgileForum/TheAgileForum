@@ -25,6 +25,19 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
     expect(res.body.facets).toMatchObject({ roles: expect.any(Array), priceRange: expect.any(Object) });
   });
 
+  it("quotes trainings priceRange in session currency (FR-178)", async () => {
+    const res = await request(app()).get(
+      "/api/v1/catalog/trainings?geo=IN&currency_override=INR",
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.currencyContext.currency).toBe("INR");
+    expect(res.body.facets.priceRange).toEqual({ min: 29990, max: 29990 });
+    expect(res.body.offerings[0].priceQuote).toMatchObject({
+      amount: "29990.00",
+      currency: "INR",
+    });
+  });
+
   it("lists certifications category only", async () => {
     const res = await request(app()).get("/api/v1/catalog/certifications");
     expect(res.body.offerings.every((o: { category: string }) => o.category === "certification")).toBe(true);
@@ -62,11 +75,15 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
         "safe-leading-safe",
         "safe-product-owner-product-manager-certification-training",
         "safe-scrum-master-certification-training",
+        "csm-certification-training",
+        "safe-rte-certification-training",
+        "psm-i-certification-training",
+        "psm-ii-certification-training",
       ]),
     );
     expect(codes).not.toContain("exam-practice-free");
     expect(codes).not.toContain("exam-mock-certification");
-    expect(res.body.offerings).toHaveLength(3);
+    expect(res.body.offerings).toHaveLength(7);
 
     const leading = res.body.offerings.find(
       (o: { code: string }) => o.code === "safe-leading-safe",
@@ -75,6 +92,51 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
     expect(leading?.defaultUnitPrice).toBe("549.00");
     expect(leading?.certificationName).toContain("SAFe Agilist");
     expect(leading?.durationHours).toBe(16);
+
+    const csm = res.body.offerings.find(
+      (o: { code: string }) => o.code === "csm-certification-training",
+    );
+    expect(csm?.certBody).toBe("scrum alliance");
+    expect(csm?.certificationName).toContain("CSM");
+    expect(csm?.durationHours).toBe(16);
+
+    const rte = res.body.offerings.find(
+      (o: { code: string }) => o.code === "safe-rte-certification-training",
+    );
+    expect(rte?.certBody).toBe("scaled agile");
+    expect(rte?.certificationName).toContain("Release Train Engineer");
+    expect(rte?.durationHours).toBe(24);
+
+    const psmI = res.body.offerings.find(
+      (o: { code: string }) => o.code === "psm-i-certification-training",
+    );
+    expect(psmI?.certBody).toBe("scrum.org");
+    expect(psmI?.title).toContain("PSM-I");
+    expect(psmI?.defaultUnitPrice).toBe("149.00");
+    expect(psmI?.durationHours).toBe(8);
+    expect(psmI?.slug).toBe(
+      "professional-scrum-master-psm-i-training-crash-course",
+    );
+
+    const psmIi = res.body.offerings.find(
+      (o: { code: string }) => o.code === "psm-ii-certification-training",
+    );
+    expect(psmIi?.certBody).toBe("scrum.org");
+    expect(psmIi?.certificationName).toContain("PSM II");
+    expect(psmIi?.durationHours).toBe(16);
+  });
+
+  it("resolves PSM I marketing slug alias to canonical offer", async () => {
+    const res = await request(app()).get(
+      "/api/v1/catalog/offerings/professional-scrum-master-psm-i-training-crash-course?geo=IN",
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.offering.code).toBe("psm-i-certification-training");
+    expect(res.body.offering.durationHours).toBe(8);
+    expect(res.body.priceQuote).toMatchObject({
+      amount: "9999.00",
+      currency: "INR",
+    });
   });
 
   it("resolves live-site slug alias for Leading SAFe detail", async () => {
@@ -89,9 +151,45 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
   });
 
   it.each([
+    "service-power-resume-cover-letter",
+    "power-resume-cover-letter",
+    "new-resume-with-cover-letter-linkedin-upgrade",
+  ])("resolves resume service code or alias %s to the canonical offer", async (code) => {
+    const res = await request(app()).get(
+      `/api/v1/catalog/offerings/${code}?geo=US`,
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.offering).toMatchObject({
+      code: "service-power-resume-cover-letter",
+      slug: "new-resume-with-cover-letter-linkedin-upgrade",
+      title: "New Resume With Cover Letter & Linkedin Upgrade",
+    });
+    expect(res.body.offering.includes).toEqual(
+      expect.arrayContaining([
+        expect.stringMatching(/LinkedIn profile upgrade/i),
+        expect.stringMatching(
+          /ATS Friendly Resume, with tried and tested formats which get you hired/i,
+        ),
+      ]),
+    );
+  });
+
+  it("quotes resume service at INR 6999 for India geo", async () => {
+    const res = await request(app()).get(
+      "/api/v1/catalog/offerings/service-power-resume-cover-letter?geo=IN",
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.priceQuote).toMatchObject({
+      amount: "6999.00",
+      currency: "INR",
+    });
+  });
+
+  it.each([
     "course-agile-fundamentals",
     "scrum-master-mentorship-masterclass",
     "live-project-mentorship-masterclass-for-scrum-master-product-owner",
+    "live-project-mentorship-masterclass-for-scrum-master-agile-pm",
   ])("resolves mentorship code or alias %s to the canonical offer", async (code) => {
     const res = await request(app()).get(
       `/api/v1/catalog/offerings/${code}?geo=IN`,
@@ -105,13 +203,58 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
       slug: "live-project-mentorship-masterclass-for-scrum-master-product-owner",
       durationLabel: "3 weeks",
     });
-    expect(res.body.offering.title).toContain("Mentorship Masterclass");
+    expect(res.body.offering.title).toBe(
+      "3+ Week AI-Enabled Scrum Master / Agile Project Manager Mentorship Masterclass (PSM 1 Certification Exam Pre-requisite)",
+    );
+    expect(res.body.offering.roleTags).toEqual(
+      expect.arrayContaining(["scrum_master", "agile_pm"]),
+    );
     expect(res.body.offering.includes.length).toBeGreaterThan(5);
     expect(res.body.offering.cohortSchedules).toHaveLength(2);
     expect(res.body.priceQuote).toMatchObject({
       amount: "29990.00",
       currency: "INR",
     });
+  });
+
+  it.each([
+    "course-po-ba-mentorship",
+    "live-project-mentorship-masterclass-for-business-analyst-product-owner",
+  ])("resolves BA/PO mentorship code or alias %s", async (code) => {
+    const res = await request(app()).get(
+      `/api/v1/catalog/offerings/${code}?geo=IN`,
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body.offering).toMatchObject({
+      code: "course-po-ba-mentorship",
+      category: "training",
+      scheduleBound: true,
+      slug: "live-project-mentorship-masterclass-for-business-analyst-product-owner",
+      durationLabel: "3 weeks",
+    });
+    expect(res.body.offering.title).toBe(
+      "3+ Week AI-Enabled Business Analyst / Product Owner Mentorship Masterclass (PSPO 1 Certification Exam Pre-requisite)",
+    );
+    expect(res.body.offering.roleTags).toEqual(
+      expect.arrayContaining(["product_owner", "business_analyst", "learner"]),
+    );
+    expect(res.body.priceQuote).toMatchObject({
+      amount: "29990.00",
+      currency: "INR",
+    });
+  });
+
+  it("lists both mentorship offerings under /trainings", async () => {
+    const res = await request(app()).get("/api/v1/catalog/trainings");
+    expect(res.status).toBe(200);
+    const codes = res.body.offerings.map((o: { code: string }) => o.code);
+    expect(codes).toEqual(
+      expect.arrayContaining([
+        "course-agile-fundamentals",
+        "course-po-ba-mentorship",
+      ]),
+    );
   });
 
   it("keeps free/paid exam SKUs available by code (FR-85/86/87)", async () => {
@@ -167,10 +310,26 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
     expect(res.body.currencyContext.currency).toBe("INR");
     expect(res.body.offerings.length).toBeGreaterThan(0);
     expect(res.body.offerings[0].priceQuote.currency).toBe("INR");
-    expect(res.body.offerings.every(
-      (o: { priceQuote: { currency: string; amount: string } }) =>
-        o.priceQuote.currency === "INR" && o.priceQuote.amount === "33999.00",
-    )).toBe(true);
+    expect(
+      res.body.offerings.every(
+        (o: { priceQuote: { currency: string } }) =>
+          o.priceQuote.currency === "INR",
+      ),
+    ).toBe(true);
+    const psmI = res.body.offerings.find(
+      (o: { code: string }) => o.code === "psm-i-certification-training",
+    );
+    expect(psmI?.priceQuote).toMatchObject({
+      amount: "9999.00",
+      currency: "INR",
+    });
+    const psmIi = res.body.offerings.find(
+      (o: { code: string }) => o.code === "psm-ii-certification-training",
+    );
+    expect(psmIi?.priceQuote).toMatchObject({
+      amount: "33999.00",
+      currency: "INR",
+    });
   });
 
   it("GET /offerings/:code returns detail priceQuote (api-contract)", async () => {
