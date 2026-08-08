@@ -3,7 +3,7 @@ import {
   SM_LEADING_SAFE_CODE,
   SM_SAFE_SCRUM_MASTER_CODE,
 } from "./sm-pathway.js";
-import { getUpsellRecommendations } from "./upsell-service.js";
+import { getUpsellRecommendations, POWER_RESUME_OFFER_CODE } from "./upsell-service.js";
 
 describe("role-based upsell recommendations (FR-181)", () => {
   it("returns SAFe cert and mock interview SKUs for scrum master", () => {
@@ -24,6 +24,47 @@ describe("role-based upsell recommendations (FR-181)", () => {
     expect(result.items.length).toBeGreaterThan(0);
     expect(result.items.every((i) => i.action === "book")).toBe(true);
     expect(result.items[0]?.priceQuote.currency).toBe("USD");
+    expect(result.resumeSkus).toEqual([]);
+  });
+
+  it("includes New Resume upsell when readinessScore is below 85", () => {
+    const result = getUpsellRecommendations({
+      targetRole: "scrum_master",
+      context: "diagnosis",
+      readinessScore: 62,
+      geo: "US",
+    });
+    expect(result.resumeSkus.map((s) => s.code)).toEqual([POWER_RESUME_OFFER_CODE]);
+    expect(result.items.some((i) => i.code === POWER_RESUME_OFFER_CODE)).toBe(true);
+    expect(result.resumeSkus[0]?.action).toBe("book");
+  });
+
+  it("does not include New Resume upsell when readinessScore is 85 or higher", () => {
+    const atThreshold = getUpsellRecommendations({
+      targetRole: "scrum_master",
+      context: "diagnosis",
+      readinessScore: 85,
+      geo: "US",
+    });
+    const above = getUpsellRecommendations({
+      targetRole: "scrum_master",
+      context: "diagnosis",
+      readinessScore: 90,
+      geo: "US",
+    });
+    expect(atThreshold.resumeSkus).toEqual([]);
+    expect(atThreshold.items.some((i) => i.code === POWER_RESUME_OFFER_CODE)).toBe(false);
+    expect(above.resumeSkus).toEqual([]);
+    expect(above.items.some((i) => i.code === POWER_RESUME_OFFER_CODE)).toBe(false);
+  });
+
+  it("omits resume upsell when readinessScore is omitted", () => {
+    const result = getUpsellRecommendations({
+      targetRole: "scrum_master",
+      context: "diagnosis",
+      geo: "US",
+    });
+    expect(result.resumeSkus).toEqual([]);
   });
 
   it("filters POPM and RTE from SM pathway and injects SAFe SM when YOE unknown", () => {

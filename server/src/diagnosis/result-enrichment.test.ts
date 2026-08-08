@@ -34,7 +34,7 @@ describe("result-enrichment", () => {
     expect(roadmap[0].status).toBe("current");
     expect(roadmap[0].phase).toBe("Week 1–3");
     expect(roadmap[0].title).toContain("Complete Mastery");
-    expect(roadmap[0].description).toContain("Prioritization");
+    expect(roadmap[0].description).toContain('Close Skill gap of "Prioritization"');
     expect(roadmap[1].title).toBe("Getting SAFe Certified");
     expect(roadmap[1].description).toMatch(/recognized SAFe/i);
     expect(roadmap[2].title).toBe("Interview readiness");
@@ -48,6 +48,9 @@ describe("result-enrichment", () => {
     ]);
     expect(roadmap[0].title).toBe(
       "Scrum Master/Agile Project Manager Complete Mastery with Live Practical Project and Sprint Execution",
+    );
+    expect(roadmap[0].description).toContain(
+      'Close Skill gap of "Summary lacks Scrum Master/Agile PM specific positioning"',
     );
     expect(roadmap[0].description).toContain("PSM certification");
     expect(roadmap[0].description).toContain("60+ topics");

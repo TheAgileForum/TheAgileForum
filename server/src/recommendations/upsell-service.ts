@@ -22,6 +22,10 @@ export const upsellContexts = [
 
 export type UpsellContext = (typeof upsellContexts)[number];
 
+/** Resume / LinkedIn upgrade SKU shown when resume match is below this threshold. */
+export const RESUME_UPSELL_SCORE_THRESHOLD = 85;
+export const POWER_RESUME_OFFER_CODE = "service-power-resume-cover-letter";
+
 export type UpsellSku = {
   code: string;
   title: string;
@@ -135,6 +139,7 @@ function rankSkus(
 
 /**
  * Role-based SAFe cert + mock interview upsell (FR-181).
+ * When readinessScore &lt; 85, also recommend New Resume + LinkedIn Upgrade.
  *
  * Scrum Master pathway: deterministic filter — never POPM/RTE; exactly one SAFe
  * cert by YOE (&lt;12 → SAFe SM, ≥12 → Leading SAFe; unknown YOE → SAFe SM).
@@ -150,6 +155,11 @@ export function getUpsellRecommendations(input: {
   yearsOfExperience?: number | null;
   /** Free-text hints (currentStatus / resume snippet) used when YOE not numeric. */
   experienceHint?: string | null;
+  /**
+   * Resume match / readiness % from diagnosis. When set and &lt; 85, include
+   * service-power-resume-cover-letter in the pathway rail. ≥ 85 skips resume upsell.
+   */
+  readinessScore?: number | null;
 }) {
   const currencyContext = resolveCurrencyContext({
     geo: input.geo ?? "US",
@@ -185,7 +195,17 @@ export function getUpsellRecommendations(input: {
       matchesRole(o, input.targetRole),
   );
 
-  // Diagnosis pathway rail: View (book) for SAFe + Mock — not Add to cart.
+  const readinessScore =
+    typeof input.readinessScore === "number" && Number.isFinite(input.readinessScore)
+      ? input.readinessScore
+      : null;
+  const includeResumeUpsell =
+    readinessScore !== null && readinessScore < RESUME_UPSELL_SCORE_THRESHOLD;
+  const resumeCandidate = includeResumeUpsell
+    ? offerings.find((o) => o.code === POWER_RESUME_OFFER_CODE)
+    : undefined;
+
+  // Diagnosis pathway rail: View (book) for SAFe + Mock (+ resume) — not Add to cart.
   const forceView = input.context === "diagnosis";
 
   const safeCertSkus = rankSkus(
@@ -203,7 +223,12 @@ export function getUpsellRecommendations(input: {
     forceView,
   );
 
-  const rankedItems = [...safeCertSkus, ...mockInterviewSkus]
+  // Score-gated resume upsell: always include when below threshold (View on diagnosis).
+  const resumeSkus = resumeCandidate
+    ? [serializeUpsellSku(resumeCandidate, currencyContext, 10, forceView)]
+    : [];
+
+  const rankedItems = [...safeCertSkus, ...mockInterviewSkus, ...resumeSkus]
     .sort((a, b) => b.relevanceScore - a.relevanceScore)
     .slice(0, 4);
 
@@ -221,6 +246,7 @@ export function getUpsellRecommendations(input: {
     items: rankedItems,
     safeCertSkus,
     mockInterviewSkus,
+    resumeSkus,
     primaryCta: primarySku
       ? {
           label:

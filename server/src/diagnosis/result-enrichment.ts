@@ -134,8 +134,8 @@ export function buildRoadmapPreview(
     ? "Scrum Master/Agile Project Manager Complete Mastery with Live Practical Project and Sprint Execution"
     : `${role} Complete Mastery with Live Practical Project and Sprint Execution`;
   const week1Description = smPathway
-    ? `Close "${topGap}" with live labs and backlog practice. Full end to end industry enablement for Scrum Master/Agile PM role with Scrum, Kanban, Agile Project Management and other 60+ topics covered to clear interviews with 100% confidence. This Live Project training is also a prerequisite for taking the PSM certification exam. Micro-exams also helps you to be fully prepared for the role.`
-    : `Close "${topGap}" with live labs and backlog practice. Full end to end industry enablement for ${role} with hands-on project work and interview-focused practice. Micro-exams also help you prepare for the role.`;
+    ? `Close Skill gap of "${topGap}" with live labs and backlog practice. Full end to end industry enablement for Scrum Master/Agile PM role with Scrum, Kanban, Agile Project Management and other 60+ topics covered to clear interviews with 100% confidence. This Live Project training is also a prerequisite for taking the PSM certification exam. Micro-exams also helps you to be fully prepared for the role.`
+    : `Close Skill gap of "${topGap}" with live labs and backlog practice. Full end to end industry enablement for ${role} with hands-on project work and interview-focused practice. Micro-exams also help you prepare for the role.`;
 
   return [
     {

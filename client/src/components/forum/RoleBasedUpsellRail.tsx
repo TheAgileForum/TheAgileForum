@@ -21,6 +21,8 @@ type RoleBasedUpsellRailProps = {
   gapTags?: string[];
   /** Parsed total YOE from diagnosis; drives SM pathway SAFe SM vs Leading SAFe. */
   yearsOfExperience?: number | null;
+  /** Resume match % — when &lt; 85, include New Resume + LinkedIn Upgrade. */
+  readinessScore?: number | null;
   onAddOffering?: (code: string, scheduleRef?: string, label?: string) => Promise<void>;
 };
 
@@ -30,6 +32,7 @@ export function RoleBasedUpsellRail({
   offerId,
   gapTags = [],
   yearsOfExperience,
+  readinessScore,
   onAddOffering,
 }: RoleBasedUpsellRailProps) {
   const { currency, geo } = usePricing();
@@ -53,6 +56,7 @@ export function RoleBasedUpsellRail({
       geo,
       currency,
       yearsOfExperience,
+      readinessScore,
     })
       .then((res) => {
         if (cancelled) return;
@@ -71,7 +75,16 @@ export function RoleBasedUpsellRail({
     return () => {
       cancelled = true;
     };
-  }, [targetRole, context, offerId, gapTags.join(","), geo, currency, yearsOfExperience]);
+  }, [
+    targetRole,
+    context,
+    offerId,
+    gapTags.join(","),
+    geo,
+    currency,
+    yearsOfExperience,
+    readinessScore,
+  ]);
 
   async function handleAdd(item: UpsellItem) {
     if (!onAddOffering) return;
