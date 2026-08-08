@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 
 const PROOF_ITEMS = [
   "Scrum.org paths",
+  "Scrum Alliance path",
   "SAFe tracks",
   "Mentor-led cohorts",
   "Interview-ready practice",
