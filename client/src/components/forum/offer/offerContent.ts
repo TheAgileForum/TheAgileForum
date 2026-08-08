@@ -2,7 +2,10 @@
 
 import {
   MENTORSHIP_OFFER_CODE,
+  MENTORSHIP_PUBLIC_SLUG,
   PO_BA_MENTORSHIP_OFFER_CODE,
+  PO_BA_MENTORSHIP_PUBLIC_SLUG,
+  resolveOfferRouteCode,
 } from "../../../lib/offer-routes";
 
 export const OFFER_INK = "#0a1628";
@@ -1816,12 +1819,40 @@ const MENTORSHIP_EXTRAS: OfferPageExtras = {
     "SPC · large-scale transformation consultant · Scrum/XP/SAFe trainer. Not sure this is your next step? Book a short call — role fit, cohort timing, and whether mock interviews or SAFe add-ons help your goal.",
 };
 
-/** BA / Product Owner mentorship — same live-project shell, audience-specific copy. */
+/** BA / Product Owner mentorship — same live-project shell, BA/PO-specific copy throughout. */
 const PO_BA_MENTORSHIP_EXTRAS: OfferPageExtras = {
   ...MENTORSHIP_EXTRAS,
+  heroEyebrow: "Job-focused mentorship · Live JIRA project",
   heroImageAlt: "BA / Product Owner mentorship masterclass — live cohort training",
+  benefitPills: [
+    "3 weeks · weekday live classes",
+    "Live JIRA backlog on your system",
+    "Discovery & stakeholder practice",
+    "Rejoin next batch free",
+  ],
+  keyBenefits: [
+    {
+      title: "5× a 2-day cert class",
+      detail: "Full discovery, backlog, and Agile product practice — not slides alone",
+    },
+    {
+      title: "Hands-on every session",
+      detail: "Refinement, prioritization, and sprint collaboration on a live JIRA project you own",
+    },
+    {
+      title: "Interview-ready",
+      detail: "Situational BA / PO questions, stakeholder roleplays, and guidance",
+    },
+    {
+      title: "Pay once, rejoin free",
+      detail: "Rejoin the next batch at no extra cost; 3 months trainer support",
+    },
+  ],
   overviewBody:
     "Practical, job-oriented hands-on training on a live project in JIRA & AI. Full backlog, discovery, stakeholder, and Agile product practices so you can step into a Business Analyst or Product Owner role with confidence.",
+  overviewPracticeTitle: "What every session builds",
+  overviewPracticeBody:
+    "Discovery and backlog work performed live in Jira on your system, stakeholder conversations and roleplays, boards/JQL/dashboards, user-story workshops, prioritization and refinement practice, and situational interview prep — plus an option to rejoin the next batch free.",
   overviewExpectationsBody:
     "In-depth Jira core features; comprehensive Agile discovery and backlog management; practical refinement and prioritization; user-story writing and splitting workshops; collaboration techniques; reusable templates; and case-based practice. This is a non-certification course, with support to prepare for PSPO 1 or other certifications after training.",
   overviewStats: [
@@ -1829,6 +1860,142 @@ const PO_BA_MENTORSHIP_EXTRAS: OfferPageExtras = {
     { num: "1.5 hrs", label: "Live class every weekday (Mon–Fri)" },
     { num: "4–6", label: "Small cohort size for personal attention" },
   ],
+  benefitsTitle: "Why this mentorship works",
+  benefitsLead:
+    "Build practical BA / PO role knowledge, certification readiness, and job-search confidence through live practice and continued support.",
+  benefits: [
+    {
+      title: "Correct, complete role knowledge",
+      detail:
+        "Learn the practical foundations and situational thinking expected of Business Analysts and Product Owners.",
+      images: [
+        {
+          src: "/mentorship-benefits/role-knowledge.png",
+          alt: "Two heads with interconnected gears representing shared practical knowledge",
+        },
+      ],
+    },
+    {
+      title: "Certification preparation and exam support",
+      detail:
+        "Strengthen your product ownership knowledge and prepare for PSPO 1 with guided review and exam-oriented support.",
+      note:
+        "Outcomes depend on participation, preparation, and exam eligibility; certification is taken separately.",
+      images: [
+        {
+          src: "/mentorship-benefits/exam-support-badge.png",
+          alt: "Certification exam preparation and support badge",
+        },
+      ],
+    },
+    {
+      title: "Handholding and job support",
+      detail:
+        "Get mentor guidance, query support, and practical job-search help as you work toward your next BA or Product Owner role.",
+      images: [
+        {
+          src: "/mentorship-benefits/handholding-job-support.png",
+          alt: "Handshake with rising arrow representing mentorship and career support",
+        },
+      ],
+    },
+    {
+      title: "Hands-on live Jira project and recordings",
+      detail:
+        "Practice backlog setup, refinement, boards, JQL, and dashboards on your own system, with recordings to revisit.",
+      images: [
+        {
+          src: "/mentorship-benefits/live-jira-project.png",
+          alt: "Live Jira project board with sprint work in progress",
+        },
+      ],
+    },
+    {
+      title: "Rejoin live sessions and the inner circle",
+      detail:
+        "Rejoin a future live batch at no extra cost and continue learning with the alumni inner-circle community.",
+      images: [
+        {
+          src: "/mentorship-benefits/rejoin-live-sessions.png",
+          alt: "Interactive online class with learners and an instructor",
+        },
+      ],
+    },
+    {
+      title: "Winning resume and relevant job leads",
+      detail:
+        "Shape a clear, role-focused resume and receive suitable job leads shared through the mentorship network when available.",
+      images: [
+        {
+          src: "/mentorship-benefits/winning-resume.png",
+          alt: "Resume examples with a highlighted hired resume",
+        },
+      ],
+    },
+  ],
+  learnLead:
+    "End-to-end knowledge to clear BA / Product Owner interviews — and prepare for PSPO after training.",
+  curriculum: [
+    {
+      title: "Agile product foundations — discovery & delivery",
+      summary:
+        "Build the mindset and practices you need before tools: Agile principles, PO/BA accountability, discovery habits, and how value flows from idea to backlog.",
+      bullets: [
+        "Product Owner & BA responsibilities end-to-end",
+        "Discovery, outcomes, and stakeholder alignment",
+        "Scrum / Kanban collaboration with delivery teams",
+      ],
+    },
+    {
+      title: "Live JIRA backlog on your laptop",
+      summary:
+        "Set up a real JIRA project on every participant’s system and manage epics, stories, and boards hands-on — not demos you only watch.",
+      bullets: ["Project & board setup", "Backlogs, refinement & workflows", "Confluence / knowledge docs where used"],
+    },
+    {
+      title: "Sprint collaboration — full checklist simulations",
+      summary:
+        "Form a scrum team and run planning, refinement, review, and retrospective with real checklists, inputs/outputs, and PO/BA coaching moments.",
+      bullets: [
+        "Sprint planning & backlog refinement",
+        "Prioritization and acceptance conversations",
+        "Review & stakeholder demo practice",
+      ],
+    },
+    {
+      title: "Boards, JQL & dashboards",
+      summary:
+        "In-depth JIRA skills: boards, JQL filters, and dashboards so you can keep transparency and reporting crisp as a working BA / PO.",
+    },
+    {
+      title: "User stories & splitting workshop",
+      summary:
+        "Best practices for epics, stories, and tasks — plus a live user-story writing and story-splitting workshop.",
+    },
+    {
+      title: "Stakeholder conversations & roleplays",
+      summary:
+        "Practice the conversations that make a great BA / PO: clarification, trade-offs, conflict, and stakeholder negotiation patterns.",
+    },
+    {
+      title: "Quality, risks & product maturity",
+      summary:
+        "Advanced topics: quality enhancement, risks and mitigations, and maturity assessments — the depth 2-day cert classes usually skip.",
+    },
+    {
+      title: "Interview guidance & situational questions",
+      summary:
+        "Walk through situational interview questions and answer patterns so you leave ready for BA / Product Owner interviews.",
+    },
+    {
+      title: "AI-enabled BA/PO workflows & templates",
+      summary:
+        "AI prompts and workflows for the modern BA / PO, plus refinement docs, discovery notes, and knowledge templates to reuse on the job.",
+    },
+  ],
+  curriculumTitle: "3 phases · 9 modules of practical mastery",
+  curriculumLead:
+    "Curriculum mirrors the live BA / PO mentorship masterclass — from discovery foundations through live JIRA immersion, stakeholder practice, interviews, and AI-enabled workflows.",
   audience: [
     {
       role: "Career changers",
@@ -1849,6 +2016,7 @@ const PO_BA_MENTORSHIP_EXTRAS: OfferPageExtras = {
   ],
   audienceLead:
     "Designed to help you land a Business Analyst or Product Owner job — not just sit through theory.",
+  certSectionTitle: "BA / PO immersion on a live JIRA project",
   certSectionLead:
     "Participants form a scrum team and simulate BA, Product Owner, and delivery collaboration on a live JIRA project — every event, checklist, and coaching moment included.",
   certBullets: [
@@ -1858,8 +2026,85 @@ const PO_BA_MENTORSHIP_EXTRAS: OfferPageExtras = {
     "Non-certification course — take PSPO/certification after training",
     "Inner-circle community support after the cohort",
   ],
+  faqGroups: [
+    {
+      title: "About the program",
+      items: [
+        {
+          question: "What is the BA / Product Owner mentorship program?",
+          answer:
+            "A comprehensive 3-week live course with hands-on experience on live JIRA projects — so you can perform Business Analyst and Product Owner work with confidence and clear BA / PO interviews. Optional add-ons include SAFe certifications, mock interviews, and resume preparation.",
+        },
+        {
+          question: "How long is the program?",
+          answer:
+            "About 3+ weeks of intensive weekday classes (1.5 hours each, Monday–Friday), with the option to rejoin the next batch free.",
+        },
+        {
+          question: "Do I need prior experience or certifications?",
+          answer:
+            "No. The program accommodates beginners through experienced practitioners — including successful career switchers from non-technical backgrounds.",
+        },
+        {
+          question: "Is this a certification course?",
+          answer:
+            "No — this is a non-certificate mentorship/masterclass. Certifications (e.g. PSPO) are taken after training. SAFe certs can be enrolled separately.",
+        },
+      ],
+    },
+    {
+      title: "Delivery & support",
+      items: [
+        {
+          question: "How are live projects conducted in JIRA?",
+          answer:
+            "We help you set up a live JIRA project on your laptop. Hands-on backlog and discovery work is core to the program — you apply learning in a practical setting every session.",
+        },
+        {
+          question: "What is the class size?",
+          answer:
+            "Intentionally small (about 4–6) for personalized attention: lectures, exercises, discussions, and project work.",
+        },
+        {
+          question: "Can I rejoin a future batch for free?",
+          answer:
+            "Yes. Pay once and you may rejoin a future batch at no extra cost. Trainer support for queries continues for 3 months after completion.",
+        },
+        {
+          question: "Do I get materials after the program?",
+          answer:
+            "Yes — recordings, course docs, and templates stay available so you can review at your own pace. Alumni join the inner-circle community for ongoing support.",
+        },
+      ],
+    },
+    {
+      title: "Enrollment",
+      items: [
+        {
+          question: "Do I need a schedule before checkout?",
+          answer:
+            "Yes. This offering is schedule-bound — select a cohort so your cart line carries the right batch.",
+        },
+        {
+          question: "Who teaches the sessions?",
+          answer:
+            "Dhirender Verma — SPC, large-scale transformation consultant, and Scrum/XP/SAFe trainer.",
+        },
+        {
+          question: "Can I change my batch?",
+          answer:
+            "Contact support if scheduling conflicts arise. Batch transfers are accommodated when seats allow — and rejoining the next batch free remains available.",
+        },
+      ],
+    },
+  ],
   corporateMailto:
     "mailto:contact@theagileforum.com?subject=Corporate%20BA%20Product%20Owner%20Mentorship",
+  finalCtaTitle: "Ready for hands-on BA / PO mentorship?",
+  finalCtaLead:
+    "Select your weekday cohort, enroll at the listed price, or book a mentor call if you want role-fit guidance first.",
+  mentorBody:
+    "SPC · large-scale transformation consultant · Scrum/XP/SAFe trainer. Not sure this is your next step? Book a short call — role fit, cohort timing, and whether mock interviews or SAFe add-ons help your BA / PO goal.",
 };
 
 /** Mock Interview Series — service offer (not schedule-bound). */
@@ -2418,29 +2663,37 @@ export function getOfferPageExtras(
   certificationName?: string,
   opts?: { currency?: string | null; geo?: string | null },
 ): OfferPageExtras | null {
-  if (code === SSM_OFFER_CODE) return SSM_EXTRAS;
-  if (code === CSM_OFFER_CODE) return CSM_EXTRAS;
-  if (code === PSM_I_OFFER_CODE) return PSM_I_EXTRAS;
-  if (code === RTE_OFFER_CODE) return RTE_EXTRAS;
-  if (code === PSM_II_OFFER_CODE) return PSM_II_EXTRAS;
-  if (code === MENTORSHIP_OFFER_CODE || code === MENTORSHIP_CANONICAL_CODE) return MENTORSHIP_EXTRAS;
+  const resolved = resolveOfferRouteCode(code);
+  if (resolved === SSM_OFFER_CODE) return SSM_EXTRAS;
+  if (resolved === CSM_OFFER_CODE) return CSM_EXTRAS;
+  if (resolved === PSM_I_OFFER_CODE) return PSM_I_EXTRAS;
+  if (resolved === RTE_OFFER_CODE) return RTE_EXTRAS;
+  if (resolved === PSM_II_OFFER_CODE) return PSM_II_EXTRAS;
   if (
-    code === PO_BA_MENTORSHIP_OFFER_CODE ||
-    code === PO_BA_MENTORSHIP_CANONICAL_CODE
+    resolved === MENTORSHIP_OFFER_CODE ||
+    resolved === MENTORSHIP_CANONICAL_CODE ||
+    code === MENTORSHIP_PUBLIC_SLUG
+  ) {
+    return MENTORSHIP_EXTRAS;
+  }
+  if (
+    resolved === PO_BA_MENTORSHIP_OFFER_CODE ||
+    resolved === PO_BA_MENTORSHIP_CANONICAL_CODE ||
+    code === PO_BA_MENTORSHIP_PUBLIC_SLUG
   ) {
     return PO_BA_MENTORSHIP_EXTRAS;
   }
-  if (code === MOCK_INTERVIEW_OFFER_CODE || code === MOCK_INTERVIEW_SLUG) {
+  if (resolved === MOCK_INTERVIEW_OFFER_CODE || code === MOCK_INTERVIEW_SLUG) {
     return MOCK_INTERVIEW_EXTRAS;
   }
   if (
-    code === POWER_RESUME_OFFER_CODE ||
+    resolved === POWER_RESUME_OFFER_CODE ||
     code === POWER_RESUME_SLUG ||
     code === POWER_RESUME_LEGACY_SLUG
   ) {
     return powerResumeExtrasForRegion(opts);
   }
-  if (SAFE_CERT_CODES.has(code)) {
+  if (SAFE_CERT_CODES.has(resolved)) {
     return genericCertExtras(certificationName ?? "SAFe® certification");
   }
   return null;
