@@ -28,6 +28,7 @@ describe("buildDiagnosisSystemPrompt", () => {
     expect(prompt).toContain(DIAGNOSIS_PROMPT_VERSION);
     expect(prompt).toMatch(/Never guarantee a job/i);
     expect(prompt).toContain("course-agile-fundamentals");
+    expect(prompt).toContain("course-po-ba-mentorship");
     expect(prompt).toContain("gaps\": string[1-12]");
     expect(prompt).toContain("GAP DETECTION RUBRIC");
     expect(prompt).toMatch(/No quantified sprint\/delivery outcomes/i);
@@ -35,6 +36,7 @@ describe("buildDiagnosisSystemPrompt", () => {
     expect(prompt).toMatch(/Do NOT recommend.*POPM|safe-product-owner/i);
     expect(prompt).toMatch(/safe-rte-certification-training \(RTE\)/i);
     expect(prompt).toMatch(/under 12 years|12\+ years/i);
+    expect(prompt).toMatch(/Business Analyst \/ Product Owner/i);
   });
 });
 

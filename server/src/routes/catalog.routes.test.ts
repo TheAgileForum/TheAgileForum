@@ -189,6 +189,7 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
     "course-agile-fundamentals",
     "scrum-master-mentorship-masterclass",
     "live-project-mentorship-masterclass-for-scrum-master-product-owner",
+    "live-project-mentorship-masterclass-for-scrum-master-agile-pm",
   ])("resolves mentorship code or alias %s to the canonical offer", async (code) => {
     const res = await request(app()).get(
       `/api/v1/catalog/offerings/${code}?geo=IN`,
@@ -203,7 +204,10 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
       durationLabel: "3 weeks",
     });
     expect(res.body.offering.title).toBe(
-      "3+ Week AI-Enabled Scrum Master / Product Owner Mentorship Masterclass (PSM 1 Certification Exam Pre-requisite)",
+      "3+ Week AI-Enabled Scrum Master / Agile Project Manager Mentorship Masterclass (PSM 1 Certification Exam Pre-requisite)",
+    );
+    expect(res.body.offering.roleTags).toEqual(
+      expect.arrayContaining(["scrum_master", "agile_pm"]),
     );
     expect(res.body.offering.includes.length).toBeGreaterThan(5);
     expect(res.body.offering.cohortSchedules).toHaveLength(2);
@@ -211,6 +215,46 @@ describe("catalog routes (FR-161, FR-162, FR-163)", () => {
       amount: "29990.00",
       currency: "INR",
     });
+  });
+
+  it.each([
+    "course-po-ba-mentorship",
+    "live-project-mentorship-masterclass-for-business-analyst-product-owner",
+  ])("resolves BA/PO mentorship code or alias %s", async (code) => {
+    const res = await request(app()).get(
+      `/api/v1/catalog/offerings/${code}?geo=IN`,
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body.offering).toMatchObject({
+      code: "course-po-ba-mentorship",
+      category: "training",
+      scheduleBound: true,
+      slug: "live-project-mentorship-masterclass-for-business-analyst-product-owner",
+      durationLabel: "3 weeks",
+    });
+    expect(res.body.offering.title).toBe(
+      "3+ Week AI-Enabled Business Analyst / Product Owner Mentorship Masterclass (PSPO 1 Certification Exam Pre-requisite)",
+    );
+    expect(res.body.offering.roleTags).toEqual(
+      expect.arrayContaining(["product_owner", "business_analyst", "learner"]),
+    );
+    expect(res.body.priceQuote).toMatchObject({
+      amount: "29990.00",
+      currency: "INR",
+    });
+  });
+
+  it("lists both mentorship offerings under /trainings", async () => {
+    const res = await request(app()).get("/api/v1/catalog/trainings");
+    expect(res.status).toBe(200);
+    const codes = res.body.offerings.map((o: { code: string }) => o.code);
+    expect(codes).toEqual(
+      expect.arrayContaining([
+        "course-agile-fundamentals",
+        "course-po-ba-mentorship",
+      ]),
+    );
   });
 
   it("keeps free/paid exam SKUs available by code (FR-85/86/87)", async () => {

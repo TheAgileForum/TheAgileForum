@@ -1,6 +1,9 @@
 /** Shared shell + per-offer extras for rich offer detail pages. */
 
-import { MENTORSHIP_OFFER_CODE } from "../../../lib/offer-routes";
+import {
+  MENTORSHIP_OFFER_CODE,
+  PO_BA_MENTORSHIP_OFFER_CODE,
+} from "../../../lib/offer-routes";
 
 export const OFFER_INK = "#0a1628";
 export const OFFER_INK_SOFT = "#12233a";
@@ -15,6 +18,8 @@ export const RTE_OFFER_CODE = "safe-rte-certification-training";
 export const PSM_I_OFFER_CODE = "psm-i-certification-training";
 export const PSM_II_OFFER_CODE = "psm-ii-certification-training";
 export const MENTORSHIP_CANONICAL_CODE = "scrum-master-mentorship-masterclass";
+export const PO_BA_MENTORSHIP_CANONICAL_CODE =
+  "live-project-mentorship-masterclass-for-business-analyst-product-owner";
 export const MOCK_INTERVIEW_OFFER_CODE = "service-mock-interview-sm";
 export const MOCK_INTERVIEW_SLUG = "mock-interview-series-with-interview-preparation";
 export const POWER_RESUME_OFFER_CODE = "service-power-resume-cover-letter";
@@ -1537,7 +1542,7 @@ const MENTORSHIP_EXTRAS: OfferPageExtras = {
   ],
   overviewTitle: "Land the role — not just another certificate",
   overviewBody:
-    "Practical, job-oriented hands-on training on a live project in JIRA & AI. Full Scrum, XP, Kanban, and Agile project management so you can step into a Scrum Master, Agile PM, or Product Owner role with confidence.",
+    "Practical, job-oriented hands-on training on a live project in JIRA & AI. Full Scrum, XP, Kanban, and Agile project management so you can step into a Scrum Master or Agile PM / APM role with confidence.",
   overviewPracticeTitle: "What every session builds",
   overviewPracticeBody:
     "Every sprint event performed live in Jira on your system, coaching conversations and roleplays, boards/JQL/dashboards, user-story workshops, advanced quality/risk/maturity topics, and situational interview practice — plus an option to rejoin the next batch free.",
@@ -1545,7 +1550,7 @@ const MENTORSHIP_EXTRAS: OfferPageExtras = {
   overviewExpectationsBody:
     "In-depth Jira core features; comprehensive Agile, Scrum, and Kanban; practical project, sprint, and backlog management; user-story writing and splitting workshops; collaboration techniques; reusable templates; and case-based practice. This is a non-certification course, with support to prepare for PSM or other certifications after training.",
   overviewStats: [
-    { num: "3 weeks", label: "AI-enabled SM/PO mentorship · weekday cohorts" },
+    { num: "3 weeks", label: "AI-enabled SM / Agile PM mentorship · weekday cohorts" },
     { num: "1.5 hrs", label: "Live class every weekday (Mon–Fri)" },
     { num: "4–6", label: "Small cohort size for personal attention" },
   ],
@@ -1809,6 +1814,52 @@ const MENTORSHIP_EXTRAS: OfferPageExtras = {
   mentorHeadline: "Learn with the mentor who runs every cohort",
   mentorBody:
     "SPC · large-scale transformation consultant · Scrum/XP/SAFe trainer. Not sure this is your next step? Book a short call — role fit, cohort timing, and whether mock interviews or SAFe add-ons help your goal.",
+};
+
+/** BA / Product Owner mentorship — same live-project shell, audience-specific copy. */
+const PO_BA_MENTORSHIP_EXTRAS: OfferPageExtras = {
+  ...MENTORSHIP_EXTRAS,
+  heroImageAlt: "BA / Product Owner mentorship masterclass — live cohort training",
+  overviewBody:
+    "Practical, job-oriented hands-on training on a live project in JIRA & AI. Full backlog, discovery, stakeholder, and Agile product practices so you can step into a Business Analyst or Product Owner role with confidence.",
+  overviewExpectationsBody:
+    "In-depth Jira core features; comprehensive Agile discovery and backlog management; practical refinement and prioritization; user-story writing and splitting workshops; collaboration techniques; reusable templates; and case-based practice. This is a non-certification course, with support to prepare for PSPO 1 or other certifications after training.",
+  overviewStats: [
+    { num: "3 weeks", label: "AI-enabled BA / PO mentorship · weekday cohorts" },
+    { num: "1.5 hrs", label: "Live class every weekday (Mon–Fri)" },
+    { num: "4–6", label: "Small cohort size for personal attention" },
+  ],
+  audience: [
+    {
+      role: "Career changers",
+      detail: "Working in a different role and want a path into BA / Product Owner",
+    },
+    {
+      role: "Non-IT aspirants",
+      detail: "Never worked in software/IT, but want to become a BA or Product Owner",
+    },
+    {
+      role: "Returners",
+      detail: "Career gap and need interview-ready fundamentals plus hands-on practice",
+    },
+    {
+      role: "Working BAs & POs",
+      detail: "Basics + advanced aren’t crisp — want practical hands-on and interview confidence",
+    },
+  ],
+  audienceLead:
+    "Designed to help you land a Business Analyst or Product Owner job — not just sit through theory.",
+  certSectionLead:
+    "Participants form a scrum team and simulate BA, Product Owner, and delivery collaboration on a live JIRA project — every event, checklist, and coaching moment included.",
+  certBullets: [
+    "Online live project on every participant’s system",
+    "Class recordings provided",
+    "All sprint events and simulations on live JIRA",
+    "Non-certification course — take PSPO/certification after training",
+    "Inner-circle community support after the cohort",
+  ],
+  corporateMailto:
+    "mailto:contact@theagileforum.com?subject=Corporate%20BA%20Product%20Owner%20Mentorship",
 };
 
 /** Mock Interview Series — service offer (not schedule-bound). */
@@ -2373,6 +2424,12 @@ export function getOfferPageExtras(
   if (code === RTE_OFFER_CODE) return RTE_EXTRAS;
   if (code === PSM_II_OFFER_CODE) return PSM_II_EXTRAS;
   if (code === MENTORSHIP_OFFER_CODE || code === MENTORSHIP_CANONICAL_CODE) return MENTORSHIP_EXTRAS;
+  if (
+    code === PO_BA_MENTORSHIP_OFFER_CODE ||
+    code === PO_BA_MENTORSHIP_CANONICAL_CODE
+  ) {
+    return PO_BA_MENTORSHIP_EXTRAS;
+  }
   if (code === MOCK_INTERVIEW_OFFER_CODE || code === MOCK_INTERVIEW_SLUG) {
     return MOCK_INTERVIEW_EXTRAS;
   }

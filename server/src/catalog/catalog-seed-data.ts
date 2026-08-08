@@ -9,6 +9,12 @@ export const OFFERING_CODE_ALIASES: Record<string, string> = {
   "scrum-master-mentorship-masterclass": "course-agile-fundamentals",
   "live-project-mentorship-masterclass-for-scrum-master-product-owner":
     "course-agile-fundamentals",
+  "live-project-mentorship-masterclass-for-scrum-master-agile-pm":
+    "course-agile-fundamentals",
+  "course-AI-Enabled-agile-live-project-mentorship": "course-agile-fundamentals",
+  "live-project-mentorship-masterclass-for-business-analyst-product-owner":
+    "course-po-ba-mentorship",
+  "course-AI-Enabled-ba-po-live-project-mentorship": "course-po-ba-mentorship",
   "mock-interview-series-with-interview-preparation": "service-mock-interview-sm",
   "power-resume-cover-letter": "service-power-resume-cover-letter",
   "new-resume-with-cover-letter-linkedin-upgrade":
@@ -16,6 +22,33 @@ export const OFFERING_CODE_ALIASES: Record<string, string> = {
   "professional-scrum-master-psm-i-training-crash-course":
     "psm-i-certification-training",
 };
+
+const MENTORSHIP_COHORT_SCHEDULES = [
+  {
+    id: "batch-1-jul-2026",
+    label:
+      "Batch 1 · 10:30 AM–12:00 PM IST / 10:00 PM–11:30 PM PST / 9:00–10:30 AM UAE",
+  },
+  {
+    id: "batch-2-jul-2026",
+    label:
+      "Batch 2 · 7:30 PM–9:00 PM IST / 10:00 AM–11:30 AM EST / 3:00–4:30 PM BST / 6:00–7:30 PM UAE",
+  },
+] as const;
+
+const MENTORSHIP_INCLUDES = [
+  "Online live project on every participant's system",
+  "Class recordings provided",
+  "All sprint events and simulations on live JIRA",
+  "JIRA training — boards, JQL, and dashboards",
+  "Coaching conversations and roleplays",
+  "Interview guidance and situational interview questions",
+  "Advanced topics: quality, risks, mitigations, maturity assessments",
+  "Trainer support for queries for 3 months after completion",
+  "Pay once, attend multiple batches (rejoin next batch free)",
+  "Non-certification course — certification exam taken after training",
+  "Inner-circle community for continuous support after the cohort",
+] as const;
 
 /**
  * Codes retired from the public catalog. Soft-hidden from listings/seed so
@@ -36,7 +69,7 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
   "course-agile-fundamentals": {
     code: "course-agile-fundamentals",
     title:
-      "3+ Week AI-Enabled Scrum Master / Product Owner Mentorship Masterclass (PSM 1 Certification Exam Pre-requisite)",
+      "3+ Week AI-Enabled Scrum Master / Agile Project Manager Mentorship Masterclass (PSM 1 Certification Exam Pre-requisite)",
     kind: "course",
     category: "training",
     scheduleBound: true,
@@ -45,40 +78,17 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
     defaultUnitPrice: "499.00",
     currency: "USD",
     regionalUnitPrices: { INR: "29990.00" },
-    roleTags: ["learner", "scrum_master", "product_owner"],
+    roleTags: ["learner", "scrum_master", "agile_pm"],
     deliveryMode: "live",
     upcomingBatchId: "batch-1-jul-2026",
     slug: "live-project-mentorship-masterclass-for-scrum-master-product-owner",
     certificationName: "Live JIRA project mentorship",
     durationLabel: "3 weeks",
     summary:
-      "Practical job-oriented hands-on training on a live project in JIRA & AI. Full Scrum, XP, Kanban, and Agile project management for Scrum Master and Product Owner roles — with the option to rejoin the next batch for free.",
+      "Practical job-oriented hands-on training on a live project in JIRA & AI. Full Scrum, XP, Kanban, and Agile project management for Scrum Master and Agile PM / APM roles — with the option to rejoin the next batch for free. Pre-requisite path for PSM 1 exam prep.",
     scheduleLabel: "Cohort 7 Jul – 27 Jul 2026 · 1.5 hr class weekdays (Mon–Fri)",
-    cohortSchedules: [
-      {
-        id: "batch-1-jul-2026",
-        label:
-          "Batch 1 · 10:30 AM–12:00 PM IST / 10:00 PM–11:30 PM PST / 9:00–10:30 AM UAE",
-      },
-      {
-        id: "batch-2-jul-2026",
-        label:
-          "Batch 2 · 7:30 PM–9:00 PM IST / 10:00 AM–11:30 AM EST / 3:00–4:30 PM BST / 6:00–7:30 PM UAE",
-      },
-    ],
-    includes: [
-      "Online live project on every participant's system",
-      "Class recordings provided",
-      "All sprint events and simulations on live JIRA",
-      "JIRA training — boards, JQL, and dashboards",
-      "Coaching conversations and roleplays",
-      "Interview guidance and situational interview questions",
-      "Advanced topics: quality, risks, mitigations, maturity assessments",
-      "Trainer support for queries for 3 months after completion",
-      "Pay once, attend multiple batches (rejoin next batch free)",
-      "Non-certification course — PSM/certification taken after training",
-      "Inner-circle community for continuous support after the cohort",
-    ],
+    cohortSchedules: [...MENTORSHIP_COHORT_SCHEDULES],
+    includes: [...MENTORSHIP_INCLUDES],
     learningOutcomes: [
       "End-to-end knowledge to clear Scrum Master or Agile PM interviews and PSM exam prep",
       "In-depth JIRA core features for sprints, backlogs, boards, JQL, and dashboards",
@@ -86,7 +96,40 @@ export const OFFERING_STUB_CATALOG: Record<string, OfferingMeta> = {
       "User story writing and story-splitting workshop",
       "Collaboration and communication techniques for agile delivery",
       "Templates: capacity sheets, coaching docs, and knowledge documents",
-      "Confidence to answer situational interview questions and work as a Scrum Master",
+      "Confidence to answer situational interview questions and work as a Scrum Master / Agile PM",
+    ],
+  },
+  "course-po-ba-mentorship": {
+    code: "course-po-ba-mentorship",
+    title:
+      "3+ Week AI-Enabled Business Analyst / Product Owner Mentorship Masterclass (PSPO 1 Certification Exam Pre-requisite)",
+    kind: "course",
+    category: "training",
+    scheduleBound: true,
+    examAccess: "preview_only",
+    safeOrgPaymentEligible: false,
+    defaultUnitPrice: "499.00",
+    currency: "USD",
+    regionalUnitPrices: { INR: "29990.00" },
+    roleTags: ["learner", "product_owner", "business_analyst"],
+    deliveryMode: "live",
+    upcomingBatchId: "batch-1-jul-2026",
+    slug: "live-project-mentorship-masterclass-for-business-analyst-product-owner",
+    certificationName: "Live JIRA project mentorship",
+    durationLabel: "3 weeks",
+    summary:
+      "Practical job-oriented hands-on training on a live project in JIRA & AI. Full backlog, discovery, stakeholder, and Agile product practices for Business Analyst and Product Owner roles — with the option to rejoin the next batch for free. Pre-requisite path for PSPO 1 exam prep.",
+    scheduleLabel: "Cohort 7 Jul – 27 Jul 2026 · 1.5 hr class weekdays (Mon–Fri)",
+    cohortSchedules: [...MENTORSHIP_COHORT_SCHEDULES],
+    includes: [...MENTORSHIP_INCLUDES],
+    learningOutcomes: [
+      "End-to-end knowledge to clear BA / Product Owner interviews and PSPO exam prep",
+      "In-depth JIRA core features for backlogs, boards, JQL, and dashboards",
+      "Practical discovery, prioritization, and backlog refinement on a live simulated team",
+      "User story writing and story-splitting workshop",
+      "Stakeholder collaboration and communication techniques for product delivery",
+      "Templates: refinement docs, discovery notes, and knowledge documents",
+      "Confidence to answer situational interview questions and work as a BA / Product Owner",
     ],
   },
   /** Kept for commerce/checkout tests; not shown on /certifications (course-only listing). */

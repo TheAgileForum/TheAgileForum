@@ -1,5 +1,8 @@
 import { formatPrice } from "./format-price";
-import { MENTORSHIP_OFFER_CODE } from "./offer-routes";
+import {
+  MENTORSHIP_OFFER_CODE,
+  PO_BA_MENTORSHIP_OFFER_CODE,
+} from "./offer-routes";
 
 const DISPLAY_DISCOUNT_RATE = 0.3;
 
@@ -14,6 +17,12 @@ export type CatalogDisplayPrice = {
  * Per-offering display overrides (card MRP / discount label).
  * Sale amount still comes from the API quote; these only affect strikethrough + %.
  */
+const MENTORSHIP_INR_DISPLAY = {
+  discountRate: 0.5,
+  mrpAmount: 60_000,
+  currencies: ["INR"] as const,
+};
+
 const OFFERING_DISPLAY_OVERRIDES: Record<
   string,
   {
@@ -21,14 +30,11 @@ const OFFERING_DISPLAY_OVERRIDES: Record<
     /** Fixed MRP when rounding from sale/(1-rate) should show a clean list price. */
     mrpAmount?: number;
     /** When set, override applies only for these currencies (e.g. Indian customers). */
-    currencies?: string[];
+    currencies?: readonly string[];
   }
 > = {
-  [MENTORSHIP_OFFER_CODE]: {
-    discountRate: 0.5,
-    mrpAmount: 60_000,
-    currencies: ["INR"],
-  },
+  [MENTORSHIP_OFFER_CODE]: MENTORSHIP_INR_DISPLAY,
+  [PO_BA_MENTORSHIP_OFFER_CODE]: MENTORSHIP_INR_DISPLAY,
 };
 
 /** Derive strikethrough MRP + sale display when API omits list/sale fields (FR-179). */

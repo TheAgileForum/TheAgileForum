@@ -63,7 +63,9 @@ export function filtersToApiQuery(filters: CatalogFilters): string {
 export const ROLE_FILTER_OPTIONS = [
   { value: "", label: "All roles" },
   { value: "scrum_master", label: "Scrum Master" },
+  { value: "agile_pm", label: "Agile PM" },
   { value: "product_owner", label: "Product Owner" },
+  { value: "business_analyst", label: "Business Analyst" },
   { value: "learner", label: "Learner" },
   { value: "safe_program_consultant", label: "SAFe / RTE" },
 ] as const;
