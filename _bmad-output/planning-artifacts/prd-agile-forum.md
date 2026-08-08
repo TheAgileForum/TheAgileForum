@@ -143,11 +143,12 @@ Deliver a guided, data-informed career growth platform where every learner can a
 19. Resume intelligence suggestions funnel (skills + keyword optimization, registration-gated deep report, resume upgrade service offers)
 20. Admin command center baseline (journey monitoring, campaign controls, human-in-the-loop approvals)
 21. Full commercial ops dashboard (customers, orders, resume/diagnosis scores & links, certs/services sold) — **later sprint** (FR-183..188 / Story 10.5)
-21. Search growth foundation (SEO + AI-engine discoverability) including schema, content structures, and indexing observability
-22. Role-specific AI enablement across all courses and services (personalized guidance, recommendations, and outcomes by target role)
-23. Role-specific mock interview services (Scrum Master, Product Owner, Product Manager, RTE, and related pathways) with booking and conversion tracking
-24. Social trust and discovery layer (official social profile visibility, active social proof modules, and cross-channel conversion routing)
-25. Role X -> Role Y transition planner with predefined pathways, suggested training/exams/certifications, actionable todos, and a 4-8 week roadmap timeline view
+22. Learner career profile editor (target roles, LinkedIn-sourced + editable completed certs/trainings, future wishlist + how soon) — **later sprint** (FR-189..195 / Story 1.4)
+23. Search growth foundation (SEO + AI-engine discoverability) including schema, content structures, and indexing observability
+24. Role-specific AI enablement across all courses and services (personalized guidance, recommendations, and outcomes by target role)
+25. Role-specific mock interview services (Scrum Master, Product Owner, Product Manager, RTE, and related pathways) with booking and conversion tracking
+26. Social trust and discovery layer (official social profile visibility, active social proof modules, and cross-channel conversion routing)
+27. Role X -> Role Y transition planner with predefined pathways, suggested training/exams/certifications, actionable todos, and a 4-8 week roadmap timeline view
 
 ### Post-MVP (Release 2+)
 
@@ -198,6 +199,7 @@ Deliver a guided, data-informed career growth platform where every learner can a
 - **B3 Structured social proof system:** reusable outcomes surfaced in post-diagnosis moments
 - **B4 Analytics truth layer:** complete event instrumentation and operator reporting
 - **B5 Full commercial ops dashboard:** admin-login CRM-style views for customers, orders, resumes/diagnosis scores, and sales mix (FR-183..188 / Story 10.5) — after Tier A commerce + diagnosis are stable
+- **B6 Learner career profile editor:** durable target roles, LinkedIn-imported/editable completed credentials, future training/cert wishlist with urgency (FR-189..195 / Story 1.4) — after auth + diagnosis are stable
 
 ## Full Site Replacement Requirements
 
@@ -417,6 +419,13 @@ These are acceptance-critical requirements for replacing current pages and legac
 - FR-1: Users can register/login with email and selected OAuth providers.
 - FR-2: Users can create and update profile details needed for personalization.
 - FR-3: Users must provide required consent acknowledgments before using diagnosis features.
+- FR-189: Authenticated learners can open a profile editor to view and update durable personalization fields (at minimum display name and personalization-relevant contact/geo preferences) with validated save and persistence across sessions.
+- FR-190: Authenticated learners can select and update one or more target roles they are looking for/targeting from the approved role list; selections persist on the profile and may default new diagnosis sessions (session override still allowed).
+- FR-191: Platform can import a learner’s completed trainings and certifications from LinkedIn when the user connects LinkedIn and granted scopes allow it, present them for review, and require explicit user confirmation before saving imported items.
+- FR-192: Authenticated learners can add, edit, and remove completed trainings and certifications on their profile (including correcting or rejecting LinkedIn-imported items), with provenance metadata (e.g. linkedin, manual, resume_extract).
+- FR-193: Authenticated learners can maintain a wishlist of trainings and certifications they want in the future, preferably linked to catalog offerings when available, with free-text goals allowed when no SKU match exists.
+- FR-194: Authenticated learners can set urgency / “how soon” intent for future learning goals (profile-level and/or per wishlist item) using a governed set of time horizons (e.g. ASAP, 1 month, 1–3 months, 3–6 months, 6+ months, exploring).
+- FR-195: Profile career data (target roles, completed credentials, future goals, urgency) is readable by personalization, recommendation, and interest-campaign systems under the learner’s consent; APIs enforce owner-only access and emit update events for analytics.
 
 ### Diagnosis and Skill Intelligence
 

@@ -142,6 +142,8 @@
 
 - [ ] **Full commercial ops dashboard** (FR-183..188 / Story 10.5) — customers, orders, resume parse/links/scores, certs & services sold, funnel KPIs. Spec: `_bmad-output/planning-artifacts/admin-full-dashboard-requirement.md`. Tasks `T10.9`–`T10.10`. Do not start until commerce + diagnosis persistence are stable.
 
+- [ ] **Learner career profile editor** (FR-189..195 / Story 1.4) — edit profile; multi target roles; LinkedIn-imported + editable completed trainings/certs; future wishlist + how soon. Spec: `_bmad-output/planning-artifacts/learner-profile-career-preferences-requirement.md`. Tasks `T1.7`–`T1.9`.
+
 
 
 ### Completed (prior sessions — do not reopen)
