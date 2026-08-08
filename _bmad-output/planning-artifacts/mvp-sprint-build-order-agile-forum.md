@@ -110,6 +110,7 @@ Increase activation and repeat engagement through dashboard, assessments, planne
 
 ## In Scope (Stories)
 
+- Epic 1: **`1.4` (learner career profile editor — FR-189..195; see `learner-profile-career-preferences-requirement.md`) — schedule after auth+diagnosis stable; may slip to Sprint 3**
 - Epic 2: `2.3`, `2.4`
 - Epic 3: `3.1`, `3.2`, `3.3`
 - Epic 7: `7.1`, `7.2`, `7.3`, `7.4`
@@ -119,6 +120,7 @@ Increase activation and repeat engagement through dashboard, assessments, planne
 
 ## Mandatory Technical Tasks
 
+- **Learner career profile APIs + Profile SPA (roles, credentials have/want, urgency): `T1.7..T1.9` (Story 1.4)**
 - Planner generation + progress state: `T2.3..T2.5`
 - Dashboard aggregates, charts, bookmarks, exam sessions: `T3.1..T3.5`
 - Webinar schedule/attendance/certificates/feedback: `T7.1..T7.4`
@@ -140,6 +142,7 @@ Increase activation and repeat engagement through dashboard, assessments, planne
 - Dashboard supports bar/radar + accessible summaries and bookmarks.
 - Webinar flow complete: discover/register, attendance code, feedback, certificate issue/download.
 - Always-on and re-engagement campaigns run with preference and fatigue controls.
+- **Stretch:** Story 1.4 career profile editor usable on staging (FR-189..195) — may slip to Sprint 3 if dashboard/webinar overruns.
 
 ---
 

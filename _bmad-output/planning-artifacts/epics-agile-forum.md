@@ -61,7 +61,7 @@ This document translates `prd-agile-forum.md` into implementable MVP epics and s
 
 | Epic    | FR Coverage (primary)                                     |
 | ------- | --------------------------------------------------------- |
-| Epic 1  | FR-1..3, FR-151                                           |
+| Epic 1  | FR-1..3, FR-151, FR-189..195                              |
 | Epic 2  | FR-4..7, FR-61..64, FR-158..160                           |
 | Epic 3  | FR-8..11, FR-131, FR-132                                  |
 | Epic 4  | FR-12..16, FR-85..87, FR-157                              |
@@ -129,6 +129,21 @@ As a non-logged-in visitor, I want to be prompted to sign in before checkout so 
 
 - Given a guest at checkout, when they proceed, then login/signup gate appears.
 - Given successful auth, when checkout resumes, then cart context is preserved.
+
+### Story 1.4: Learner Career Profile Editor (Later Sprint)
+
+As a learner, I want to edit my profile — including target roles, certifications/trainings I already have (including from LinkedIn), and what I want next with how soon — so recommendations and campaigns match my real goals.
+
+**Requirement elaboration:** `_bmad-output/planning-artifacts/learner-profile-career-preferences-requirement.md`  
+**FRs:** FR-189 .. FR-195  
+**Sprint:** Sprint 2+/3 (after auth + diagnosis persistence; does not block Sprint 1 commerce)
+
+**Acceptance Criteria**
+
+- Given an authenticated learner, when opening Profile, then they can update durable profile fields and save successfully.
+- Given approved role options, when selecting multiple target roles, then selections persist and can default new diagnosis sessions.
+- Given LinkedIn connection with available credential scopes, when importing, then proposed completed trainings/certs are shown for confirm/edit before save; manual add/edit/remove always works.
+- Given future learning goals, when saved with urgency/how soon, then wishlist persists and is available to personalization/campaign consumers under owner-only API access.
 
 ---
 
@@ -655,6 +670,9 @@ As an engineering team, we need reusable auth middleware and guards so that feat
 - T1.4 Add consent capture + audit columns to user/auth tables.
 - T1.5 Add route guards for checkout-auth requirement.
 - T1.6 Add integration tests for auth happy path and failure states.
+- T1.7 Build learner career profile data model + APIs (profile, target roles, credentials, learning goals/urgency) — Story 1.4 / FR-189..195.
+- T1.8 Implement LinkedIn credential import preview + confirm flow with provenance and consent copy.
+- T1.9 Build Profile SPA editor (roles, have/want credentials, urgency) wired to T1.7–T1.8.
 
 ## Epic 2 Technical Layer (Diagnosis and Transition Planner)
 

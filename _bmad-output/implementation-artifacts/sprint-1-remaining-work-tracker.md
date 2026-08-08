@@ -216,6 +216,7 @@ Quick reference — detail in `s1-3-ux-implementation-epics-stories-tasks.md`:
 | Item | FRs / Story | Target | Spec |
 |------|-------------|--------|------|
 | Full commercial ops dashboard (customers, orders, resumes/scores, sales mix) | FR-183..188 / Story 10.5 / T10.9–T10.10 | Sprint 3+ | `_bmad-output/planning-artifacts/admin-full-dashboard-requirement.md` |
+| Learner career profile editor (roles, LinkedIn/manual credentials, future goals + urgency) | FR-189..195 / Story 1.4 / T1.7–T1.9 | Sprint 2+/3 | `_bmad-output/planning-artifacts/learner-profile-career-preferences-requirement.md` |
 
 ---
 
