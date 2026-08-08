@@ -667,7 +667,9 @@ function TestimonialCard({ item, featured = false }: { item: Testimonial; featur
 }
 
 export function TestimonialsPage() {
-  const featured = TESTIMONIALS.find((item) => item.linkedinUrl);
+  const featured =
+    TESTIMONIALS.find((item) => item.photoUrl && item.linkedinUrl) ??
+    TESTIMONIALS.find((item) => item.photoUrl);
   const rest = TESTIMONIALS.filter((item) => item !== featured);
   return (
     <Stack spacing={3} sx={{ py: { xs: 1, sm: 2 } }}>
