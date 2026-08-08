@@ -21,6 +21,14 @@ const PROVIDER_DISCLAIMERS: Record<string, string> = {
   zip: "Zip · Subject to approval · Gateway T&C apply",
 };
 
+/**
+ * Currencies for which installment/EMI affordability messaging is displayed.
+ * Installment checkout is only wired end-to-end for INR (Razorpay EMI); the
+ * non-INR 3-weekly/BNPL plan is deferred to the backlog, so we suppress EMI
+ * display (e.g. "EMI from $83.17/mo · 6 months") for all non-INR transactions.
+ */
+const EMI_DISPLAY_CURRENCIES = new Set(["INR"]);
+
 export function emiPreviewFromPlans(
   plans: InstallmentPlanQuote[] | undefined,
   totalAmount?: string,
@@ -28,6 +36,7 @@ export function emiPreviewFromPlans(
 ): EmiPreview | null {
   const primary = plans?.[0];
   if (!primary) return null;
+  if (!EMI_DISPLAY_CURRENCIES.has(primary.currency)) return null;
 
   const monthlyLabel = formatPrice(primary.currency, primary.monthlyAmount);
   return {
@@ -51,6 +60,7 @@ export function resolveEmiPreview(
   offeringCurrency: string,
 ): EmiPreview | null {
   if (offeringCurrency !== sessionCurrency) return null;
+  if (!EMI_DISPLAY_CURRENCIES.has(sessionCurrency)) return null;
   const price = Number.parseFloat(unitPrice);
   if (!Number.isFinite(price) || price <= 0) return null;
 
