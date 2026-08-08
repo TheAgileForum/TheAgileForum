@@ -21,25 +21,36 @@ const STAGE_PROGRESS: Record<AnalysisStage, number> = {
 
 export function buildStubRecommendation(targetRole: string | null): DiagnosisRecommendation {
   const role = targetRole ?? "Agile professional";
-  const isPoTransition = /product owner/i.test(role);
+  const isPoBa =
+    /product owner|business analyst|\bba\b|product_owner|business_analyst/i.test(
+      role,
+    );
+  const mentorshipCode = isPoBa
+    ? "course-po-ba-mentorship"
+    : "course-agile-fundamentals";
+  const mentorshipLabel = isPoBa
+    ? "Start BA / Product Owner Live Project Mentorship Masterclass"
+    : "Start Scrum Master / Agile PM Live Project Mentorship Masterclass";
   return {
-    readinessScore: isPoTransition ? 68 : 62,
+    readinessScore: isPoBa ? 68 : 62,
     strengths: ["Stakeholder communication", "Delivery rhythm"],
-    gaps: isPoTransition
+    gaps: isPoBa
       ? ["Prioritization frameworks", "Product discovery"]
       : ["SAFe PI planning depth", "Metrics storytelling"],
-    confidence: isPoTransition ? 0.55 : 0.78,
+    confidence: isPoBa ? 0.55 : 0.78,
     primaryAction: {
       type: "offer",
-      label: `Start Live Project Mentorship Masterclass`,
-      href: "/offers/course-agile-fundamentals",
-      offeringCode: "course-agile-fundamentals",
+      label: mentorshipLabel,
+      href: `/offers/${mentorshipCode}`,
+      offeringCode: mentorshipCode,
     },
     rationale: [
       { label: "Role fit", detail: `Gaps align with ${role} hiring signals.` },
       {
         label: "Fastest win",
-        detail: "Live project mentorship addresses top gaps for SM and PO roles.",
+        detail: isPoBa
+          ? "Live project mentorship addresses top gaps for BA and Product Owner roles."
+          : "Live project mentorship addresses top gaps for Scrum Master and Agile PM roles.",
       },
     ],
   };

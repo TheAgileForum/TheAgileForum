@@ -2,11 +2,12 @@ import { z } from "zod";
 import type { PrimaryAction, RationaleChip } from "./contracts.js";
 
 /** Bump when gap rubric or system prompt instructions change (audit trail). */
-export const DIAGNOSIS_PROMPT_VERSION = "diagnosis-ai-v5";
+export const DIAGNOSIS_PROMPT_VERSION = "diagnosis-ai-v6";
 
 /** Catalog offering codes the model may recommend (allowlist). */
 export const DIAGNOSIS_OFFERING_ALLOWLIST = [
   "course-agile-fundamentals",
+  "course-po-ba-mentorship",
   "service-mock-interview-sm",
   "service-power-resume-cover-letter",
   "safe-leading-safe",
@@ -62,6 +63,7 @@ export type DiagnosisRecommendation = {
 
 const OFFER_HREF_BY_CODE: Record<string, string> = {
   "course-agile-fundamentals": "/offers/course-agile-fundamentals",
+  "course-po-ba-mentorship": "/offers/course-po-ba-mentorship",
   "service-mock-interview-sm": "/offers/service-mock-interview-sm",
   "service-power-resume-cover-letter": "/offers/service-power-resume-cover-letter",
   "safe-leading-safe": "/offers/safe-leading-safe",

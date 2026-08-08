@@ -28,8 +28,10 @@ export function isScrumMasterPathway(targetRole: string): boolean {
   const n = normalizeRoleKey(targetRole);
   return (
     n === "scrum_master" ||
+    n === "agile_pm" ||
     n.includes("scrum_master") ||
-    n.includes("agile_project_manager")
+    n.includes("agile_project_manager") ||
+    n.includes("agile_pm")
   );
 }
 

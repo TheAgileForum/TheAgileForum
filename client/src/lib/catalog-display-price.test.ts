@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { catalogDisplayPrice } from "./catalog-display-price";
-import { MENTORSHIP_OFFER_CODE } from "./offer-routes";
+import {
+  MENTORSHIP_OFFER_CODE,
+  PO_BA_MENTORSHIP_OFFER_CODE,
+} from "./offer-routes";
 
 describe("catalogDisplayPrice", () => {
   it("uses ~30% default derivation for generic offerings", () => {
@@ -33,5 +36,16 @@ describe("catalogDisplayPrice", () => {
     expect(result.saleFormatted).toBe("$499");
     expect(result.discountPercent).toBe(30);
     expect(result.mrpFormatted).not.toBe("₹60,000");
+  });
+
+  it("applies the same INR mentorship display override to BA/PO mentorship", () => {
+    const result = catalogDisplayPrice(
+      "INR",
+      "29990",
+      PO_BA_MENTORSHIP_OFFER_CODE,
+    );
+    expect(result.saleFormatted).toBe("₹29,990");
+    expect(result.mrpFormatted).toBe("₹60,000");
+    expect(result.discountPercent).toBe(50);
   });
 });

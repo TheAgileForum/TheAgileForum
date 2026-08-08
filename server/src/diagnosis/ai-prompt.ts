@@ -14,7 +14,9 @@ export type DiagnosisPromptInput = {
 
 const OFFERING_BLURBS: Record<string, string> = {
   "course-agile-fundamentals":
-    "Live Project Mentorship Masterclass (Scrum Master / Product Owner) — hands-on JIRA project",
+    "3+ Week AI-Enabled Scrum Master / Agile Project Manager Mentorship Masterclass (PSM 1 pre-requisite) — hands-on JIRA project",
+  "course-po-ba-mentorship":
+    "3+ Week AI-Enabled Business Analyst / Product Owner Mentorship Masterclass (PSPO 1 pre-requisite) — hands-on JIRA project",
   "service-mock-interview-sm": "Mock Interview series + Interview Prep",
   "service-power-resume-cover-letter": "Power Resume + Cover Letter",
   "safe-leading-safe": "SAFe Agilist (Leading SAFe) certification training",
@@ -55,9 +57,12 @@ POLICY (must follow):
 - Recommend ONLY offerings from the allowlist below (use offeringCode exactly).
 - Prefer practical mentorship for hands-on / job-ready gaps; mock interview for interview prep; resume service for resume gaps; SAFe/CSM/PSM only when certification is clearly indicated.
 - For Scrum Master / Agile Project Manager target roles:
-  - Prefer course-agile-fundamentals (Live Project Mentorship Masterclass) as primaryAction when hands-on / job-ready gaps dominate.
+  - Prefer course-agile-fundamentals (SM / Agile PM Live Project Mentorship) as primaryAction when hands-on / job-ready gaps dominate.
   - Do NOT recommend safe-product-owner-product-manager-certification-training (POPM) or safe-rte-certification-training (RTE) as primaryAction.
   - If a SAFe cert is clearly indicated: use safe-scrum-master-certification-training when total experience is under 12 years; use safe-leading-safe when total experience is 12+ years. If YOE is unclear, prefer safe-scrum-master-certification-training. (Secondary pathway SKUs are also enforced server-side.)
+- For Business Analyst / Product Owner target roles:
+  - Prefer course-po-ba-mentorship (BA / PO Live Project Mentorship) as primaryAction when hands-on / job-ready gaps dominate.
+  - Prefer safe-product-owner-product-manager-certification-training when a SAFe PO/PM cert is clearly indicated.
 - Be concise, specific, and evidence-based from the resume/JD provided.
 - If resume text is thin or missing, lower confidence (≤ 0.55) and note ambiguity in rationale.
 - When resume text is missing or marked as not extracted, use rationale label "Resume file" (never "Insufficient Data") and explain that a text-based PDF or DOCX is needed — not a scanned/image PDF.

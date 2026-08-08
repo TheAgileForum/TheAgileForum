@@ -115,6 +115,9 @@ describe("resolveAnalysisRecommendation", () => {
     expect(result.recommendation.readinessScore).toBe(
       buildStubRecommendation("Product Owner").readinessScore,
     );
+    expect(result.recommendation.primaryAction.offeringCode).toBe(
+      "course-po-ba-mentorship",
+    );
     expect(buildStubAudit().usedStubFallback).toBe(false);
   });
 });

@@ -3,6 +3,9 @@ import {
   MENTORSHIP_LEGACY_ROUTE_SEGMENTS,
   MENTORSHIP_OFFER_CODE,
   MENTORSHIP_PUBLIC_SLUG,
+  PO_BA_MENTORSHIP_LEGACY_ROUTE_SEGMENTS,
+  PO_BA_MENTORSHIP_OFFER_CODE,
+  PO_BA_MENTORSHIP_PUBLIC_SLUG,
   POWER_RESUME_LEGACY_ROUTE_SEGMENTS,
   POWER_RESUME_OFFER_CODE,
   POWER_RESUME_PUBLIC_SLUG,
@@ -30,6 +33,20 @@ describe("offer routes", () => {
     for (const routeSegment of MENTORSHIP_LEGACY_ROUTE_SEGMENTS) {
       expect(resolveOfferRouteCode(routeSegment)).toBe(
         MENTORSHIP_OFFER_CODE,
+      );
+    }
+  });
+
+  it("emits the BA/PO mentorship public slug without changing its stable code", () => {
+    expect(offerDetailPath(PO_BA_MENTORSHIP_OFFER_CODE)).toBe(
+      `/offers/${PO_BA_MENTORSHIP_PUBLIC_SLUG}`,
+    );
+    expect(resolveOfferRouteCode(PO_BA_MENTORSHIP_PUBLIC_SLUG)).toBe(
+      PO_BA_MENTORSHIP_OFFER_CODE,
+    );
+    for (const routeSegment of PO_BA_MENTORSHIP_LEGACY_ROUTE_SEGMENTS) {
+      expect(resolveOfferRouteCode(routeSegment)).toBe(
+        PO_BA_MENTORSHIP_OFFER_CODE,
       );
     }
   });

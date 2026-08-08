@@ -57,8 +57,13 @@ describe("catalog repository (FR-182 SSOT)", () => {
     expect(await getOfferingFromCatalog("agile-readiness")).toBeUndefined();
     const titled = await getOfferingFromCatalog("course-agile-fundamentals");
     expect(titled?.title).toBe(
-      "3+ Week AI-Enabled Scrum Master / Product Owner Mentorship Masterclass (PSM 1 Certification Exam Pre-requisite)",
+      "3+ Week AI-Enabled Scrum Master / Agile Project Manager Mentorship Masterclass (PSM 1 Certification Exam Pre-requisite)",
     );
+    const poBa = await getOfferingFromCatalog("course-po-ba-mentorship");
+    expect(poBa?.title).toBe(
+      "3+ Week AI-Enabled Business Analyst / Product Owner Mentorship Masterclass (PSPO 1 Certification Exam Pre-requisite)",
+    );
+    expect(poBa?.roleTags).toEqual(["learner", "product_owner", "business_analyst"]);
   });
 
   it("resolves stub offering by code when DB row missing", async () => {
