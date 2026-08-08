@@ -425,12 +425,18 @@ export function OfferDetailView({
               >
                 Investment
               </Typography>
+              <EmiAffordabilityModule
+                amount={offering.priceQuote?.amount ?? offering.defaultUnitPrice}
+                currency={offering.priceQuote?.currency ?? offering.currency}
+                offerId={offering.code}
+                installmentPlans={offering.priceQuote?.installmentPlans}
+              />
               <Stack
                 direction="row"
                 spacing={1}
                 useFlexGap
                 aria-label={`Price: ${displayPrice.saleFormatted}`}
-                sx={{ alignItems: "baseline", flexWrap: "wrap", mt: 0.5 }}
+                sx={{ alignItems: "baseline", flexWrap: "wrap", mt: 0.75 }}
               >
                 {displayPrice.mrpFormatted ? (
                   <Typography
@@ -488,16 +494,10 @@ export function OfferDetailView({
                 </Box>
               ) : (
                 <Typography sx={{ color: OFFER_MUTED, fontSize: "0.85rem", mt: 0.75, mb: 1 }}>
-                  Ready to enroll
+                  Ready to add to cart
                 </Typography>
               )}
 
-              <EmiAffordabilityModule
-                amount={offering.priceQuote?.amount ?? offering.defaultUnitPrice}
-                currency={offering.priceQuote?.currency ?? offering.currency}
-                offerId={offering.code}
-                installmentPlans={offering.priceQuote?.installmentPlans}
-              />
               <Typography sx={{ color: OFFER_MUTED, fontSize: "0.8rem", mt: 0.75, mb: 2 }}>
                 Or book a mentor call before you enroll
               </Typography>
@@ -522,7 +522,7 @@ export function OfferDetailView({
                   onClick={() => void onEnroll()}
                   sx={{ fontWeight: 700 }}
                 >
-                  {adding ? "Adding…" : "Enroll now"}
+                  {adding ? "Adding…" : "Add to Cart"}
                 </Button>
                 <Button
                   variant="outlined"
@@ -1053,7 +1053,7 @@ export function OfferDetailView({
                       fontWeight: selected ? 600 : 400,
                     }}
                   >
-                    {selected ? "Selected · Continue to enroll" : "Select to continue"}
+                    {selected ? "Selected · Continue to cart" : "Select to continue"}
                   </Typography>
                   <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
                     <Button
@@ -1069,7 +1069,7 @@ export function OfferDetailView({
                       onClick={() => void onEnroll()}
                       sx={{ fontWeight: 600 }}
                     >
-                      Enroll
+                      Add to Cart
                     </Button>
                   </Stack>
                 </Box>
@@ -1362,7 +1362,10 @@ export function OfferDetailView({
           <SectionHead
             eyebrow="Official exam"
             title="Exam guidelines"
-            lead="Domain weighting from Scaled Agile’s SAFe Scrum Master certification page — use this with your workshop notes and practice exam."
+            lead={
+              extras.examGuidelines.lead ??
+              "Use this domain outline with your workshop notes and practice exam."
+            }
           />
           <Box
             sx={{
@@ -1409,7 +1412,7 @@ export function OfferDetailView({
           <Typography sx={{ mt: 2, color: OFFER_MUTED, fontSize: "0.85rem" }}>
             {extras.examGuidelines.footnote} Source:{" "}
             <Link href={extras.examGuidelines.sourceUrl} target="_blank" rel="noopener noreferrer">
-              scaledagile.com/certification/scrum-master
+              {extras.examGuidelines.sourceLabel ?? extras.examGuidelines.sourceUrl.replace(/^https?:\/\//, "")}
             </Link>
           </Typography>
         </Section>
@@ -1463,7 +1466,7 @@ export function OfferDetailView({
                 onClick={() => void onEnroll()}
                 sx={{ fontWeight: 700, bgcolor: OFFER_ACCENT, "&:hover": { bgcolor: OFFER_ACCENT_DEEP } }}
               >
-                Enroll now
+                Add to Cart
               </Button>
             )}
             <Button
@@ -1515,7 +1518,7 @@ export function OfferDetailView({
       </Section>
 
       <StickyMobileCta
-        label={scheduleRequired && !scheduleRef ? "Select Schedule" : "Enroll now"}
+        label={scheduleRequired && !scheduleRef ? "Select Schedule" : "Add to Cart"}
         disabled={adding}
         onClick={() => {
           if (scheduleRequired && !scheduleRef) {

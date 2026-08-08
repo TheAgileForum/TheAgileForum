@@ -14,6 +14,9 @@ export type AnalyticsEvent =
   | "home_mentor_coach_social_click"
   | "diagnosis_resume_upload_success"
   | "diagnosis_resume_upload_failure"
+  | "diagnosis_resume_extract_ok"
+  | "diagnosis_resume_extract_empty"
+  | "diagnosis_resume_extract_failure"
   | "diagnosis_analysis_timeout"
   | "offer_view"
   | "offer_proceed_checkout"
@@ -25,6 +28,10 @@ export type AnalyticsEvent =
   | "catalog_list_viewed"
   | "catalog_filter_applied"
   | "catalog_add_to_cart"
+  | "catalog_pricing_refetch"
+  | "catalog_currency_mismatch"
+  | "currency_changed"
+  | "currency_change_failed"
   | "global_cart_viewed"
   | "global_cart_clicked"
   | "checkout_started"
@@ -33,7 +40,11 @@ export type AnalyticsEvent =
   | "installment_option_impression"
   | "cart_line_removed"
   | "upsell_impression"
-  | "upsell_click";
+  | "upsell_click"
+  | "account_orders_viewed"
+  | "mock_interview_book_slot_clicked"
+  | "account_order_continue_checkout_clicked"
+  | "account_order_delete_clicked";
 
 export function trackEvent(name: AnalyticsEvent, props?: Record<string, string | number | boolean>) {
   if (import.meta.env.DEV) {

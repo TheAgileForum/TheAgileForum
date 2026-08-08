@@ -6,6 +6,12 @@ describe("LiveEmailAdapter", () => {
 
   beforeEach(() => {
     vi.unstubAllGlobals();
+    delete process.env.EMAIL_PROVIDER;
+    delete process.env.RESEND_API_KEY;
+    delete process.env.SENDER_API_TOKEN;
+    delete process.env.SENDER_API_KEY;
+    delete process.env.EMAIL_FROM;
+    delete process.env.EMAIL_FROM_NAME;
   });
 
   afterEach(() => {
@@ -13,8 +19,7 @@ describe("LiveEmailAdapter", () => {
     vi.unstubAllGlobals();
   });
 
-  it("returns stub messageId when RESEND_API_KEY is unset", async () => {
-    delete process.env.RESEND_API_KEY;
+  it("returns stub messageId when no email credentials are set", async () => {
     const adapter = new LiveEmailAdapter();
 
     const result = await adapter.sendTransactional({
@@ -45,11 +50,43 @@ describe("LiveEmailAdapter", () => {
 
     expect(result.messageId).toBe("msg_live_1");
     expect(fetchMock).toHaveBeenCalledOnce();
+    expect(fetchMock.mock.calls[0]?.[0]).toBe("https://api.resend.com/emails");
   });
 
-  it("fails when RESEND_API_KEY is set but EMAIL_FROM is missing", async () => {
+  it("sends via Sender when EMAIL_PROVIDER=sender and token set", async () => {
+    process.env.EMAIL_PROVIDER = "sender";
+    process.env.SENDER_API_TOKEN = "sender_tok";
+    process.env.EMAIL_FROM = "DhirenderVerma@theagileforum.com";
+    process.env.EMAIL_FROM_NAME = "The Agile Forum";
+    // Resend also set — explicit provider must win
+    process.env.RESEND_API_KEY = "re_should_not_use";
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: true,
+        message: "Email sent",
+        emailId: "sender_msg_1",
+      }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const adapter = new LiveEmailAdapter();
+    const result = await adapter.sendTransactional({
+      to: "user@example.com",
+      subject: "Welcome",
+      html: "<p>Welcome</p>",
+    });
+
+    expect(result.messageId).toBe("sender_msg_1");
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(
+      "https://api.sender.net/v2/message/send",
+    );
+  });
+
+  it("fails when provider credentials are set but EMAIL_FROM is missing", async () => {
     process.env.RESEND_API_KEY = "re_test_key";
-    delete process.env.EMAIL_FROM;
 
     const adapter = new LiveEmailAdapter();
 
@@ -59,6 +96,6 @@ describe("LiveEmailAdapter", () => {
         subject: "Test",
         html: "<p>Hi</p>",
       }),
-    ).rejects.toThrow("EMAIL_FROM is required when RESEND_API_KEY is set");
+    ).rejects.toThrow("EMAIL_FROM is required when EMAIL_PROVIDER=resend");
   });
 });

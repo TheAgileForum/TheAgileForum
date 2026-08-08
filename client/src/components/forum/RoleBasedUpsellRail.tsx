@@ -12,12 +12,17 @@ import { trackEvent } from "../../lib/analytics";
 import { formatPrice } from "../../lib/format-price";
 import { getUpsellRecommendations, type UpsellItem } from "../../lib/forum-api";
 import { offerDetailPath } from "../../lib/offer-routes";
+import { displayOfferingTitle } from "../../lib/offering-display-title";
 
 type RoleBasedUpsellRailProps = {
   targetRole?: string | null;
   context?: "diagnosis" | "dashboard" | "cart" | "detail" | "post_webinar";
   offerId?: string;
   gapTags?: string[];
+  /** Parsed total YOE from diagnosis; drives SM pathway SAFe SM vs Leading SAFe. */
+  yearsOfExperience?: number | null;
+  /** Resume match % — when &lt; 85, include New Resume + LinkedIn Upgrade. */
+  readinessScore?: number | null;
   onAddOffering?: (code: string, scheduleRef?: string, label?: string) => Promise<void>;
 };
 
@@ -26,6 +31,8 @@ export function RoleBasedUpsellRail({
   context = "detail",
   offerId,
   gapTags = [],
+  yearsOfExperience,
+  readinessScore,
   onAddOffering,
 }: RoleBasedUpsellRailProps) {
   const { currency, geo } = usePricing();
@@ -48,6 +55,8 @@ export function RoleBasedUpsellRail({
       gapTags,
       geo,
       currency,
+      yearsOfExperience,
+      readinessScore,
     })
       .then((res) => {
         if (cancelled) return;
@@ -66,14 +75,27 @@ export function RoleBasedUpsellRail({
     return () => {
       cancelled = true;
     };
-  }, [targetRole, context, offerId, gapTags.join(","), geo, currency]);
+  }, [
+    targetRole,
+    context,
+    offerId,
+    gapTags.join(","),
+    geo,
+    currency,
+    yearsOfExperience,
+    readinessScore,
+  ]);
 
   async function handleAdd(item: UpsellItem) {
     if (!onAddOffering) return;
     setAddingCode(item.code);
     trackEvent("upsell_click", { code: item.code, context });
     try {
-      await onAddOffering(item.code, item.scheduleRef ?? undefined, item.title);
+      await onAddOffering(
+        item.code,
+        item.scheduleRef ?? undefined,
+        displayOfferingTitle(item.code, item.title, { currency, geo }),
+      );
     } catch {
       // Error surfaced by ForumCartContext snackbar
     } finally {
@@ -101,12 +123,14 @@ export function RoleBasedUpsellRail({
               sx={{ justifyContent: "space-between", alignItems: "center", gap: 1 }}
             >
               <Stack spacing={0.25}>
-                <Typography variant="body2">{item.title}</Typography>
+                <Typography variant="body2">
+                  {displayOfferingTitle(item.code, item.title, { currency, geo })}
+                </Typography>
                 <Typography variant="caption" color="text.secondary">
                   {formatPrice(item.priceQuote.currency, item.priceQuote.amount)}
                 </Typography>
               </Stack>
-              {item.action === "add" ? (
+              {item.action === "add" && context !== "diagnosis" ? (
                 <Button
                   size="small"
                   variant="outlined"
@@ -133,7 +157,7 @@ export function RoleBasedUpsellRail({
           ))}
         </Stack>
         <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1 }}>
-          Role-based suggestions · Session {currency} · No discount marketing (FR-181)
+          Suggested for your role · Prices in {currency}
         </Typography>
       </CardContent>
     </Card>

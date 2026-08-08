@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { trackEvent } from "../lib/analytics";
 import {
   getCurrencyContext,
   postSessionCurrency,
@@ -99,13 +100,35 @@ export function PricingProvider({ children }: { children: ReactNode }) {
   }, [refresh]);
 
   const setCurrency = useCallback(async (currency: SessionCurrency) => {
+    const previous = getSessionCurrency();
+    const geo = geoFromSessionCurrency(currency);
+    const optimistic: CurrencyContextResponse = {
+      currency,
+      geoDetected: geo,
+      source: "user",
+    };
     setLoading(true);
     try {
       markExplicitSessionCurrencyOverride();
+      // Optimistic update so catalog/cart refetch immediately — do not wait on API.
       syncSessionStorage(currency);
-      const geo = geoFromSessionCurrency(currency);
+      setContext(optimistic);
+      trackEvent("currency_changed", {
+        from: previous,
+        to: currency,
+        geo,
+        source: "user",
+      });
       const res = await postSessionCurrency(currency, geo);
       setContext(res);
+    } catch (err) {
+      trackEvent("currency_change_failed", {
+        from: previous,
+        to: currency,
+        geo,
+        message: err instanceof Error ? err.message : "unknown",
+      });
+      // Keep optimistic local choice so UI stays on the user's selection.
     } finally {
       setLoading(false);
     }

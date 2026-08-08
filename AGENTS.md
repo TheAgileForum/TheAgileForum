@@ -21,7 +21,7 @@ This repo is a two-package monorepo: `server/` (Express + TypeScript + Prisma AP
 - Test DB (needed once before `npm run test:integration`): apply migrations with the test URL, e.g.
   `cd server && DATABASE_URL="postgresql://postgres:postgres@localhost:5432/mybmadproj_test" DIRECT_URL="postgresql://postgres:postgres@localhost:5432/mybmadproj_test" npx prisma migrate deploy`
 - Gotcha: the integration tests run `npx tsx prisma/seed.ts` in `beforeAll`, which fails if the test DB has no schema. Ensure the test DB migrations are applied first.
-- Seed creates demo logins: `customer@demo.local` / `password123` and `ops@demo.local` / `password123`, plus 8 catalog offerings.
+- Seed creates demo logins: `customer@demo.local` / `password123` and `ops@demo.local` / `password123`, plus catalog offerings (including both Live Project Mentorship SKUs). After deploy of catalog seed changes, run `cd server && npm run db:seed` on staging so new offering rows (e.g. BA/PO mentorship) are inserted and titles stay in sync; `/trainings` also merges unseeded stub SKUs without a reseed.
 
 ### Running & testing
 - API: `cd server && npm run dev` (health: `curl http://localhost:3001/api/v1/health` → `{"status":"ok"}`).

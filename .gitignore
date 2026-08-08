@@ -18,11 +18,20 @@ deploy/staging.client.env
 .DS_Store
 Thumbs.db
 
+# Local resume uploads (diagnosis AI)
+server/uploads/
+uploads/
+
 # IDE
 .idea/
 .vscode/*
 !.vscode/extensions.json
-.cursor/
+# Ignore Cursor local state; allow only the diagnosis gap-rubric project skill
+.cursor/*
+!.cursor/skills/
+.cursor/skills/*
+!.cursor/skills/diagnosis-gap-rubric/
+!.cursor/skills/diagnosis-gap-rubric/**/
 
 # Test / coverage
 coverage/

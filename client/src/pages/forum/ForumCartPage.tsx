@@ -19,12 +19,13 @@ import { trackEvent } from "../../lib/analytics";
 import { setCommerceJourneyOrigin } from "../../lib/commerce-journey";
 import { formatPrice } from "../../lib/format-price";
 import { getStoredDiagnosisGapTags, getStoredDiagnosisTargetRole, listOfferings } from "../../lib/forum-api";
+import { displayOfferingTitle } from "../../lib/offering-display-title";
 
 export function ForumCartPage() {
   const { user } = useAuth();
   const { cart, loading, itemCount, removeItem, setQuantity, addItem, refresh } = useForumCart();
   const navigate = useNavigate();
-  const { currency } = usePricing();
+  const { currency, geo } = usePricing();
   const [titles, setTitles] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -37,11 +38,11 @@ export function ForumCartPage() {
     void listOfferings().then((items) => {
       const map: Record<string, string> = {};
       items.forEach((o) => {
-        map[o.code] = o.title;
+        map[o.code] = displayOfferingTitle(o.code, o.title, { currency, geo });
       });
       setTitles(map);
     });
-  }, []);
+  }, [currency, geo]);
 
   const empty = !cart || cart.items.length === 0;
 
@@ -85,7 +86,7 @@ export function ForumCartPage() {
         Your cart · {itemCount} {itemCount === 1 ? "item" : "items"}
       </Typography>
       <Typography variant="body2" color="text.secondary">
-        {user ? "Signed in" : "Guest cart"} · Session currency {currency} · No promo chips (FR-179)
+        {user ? "Signed in" : "Guest cart"} · Prices shown in {currency}
       </Typography>
 
       {error ? <Alert severity="error">{error}</Alert> : null}

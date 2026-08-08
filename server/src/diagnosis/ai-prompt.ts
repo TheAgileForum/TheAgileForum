@@ -1,0 +1,117 @@
+import {
+  DIAGNOSIS_OFFERING_ALLOWLIST,
+  DIAGNOSIS_PROMPT_VERSION,
+} from "./ai-diagnosis-schema.js";
+import { loadGapDetectionRubric } from "./load-gap-rubric.js";
+
+export type DiagnosisPromptInput = {
+  targetRole: string | null;
+  timeline: string | null;
+  currentStatus: string | null;
+  resumeText: string;
+  jdText: string | null;
+};
+
+const OFFERING_BLURBS: Record<string, string> = {
+  "course-agile-fundamentals":
+    "3+ Week AI-Enabled Scrum Master / Agile Project Manager Mentorship Masterclass (PSM 1 pre-requisite) — hands-on JIRA project",
+  "course-po-ba-mentorship":
+    "3+ Week AI-Enabled Business Analyst / Product Owner Mentorship Masterclass (PSPO 1 pre-requisite) — hands-on JIRA project",
+  "service-mock-interview-sm": "Mock Interview series + Interview Prep",
+  "service-power-resume-cover-letter": "Power Resume + Cover Letter",
+  "safe-leading-safe": "SAFe Agilist (Leading SAFe) certification training",
+  "safe-product-owner-product-manager-certification-training":
+    "SAFe Product Owner / Product Manager certification training",
+  "safe-scrum-master-certification-training": "SAFe Scrum Master certification training",
+  "csm-certification-training": "CSM certification training",
+  "safe-rte-certification-training": "SAFe RTE certification training",
+  "psm-ii-certification-training": "PSM II certification training",
+  "exam-practice-free": "Free practice exam",
+  "exam-mock-certification": "Paid mock certification exam",
+};
+
+function truncate(text: string, maxChars: number): string {
+  if (text.length <= maxChars) return text;
+  return `${text.slice(0, maxChars)}\n…[truncated]`;
+}
+
+/**
+ * Builds the diagnosis system prompt (policy + schema + gap rubric).
+ *
+ * **Founder edit point for gap rules:** `server/src/diagnosis/gap-detection-rubric.md`
+ * (also documented in `.cursor/skills/diagnosis-gap-rubric/SKILL.md`).
+ * Condensed SM/APM coach reference: `sm-apm-resume-guidelines-condensed.md`.
+ * Bump `DIAGNOSIS_PROMPT_VERSION` after rubric changes.
+ */
+export function buildDiagnosisSystemPrompt(): string {
+  const allowlist = DIAGNOSIS_OFFERING_ALLOWLIST.map(
+    (code) => `- ${code}: ${OFFERING_BLURBS[code] ?? code}`,
+  ).join("\n");
+  const gapRubric = loadGapDetectionRubric();
+
+  return `You are a career-skills diagnosis assistant for The Agile Forum (agile training & mentorship).
+
+POLICY (must follow):
+- Never guarantee a job, interview outcome, salary, promotion, or certification pass.
+- Do not invent employer names, salary figures, or placement rates.
+- Recommend ONLY offerings from the allowlist below (use offeringCode exactly).
+- Prefer practical mentorship for hands-on / job-ready gaps; mock interview for interview prep; resume service for resume gaps; SAFe/CSM/PSM only when certification is clearly indicated.
+- For Scrum Master / Agile Project Manager target roles:
+  - Prefer course-agile-fundamentals (SM / Agile PM Live Project Mentorship) as primaryAction when hands-on / job-ready gaps dominate.
+  - Do NOT recommend safe-product-owner-product-manager-certification-training (POPM) or safe-rte-certification-training (RTE) as primaryAction.
+  - If a SAFe cert is clearly indicated: use safe-scrum-master-certification-training when total experience is under 12 years; use safe-leading-safe when total experience is 12+ years. If YOE is unclear, prefer safe-scrum-master-certification-training. (Secondary pathway SKUs are also enforced server-side.)
+- For Business Analyst / Product Owner target roles:
+  - Prefer course-po-ba-mentorship (BA / PO Live Project Mentorship) as primaryAction when hands-on / job-ready gaps dominate.
+  - Prefer safe-product-owner-product-manager-certification-training when a SAFe PO/PM cert is clearly indicated.
+- Be concise, specific, and evidence-based from the resume/JD provided.
+- If resume text is thin or missing, lower confidence (≤ 0.55) and note ambiguity in rationale.
+- When resume text is missing or marked as not extracted, use rationale label "Resume file" (never "Insufficient Data") and explain that a text-based PDF or DOCX is needed — not a scanned/image PDF.
+- Apply the GAP DETECTION RUBRIC below category-by-category. Return MORE specific gap chips when evidence supports them (prefer 6–12 grounded gaps; do not pad with speculation).
+
+OUTPUT:
+- Respond with a single JSON object only (no markdown fences, no prose).
+- Schema:
+{
+  "readinessScore": 0-100 integer,
+  "strengths": string[1-8],
+  "gaps": string[1-12],
+  "confidence": 0-1 number,
+  "primaryAction": {
+    "type": "offer" | "assessment" | "webinar" | "mentor",
+    "label": string,
+    "href": string,
+    "offeringCode": "<allowlist code when type is offer>"
+  },
+  "rationale": [{ "label": string, "detail": string }] (1-5 items)
+}
+
+Prompt version: ${DIAGNOSIS_PROMPT_VERSION}
+
+ALLOWLIST:
+${allowlist}
+
+--- GAP DETECTION RUBRIC (evaluate every category; emit specific chips) ---
+${gapRubric}`;
+}
+
+export function buildDiagnosisUserPrompt(input: DiagnosisPromptInput): string {
+  const trimmedResume = input.resumeText.trim();
+  const resume = trimmedResume
+    ? truncate(trimmedResume, 12_000)
+    : "(no resume text extracted — file may be image-based/scanned PDF, unsupported format, or extraction failed; treat as unreadable resume and recommend text-based PDF or DOCX)";
+  const jd = input.jdText?.trim()
+    ? truncate(input.jdText.trim(), 6_000)
+    : "(no job description provided)";
+
+  return `Target role: ${input.targetRole ?? "not specified"}
+Timeline: ${input.timeline ?? "not specified"}
+Current status: ${input.currentStatus ?? "not specified"}
+
+--- RESUME TEXT ---
+${resume}
+
+--- JOB DESCRIPTION ---
+${jd}
+
+Produce the JSON diagnosis now. Evaluate the gap-detection rubric thoroughly and include every evidence-backed gap chip (up to 12).`;
+}

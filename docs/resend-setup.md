@@ -2,17 +2,22 @@
 
 Transactional email for verification, enrollment confirmations, and ops alerts. Uses the Resend REST API via `LiveEmailAdapter` (no SDK dependency).
 
+For Sender.net as an alternative provider, see **`docs/sender-setup.md`**. Set `EMAIL_PROVIDER=resend` (or leave unset with `RESEND_API_KEY`) to keep Resend as the active backend.
+
 ## Environment variables
 
 | Variable | Required | Example | Notes |
 |----------|----------|---------|-------|
-| `RESEND_API_KEY` | For real sends | `re_...` | From [Resend API Keys](https://resend.com/api-keys). Never commit. |
-| `EMAIL_FROM` | When `RESEND_API_KEY` set | `onboarding@resend.dev` (dev) / `notifications@theagileforum.com` (prod) | Must be a verified sender in Resend |
+| `EMAIL_PROVIDER` | Optional | `resend` | `resend` \| `sender`. Auto: Resend if key set, else Sender if token set, else stub |
+| `RESEND_API_KEY` | For real Resend sends | `re_...` | From [Resend API Keys](https://resend.com/api-keys). Never commit. |
+| `EMAIL_FROM` | When provider credentials set | `onboarding@resend.dev` (dev) / `DhirenderVerma@theagileforum.com` (staging/prod) | Must be a verified sender in Resend (`theagileforum.com` or that mailbox) |
 | `INTEGRATION_PROVIDER_MODE` | Staging/prod | `live` | Stub mode uses `StubEmailAdapter` and never calls Resend |
 | `REQUIRE_EMAIL_VERIFICATION` | Optional | `true` on staging | Blocks login until email verified |
 | `OPS_ENROLLMENT_ALERT_EMAIL` | Optional | `ops@theagileforum.com` | Ops enrollment alert recipient |
+| `MOCK_INTERVIEW_RESOURCES_FOLDER_URL` | Optional | OneDrive/Drive folder URL | Shared prep folder used when per-file links are unset |
+| `MOCK_INTERVIEW_RESOURCE_*_URL` | Optional | Per-file public URLs | Overrides for Topics xlsx, Interview Questions, SM Situational PDF, Agile/Scrum Q&A docx, SAFe Q&A docx |
 
-When `INTEGRATION_PROVIDER_MODE=live` and `RESEND_API_KEY` is **unset**, `LiveEmailAdapter` returns a stub `messageId` (no network call). This keeps local/staging deploys safe until the key is added.
+When `INTEGRATION_PROVIDER_MODE=live` and no matching provider credentials are set, `LiveEmailAdapter` returns a stub `messageId` (no network call). This keeps local/staging deploys safe until keys are added.
 
 ## Local development
 
@@ -36,7 +41,8 @@ When `INTEGRATION_PROVIDER_MODE=live` and `RESEND_API_KEY` is **unset**, `LiveEm
 1. In Resend → **Domains** → **Add Domain** (e.g. `theagileforum.com` or `notify.staging.theagileforum.com`).
 2. Add the DNS records Resend provides (SPF, DKIM; add DMARC when ready).
 3. Wait for verification (usually minutes).
-4. Set `EMAIL_FROM` to an address on that domain, e.g. `notifications@theagileforum.com`.
+4. Set `EMAIL_FROM` to an address on that domain. Preferred for enrollment / transactional mail:
+   `DhirenderVerma@theagileforum.com` (mailbox must be allowed/verified in Resend).
 
 Keep human mail (`ops@`, `support@`) on Microsoft 365; use Resend only for app-generated mail. See `docs/email-provider-comparison.md`.
 
@@ -45,12 +51,13 @@ Keep human mail (`ops@`, `support@`) on Microsoft 365; use Resend only for app-g
 1. Open the **agile-forum-api-staging** service → **Environment**.
 2. Add secrets (do not put in git):
    - `RESEND_API_KEY` = your Resend API key
-   - `EMAIL_FROM` = verified sender (or `onboarding@resend.dev` for first smoke test)
+   - `EMAIL_FROM` = `DhirenderVerma@theagileforum.com` (after domain/mailbox verification) or `onboarding@resend.dev` for first smoke test
 3. Ensure these are already set (see `deploy/staging.server.env.example`):
    - `INTEGRATION_PROVIDER_MODE=live`
    - `REQUIRE_EMAIL_VERIFICATION=true` (when you want gated signup)
    - `OPS_ENROLLMENT_ALERT_EMAIL=ops@theagileforum.com`
-4. Redeploy after env changes.
+4. Optional Mock Interview welcome prep links: `MOCK_INTERVIEW_RESOURCES_FOLDER_URL` and/or `MOCK_INTERVIEW_RESOURCE_*_URL` (see table above).
+5. Redeploy after env changes.
 
 Blueprint reference: `deploy/render.yaml.example`.
 
@@ -71,6 +78,7 @@ Blueprint reference: `deploy/render.yaml.example`.
 | Live adapter | `server/src/integrations/adapters.live.ts` |
 | Verification flow | `server/src/services/email-verification-service.ts` |
 | Enrollment mail | `server/src/notifications/enrollment-notifier.ts` |
+| Mock Interview welcome template | `server/src/notifications/mock-interview-welcome-email.ts` |
 | Verify script | `server/scripts/verify-resend-key.ts` |
 
 ## Future

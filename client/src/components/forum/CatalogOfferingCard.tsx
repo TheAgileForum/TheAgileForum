@@ -6,6 +6,7 @@ import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { Link as RouterLink } from "react-router-dom";
+import { usePricing } from "../../contexts/PricingContext";
 import { catalogDisplayPrice } from "../../lib/catalog-display-price";
 import {
   catalogSocialProof,
@@ -15,6 +16,10 @@ import {
 import type { CatalogOffering } from "../../lib/forum-api";
 import { resolvedOfferingPrice } from "../../lib/format-price";
 import { offerDetailPath } from "../../lib/offer-routes";
+import {
+  displayOfferingIncludes,
+  displayOfferingTitle,
+} from "../../lib/offering-display-title";
 import { EmiAffordabilityModule } from "./EmiAffordabilityModule";
 
 type CatalogOfferingCardProps = {
@@ -25,6 +30,16 @@ type CatalogOfferingCardProps = {
 
 function roleLabel(tag: string): string {
   return tag.replace(/_/g, " ");
+}
+
+/** Some live offerings should not show the catalog "Live Class" chip. */
+function showDeliveryModeChip(code: string): boolean {
+  const normalized = code.toLowerCase();
+  return (
+    !normalized.includes("mock-interview") &&
+    !normalized.includes("power-resume") &&
+    !normalized.includes("linkedin-upgrade")
+  );
 }
 
 function FeatureCheck() {
@@ -49,13 +64,17 @@ function FeatureCheck() {
 }
 
 export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOfferingCardProps) {
+  const { currency, geo } = usePricing();
   const priced = resolvedOfferingPrice(offering);
   const displayPrice = catalogDisplayPrice(
     priced.currency,
     priced.amount,
     offering.code,
   );
+  const regionOpts = { currency, geo };
+  const title = displayOfferingTitle(offering.code, offering.title, regionOpts);
   const badge = resolveCertBadge(offering);
+  const coverHero = badge.variant === "cover";
   const social = catalogSocialProof(offering);
   const popular = isPopularOffering(offering.code);
 
@@ -75,7 +94,12 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
     durationAlreadyInMeta ? undefined : durationMeta,
   ].filter(Boolean);
 
-  const features = (offering.includes ?? offering.learningOutcomes ?? []).slice(0, 4);
+  const regionIncludes = displayOfferingIncludes(
+    offering.code,
+    offering.includes,
+    regionOpts,
+  );
+  const features = (regionIncludes ?? offering.learningOutcomes ?? []).slice(0, 4);
 
   return (
     <Box
@@ -101,24 +125,34 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
         sx={{
           position: "relative",
           background: badge.heroGradient,
-          pt: 3,
-          pb: 2.5,
-          minHeight: 148,
+          pt: coverHero ? 0 : 3,
+          pb: coverHero ? 0 : 2.5,
+          minHeight: coverHero ? 168 : 148,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           overflow: "hidden",
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            inset: 0,
-            background: `
+          "&::before": coverHero
+            ? {
+                content: '""',
+                position: "absolute",
+                inset: 0,
+                zIndex: 1,
+                background:
+                  "linear-gradient(180deg, rgba(15,23,42,0.35) 0%, rgba(15,23,42,0.08) 45%, rgba(15,23,42,0.45) 100%)",
+                pointerEvents: "none",
+              }
+            : {
+                content: '""',
+                position: "absolute",
+                inset: 0,
+                background: `
               radial-gradient(ellipse 80% 60% at 20% 100%, rgba(255,255,255,0.12) 0%, transparent 60%),
               radial-gradient(ellipse 50% 40% at 90% 10%, rgba(245,158,11,0.15) 0%, transparent 50%)
             `,
-            pointerEvents: "none",
-          },
+                pointerEvents: "none",
+              },
           "&::after": {
             content: '""',
             position: "absolute",
@@ -128,9 +162,25 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
             height: 24,
             bgcolor: "background.paper",
             borderRadius: "14px 14px 0 0",
+            zIndex: 2,
           },
         }}
       >
+        {coverHero ? (
+          <Box
+            component="img"
+            src={badge.src}
+            alt=""
+            sx={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center",
+            }}
+          />
+        ) : null}
         <Stack
           direction="row"
           spacing={0.75}
@@ -141,24 +191,26 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
             left: 12,
             right: 12,
             flexWrap: "wrap",
-            zIndex: 2,
+            zIndex: 3,
           }}
         >
-          <Chip
-            label={offering.deliveryMode === "live" ? "Live Class" : "Self-paced"}
-            size="small"
-            sx={{
-              height: 22,
-              fontSize: "0.65rem",
-              fontWeight: 600,
-              letterSpacing: "0.03em",
-              bgcolor: "rgba(255,255,255,0.22)",
-              color: "#fff",
-              border: "1px solid rgba(255,255,255,0.3)",
-              backdropFilter: "blur(8px)",
-              "& .MuiChip-label": { px: 1 },
-            }}
-          />
+          {showDeliveryModeChip(offering.code) ? (
+            <Chip
+              label={offering.deliveryMode === "live" ? "Live Class" : "Self-paced"}
+              size="small"
+              sx={{
+                height: 22,
+                fontSize: "0.65rem",
+                fontWeight: 600,
+                letterSpacing: "0.03em",
+                bgcolor: "rgba(255,255,255,0.22)",
+                color: "#fff",
+                border: "1px solid rgba(255,255,255,0.3)",
+                backdropFilter: "blur(8px)",
+                "& .MuiChip-label": { px: 1 },
+              }}
+            />
+          ) : null}
           {offering.upcomingBatchId ? (
             <Chip
               label="Batch open"
@@ -192,21 +244,23 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
           ) : null}
         </Stack>
 
-        <Box
-          component="img"
-          src={badge.src}
-          alt=""
-          sx={{
-            position: "relative",
-            zIndex: 1,
-            width: 88,
-            height: "auto",
-            maxHeight: 100,
-            objectFit: "contain",
-            filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.25))",
-            mb: -1,
-          }}
-        />
+        {!coverHero ? (
+          <Box
+            component="img"
+            src={badge.src}
+            alt=""
+            sx={{
+              position: "relative",
+              zIndex: 1,
+              width: 88,
+              height: "auto",
+              maxHeight: 100,
+              objectFit: "contain",
+              filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.25))",
+              mb: -1,
+            }}
+          />
+        ) : null}
       </Box>
 
       {/* Body */}
@@ -223,7 +277,7 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
             mb: 0.5,
           }}
         >
-          {offering.title}
+          {title}
         </Typography>
 
         <Typography
@@ -334,7 +388,17 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
         )}
 
         <Box sx={{ mt: "auto" }}>
-          <Stack spacing={0.75} sx={{ mb: 1.25 }}>
+          <EmiAffordabilityModule
+            amount={priced.amount}
+            currency={priced.currency}
+            offerId={offering.code}
+            installmentPlans={offering.priceQuote?.installmentPlans}
+            compact
+            variant="info"
+            icon={<CreditCardOutlinedIcon sx={{ fontSize: 16, opacity: 0.8 }} />}
+          />
+
+          <Stack spacing={0.75} sx={{ mb: 1.25, mt: 0.75 }}>
             <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: "baseline", flexWrap: "wrap" }}>
               {displayPrice.mrpFormatted ? (
                 <Typography
@@ -377,16 +441,6 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
               </Box>
             ) : null}
           </Stack>
-
-          <EmiAffordabilityModule
-            amount={priced.amount}
-            currency={priced.currency}
-            offerId={offering.code}
-            installmentPlans={offering.priceQuote?.installmentPlans}
-            compact
-            variant="info"
-            icon={<CreditCardOutlinedIcon sx={{ fontSize: 16, opacity: 0.8 }} />}
-          />
 
           {offering.scheduleBound ? (
             <Typography
@@ -434,7 +488,7 @@ export function CatalogOfferingCard({ offering, onAdd, adding }: CatalogOffering
                 },
               }}
             >
-              {offering.scheduleBound ? "Select Schedule" : "Add to cart"}
+              {offering.scheduleBound ? "Select Schedule" : "Add to Cart"}
             </Button>
           </Stack>
         </Box>

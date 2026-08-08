@@ -151,9 +151,29 @@ export function ForumLayout() {
           <GlobalCartButton />
           {user ? (
             <>
-              <Typography variant="caption" sx={{ display: { xs: "none", sm: "block" }, color: "rgba(255,255,255,0.65)" }}>
+              <Button
+                component={RouterLink}
+                to="/account"
+                size="small"
+                sx={{
+                  ...navButtonSx,
+                  display: { xs: "none", sm: "inline-flex" },
+                  color: "rgba(255,255,255,0.9)",
+                  textTransform: "none",
+                  letterSpacing: "0.02em",
+                  fontSize: "0.8rem",
+                }}
+              >
                 {userDisplayLabel(user)}
-              </Typography>
+              </Button>
+              <Button
+                component={RouterLink}
+                to="/account"
+                size="small"
+                sx={{ ...navButtonSx, display: { xs: "none", md: "inline-flex" } }}
+              >
+                My orders
+              </Button>
               <Button size="small" onClick={() => void logout()} sx={{ color: "#fff", minWidth: { xs: 0 }, px: { xs: 1, sm: 1.5 } }}>
                 Log out
               </Button>
@@ -227,6 +247,34 @@ export function ForumLayout() {
               </ListItemButton>
             );
           })}
+          {user ? (
+            <ListItemButton
+              component={RouterLink}
+              to="/account"
+              selected={pathname === "/account" || pathname.startsWith("/account/")}
+              onClick={closeMobileNav}
+              sx={{
+                mx: 1,
+                borderRadius: 1,
+                color: "rgba(255,255,255,0.85)",
+                "&.Mui-selected": {
+                  bgcolor: "rgba(255,255,255,0.1)",
+                  color: "#fff",
+                  "&:hover": { bgcolor: "rgba(255,255,255,0.14)" },
+                },
+                "&:hover": { bgcolor: "rgba(255,255,255,0.06)" },
+              }}
+            >
+              <ListItemText
+                primary="My orders"
+                secondary={userDisplayLabel(user)}
+                slotProps={{
+                  primary: { sx: { fontSize: "0.95rem", letterSpacing: "0.04em" } },
+                  secondary: { sx: { color: "rgba(255,255,255,0.45)", fontSize: "0.75rem" } },
+                }}
+              />
+            </ListItemButton>
+          ) : null}
         </List>
       </Drawer>
 
@@ -235,7 +283,13 @@ export function ForumLayout() {
         sx={{
           flex: 1,
           p: fullBleed ? 0 : { xs: 2, sm: 3 },
-          maxWidth: fullBleed ? "none" : wideLayout ? 1100 : 800,
+          maxWidth: fullBleed
+            ? "none"
+            : pathname.startsWith("/testimonials")
+              ? 1280
+              : wideLayout
+                ? 1100
+                : 800,
           mx: "auto",
           width: "100%",
           boxSizing: "border-box",

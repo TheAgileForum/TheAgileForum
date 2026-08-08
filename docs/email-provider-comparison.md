@@ -11,7 +11,7 @@ Research snapshot (July 2026). No secrets. Use this to choose transactional emai
 | **Ops enrollment alert** | Same | `OPS_ENROLLMENT_ALERT_EMAIL` | Implemented |
 | **Ops Telegram alert** | Same | Telegram chat | Implemented (parallel channel, not email) |
 
-`LiveEmailAdapter` sends via [Resend](https://resend.com) when `RESEND_API_KEY` and `EMAIL_FROM` are set; otherwise it stubs (no delivery). See **`docs/resend-setup.md`** for DNS, Render env, and staging verification steps.
+`LiveEmailAdapter` supports dual providers: [Resend](https://resend.com) (`EMAIL_PROVIDER=resend` / `RESEND_API_KEY`) or [Sender.net](https://www.sender.net/) (`EMAIL_PROVIDER=sender` / `SENDER_API_TOKEN`). Auto-select prefers Resend when its key is set, else Sender, else stub. See **`docs/resend-setup.md`** and **`docs/sender-setup.md`**.
 
 ## Planned (PRD / architecture)
 
@@ -93,7 +93,7 @@ For **early staging smoke tests** only (tens of emails). For **production transa
 
 **Next implementation step:** Bounce/complaint webhooks; marketing subdomain when campaigns launch.
 
-**Implemented:** `LiveEmailAdapter` + Resend (`RESEND_API_KEY`, `EMAIL_FROM`) — see `docs/resend-setup.md`.
+**Implemented:** `LiveEmailAdapter` + Resend (`RESEND_API_KEY`, `EMAIL_FROM`) and Sender.net (`SENDER_API_TOKEN`, `EMAIL_PROVIDER=sender`) — see `docs/resend-setup.md` and `docs/sender-setup.md`.
 
 ---
 

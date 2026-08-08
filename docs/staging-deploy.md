@@ -72,6 +72,8 @@ curl https://api.staging.theagileforum.com/api/v1/health
 cd server && npm run staging:preflight   # with staging env vars set
 ```
 
+**Email (Render):** set `EMAIL_FROM=DhirenderVerma@theagileforum.com`. For Resend: verify domain and set `RESEND_API_KEY` (`docs/resend-setup.md`). For Sender.net: set `EMAIL_PROVIDER=sender` + `SENDER_API_TOKEN` (`docs/sender-setup.md`). Optional Mock Interview prep links: `MOCK_INTERVIEW_RESOURCES_FOLDER_URL` / `MOCK_INTERVIEW_RESOURCE_*_URL`.
+
 ---
 
 ## 4. Client build (staging SPA host)
@@ -171,6 +173,23 @@ LIMIT 10;
 | `spa-direct-api-bundle` note | Informational — redeploy client so `api-base.ts` maps app.staging → api.staging |
 | Catalog timeout / 0 results | Render cold start — retry; see `npm run staging:verify`; confirm CORS allows app origin for direct API |
 | Mixed content | Use `https` for both `APP_PUBLIC_URL` and `API_PUBLIC_URL` in staging |
+
+---
+
+## 9. Diagnosis AI (OpenRouter)
+
+Diagnosis analysis defaults to **stub** mode (`AI_PROVIDER_MODE=stub`) — deterministic recommendations without calling OpenRouter.
+
+To enable live AI on staging (env only; never commit secrets):
+
+1. Set `OPENROUTER_API_KEY` in the staging API secret store (Render dashboard).
+2. Set `OPENROUTER_MODEL` to a working free slug (recommended: `google/gemma-4-26b-a4b-it:free`). Do **not** use `meta-llama/llama-3.3-70b-instruct:free` — OpenRouter returns HTTP 404 ("unavailable for free"), which triggers soft stub fallback.
+3. Set `AI_PROVIDER_MODE=live`.
+4. Redeploy the API (env changes on Render do not apply until the next deploy/restart).
+
+If OpenRouter is down or returns an error while mode is `live`, the API falls back to the stub recommendation, logs `diagnosis.analysis.stub_fallback` (reason + model + status), sets `usedStubFallback: true` (and `fallbackReason`) on the results payload, and the results UI shows a soft note. Hard spend caps are not enforced in Phase 1.
+
+Resume uploads store PDF/DOCX bytes on the API host (`uploads/resumes/`) and extract text for analysis via the shared document extractor (`server/src/diagnosis/text-extract/`). Formats: PDF (pdf-parse/PDF.js with fallback), DOCX (mammoth), legacy DOC (word-extractor), plus HTML/TXT/MD on `POST /api/v1/diagnosis/extract-text` (session-optional preview). Diagnosis resume upload persists `extractedText` on `ResumeAsset` and returns `extractedTextChars` / `extractionWarning`. Virus scanning remains a deferred stub hook.
 
 ---
 

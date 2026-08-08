@@ -1,9 +1,11 @@
 import type { InstallmentProvider, PaymentMode } from "./forum-api";
 
 export const INDIA_FULL_PAY_MESSAGE =
-  "All payment Option Available - Credit Card, Debit Card, Installments(EMI), UPI, Netbanking, Wallets Etc.";
+  "All payment Option Available On Checkout - Credit Card, Debit Card, Installments(EMI), UPI, Netbanking, Wallets Etc.";
 
-export const INSTALLMENT_MODE_LABEL = "Pay in 3/6/12 Monthly installments";
+export const FULL_PAYMENT_MODE_LABEL = "Full Payment";
+
+export const INSTALLMENT_MODE_LABEL = "Pay in Installments - 3/6/12 Months";
 
 export function isIndiaCheckoutContext(geo: string, currency: string): boolean {
   return geo === "IN" || currency === "INR";
@@ -33,7 +35,7 @@ export function getFullPayModeLabel(
   currency: string,
 ): string {
   if (fullPayProvider === "razorpay" && isIndiaCheckoutContext(geo, currency)) {
-    return INDIA_FULL_PAY_MESSAGE;
+    return FULL_PAYMENT_MODE_LABEL;
   }
   if (fullPayProvider === "razorpay") {
     return "Pay in full (Razorpay / UPI)";

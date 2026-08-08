@@ -61,7 +61,7 @@ This document translates `prd-agile-forum.md` into implementable MVP epics and s
 
 | Epic    | FR Coverage (primary)                                     |
 | ------- | --------------------------------------------------------- |
-| Epic 1  | FR-1..3, FR-151                                           |
+| Epic 1  | FR-1..3, FR-151, FR-189..195                              |
 | Epic 2  | FR-4..7, FR-61..64, FR-158..160                           |
 | Epic 3  | FR-8..11, FR-131, FR-132                                  |
 | Epic 4  | FR-12..16, FR-85..87, FR-157                              |
@@ -70,7 +70,7 @@ This document translates `prd-agile-forum.md` into implementable MVP epics and s
 | Epic 7  | FR-30..34, FR-79..84, FR-49..51                           |
 | Epic 8  | FR-17..19, FR-23..29, FR-35..41, FR-121..125, FR-144..146 |
 | Epic 9  | FR-52..60, FR-133..135, FR-147..150, FR-154..156          |
-| Epic 10 | FR-65..78, FR-92..95                                      |
+| Epic 10 | FR-65..78, FR-92..95, FR-183..188                          |
 | Epic 11 | FR-96..107                                                |
 | Epic 12 | FR-42..45, FR-46..48, NFR clusters                        |
 
@@ -129,6 +129,21 @@ As a non-logged-in visitor, I want to be prompted to sign in before checkout so 
 
 - Given a guest at checkout, when they proceed, then login/signup gate appears.
 - Given successful auth, when checkout resumes, then cart context is preserved.
+
+### Story 1.4: Learner Career Profile Editor (Later Sprint)
+
+As a learner, I want to edit my profile — including target roles, certifications/trainings I already have (including from LinkedIn), and what I want next with how soon — so recommendations and campaigns match my real goals.
+
+**Requirement elaboration:** `_bmad-output/planning-artifacts/learner-profile-career-preferences-requirement.md`  
+**FRs:** FR-189 .. FR-195  
+**Sprint:** Sprint 2+/3 (after auth + diagnosis persistence; does not block Sprint 1 commerce)
+
+**Acceptance Criteria**
+
+- Given an authenticated learner, when opening Profile, then they can update durable profile fields and save successfully.
+- Given approved role options, when selecting multiple target roles, then selections persist and can default new diagnosis sessions.
+- Given LinkedIn connection with available credential scopes, when importing, then proposed completed trainings/certs are shown for confirm/edit before save; manual add/edit/remove always works.
+- Given future learning goals, when saved with urgency/how soon, then wishlist persists and is available to personalization/campaign consumers under owner-only API access.
 
 ---
 
@@ -540,6 +555,22 @@ As an AI operator, I want versioned prompt/policy management and safe experiment
 - Given prompt/policy changes, when submitted, then versioning + review workflow applies.
 - Given experiment rollout, when enabled, then flags and rollback controls are available.
 
+### Story 10.5: Unified Commercial Ops Dashboard (Later Sprint)
+
+As an ops/super-admin, I want one admin-login dashboard for customers, orders, resume/diagnosis artifacts, and sales analytics so I can support learners and track what sold without leaving the app.
+
+**Requirement elaboration:** `_bmad-output/planning-artifacts/admin-full-dashboard-requirement.md`  
+**FRs:** FR-183 .. FR-188  
+**Sprint:** Sprint 3+ (after commerce + diagnosis stability; does not block Sprint 1–2)
+
+**Acceptance Criteria**
+
+- Given admin login, when opening the ops dashboard, then KPI tiles and navigable modules for Customers, Orders, Resumes/Diagnosis, Sales, and Funnel are available.
+- Given customers/orders lists, when filtering/searching, then results paginate and open detail views with linked commerce and diagnosis context.
+- Given resume assets, when opened by admin, then parse status, secure link, and available scores are visible; learner tokens cannot access these APIs.
+- Given paid orders, when viewing sales analytics, then trainings, certifications, and services sold are broken down by SKU/category for the selected range.
+- Given PII-bearing detail views, when accessed, then access is audited.
+
 ---
 
 ## Epic 11: Search Growth Platform (SEO + GEO)
@@ -639,6 +670,9 @@ As an engineering team, we need reusable auth middleware and guards so that feat
 - T1.4 Add consent capture + audit columns to user/auth tables.
 - T1.5 Add route guards for checkout-auth requirement.
 - T1.6 Add integration tests for auth happy path and failure states.
+- T1.7 Build learner career profile data model + APIs (profile, target roles, credentials, learning goals/urgency) — Story 1.4 / FR-189..195.
+- T1.8 Implement LinkedIn credential import preview + confirm flow with provenance and consent copy.
+- T1.9 Build Profile SPA editor (roles, have/want credentials, urgency) wired to T1.7–T1.8.
 
 ## Epic 2 Technical Layer (Diagnosis and Transition Planner)
 
@@ -814,6 +848,8 @@ As ops teams, we need triage queues and decision tooling for interventions/appro
 - T10.4 Build intervention queue (at-risk users, escalations).
 - T10.5 Build audit trail storage/query API.
 - T10.6 Build role-based admin permissions model and tests.
+- T10.9 Build commercial ops dashboard APIs (customers, orders, resumes/diagnosis, sales, funnel) — Story 10.5 / FR-183..188.
+- T10.10 Build ops SPA modules (tables + detail drawers) wired to T10.9 with admin RBAC gates.
 
 ## Epic 11 Technical Layer (Search Growth Platform)
 

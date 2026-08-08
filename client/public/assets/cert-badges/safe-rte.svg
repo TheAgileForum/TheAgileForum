@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640" role="img" aria-label="SAFe Release Train Engineer RTE">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="50%" stop-color="#312e81"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="640" rx="48" fill="url(#bg)"/>
+  <circle cx="320" cy="240" r="118" fill="none" stroke="#e0e7ff" stroke-width="10" opacity="0.95"/>
+  <circle cx="320" cy="240" r="88" fill="none" stroke="#a5b4fc" stroke-width="4" opacity="0.75"/>
+  <text x="320" y="258" text-anchor="middle" fill="#f8fafc" font-family="Georgia, 'Times New Roman', serif" font-size="78" font-weight="700">RTE</text>
+  <text x="320" y="390" text-anchor="middle" fill="#eef2ff" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="26" font-weight="600" letter-spacing="1">Release Train Engineer</text>
+  <text x="320" y="438" text-anchor="middle" fill="#c7d2fe" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="20" letter-spacing="3">AI-EMPOWERED SAFe®</text>
+  <text x="320" y="520" text-anchor="middle" fill="#a5f3fc" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18">The Agile Forum</text>
+</svg>

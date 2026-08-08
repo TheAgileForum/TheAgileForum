@@ -5,7 +5,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { ApiRequestError } from "../../lib/api";
+import { ApiRequestError, wakeApi } from "../../lib/api";
 import {
   confirmRazorpayCheckout,
   getRazorpayCheckoutConfig,
@@ -65,6 +65,16 @@ function loadRazorpayScript(): Promise<void> {
   });
 }
 
+function paymentConfirmErrorMessage(err: unknown): string {
+  if (err instanceof ApiRequestError) {
+    if (err.code === "REQUEST_TIMEOUT" || err.code === "NETWORK_ERROR") {
+      return "Payment succeeded at Razorpay, but confirming your order is taking longer than usual. Please wait a moment or contact support with your order details.";
+    }
+    return err.message;
+  }
+  return "Payment confirmation failed. If you were charged, contact support with your order details.";
+}
+
 export function ForumRazorpayCheckoutPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -85,6 +95,7 @@ export function ForumRazorpayCheckoutPage() {
 
     void (async () => {
       try {
+        void wakeApi();
         let checkout = state?.razorpayCheckout;
         if (!checkout || checkout.mode !== "live") {
           const fetched = await getRazorpayCheckoutConfig(orderId);
@@ -115,30 +126,54 @@ export function ForumRazorpayCheckoutPage() {
             void (async () => {
               setBusy(true);
               setError(null);
+              const confirmInput = {
+                orderId,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature,
+                paymentMode,
+              };
+              const successState = {
+                orderNumber: state?.orderNumber,
+                orderId,
+                variant: state?.variant ?? "standard",
+                paymentMode,
+                installmentProvider:
+                  paymentMode === "installment" ? ("razorpay_emi" as const) : null,
+                paymentProvider: "razorpay" as const,
+                razorpayConfirm: confirmInput,
+              };
               try {
-                const done = await confirmRazorpayCheckout({
-                  orderId,
-                  razorpayOrderId: response.razorpay_order_id,
-                  razorpayPaymentId: response.razorpay_payment_id,
-                  razorpaySignature: response.razorpay_signature,
-                  paymentMode,
-                });
+                void wakeApi();
+                const done = await confirmRazorpayCheckout(confirmInput);
                 navigate("/checkout/success", {
                   replace: true,
                   state: {
+                    ...successState,
                     orderNumber: done.order.orderNumber,
                     orderId: done.order.id,
-                    variant: state?.variant ?? "standard",
-                    paymentMode,
-                    installmentProvider:
-                      paymentMode === "installment" ? ("razorpay_emi" as const) : null,
-                    paymentProvider: "razorpay",
+                    razorpayConfirm: undefined,
                   },
                 });
               } catch (err) {
-                setError(
-                  err instanceof ApiRequestError ? err.message : "Payment confirmation failed.",
-                );
+                // Gateway already charged — never strand the user on this page with
+                // catalog-branded timeouts. Hand off to success to retry confirm.
+                const retryable =
+                  err instanceof ApiRequestError &&
+                  (err.retryable ||
+                    err.code === "REQUEST_TIMEOUT" ||
+                    err.code === "NETWORK_ERROR");
+                if (retryable) {
+                  navigate("/checkout/success", {
+                    replace: true,
+                    state: {
+                      ...successState,
+                      confirmPending: true,
+                    },
+                  });
+                  return;
+                }
+                setError(paymentConfirmErrorMessage(err));
                 setBusy(false);
               }
             })();
@@ -158,7 +193,17 @@ export function ForumRazorpayCheckoutPage() {
         });
         rzp.open();
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Could not start Razorpay checkout.");
+        if (err instanceof ApiRequestError) {
+          if (err.code === "REQUEST_TIMEOUT" || err.code === "NETWORK_ERROR") {
+            setError(
+              "Checkout is taking longer than usual. Please try again in a moment.",
+            );
+          } else {
+            setError(err.message);
+          }
+        } else {
+          setError(err instanceof Error ? err.message : "Could not start Razorpay checkout.");
+        }
       } finally {
         setLoading(false);
       }
@@ -186,7 +231,7 @@ export function ForumRazorpayCheckoutPage() {
       </Typography>
       <Typography color="text.secondary">
         Complete payment in the Razorpay window. Sandbox test cards and EMI options are available
-        when your Razorpay test account has EMI enabled (FR-170).
+        when your Razorpay test account has EMI enabled.
       </Typography>
       {loading || busy ? <LinearProgress /> : null}
       {error ? <Alert severity="error">{error}</Alert> : null}

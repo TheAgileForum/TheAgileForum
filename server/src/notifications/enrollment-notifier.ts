@@ -3,6 +3,11 @@ import { createIntegrationAdapters } from "../integrations/factory.js";
 import { logInfo } from "../runtime/logger.js";
 import { publishEvent } from "../events/publisher.js";
 import type { EnrollmentLine } from "../services/order-notification-service.js";
+import {
+  buildMockInterviewWelcomeHtml,
+  MOCK_INTERVIEW_WELCOME_SUBJECT,
+  orderIncludesMockInterview,
+} from "./mock-interview-welcome-email.js";
 
 const DEFAULT_OPS_ALERT_EMAIL = "ops@demo.local";
 
@@ -11,6 +16,10 @@ export type EnrollmentDeliveryResult = {
   opsEmailMessageId: string | null;
   opsTelegramDeliveryId: string | null;
 };
+
+function buildGenericLearnerHtml(orderNumber: string, itemSummary: string): string {
+  return `<p>Thank you for your enrollment.</p><p>Order <strong>${orderNumber}</strong></p><p>${itemSummary}</p>`;
+}
 
 export async function deliverEnrollmentNotifications(input: {
   orderId: string;
@@ -21,19 +30,32 @@ export async function deliverEnrollmentNotifications(input: {
   const adapters = createIntegrationAdapters();
   const user = await prisma.user.findUnique({
     where: { id: input.userId },
-    select: { email: true },
+    select: { email: true, displayName: true },
   });
 
   const itemSummary = input.items
     .map((i) => `${i.title} (${i.quantity} × ${i.currency} ${i.unitPrice})`)
     .join("; ");
 
+  const mockInterview = orderIncludesMockInterview(input.items);
+
   let learnerEmailMessageId: string | null = null;
   if (user?.email) {
+    const subject = mockInterview
+      ? MOCK_INTERVIEW_WELCOME_SUBJECT
+      : `Enrollment confirmed — ${input.orderNumber}`;
+    const html = mockInterview
+      ? buildMockInterviewWelcomeHtml({
+          displayName: user.displayName,
+          orderNumber: input.orderNumber,
+          itemSummary,
+        })
+      : buildGenericLearnerHtml(input.orderNumber, itemSummary);
+
     const sent = await adapters.email.sendTransactional({
       to: user.email,
-      subject: `Enrollment confirmed — ${input.orderNumber}`,
-      html: `<p>Thank you for your enrollment.</p><p>Order <strong>${input.orderNumber}</strong></p><p>${itemSummary}</p>`,
+      subject,
+      html,
     });
     learnerEmailMessageId = sent.messageId;
   }
@@ -60,6 +82,7 @@ export async function deliverEnrollmentNotifications(input: {
     event: "enrollment_delivered",
     orderId: input.orderId,
     orderNumber: input.orderNumber,
+    mockInterviewWelcome: mockInterview,
     learnerEmailMessageId,
     opsEmailMessageId: opsSent.messageId,
     opsTelegramDeliveryId,
@@ -73,6 +96,7 @@ export async function deliverEnrollmentNotifications(input: {
       orderId: input.orderId,
       orderNumber: input.orderNumber,
       userId: input.userId,
+      mockInterviewWelcome: mockInterview,
       learnerEmailMessageId,
       opsEmailMessageId: opsSent.messageId,
       opsTelegramDeliveryId,
