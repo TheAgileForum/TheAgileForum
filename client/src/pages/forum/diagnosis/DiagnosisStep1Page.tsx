@@ -15,14 +15,25 @@ import { ApiRequestError, wakeApi } from "../../../lib/api";
 import {
   DEFAULT_DIAGNOSIS_TARGET_ROLE,
   DIAGNOSIS_TARGET_ROLES,
+  isDiagnosisTargetRole,
   type DiagnosisTargetRole,
 } from "../../../lib/diagnosis-target-roles";
-import { saveDiagnosisIntent } from "../../../lib/forum-api";
+import {
+  getStoredDiagnosisTargetRole,
+  saveDiagnosisIntent,
+  storeDiagnosisPersonalization,
+} from "../../../lib/forum-api";
+
+function initialTargetRole(): DiagnosisTargetRole {
+  const stored = getStoredDiagnosisTargetRole();
+  if (stored && isDiagnosisTargetRole(stored)) return stored;
+  return DEFAULT_DIAGNOSIS_TARGET_ROLE;
+}
 
 export function DiagnosisStep1Page() {
   const navigate = useNavigate();
   const { sessionId, sessionStarting, startSession, prefetchSession } = useDiagnosis();
-  const [targetRole, setTargetRole] = useState<DiagnosisTargetRole>(DEFAULT_DIAGNOSIS_TARGET_ROLE);
+  const [targetRole, setTargetRole] = useState<DiagnosisTargetRole>(initialTargetRole);
   const [timeline, setTimeline] = useState("3 months");
   const [currentStatus, setCurrentStatus] = useState("");
   const [consent, setConsent] = useState(false);
@@ -55,6 +66,7 @@ export function DiagnosisStep1Page() {
         consentAck: true,
         policyVersion: "diagnosis-v1",
       });
+      storeDiagnosisPersonalization(targetRole, []);
       navigate("/diagnosis/step-2");
     } catch (err: unknown) {
       setError(err instanceof ApiRequestError ? err.message : "Could not save intent.");
